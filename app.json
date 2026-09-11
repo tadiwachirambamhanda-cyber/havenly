@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Havenly",
+    "slug": "havenly",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": { "backgroundColor": "#FBF5EA" },
+    "ios": { "supportsTablet": false, "bundleIdentifier": "com.havenly.app" },
+    "android": { "package": "com.havenly.app" },
+    "extra": {
+      "supabaseUrl": "SUPABASE_URL_HERE",
+      "supabaseAnonKey": "SUPABASE_ANON_KEY_HERE"
+    }
+  }
+}

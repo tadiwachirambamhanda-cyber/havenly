@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Havenly — Dubai Lifestyle Community</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,500;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --sand:#FBF5EA;
+    --sand-deep:#F2E8D8;
+    --ink:#20261F;
+    --ink-soft:#5B6459;
+    --coral:#FF5A3C;
+    --coral-soft:#FFE4DB;
+    --teal:#0F8B82;
+    --teal-soft:#DCF2EF;
+    --gold:#E3A23A;
+    --white:#FFFFFF;
+    --line:#E7DDC9;
+    --radius-lg:26px;
+    --radius-md:16px;
+    --radius-sm:10px;
+    --font-display:'Fraunces', serif;
+    --font-body:'Plus Jakarta Sans', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:var(--font-body);
+    background:linear-gradient(180deg,#EDE3D0 0%, #DCD0B8 100%);
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:40px 20px;
+    color:var(--ink);
+  }
+
+  /* ---- Phone frame ---- */
+  .phone{
+    width:390px;
+    max-width:100%;
+    height:844px;
+    background:var(--sand);
+    border-radius:44px;
+    border:10px solid #1A1D17;
+    box-shadow:0 40px 80px -20px rgba(0,0,0,0.45), 0 0 0 1px rgba(0,0,0,0.1);
+    overflow:hidden;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  .notch{
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:120px; height:26px; background:#1A1D17; border-radius:0 0 16px 16px; z-index:50;
+  }
+  .screens{ flex:1; position:relative; overflow:hidden; }
+  .screen{
+    position:absolute; inset:0; overflow-y:auto; opacity:0; pointer-events:none;
+    transition:opacity .25s ease; padding-bottom:90px;
+    -ms-overflow-style:none; scrollbar-width:none;
+  }
+  .screen::-webkit-scrollbar{display:none;}
+  .screen.active{ opacity:1; pointer-events:auto; }
+
+  /* ---- Skyline signature motif ---- */
+  .skyline-strip{
+    width:100%; height:22px; display:block;
+  }
+
+  /* ---- Bottom nav ---- */
+  .navbar{
+    position:absolute; bottom:0; left:0; right:0; height:82px;
+    background:var(--ink); z-index:40;
+    display:flex; align-items:flex-start; justify-content:space-around;
+    padding-top:14px;
+    clip-path: polygon(0 22px, 6% 0, 12% 22px, 20% 0, 28% 22px, 36% 0, 44% 22px, 50% 4px, 56% 22px, 64% 0, 72% 22px, 80% 0, 88% 22px, 94% 0, 100% 22px, 100% 100%, 0 100%);
+  }
+  .nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    color:#B9BDB2; font-size:10px; font-weight:600; letter-spacing:.02em;
+    cursor:pointer; background:none; border:none; font-family:var(--font-body);
+  }
+  .nav-item.active{ color:var(--coral); }
+  .nav-icon{ width:22px; height:22px; }
+  .nav-item.center{
+    background:var(--coral); width:46px; height:46px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; margin-top:-8px;
+    box-shadow:0 6px 16px rgba(255,90,60,.5);
+  }
+  .nav-item.center svg{ width:22px; height:22px; }
+
+  /* ================= ONBOARDING ================= */
+  #onboarding{ background:linear-gradient(180deg, #2A2118 0%, #4A3423 55%, #B9784A 100%); color:var(--sand); padding:0; }
+  .ob-hero{ padding:60px 28px 20px; position:relative; }
+  .ob-eyebrow{ font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#F0C79A; }
+  .ob-title{ font-family:var(--font-display); font-weight:600; font-size:44px; line-height:1.02; margin-top:14px; }
+  .ob-title em{ font-style:italic; color:var(--coral); font-weight:500;}
+  .ob-sub{ margin-top:14px; font-size:14.5px; line-height:1.5; color:#E7D9C8; max-width:280px; }
+  .dune-svg{ width:100%; display:block; margin-top:20px; }
+  .ob-panel{
+    background:var(--sand); border-radius:32px 32px 0 0; margin-top:-6px;
+    padding:28px 24px 24px; color:var(--ink);
+  }
+  .ob-step-label{ font-family:var(--font-mono); font-size:11px; color:var(--ink-soft); letter-spacing:.08em; text-transform:uppercase;}
+  .ob-question{ font-family:var(--font-display); font-size:22px; font-weight:600; margin:8px 0 16px; }
+  .chip-grid{ display:flex; flex-wrap:wrap; gap:9px; margin-bottom:20px;}
+  .chip{
+    padding:10px 16px; border-radius:100px; border:1.5px solid var(--line);
+    background:var(--white); font-size:13.5px; font-weight:600; cursor:pointer;
+    transition:all .15s ease; user-select:none;
+  }
+  .chip.selected{ background:var(--ink); color:var(--sand); border-color:var(--ink); }
+  .btn-primary{
+    width:100%; padding:16px; background:var(--coral); color:white; border:none;
+    border-radius:100px; font-family:var(--font-body); font-weight:700; font-size:15px;
+    cursor:pointer; letter-spacing:.01em; box-shadow:0 10px 24px -8px rgba(255,90,60,.6);
+  }
+  .btn-primary:active{ transform:scale(.98); }
+  .ob-skip{ text-align:center; margin-top:12px; font-size:12.5px; color:var(--ink-soft); font-weight:600; cursor:pointer;}
+
+  /* ================= FEED ================= */
+  #feed{ background:var(--sand); }
+  .top-bar{
+    padding:18px 20px 12px; display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; background:var(--sand); z-index:10;
+  }
+  .brand{ font-family:var(--font-display); font-weight:700; font-style:italic; font-size:24px; color:var(--ink); display:flex; align-items:center; gap:6px;}
+  .brand-dot{ width:8px; height:8px; background:var(--coral); border-radius:50%; }
+  .icon-btn{ width:36px; height:36px; border-radius:50%; background:var(--white); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; cursor:pointer;}
+  .tabs-row{ display:flex; gap:8px; padding:4px 20px 14px; overflow-x:auto; }
+  .tab-pill{ font-size:12.5px; font-weight:700; padding:7px 14px; border-radius:100px; white-space:nowrap; cursor:pointer; font-family:var(--font-body);}
+  .tab-pill.on{ background:var(--ink); color:var(--sand); }
+  .tab-pill.off{ background:transparent; color:var(--ink-soft); border:1px solid var(--line); }
+  .masonry{ column-count:2; column-gap:10px; padding:0 20px; }
+  .card{
+    break-inside:avoid; margin-bottom:12px; border-radius:var(--radius-md); overflow:hidden;
+    background:var(--white); border:1px solid var(--line); cursor:pointer;
+  }
+  .card-img{ width:100%; display:block; position:relative; }
+  .card-body{ padding:10px 11px 12px; }
+  .card-tag{ font-family:var(--font-mono); font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--teal); font-weight:600;}
+  .card.editorial{ border:1.5px solid var(--gold); }
+  .editorial-badge{
+    position:absolute; top:8px; left:8px; background:var(--ink); color:var(--gold);
+    font-family:var(--font-mono); font-size:8.5px; font-weight:700; letter-spacing:.05em;
+    padding:4px 8px; border-radius:100px; text-transform:uppercase; display:flex; align-items:center; gap:3px;
+  }
+  .card-img{ position:relative; }
+  .card-title{ font-size:13.5px; font-weight:700; line-height:1.3; margin-top:5px; }
+  .card-meta{ display:flex; align-items:center; gap:6px; margin-top:9px; }
+  .avatar{ width:18px; height:18px; border-radius:50%; flex-shrink:0; }
+  .card-user{ font-size:11px; color:var(--ink-soft); font-weight:600; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .card-likes{ font-size:11px; color:var(--ink-soft); display:flex; align-items:center; gap:3px; font-weight:600;}
+
+  /* ================= DISCOVER ================= */
+  #discover{ background:var(--sand); }
+  .disc-header{ padding:20px 20px 14px; }
+  .disc-title{ font-family:var(--font-display); font-size:26px; font-weight:600; }
+  .search-bar{
+    margin:14px 20px; padding:12px 16px; background:var(--white); border:1.5px solid var(--line);
+    border-radius:100px; display:flex; align-items:center; gap:10px; font-size:13px; color:var(--ink-soft);
+  }
+  .spot-scroll{ display:flex; gap:12px; overflow-x:auto; padding:0 20px 4px; }
+  .spot-card{ min-width:150px; border-radius:var(--radius-md); overflow:hidden; background:var(--white); border:1px solid var(--line); }
+  .spot-img{ height:100px; width:100%; }
+  .spot-info{ padding:9px 11px 11px; }
+  .spot-name{ font-size:12.5px; font-weight:700; }
+  .spot-sub{ font-size:10.5px; color:var(--ink-soft); margin-top:2px; }
+  .section-label{ font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); padding:20px 20px 10px; font-weight:600;}
+  .event-row{ margin:0 20px 10px; background:var(--white); border:1px solid var(--line); border-radius:var(--radius-md); padding:12px; display:flex; gap:12px; align-items:center; }
+  .event-date{ width:46px; height:46px; border-radius:10px; background:var(--teal-soft); color:var(--teal); display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;}
+  .event-date .d{ font-size:15px; line-height:1;}
+  .event-date .m{ font-size:8.5px; text-transform:uppercase; letter-spacing:.04em;}
+  .event-name{ font-size:12.5px; font-weight:700; }
+  .event-loc{ font-size:10.5px; color:var(--ink-soft); margin-top:2px;}
+
+  /* ================= POST DETAIL ================= */
+  #detail{ background:var(--sand); }
+  .detail-hero{ width:100%; height:340px; position:relative; }
+  .detail-back{
+    position:absolute; top:16px; left:16px; width:34px; height:34px; border-radius:50%;
+    background:rgba(255,255,255,.9); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:5;
+  }
+  .detail-body{ padding:18px 20px 20px; }
+  .detail-tag{ font-family:var(--font-mono); font-size:10.5px; color:var(--teal); text-transform:uppercase; letter-spacing:.06em; font-weight:700;}
+  .detail-title{ font-family:var(--font-display); font-size:22px; font-weight:600; margin-top:8px; line-height:1.25;}
+  .detail-user-row{ display:flex; align-items:center; gap:8px; margin:14px 0; }
+  .detail-avatar{ width:32px; height:32px; border-radius:50%; }
+  .detail-username{ font-size:13px; font-weight:700; }
+  .detail-loc{ font-size:11px; color:var(--ink-soft); }
+  .follow-btn{ margin-left:auto; padding:7px 16px; border-radius:100px; background:var(--ink); color:var(--sand); font-size:11.5px; font-weight:700; border:none; cursor:pointer;}
+  .detail-text{ font-size:13.5px; line-height:1.65; color:#3A4038; }
+  .action-bar{ display:flex; gap:18px; margin-top:20px; padding-top:16px; border-top:1px solid var(--line); }
+  .action-item{ display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+
+  /* ================= PROFILE ================= */
+  #profile{ background:var(--sand); }
+  .profile-cover{ height:110px; background:linear-gradient(120deg,#FF7A5C,#E3A23A 60%,#0F8B82); position:relative; }
+  .profile-avatar-wrap{ padding:0 20px; margin-top:-38px; display:flex; align-items:flex-end; justify-content:space-between; }
+  .profile-avatar{ width:76px; height:76px; border-radius:50%; border:4px solid var(--sand); }
+  .edit-profile{ padding:8px 16px; border-radius:100px; border:1.5px solid var(--line); background:var(--white); font-size:12px; font-weight:700; cursor:pointer; margin-bottom:6px;}
+  .profile-name{ font-family:var(--font-display); font-size:20px; font-weight:600; padding:12px 20px 2px; }
+  .profile-handle{ font-size:12.5px; color:var(--ink-soft); padding:0 20px; font-family:var(--font-mono);}
+  .profile-bio{ font-size:13px; color:#3A4038; padding:10px 20px 0; line-height:1.5;}
+  .stats-row{ display:flex; gap:22px; padding:16px 20px 6px; }
+  .stat{ text-align:left; }
+  .stat-num{ font-size:16px; font-weight:800; }
+  .stat-label{ font-size:10.5px; color:var(--ink-soft); font-weight:600;}
+  .interest-row{ display:flex; flex-wrap:wrap; gap:7px; padding:14px 20px; }
+  .interest-chip{ padding:6px 12px; border-radius:100px; background:var(--coral-soft); color:var(--coral); font-size:11px; font-weight:700;}
+  .profile-grid-tabs{ display:flex; border-top:1px solid var(--line); border-bottom:1px solid var(--line); margin-top:6px;}
+  .pg-tab{ flex:1; text-align:center; padding:11px; font-size:12px; font-weight:700; color:var(--ink-soft); cursor:pointer;}
+  .pg-tab.active{ color:var(--ink); border-bottom:2px solid var(--coral); margin-bottom:-1px;}
+  .profile-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:2px; padding:2px 0;}
+  .pg-img{ width:100%; aspect-ratio:1/1.15; display:block;}
+
+  /* ================= INBOX ================= */
+  #inbox{ background:var(--sand); }
+  .inbox-title{ font-family:var(--font-display); font-size:26px; font-weight:600; padding:20px 20px 4px; }
+  .inbox-search{ margin:12px 20px 6px; padding:11px 16px; background:var(--white); border:1.5px solid var(--line); border-radius:100px; font-size:13px; color:var(--ink-soft); }
+  .thread-row{ display:flex; align-items:center; gap:12px; padding:12px 20px; cursor:pointer; }
+  .thread-row:active{ background:var(--sand-deep); }
+  .thread-avatar{ width:50px; height:50px; border-radius:50%; flex-shrink:0; position:relative; }
+  .unread-dot{ position:absolute; top:-2px; right:-2px; width:12px; height:12px; background:var(--coral); border-radius:50%; border:2px solid var(--sand); }
+  .thread-mid{ flex:1; min-width:0; }
+  .thread-name{ font-size:13.5px; font-weight:700; }
+  .thread-preview{ font-size:12px; color:var(--ink-soft); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:210px; }
+  .thread-preview.unread{ color:var(--ink); font-weight:600; }
+  .thread-time{ font-size:10.5px; color:var(--ink-soft); flex-shrink:0; }
+
+  /* ================= CHAT THREAD ================= */
+  #chat{ background:var(--sand); display:flex; flex-direction:column; padding-bottom:0; }
+  .chat-header{ display:flex; align-items:center; gap:10px; padding:16px 16px 12px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--sand); z-index:5; }
+  .chat-back{ width:32px; height:32px; border-radius:50%; background:var(--white); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+  .chat-header-avatar{ width:34px; height:34px; border-radius:50%; }
+  .chat-header-name{ font-size:13.5px; font-weight:700; }
+  .chat-header-sub{ font-size:10.5px; color:var(--teal); font-weight:600; }
+  .chat-body{ flex:1; overflow-y:auto; padding:16px 16px 8px; display:flex; flex-direction:column; gap:8px; }
+  .bubble{ max-width:75%; padding:10px 14px; border-radius:18px; font-size:13px; line-height:1.4; }
+  .bubble.them{ background:var(--white); border:1px solid var(--line); align-self:flex-start; border-bottom-left-radius:5px; }
+  .bubble.me{ background:var(--coral); color:white; align-self:flex-end; border-bottom-right-radius:5px; }
+  .bubble-time{ font-size:9.5px; color:var(--ink-soft); margin-top:2px; }
+  .chat-input-row{ display:flex; align-items:center; gap:9px; padding:10px 14px 18px; border-top:1px solid var(--line); background:var(--sand); }
+  .chat-input{ flex:1; padding:11px 16px; border-radius:100px; border:1.5px solid var(--line); background:var(--white); font-size:13px; font-family:var(--font-body); }
+  .chat-send{ width:38px; height:38px; border-radius:50%; background:var(--ink); color:var(--sand); border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+
+  /* ================= COMMUNITIES ================= */
+  #communities{ background:var(--sand); }
+  .comm-header{ padding:20px 20px 6px; display:flex; align-items:center; justify-content:space-between; }
+  .comm-title{ font-family:var(--font-display); font-size:26px; font-weight:600; }
+  .comm-sub{ font-size:12.5px; color:var(--ink-soft); padding:0 20px 14px; }
+  .comm-section-label{ font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); padding:18px 20px 10px; font-weight:600; }
+  .comm-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 20px; }
+  .comm-card{ border-radius:var(--radius-md); overflow:hidden; background:var(--white); border:1px solid var(--line); cursor:pointer; }
+  .comm-cover{ height:64px; position:relative; }
+  .comm-emoji{ position:absolute; bottom:-16px; left:12px; width:38px; height:38px; border-radius:50%; background:var(--white); border:2px solid var(--white); display:flex; align-items:center; justify-content:center; font-size:17px; box-shadow:0 2px 6px rgba(0,0,0,.12); }
+  .comm-body{ padding:22px 11px 12px; }
+  .comm-name{ font-size:12.5px; font-weight:700; line-height:1.25; }
+  .comm-meta{ font-size:10.5px; color:var(--ink-soft); margin-top:4px; }
+  .comm-join{ margin-top:9px; width:100%; padding:7px; border-radius:100px; font-size:11px; font-weight:700; border:1.5px solid var(--ink); background:transparent; color:var(--ink); cursor:pointer; }
+  .comm-join.joined{ background:var(--ink); color:var(--sand); }
+
+  /* ================= COMMUNITY DETAIL ================= */
+  #commDetail{ background:var(--sand); }
+  .cd-cover{ height:130px; position:relative; }
+  .cd-back{ position:absolute; top:16px; left:16px; width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.9); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .cd-emoji{ position:absolute; bottom:-24px; left:20px; width:56px; height:56px; border-radius:50%; background:var(--white); border:3px solid var(--sand); display:flex; align-items:center; justify-content:center; font-size:26px; }
+  .cd-body{ padding:36px 20px 20px; }
+  .cd-name{ font-family:var(--font-display); font-size:21px; font-weight:600; }
+  .cd-members{ font-size:12px; color:var(--ink-soft); margin-top:4px; }
+  .cd-desc{ font-size:13px; color:#3A4038; line-height:1.55; margin-top:12px; }
+  .cd-join-btn{ margin-top:16px; width:100%; padding:13px; border-radius:100px; background:var(--coral); color:white; border:none; font-weight:700; font-size:14px; cursor:pointer; }
+  .worship-card{ display:flex; gap:12px; align-items:center; background:var(--white); border:1px solid var(--line); border-radius:var(--radius-md); padding:12px; margin-bottom:9px; }
+  .worship-icon{ width:42px; height:42px; border-radius:12px; background:var(--teal-soft); color:var(--teal); display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; }
+  .worship-name{ font-size:12.5px; font-weight:700; }
+  .worship-meta{ font-size:10.5px; color:var(--ink-soft); margin-top:2px; }
+  .worship-dist{ margin-left:auto; font-family:var(--font-mono); font-size:11px; color:var(--teal); font-weight:700; text-align:right; flex-shrink:0; }
+  .comm-members-row{ display:flex; margin-top:10px; }
+  .cm-avatar{ width:26px; height:26px; border-radius:50%; border:2px solid var(--sand); margin-left:-8px; }
+  .cm-avatar:first-child{ margin-left:0; }
+
+  /* top bar communities icon */
+  .top-bar-actions{ display:flex; gap:8px; }
+
+  /* device switcher (outside phone, for demo controls) */
+  .demo-note{ max-width:390px; margin-top:18px; text-align:center; color:#4A4436; font-size:12.5px; font-family:var(--font-body); line-height:1.6;}
+  .demo-note b{ color:#2A2118; }
+</style>
+</head>
+<body>
+
+<div style="display:flex; flex-direction:column; align-items:center;">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="screens">
+
+    <!-- ============ ONBOARDING ============ -->
+    <div class="screen active" id="onboarding">
+      <div class="ob-hero">
+        <div class="ob-eyebrow">Welcome to Dubai's feed</div>
+        <div class="ob-title">Your city,<br><em>curated</em> by you.</div>
+        <div class="ob-sub">Discover cafés, drops, campus events & weekend plans — picked by people just like you.</div>
+      </div>
+      <svg class="dune-svg" viewBox="0 0 390 60" preserveAspectRatio="none">
+        <path d="M0,60 L0,35 Q40,10 90,28 Q150,50 195,22 Q250,-8 300,20 Q345,42 390,18 L390,60 Z" fill="#FBF5EA"/>
+      </svg>
+      <div class="ob-panel">
+        <div class="ob-step-label">Step 1 of 1 · Pick your vibe</div>
+        <div class="ob-question">What are you into?</div>
+        <div class="chip-grid" id="chipGrid">
+          <div class="chip" data-c>☕ Cafés</div>
+          <div class="chip" data-c>👗 Fashion</div>
+          <div class="chip" data-c>🌙 Nightlife</div>
+          <div class="chip" data-c>💪 Fitness</div>
+          <div class="chip" data-c>🏖️ Beach Days</div>
+          <div class="chip" data-c>📚 Study Spots</div>
+          <div class="chip" data-c>✈️ Travel</div>
+          <div class="chip" data-c>🎧 Events</div>
+          <div class="chip" data-c>🏓 Padel</div>
+          <div class="chip" data-c>💄 Beauty</div>
+        </div>
+        <button class="btn-primary" onclick="goTo('feed')">Continue</button>
+        <div class="ob-skip" onclick="goTo('feed')">Skip for now</div>
+      </div>
+    </div>
+
+    <!-- ============ FEED ============ -->
+    <div class="screen" id="feed">
+      <div class="top-bar">
+        <div class="brand"><span class="brand-dot"></span>havenly.</div>
+        <div class="top-bar-actions">
+          <div class="icon-btn" onclick="goTo('communities')">👥</div>
+          <div class="icon-btn">🔔</div>
+        </div>
+      </div>
+      <div class="tabs-row">
+        <div class="tab-pill on">For You</div>
+        <div class="tab-pill off">☕ Cafés</div>
+        <div class="tab-pill off">👗 Fashion</div>
+        <div class="tab-pill off">🌙 Nightlife</div>
+        <div class="tab-pill off">📚 Study</div>
+      </div>
+      <div class="masonry" id="masonry"></div>
+    </div>
+
+    <!-- ============ DISCOVER ============ -->
+    <div class="screen" id="discover">
+      <div class="disc-header">
+        <div class="disc-title">Discover Dubai</div>
+      </div>
+      <div class="search-bar">🔍 Search spots, events, tags…</div>
+      <div class="section-label">Trending spots near you</div>
+      <div class="spot-scroll" id="spotScroll"></div>
+      <div class="section-label">This week on campus</div>
+      <div id="eventList"></div>
+    </div>
+
+    <!-- ============ POST DETAIL ============ -->
+    <div class="screen" id="detail">
+      <div class="detail-hero" id="detailHero">
+        <div class="detail-back" onclick="goTo('feed')">←</div>
+      </div>
+      <div class="detail-body">
+        <div class="detail-tag" id="detailTag">Cafés</div>
+        <div class="detail-title" id="detailTitle">This AUS café spot is criminally underrated ☕</div>
+        <div class="detail-user-row">
+          <div class="detail-avatar" style="background:linear-gradient(135deg,#FF7A5C,#E3A23A);"></div>
+          <div>
+            <div class="detail-username" id="detailUser">@mayaz</div>
+            <div class="detail-loc">Sharjah · 2h ago</div>
+          </div>
+          <button class="follow-btn">Follow</button>
+        </div>
+        <div class="detail-text">Found this tiny spot near AUS that does the best pistachio croissant in the Emirates, no cap. Quiet enough to actually study, playlist is immaculate, and they don't rush you out after one drink. Going back every Thursday for sure 🤍</div>
+        <div class="action-bar">
+          <div class="action-item">❤️ 1.2k</div>
+          <div class="action-item">💬 84</div>
+          <div class="action-item">↗ Share</div>
+          <div class="action-item">🔖 Save</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PROFILE ============ -->
+    <div class="screen" id="profile">
+      <div class="profile-cover"></div>
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" style="background:linear-gradient(135deg,#0F8B82,#FF5A3C);"></div>
+        <button class="edit-profile">Edit profile</button>
+      </div>
+      <div class="profile-name">Lena Haddad</div>
+      <div class="profile-handle">@lenah · Dubai, UAE</div>
+      <div class="profile-bio">21 · Business @ AUS 🎓 · coffee snob, weekend padel, forever chasing sunset spots</div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-num">312</div><div class="stat-label">Posts</div></div>
+        <div class="stat"><div class="stat-num">4.8K</div><div class="stat-label">Followers</div></div>
+        <div class="stat"><div class="stat-num">890</div><div class="stat-label">Following</div></div>
+      </div>
+      <div class="interest-row">
+        <div class="interest-chip">☕ Cafés</div>
+        <div class="interest-chip">🏓 Padel</div>
+        <div class="interest-chip">✈️ Travel</div>
+        <div class="interest-chip">📚 Study Spots</div>
+      </div>
+      <div class="profile-grid-tabs">
+        <div class="pg-tab active">Posts</div>
+        <div class="pg-tab">Saved</div>
+        <div class="pg-tab">Tagged</div>
+      </div>
+      <div class="profile-grid" id="profileGrid"></div>
+    </div>
+
+    <!-- ============ INBOX ============ -->
+    <div class="screen" id="inbox">
+      <div class="inbox-title">Messages</div>
+      <div class="inbox-search">🔍 Search messages…</div>
+      <div id="threadList"></div>
+    </div>
+
+    <!-- ============ CHAT THREAD ============ -->
+    <div class="screen" id="chat" style="padding-bottom:0;">
+      <div class="chat-header">
+        <div class="chat-back" onclick="goTo('inbox')">←</div>
+        <div class="chat-header-avatar" id="chatAvatar" style="background:linear-gradient(135deg,#FF7A5C,#E3A23A);"></div>
+        <div>
+          <div class="chat-header-name" id="chatName">@mayaz</div>
+          <div class="chat-header-sub">Active now</div>
+        </div>
+      </div>
+      <div class="chat-body" id="chatBody"></div>
+      <div class="chat-input-row">
+        <input class="chat-input" placeholder="Message…" id="chatInputBox">
+        <button class="chat-send" onclick="sendMsg()">➤</button>
+      </div>
+    </div>
+
+    <!-- ============ COMMUNITIES ============ -->
+    <div class="screen" id="communities">
+      <div class="comm-header">
+        <div class="comm-title">Communities</div>
+      </div>
+      <div class="comm-sub">Join groups around your interests, faith, or campus.</div>
+
+      <div class="comm-section-label">Based on your interests</div>
+      <div class="comm-grid" id="commGridInterest"></div>
+
+      <div class="comm-section-label">Faith & belief communities</div>
+      <div class="comm-grid" id="commGridFaith"></div>
+
+      <div class="comm-section-label">Campus communities</div>
+      <div class="comm-grid" id="commGridCampus"></div>
+    </div>
+
+    <!-- ============ COMMUNITY DETAIL ============ -->
+    <div class="screen" id="commDetail">
+      <div class="cd-cover" id="cdCover">
+        <div class="cd-back" onclick="goTo('communities')">←</div>
+        <div class="cd-emoji" id="cdEmoji">🕌</div>
+      </div>
+      <div class="cd-body">
+        <div class="cd-name" id="cdName">Muslim Students of Dubai</div>
+        <div class="cd-members" id="cdMembers">2,140 members</div>
+        <div class="comm-members-row" id="cdAvatars"></div>
+        <div class="cd-desc" id="cdDesc">A space to connect, share halal spots, and never miss Jummah.</div>
+        <button class="cd-join-btn" id="cdJoinBtn" onclick="toggleDetailJoin()">Join community</button>
+
+        <div id="worshipSection" style="display:none;">
+          <div class="comm-section-label" style="padding-left:0;">Nearest places of worship</div>
+          <div id="worshipList"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ BOTTOM NAV ============ -->
+  <div class="navbar">
+    <button class="nav-item active" id="nav-feed" onclick="goTo('feed')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7M5 10v10h14V10"/></svg>
+      Home
+    </button>
+    <button class="nav-item" id="nav-discover" onclick="goTo('discover')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+      Discover
+    </button>
+    <button class="nav-item center" onclick="alert('Create post flow — camera roll / caption / tag location / pick topic chip.')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+    <button class="nav-item" id="nav-inbox" onclick="goTo('inbox')" style="position:relative;">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Inbox
+      <span style="position:absolute; top:-2px; right:8px; width:8px; height:8px; background:var(--coral); border-radius:50%;"></span>
+    </button>
+    <button class="nav-item" id="nav-profile" onclick="goTo('profile')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+      Profile
+    </button>
+  </div>
+</div>
+
+<div class="demo-note">Tap the chips, then <b>Continue</b> to enter the feed. Tap any card to open a post. Use the bottom nav to explore <b>Discover</b> and <b>Profile</b>. This is a clickable prototype — no data is saved.</div>
+</div>
+
+<script>
+const gradients = [
+  'linear-gradient(135deg,#FF9A76,#FF5A3C)',
+  'linear-gradient(135deg,#0F8B82,#4ED9C8)',
+  'linear-gradient(135deg,#E3A23A,#FFD98A)',
+  'linear-gradient(135deg,#3A3A6B,#8A6BFF)',
+  'linear-gradient(135deg,#FF5A3C,#E3A23A)',
+  'linear-gradient(135deg,#0F8B82,#20261F)',
+  'linear-gradient(135deg,#F06A9E,#FFB0C8)',
+  'linear-gradient(135deg,#4A6FE3,#7EC8E3)'
+];
+
+const posts = [
+  {tag:'Cafés', h:170, title:'This AUS café spot is criminally underrated ☕', user:'@mayaz', likes:'1.2k'},
+  {tag:'Cafés Guide', h:230, title:'The 12 best study cafés in Dubai, ranked by wifi + plugs', user:'Havenly Editorial', likes:'5.6k', ed:true},
+  {tag:'Fashion', h:230, title:'Thrifted my entire Ramadan iftar fit for 90 AED', user:'@nour.k', likes:'3.4k'},
+  {tag:'Nightlife', h:190, title:'Best rooftop for a first date under 150 AED', user:'@faisal_a', likes:'980'},
+  {tag:'This Week', h:200, title:'Every free student event in Dubai this week', user:'Havenly Editorial', likes:'4.1k', ed:true},
+  {tag:'Study Spots', h:210, title:'Silent library hack nobody at AUD knows about', user:'@ritaa', likes:'2.1k'},
+  {tag:'Beach Days', h:160, title:'Kite Beach sunset > every influencer photo', user:'@zayd.m', likes:'640'},
+  {tag:'Padel', h:200, title:'How I found padel partners as a new student', user:'@lenah', likes:'512'},
+  {tag:'Beauty', h:180, title:'Souk perfume dupes that actually last', user:'@amiraaa', likes:'1.8k'},
+  {tag:'New Openings', h:190, title:'5 new cafés that opened in Dubai this month', user:'Havenly Editorial', likes:'3.0k', ed:true},
+  {tag:'Travel', h:220, title:'48hr Ras Al Khaimah trip on a student budget', user:'@omarhh', likes:'2.9k'},
+];
+
+function buildMasonry(){
+  const el = document.getElementById('masonry');
+  el.innerHTML = posts.map((p,i)=>`
+    <div class="card ${p.ed?'editorial':''}" onclick="openDetail(${i})">
+      <div class="card-img" style="height:${p.h}px; background:${gradients[i%gradients.length]}">
+        ${p.ed?'<div class="editorial-badge">★ Havenly Picks</div>':''}
+      </div>
+      <div class="card-body">
+        <div class="card-tag">${p.tag}</div>
+        <div class="card-title">${p.title}</div>
+        <div class="card-meta">
+          <div class="avatar" style="background:${p.ed?'#20261F':gradients[(i+3)%gradients.length]}"></div>
+          <div class="card-user">${p.user}</div>
+          <div class="card-likes">❤️ ${p.likes}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+const spots = [
+  {name:'Nightjar Coffee', sub:'Al Quoz · Café', h:100},
+  {name:'Sunset Padel Club', sub:'JBR · Sports', h:100},
+  {name:'La Mer Beach', sub:'Jumeirah · Beach', h:100},
+  {name:'Alserkal Studios', sub:'Al Quoz · Art', h:100},
+];
+function buildSpots(){
+  document.getElementById('spotScroll').innerHTML = spots.map((s,i)=>`
+    <div class="spot-card">
+      <div class="spot-img" style="background:${gradients[(i+2)%gradients.length]}"></div>
+      <div class="spot-info">
+        <div class="spot-name">${s.name}</div>
+        <div class="spot-sub">${s.sub}</div>
+      </div>
+    </div>`).join('');
+}
+
+const events = [
+  {d:'24', m:'Aug', name:'AUS Rooftop Movie Night', loc:'American University · Free entry'},
+  {d:'27', m:'Aug', name:'Alserkal Night Market', loc:'Al Quoz · 6–11pm'},
+  {d:'02', m:'Sep', name:'UOWD Freshers Mixer', loc:'DIAC · RSVP required'},
+];
+function buildEvents(){
+  document.getElementById('eventList').innerHTML = events.map(e=>`
+    <div class="event-row">
+      <div class="event-date"><div class="d">${e.d}</div><div class="m">${e.m}</div></div>
+      <div>
+        <div class="event-name">${e.name}</div>
+        <div class="event-loc">${e.loc}</div>
+      </div>
+    </div>`).join('');
+}
+
+function buildProfileGrid(){
+  document.getElementById('profileGrid').innerHTML = Array.from({length:9}).map((_,i)=>
+    `<div class="pg-img" style="background:${gradients[i%gradients.length]}"></div>`
+  ).join('');
+}
+
+const threads = [
+  {name:'@mayaz', last:'the pistachio croissant one is CRAZY', time:'2m', unread:true, g:0},
+  {name:'@nour.k', last:'sent you the thrift store location 📍', time:'25m', unread:true, g:2},
+  {name:'@faisal_a', last:'you in for Thursday?', time:'1h', unread:false, g:4},
+  {name:'Havenly Editorial', last:'New café guide just dropped ☕', time:'3h', unread:false, g:5},
+  {name:'@ritaa', last:'omg yes that spot is so quiet', time:'1d', unread:false, g:1},
+  {name:'@zayd.m', last:'sunset was unreal today', time:'2d', unread:false, g:3},
+];
+
+const chatData = {
+  '@mayaz': [
+    {from:'them', text:'okay wait you have to try this café near AUS'},
+    {from:'them', text:'the pistachio croissant one is CRAZY'},
+    {from:'me', text:'no way, sending me the location?'},
+    {from:'them', text:'on it 🤍'},
+  ],
+  '@nour.k': [
+    {from:'them', text:'found the cutest thrift spot for iftar fits'},
+    {from:'them', text:'sent you the thrift store location 📍'},
+    {from:'me', text:'omg yes, saving this'},
+  ],
+  '@faisal_a': [
+    {from:'me', text:'rooftop thursday?'},
+    {from:'them', text:'you in for Thursday?'},
+  ],
+  'Havenly Editorial': [
+    {from:'them', text:'New café guide just dropped ☕'},
+    {from:'them', text:'12 spots ranked by wifi + plugs — perfect for exam season'},
+  ],
+  '@ritaa': [
+    {from:'me', text:'that library spot you mentioned is actually so quiet'},
+    {from:'them', text:'omg yes that spot is so quiet'},
+  ],
+  '@zayd.m': [
+    {from:'them', text:'sunset was unreal today'},
+    {from:'me', text:'kite beach never misses'},
+  ],
+};
+
+function buildThreads(){
+  document.getElementById('threadList').innerHTML = threads.map(t=>`
+    <div class="thread-row" onclick="openChat('${t.name}')">
+      <div class="thread-avatar" style="background:${gradients[t.g%gradients.length]}">
+        ${t.unread?'<span class="unread-dot"></span>':''}
+      </div>
+      <div class="thread-mid">
+        <div class="thread-name">${t.name}</div>
+        <div class="thread-preview ${t.unread?'unread':''}">${t.last}</div>
+      </div>
+      <div class="thread-time">${t.time}</div>
+    </div>`).join('');
+}
+
+function openChat(name){
+  const t = threads.find(x=>x.name===name);
+  document.getElementById('chatAvatar').style.background = gradients[t.g%gradients.length];
+  document.getElementById('chatName').textContent = name;
+  renderChatBody(name);
+  goTo('chat');
+}
+
+function renderChatBody(name){
+  const msgs = chatData[name] || [];
+  document.getElementById('chatBody').innerHTML = msgs.map(m=>
+    `<div class="bubble ${m.from==='me'?'me':'them'}">${m.text}</div>`
+  ).join('');
+  const body = document.getElementById('chatBody');
+  body.scrollTop = body.scrollHeight;
+}
+
+function sendMsg(){
+  const input = document.getElementById('chatInputBox');
+  const name = document.getElementById('chatName').textContent;
+  if(!input.value.trim()) return;
+  if(!chatData[name]) chatData[name] = [];
+  chatData[name].push({from:'me', text: input.value.trim()});
+  input.value = '';
+  renderChatBody(name);
+}
+document.getElementById('chatInputBox') && document.getElementById('chatInputBox').addEventListener('keydown', e=>{
+  if(e.key==='Enter') sendMsg();
+});
+
+const communitiesInterest = [
+  {id:'padel', name:'Padel Club Dubai', emoji:'🏓', members:'1,860', cover:gradients[6], desc:'Find partners, join weekly meetups, and track your rank across Dubai courts.'},
+  {id:'cafe', name:'Café Hoppers', emoji:'☕', members:'3,210', cover:gradients[2], desc:'For people who plan their week around new café openings.'},
+  {id:'thrift', name:'Thrift & Style', emoji:'👗', members:'2,040', cover:gradients[0], desc:'Swap fits, find thrift spots, and share styling inspo.'},
+  {id:'study', name:'Study Grind', emoji:'📚', members:'2,780', cover:gradients[1], desc:'Silent co-study sessions, best study spots, and exam-season survival tips.'},
+];
+
+const communitiesFaith = [
+  {id:'muslim', name:'Muslim Students of Dubai', emoji:'🕌', members:'4,120', cover:gradients[5], desc:'A space to connect, share halal spots, and never miss Jummah.', worship:'mosque'},
+  {id:'christian', name:'Christian Fellowship', emoji:'✝️', members:'1,340', cover:gradients[3], desc:'Weekly fellowship, worship nights, and finding a church community away from home.', worship:'church'},
+  {id:'hindu', name:'Hindu Students Circle', emoji:'🕉️', members:'980', cover:gradients[4], desc:'Festivals, temple visits, and community gatherings for Hindu students in Dubai.', worship:'temple'},
+  {id:'jewish', name:'Jewish Community Dubai', emoji:'✡️', members:'210', cover:gradients[7], desc:'Shabbat dinners, holidays, and connecting with the Jewish community in the UAE.', worship:'synagogue'},
+  {id:'sikh', name:'Sikh Sangat Dubai', emoji:'☬', members:'340', cover:gradients[2], desc:'Gurdwara visits, seva opportunities, and community events.', worship:'gurdwara'},
+  {id:'other-faith', name:'Interfaith & Spiritual', emoji:'🙏', members:'560', cover:gradients[6], desc:'Open space for any faith, philosophy, or spiritual practice not listed above.', worship:'general'},
+];
+
+const communitiesCampus = [
+  {id:'aus', name:'AUS Freshers', emoji:'🎓', members:'1,120', cover:gradients[1], desc:'American University of Sharjah — new student meetups & housing tips.'},
+  {id:'uowd', name:'UOWD Connect', emoji:'🏫', members:'890', cover:gradients[4], desc:'University of Wollongong Dubai student community.'},
+];
+
+const worshipPlaces = {
+  mosque: [
+    {name:'Al Farooq Omar Bin Al Khattab Mosque', meta:'Jumeirah 1', dist:'0.8 km'},
+    {name:'Al Rashidiya Mosque', meta:'Al Rashidiya', dist:'1.4 km'},
+    {name:'Jumeirah Mosque', meta:'Jumeirah 1', dist:'2.1 km'},
+  ],
+  church: [
+    {name:'Holy Trinity Church', meta:'Oud Metha', dist:'1.1 km'},
+    {name:'St. Mary\'s Catholic Church', meta:'Oud Metha', dist:'1.3 km'},
+    {name:'Emirates Baptist Church', meta:'Al Qusais', dist:'3.6 km'},
+  ],
+  temple: [
+    {name:'Shiva & Krishna Temple', meta:'Bur Dubai', dist:'2.4 km'},
+    {name:'Guru Nanak Darbar (Shared Complex)', meta:'Jebel Ali', dist:'6.8 km'},
+    {name:'Sindhi Guru Darbar Temple', meta:'Bur Dubai', dist:'2.6 km'},
+  ],
+  synagogue: [
+    {name:'The Sephardic Synagogue of Dubai', meta:'Jumeirah', dist:'2.0 km'},
+    {name:'Jewish Community Centre', meta:'Downtown', dist:'3.2 km'},
+  ],
+  gurdwara: [
+    {name:'Guru Nanak Darbar Gurdwara', meta:'Jebel Ali', dist:'6.8 km'},
+  ],
+  general: [
+    {name:'Interfaith Meeting Space — Alserkal', meta:'Al Quoz', dist:'2.9 km'},
+    {name:'Dubai Community Centre', meta:'Al Qusais', dist:'3.5 km'},
+  ],
+};
+
+const worshipIcons = {mosque:'🕌', church:'✝️', temple:'🕉️', synagogue:'✡️', gurdwara:'☬', general:'🙏'};
+
+const joinedState = {};
+
+function commCard(c){
+  const joined = !!joinedState[c.id];
+  return `
+    <div class="comm-card" onclick="openCommunity('${c.id}')">
+      <div class="comm-cover" style="background:${c.cover}">
+        <div class="comm-emoji">${c.emoji}</div>
+      </div>
+      <div class="comm-body">
+        <div class="comm-name">${c.name}</div>
+        <div class="comm-meta">${c.members} members</div>
+        <button class="comm-join ${joined?'joined':''}" onclick="event.stopPropagation(); toggleJoin('${c.id}')">${joined?'Joined ✓':'Join'}</button>
+      </div>
+    </div>`;
+}
+
+function buildCommunities(){
+  document.getElementById('commGridInterest').innerHTML = communitiesInterest.map(commCard).join('');
+  document.getElementById('commGridFaith').innerHTML = communitiesFaith.map(commCard).join('');
+  document.getElementById('commGridCampus').innerHTML = communitiesCampus.map(commCard).join('');
+}
+
+function allCommunities(){ return [...communitiesInterest, ...communitiesFaith, ...communitiesCampus]; }
+
+function toggleJoin(id){
+  joinedState[id] = !joinedState[id];
+  buildCommunities();
+}
+
+function toggleDetailJoin(){
+  const id = document.getElementById('commDetail').dataset.id;
+  toggleJoin(id);
+  const btn = document.getElementById('cdJoinBtn');
+  const joined = !!joinedState[id];
+  btn.textContent = joined ? 'Joined ✓' : 'Join community';
+  btn.style.background = joined ? 'var(--ink)' : 'var(--coral)';
+}
+
+function openCommunity(id){
+  const c = allCommunities().find(x=>x.id===id);
+  document.getElementById('commDetail').dataset.id = id;
+  document.getElementById('cdCover').style.background = c.cover;
+  document.getElementById('cdEmoji').textContent = c.emoji;
+  document.getElementById('cdName').textContent = c.name;
+  document.getElementById('cdMembers').textContent = c.members + ' members';
+  document.getElementById('cdDesc').textContent = c.desc;
+  document.getElementById('cdAvatars').innerHTML = gradients.slice(0,5).map(g=>`<div class="cm-avatar" style="background:${g}"></div>`).join('');
+
+  const joined = !!joinedState[id];
+  const btn = document.getElementById('cdJoinBtn');
+  btn.textContent = joined ? 'Joined ✓' : 'Join community';
+  btn.style.background = joined ? 'var(--ink)' : 'var(--coral)';
+
+  const worshipSection = document.getElementById('worshipSection');
+  if(c.worship){
+    worshipSection.style.display = 'block';
+    document.getElementById('worshipList').innerHTML = worshipPlaces[c.worship].map(w=>`
+      <div class="worship-card">
+        <div class="worship-icon">${worshipIcons[c.worship]}</div>
+        <div>
+          <div class="worship-name">${w.name}</div>
+          <div class="worship-meta">${w.meta}</div>
+        </div>
+        <div class="worship-dist">${w.dist}</div>
+      </div>`).join('');
+  } else {
+    worshipSection.style.display = 'none';
+  }
+  goTo('commDetail');
+}
+
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById(id).scrollTop = 0;
+  ['feed','discover','inbox','profile'].forEach(n=>{
+    const el = document.getElementById('nav-'+n);
+    if(el) el.classList.toggle('active', n===id);
+  });
+}
+
+function openDetail(i){
+  const p = posts[i];
+  document.getElementById('detailHero').style.background = gradients[i%gradients.length];
+  document.getElementById('detailTag').textContent = p.tag;
+  document.getElementById('detailTitle').textContent = p.title;
+  document.getElementById('detailUser').textContent = p.user;
+  goTo('detail');
+}
+
+document.querySelectorAll('.chip').forEach(c=>{
+  c.addEventListener('click', ()=> c.classList.toggle('selected'));
+});
+
+buildMasonry();
+buildSpots();
+buildEvents();
+buildProfileGrid();
+buildThreads();
+buildCommunities();
+</script>
+
+</body>
+</html>
