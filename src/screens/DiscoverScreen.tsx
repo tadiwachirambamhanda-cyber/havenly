@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors, radius, spacing, gradients } from '@/theme/tokens';
 
 // Static mock content for now — PROJECT_BRIEF.md section 2 designs this to
@@ -33,10 +34,10 @@ export default function DiscoverScreen() {
       <Text style={styles.sectionLabel}>Trending spots near you</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.spotScroll}>
         {SPOTS.map((spot, i) => {
-          const [from] = gradients[(i + 2) % gradients.length];
+          const [from, to] = gradients[(i + 2) % gradients.length];
           return (
             <View key={spot.name} style={styles.spotCard}>
-              <View style={[styles.spotImage, { backgroundColor: from }]} />
+              <LinearGradient colors={[from, to]} style={styles.spotImage} />
               <View style={styles.spotInfo}>
                 <Text style={styles.spotName}>{spot.name}</Text>
                 <Text style={styles.spotSub}>{spot.sub}</Text>

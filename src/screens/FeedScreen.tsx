@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { supabase } from '@/lib/supabase';
@@ -36,13 +37,14 @@ export default function FeedScreen() {
   }, [fetchPosts]);
 
   const renderCard = ({ item, index }: { item: Post; index: number }) => {
-    const [from] = gradients[index % gradients.length];
+    const [from, to] = gradients[index % gradients.length];
     return (
       <Pressable
         style={[styles.card, item.is_editorial && styles.cardEditorial]}
         onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
       >
-        <View style={[styles.cardImage, { backgroundColor: from }]}>
+        <View style={styles.cardImage}>
+          <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
           {item.image_url ? (
             <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" />
           ) : null}

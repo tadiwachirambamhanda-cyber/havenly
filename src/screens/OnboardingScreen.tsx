@@ -3,15 +3,8 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { colors, spacing } from '@/theme/tokens';
+import { INTEREST_OPTIONS } from '@/constants/interests';
 import type { Interest } from '@/types';
-
-const INTEREST_OPTIONS: { key: Interest; label: string }[] = [
-  { key: 'cafes', label: '☕ Cafés' }, { key: 'fashion', label: '👗 Fashion' },
-  { key: 'nightlife', label: '🌙 Nightlife' }, { key: 'fitness', label: '💪 Fitness' },
-  { key: 'beach', label: '🏖️ Beach Days' }, { key: 'study', label: '📚 Study Spots' },
-  { key: 'travel', label: '✈️ Travel' }, { key: 'events', label: '🎧 Events' },
-  { key: 'padel', label: '🏓 Padel' }, { key: 'beauty', label: '💄 Beauty' },
-];
 
 export default function OnboardingScreen() {
   const { session, refreshProfile } = useAuth();
