@@ -10,7 +10,12 @@ export interface Profile {
 
 export interface Post {
   id: string; author_id: string; author?: Profile; title: string; body: string | null;
-  image_url: string | null; tag: string; is_editorial: boolean; like_count: number; created_at: string;
+  image_url: string | null; tag: string; is_editorial: boolean; like_count: number;
+  comment_count: number; created_at: string;
+}
+
+export interface Comment {
+  id: string; post_id: string; author_id: string; author?: Profile; body: string; created_at: string;
 }
 
 export type CommunityCategory = 'interest' | 'campus';

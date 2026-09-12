@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Share } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Share, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,9 +10,9 @@ import { useAuth } from '@/lib/AuthContext';
 import { findOrCreateConversation } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
-import { colors, gradients, spacing } from '@/theme/tokens';
+import { colors, gradients, radius, spacing } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
-import type { Post } from '@/types';
+import type { Comment, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Route = RouteProp<RootStackParamList, 'PostDetail'>;
@@ -25,10 +25,20 @@ export default function PostDetailScreen() {
   const { session } = useAuth();
   const [post, setPost] = useState<Post | null>(null);
   const [liked, setLiked] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [following, setFollowing] = useState(false);
   const [messaging, setMessaging] = useState(false);
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentInput, setCommentInput] = useState('');
+  const [postingComment, setPostingComment] = useState(false);
+
+  const loadComments = useCallback(async () => {
+    const { data } = await supabase.from('comments').select('*, author:profiles(*)')
+      .eq('post_id', route.params.postId).order('created_at', { ascending: true });
+    setComments((data as unknown as Comment[]) ?? []);
+  }, [route.params.postId]);
 
   const load = useCallback(async () => {
     // Explicit FK hint (posts_author_id_fkey) — see FeedScreen.tsx for why it's needed.
@@ -38,17 +48,20 @@ export default function PostDetailScreen() {
       .eq('id', route.params.postId).single();
     setPost(data as unknown as Post);
     setLoaded(true);
+    loadComments();
 
     const userId = session?.user.id;
     if (!userId || !data) return;
 
-    const [{ data: likeRow }, { data: followRow }] = await Promise.all([
+    const [{ data: likeRow }, { data: followRow }, { data: savedRow }] = await Promise.all([
       supabase.from('post_likes').select('*').eq('post_id', route.params.postId).eq('user_id', userId).maybeSingle(),
       supabase.from('follows').select('*').eq('follower_id', userId).eq('following_id', data.author_id).maybeSingle(),
+      supabase.from('saved_posts').select('*').eq('post_id', route.params.postId).eq('user_id', userId).maybeSingle(),
     ]);
     setLiked(!!likeRow);
     setFollowing(!!followRow);
-  }, [route.params.postId, session]);
+    setSaved(!!savedRow);
+  }, [route.params.postId, session, loadComments]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -63,6 +76,43 @@ export default function PostDetailScreen() {
       setLiked(result.liked);
       setPost((prev) => prev && { ...prev, like_count: result.like_count });
     }
+  };
+
+  const toggleSave = async () => {
+    if (!post || !session?.user) return;
+    setSaved((prev) => !prev);
+    if (saved) {
+      await supabase.from('saved_posts').delete().eq('user_id', session.user.id).eq('post_id', post.id);
+    } else {
+      await supabase.from('saved_posts').insert({ user_id: session.user.id, post_id: post.id });
+    }
+  };
+
+  const addComment = async () => {
+    if (!post || !session?.user || !commentInput.trim() || postingComment) return;
+    setPostingComment(true);
+    const body = commentInput.trim();
+    setCommentInput('');
+    const { data, error } = await supabase.from('comments')
+      .insert({ post_id: post.id, author_id: session.user.id, body })
+      .select('*, author:profiles(*)').single();
+    setPostingComment(false);
+    if (error) { Alert.alert('Couldn\'t post comment', error.message); return; }
+    setComments((prev) => [...prev, data as unknown as Comment]);
+    setPost((prev) => prev && { ...prev, comment_count: prev.comment_count + 1 });
+  };
+
+  const deleteComment = (comment: Comment) => {
+    Alert.alert('Delete comment?', undefined, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete', style: 'destructive', onPress: async () => {
+          await supabase.from('comments').delete().eq('id', comment.id);
+          setComments((prev) => prev.filter((c) => c.id !== comment.id));
+          setPost((prev) => prev && { ...prev, comment_count: Math.max(prev.comment_count - 1, 0) });
+        },
+      },
+    ]);
   };
 
   const toggleFollow = async () => {
@@ -147,7 +197,9 @@ export default function PostDetailScreen() {
   const [heroFrom, heroTo] = gradients[post.id.charCodeAt(0) % gradients.length];
 
   return (
-    <ScrollView style={styles.container}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
+    <View style={styles.container}>
+    <ScrollView>
       <View style={styles.hero}>
         <LinearGradient colors={[heroFrom, heroTo]} style={StyleSheet.absoluteFill} />
         {post.image_url && <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" />}
@@ -190,19 +242,56 @@ export default function PostDetailScreen() {
           <Pressable style={styles.actionItem} onPress={toggleLike}>
             <Text style={styles.actionText}>{liked ? '❤️' : '🤍'} {post.like_count}</Text>
           </Pressable>
-          <Pressable style={styles.actionItem} onPress={() => Alert.alert('Coming soon', 'Comments aren\'t built yet.')}>
-            <Text style={styles.actionText}>💬</Text>
-          </Pressable>
+          <View style={styles.actionItem}>
+            <Text style={styles.actionText}>💬 {post.comment_count}</Text>
+          </View>
           <Pressable style={styles.actionItem} onPress={onShare}>
             <Text style={styles.actionText}>↗ Share</Text>
           </Pressable>
-          <Pressable style={styles.actionItem} onPress={() => Alert.alert('Coming soon', 'Saving posts isn\'t built yet.')}>
-            <Text style={styles.actionText}>🔖 Save</Text>
+          <Pressable style={styles.actionItem} onPress={toggleSave}>
+            <Text style={[styles.actionText, saved && styles.actionTextActive]}>🔖 {saved ? 'Saved' : 'Save'}</Text>
           </Pressable>
+        </View>
+
+        <View style={styles.commentsSection}>
+          <Text style={styles.commentsLabel}>Comments</Text>
+          {comments.map((comment) => (
+            <Pressable
+              key={comment.id}
+              style={styles.commentRow}
+              onLongPress={() => comment.author_id === session?.user.id && deleteComment(comment)}
+            >
+              {comment.author?.avatar_url ? (
+                <Image source={{ uri: comment.author.avatar_url }} style={styles.commentAvatar} />
+              ) : (
+                <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.commentAvatar} />
+              )}
+              <View style={{ flex: 1 }}>
+                <Text style={styles.commentMeta}>
+                  <Text style={styles.commentUser}>@{comment.author?.username ?? 'user'}</Text> · {timeAgo(comment.created_at)}
+                </Text>
+                <Text style={styles.commentBody}>{comment.body}</Text>
+              </View>
+            </Pressable>
+          ))}
+          {comments.length === 0 && <Text style={styles.noComments}>No comments yet — be the first.</Text>}
         </View>
       </View>
       <ReportModal visible={reportModalVisible} onClose={() => setReportModalVisible(false)} onSubmit={handleReportSubmit} />
     </ScrollView>
+    <View style={styles.commentInputRow}>
+      <TextInput
+        style={styles.commentInput}
+        placeholder="Add a comment…"
+        placeholderTextColor={colors.inkSoft}
+        value={commentInput}
+        onChangeText={setCommentInput}
+        onSubmitEditing={addComment}
+      />
+      <Pressable style={styles.commentSendBtn} onPress={addComment}><Text style={{ color: colors.sand }}>➤</Text></Pressable>
+    </View>
+    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -236,4 +325,16 @@ const styles = StyleSheet.create({
   actionBar: { flexDirection: 'row', gap: 18, marginTop: 20, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.line },
   actionItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   actionText: { fontSize: 12.5, fontWeight: '700', color: colors.inkSoft },
+  actionTextActive: { color: colors.coral },
+  commentsSection: { marginTop: 20, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.line },
+  commentsLabel: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft, marginBottom: 12 },
+  commentRow: { flexDirection: 'row', gap: 10, marginBottom: 14 },
+  commentAvatar: { width: 28, height: 28, borderRadius: 14 },
+  commentMeta: { fontSize: 11, color: colors.inkSoft },
+  commentUser: { fontWeight: '700', color: colors.ink },
+  commentBody: { fontSize: 13, color: '#3A4038', marginTop: 3, lineHeight: 18 },
+  noComments: { fontSize: 12.5, color: colors.inkSoft },
+  commentInputRow: { flexDirection: 'row', gap: 9, alignItems: 'center', padding: spacing.md, borderTopWidth: 1, borderColor: colors.line, backgroundColor: colors.sand },
+  commentInput: { flex: 1, backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line, borderRadius: radius.pill, paddingHorizontal: 16, paddingVertical: 11, fontSize: 13 },
+  commentSendBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' },
 });

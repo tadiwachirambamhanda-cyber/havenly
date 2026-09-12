@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -25,27 +25,30 @@ export default function ProfileScreen() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState({ posts: 0, followers: 0, following: 0 });
   const [posts, setPosts] = useState<Post[]>([]);
+  const [savedPosts, setSavedPosts] = useState<Post[]>([]);
   const [activeTab, setActiveTab] = useState<GridTab>('posts');
 
   const load = useCallback(async () => {
     const userId = session?.user.id;
     if (!userId) return;
 
-    const [{ data: profileData }, { count: postCount }, { count: followerCount }, { count: followingCount }, { data: postData }] =
+    const [{ data: profileData }, { count: postCount }, { count: followerCount }, { count: followingCount }, { data: postData }, { data: savedData }] =
       await Promise.all([
         supabase.from('profiles').select('*').eq('id', userId).single(),
         supabase.from('posts').select('*', { count: 'exact', head: true }).eq('author_id', userId),
         supabase.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', userId),
         supabase.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', userId),
         supabase.from('posts').select('*').eq('author_id', userId).order('created_at', { ascending: false }),
+        supabase.from('saved_posts').select('created_at, post:posts(*)').eq('user_id', userId).order('created_at', { ascending: false }),
       ]);
 
     setProfile(profileData as Profile);
     setStats({ posts: postCount ?? 0, followers: followerCount ?? 0, following: followingCount ?? 0 });
     setPosts((postData as Post[]) ?? []);
+    setSavedPosts(((savedData ?? []) as unknown as { post: Post }[]).map((row) => row.post).filter(Boolean));
   }, [session]);
 
-  useEffect(() => { load(); }, [load]);
+  useFocusEffect(useCallback(() => { load(); }, [load]));
 
   if (!profile) return null;
 
@@ -54,7 +57,7 @@ export default function ProfileScreen() {
   return (
     <FlatList
       style={styles.container}
-      data={activeTab === 'posts' ? posts : []}
+      data={activeTab === 'posts' ? posts : activeTab === 'saved' ? savedPosts : []}
       keyExtractor={(item) => item.id}
       numColumns={3}
       columnWrapperStyle={{ gap: 2 }}
@@ -62,10 +65,10 @@ export default function ProfileScreen() {
       renderItem={({ item, index }) => {
         const [from, to] = gradients[index % gradients.length];
         return (
-          <View style={styles.gridCell}>
+          <Pressable style={styles.gridCell} onPress={() => navigation.navigate('PostDetail', { postId: item.id })}>
             <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
             {item.image_url && <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" />}
-          </View>
+          </Pressable>
         );
       }}
       ListEmptyComponent={
