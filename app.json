@@ -6,12 +6,26 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "splash": { "backgroundColor": "#FBF5EA" },
-    "ios": { "supportsTablet": false, "bundleIdentifier": "com.havenly.app" },
-    "android": { "package": "com.havenly.app" },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.havenly.app"
+    },
+    "android": {
+      "package": "com.havenly.app"
+    },
     "extra": {
       "supabaseUrl": "https://xygkeodsjpaobnpjtkiz.supabase.co",
       "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5Z2tlb2RzanBhb2JucGp0a2l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxOTc4MzgsImV4cCI6MjEwNDc3MzgzOH0.cn366qcymhWsaVxKAKdxKUk3uwbfrujofk0Q4SoUYFY"
-    }
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "imageWidth": 200,
+          "backgroundColor": "#FBF5EA"
+        }
+      ]
+    ]
   }
 }
