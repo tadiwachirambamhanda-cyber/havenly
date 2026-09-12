@@ -25,7 +25,8 @@
           "imageWidth": 200,
           "backgroundColor": "#FBF5EA"
         }
-      ]
+      ],
+      "expo-font"
     ]
   }
 }
