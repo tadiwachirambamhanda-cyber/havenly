@@ -15,3 +15,11 @@ export async function findOrCreateConversation(myId: string, otherId: string): P
   if (error) throw error;
   return created.id;
 }
+
+// Marks a conversation as read up to now for one user — call this whenever
+// they're actively looking at it (on open, and whenever a new message
+// arrives while they have it open) or just sent into it themselves.
+export async function markConversationRead(conversationId: string, userId: string): Promise<void> {
+  await supabase.from('conversation_reads')
+    .upsert({ conversation_id: conversationId, user_id: userId, last_read_at: new Date().toISOString() });
+}

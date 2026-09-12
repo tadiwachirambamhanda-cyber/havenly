@@ -5,6 +5,7 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
+import { markConversationRead } from '@/lib/conversations';
 import { colors, radius, spacing } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
 import type { Conversation, Message, Profile } from '@/types';
@@ -33,21 +34,35 @@ export default function ChatScreen() {
     supabase.from('messages').select('*').eq('conversation_id', conversationId)
       .order('created_at', { ascending: true }).then(({ data }) => setMessages((data as Message[]) ?? []));
 
+    if (myId) markConversationRead(conversationId, myId);
+
+    // Dedupe by id in both handlers below: a message I send is appended
+    // immediately in `send()` for instant feedback, then arrives again here
+    // via realtime — without the check it would render twice.
     const channel = supabase.channel(`chat-${conversationId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` },
-        (payload) => setMessages((prev) => [...prev, payload.new as Message]))
+        (payload) => {
+          const incoming = payload.new as Message;
+          setMessages((prev) => (prev.some((m) => m.id === incoming.id) ? prev : [...prev, incoming]));
+          if (myId) markConversationRead(conversationId, myId);
+        })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations', filter: `id=eq.${conversationId}` },
         (payload) => setConversation(payload.new as Conversation))
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [conversationId, otherUserId]);
+  }, [conversationId, otherUserId, myId]);
 
   const send = async () => {
     if (!input.trim() || !myId) return;
     const body = input.trim();
     setInput('');
-    await supabase.from('messages').insert({ conversation_id: conversationId, sender_id: myId, body });
+    const { data: inserted, error } = await supabase.from('messages')
+      .insert({ conversation_id: conversationId, sender_id: myId, body })
+      .select().single();
+    if (error) { console.error('Failed to send message:', error.message); return; }
+    setMessages((prev) => (prev.some((m) => m.id === inserted.id) ? prev : [...prev, inserted as Message]));
     await supabase.from('conversations').update({ last_message: body, last_message_at: new Date().toISOString() }).eq('id', conversationId);
+    await markConversationRead(conversationId, myId);
   };
 
   const respondToRequest = async (status: 'accepted' | 'declined') => {

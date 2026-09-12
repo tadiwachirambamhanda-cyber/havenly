@@ -5,6 +5,7 @@ import Svg, { Polygon } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { colors } from '@/theme/tokens';
+import { useUnreadMessages } from '@/lib/useUnreadMessages';
 
 const BAR_HEIGHT = 82;
 const NOTCH_DEPTH = 22;
@@ -35,6 +36,7 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const totalHeight = BAR_HEIGHT + insets.bottom;
+  const hasUnread = useUnreadMessages();
 
   const renderTab = (route: (typeof state.routes)[number], index: number) => {
     const config = TAB_CONFIG[route.name];
@@ -50,7 +52,10 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
           if (!isFocused && !event.defaultPrevented) navigation.navigate(route.name);
         }}
       >
-        <Feather name={config.icon} size={22} color={isFocused ? colors.coral : INACTIVE_COLOR} />
+        <View>
+          <Feather name={config.icon} size={22} color={isFocused ? colors.coral : INACTIVE_COLOR} />
+          {route.name === 'Inbox' && hasUnread && <View style={styles.navUnreadDot} />}
+        </View>
         <Text style={[styles.tabLabel, { color: isFocused ? colors.coral : INACTIVE_COLOR }]}>{config.label}</Text>
       </Pressable>
     );
@@ -77,6 +82,7 @@ const styles = StyleSheet.create({
   container: { position: 'absolute', bottom: 0, left: 0, right: 0 },
   row: { flexDirection: 'row', alignItems: 'center', paddingTop: 18 },
   tabItem: { flex: 1, alignItems: 'center', gap: 4 },
+  navUnreadDot: { position: 'absolute', top: -2, right: -3, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral },
   tabLabel: { fontSize: 10, fontWeight: '600' },
   centerSpacer: { width: 46 },
   centerBtn: {

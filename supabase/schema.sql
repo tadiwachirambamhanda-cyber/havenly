@@ -202,6 +202,26 @@ create policy "Users can send messages in their conversations" on messages for i
   )
 );
 
+-- Tracks the last time each user viewed each conversation, so Inbox can show
+-- a real per-thread unread indicator (and the nav bar a real unread dot).
+create table conversation_reads (
+  conversation_id uuid references conversations(id) on delete cascade,
+  user_id uuid references profiles(id) on delete cascade,
+  last_read_at timestamptz not null default now(),
+  primary key (conversation_id, user_id)
+);
+alter table conversation_reads enable row level security;
+create policy "Users can view their own read state" on conversation_reads for select using (auth.uid() = user_id);
+create policy "Users can set their own read state" on conversation_reads for insert with check (auth.uid() = user_id);
+create policy "Users can update their own read state" on conversation_reads for update using (auth.uid() = user_id);
+
+-- Postgres tables are NOT broadcast to Supabase Realtime unless explicitly
+-- added here — required for ChatScreen's live message/status subscriptions
+-- and the Inbox/nav-bar unread indicators to actually receive events.
+alter publication supabase_realtime add table messages;
+alter publication supabase_realtime add table conversations;
+alter publication supabase_realtime add table conversation_reads;
+
 -- SAFETY LAYER (flagged in planning — implement before public launch)
 create table blocked_users (
   blocker_id uuid references profiles(id) on delete cascade,

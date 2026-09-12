@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SectionList, Pressable } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -12,38 +12,55 @@ import type { Conversation, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
-type Row = Conversation & { otherUser: Profile | undefined };
+type Row = Conversation & { otherUser: Profile | undefined; unread: boolean };
 
 export default function InboxScreen() {
   const navigation = useNavigation<Nav>();
   const { session } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
+  const myId = session?.user.id;
 
   const load = useCallback(async () => {
-    const myId = session?.user.id;
     if (!myId) return;
 
-    const { data: conversations } = await supabase.from('conversations').select('*')
-      .contains('participant_ids', [myId])
-      .neq('status', 'declined')
-      .order('last_message_at', { ascending: false, nullsFirst: false });
+    const [{ data: conversations }, { data: reads }] = await Promise.all([
+      supabase.from('conversations').select('*')
+        .contains('participant_ids', [myId])
+        .neq('status', 'declined')
+        .order('last_message_at', { ascending: false, nullsFirst: false }),
+      supabase.from('conversation_reads').select('conversation_id, last_read_at').eq('user_id', myId),
+    ]);
     if (!conversations) return;
 
+    const readAtByConversation = new Map((reads ?? []).map((r) => [r.conversation_id, r.last_read_at]));
     const otherIds = conversations.map((c) => c.participant_ids.find((id: string) => id !== myId)).filter(Boolean) as string[];
     const { data: profiles } = otherIds.length
       ? await supabase.from('profiles').select('*').in('id', otherIds)
       : { data: [] as Profile[] };
     const profileById = new Map((profiles ?? []).map((p) => [p.id, p as Profile]));
 
-    setRows(conversations.map((c) => ({
-      ...(c as Conversation),
-      otherUser: profileById.get(c.participant_ids.find((id: string) => id !== myId) ?? ''),
-    })));
-  }, [session]);
+    setRows(conversations.map((c) => {
+      const readAt = readAtByConversation.get(c.id);
+      const unread = !!c.last_message_at && (!readAt || new Date(readAt) < new Date(c.last_message_at));
+      return { ...(c as Conversation), otherUser: profileById.get(c.participant_ids.find((id: string) => id !== myId) ?? ''), unread };
+    }));
+  }, [myId]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
-  const myId = session?.user.id;
+  // Keep the list live while sitting on this tab, not just on re-focus —
+  // both a new message and someone else's read state changing (irrelevant
+  // here, but conversations status/last_message updates matter) should
+  // update the list without the user needing to switch tabs and back.
+  useEffect(() => {
+    if (!myId) return;
+    const channel = supabase.channel('inbox-updates')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => load())
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations' }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [myId, load]);
+
   const requests = rows.filter((r) => r.status === 'pending' && r.initiator_id !== myId);
   const messages = rows.filter((r) => r.status === 'accepted' || (r.status === 'pending' && r.initiator_id === myId));
 
@@ -73,14 +90,17 @@ export default function InboxScreen() {
         )}
         renderItem={({ item }) => (
           <Pressable style={styles.row} onPress={() => openChat(item)}>
-            {item.otherUser?.avatar_url ? (
-              <Image source={{ uri: item.otherUser.avatar_url }} style={styles.avatar} />
-            ) : (
-              <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
-            )}
+            <View>
+              {item.otherUser?.avatar_url ? (
+                <Image source={{ uri: item.otherUser.avatar_url }} style={styles.avatar} />
+              ) : (
+                <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+              )}
+              {item.unread && <View style={styles.unreadDot} />}
+            </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.name}>{item.otherUser?.display_name ?? 'Havenly user'}</Text>
-              <Text style={styles.preview} numberOfLines={1}>
+              <Text style={[styles.preview, item.unread && styles.previewUnread]} numberOfLines={1}>
                 {item.status === 'pending' && item.initiator_id === myId ? 'Request sent' : item.last_message ?? 'Say hi 👋'}
               </Text>
             </View>
@@ -109,8 +129,10 @@ const styles = StyleSheet.create({
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: spacing.lg, paddingVertical: 10 },
   avatar: { width: 50, height: 50, borderRadius: 25 },
+  unreadDot: { position: 'absolute', top: -2, right: -2, width: 12, height: 12, borderRadius: 6, backgroundColor: colors.coral, borderWidth: 2, borderColor: colors.sand },
   name: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   preview: { fontSize: 12, color: colors.inkSoft, marginTop: 2 },
+  previewUnread: { color: colors.ink, fontWeight: '600' },
   time: { fontSize: 10.5, color: colors.inkSoft },
   placeholder: { color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 20 },
 });
