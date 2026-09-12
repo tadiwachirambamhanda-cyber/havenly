@@ -157,19 +157,25 @@ valid choice.
   topic-chip picker (reuses the onboarding interest vocabulary — this
   screen had no prototype spec to port, its prototype entry was just a
   placeholder alert)
-- Inbox + Chat → real-time messaging via Supabase Realtime subscriptions
+- Inbox + Chat → real-time messaging via Supabase Realtime subscriptions,
+  gated by message requests (a conversation starts 'pending'; the recipient
+  must accept before they can send anything — enforced in RLS, not just the
+  UI), with real unread tracking (`conversation_reads`)
 - Real brand fonts loaded (Fraunces / Plus Jakarta Sans / JetBrains Mono)
   and wired through `expo-font`; Feed/Discover/Profile image placeholders
   use real two-stop gradients via `expo-linear-gradient`
+- Safety layer: block and report, both actually enforced — a block hides
+  the blocked user's posts (RLS on `posts`) and prevents new or continued
+  messaging in either direction (`is_blocked_between()`), not just a
+  database row with no effect. `BlockedUsersScreen` lets you undo a block.
+- 32 editorial "Havenly Picks" posts seeded across all 10 interest tags,
+  attributed to a real "Havenly Editorial" system account (auth user
+  created via the Admin API, not a fake profiles row with no matching
+  login — see README.md for how to recreate it on a fresh project)
 
 **Not started — build in this order:**
 1. True masonry feed layout (currently equal-height columns, not variable)
-2. **Safety layer UI**: block/report screens — database tables already exist
-   (`blocked_users`, `reports`) with RLS policies, just need UI
-3. Message requests vs. accepted DMs split (prevents spam/harassment)
-4. Seed 30-40 real editorial posts before any public user sees the app —
-   this is the entire point of the cold-start strategy, don't skip it
-5. Comments + a bookmarks/"Saved" table — neither exists; PostDetail and
+2. Comments + a bookmarks/"Saved" table — neither exists; PostDetail and
    Profile currently show honest placeholders instead of fake data for these
 
 Database schema (`supabase/schema.sql`) already includes Row Level Security

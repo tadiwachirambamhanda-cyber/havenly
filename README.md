@@ -19,7 +19,18 @@ npm install
 3. In Supabase → Authentication → Providers → Email, turn **off** "Confirm email"
    for the closed-beta phase (turn it back on before public launch)
 4. Copy your Project URL + anon key into `app.json` → `expo.extra`
-5. `npx expo start`
+5. Create the editorial system account (needed before running the editorial
+   posts migration, which looks it up by email):
+   ```bash
+   curl -X POST "https://<project-ref>.supabase.co/auth/v1/admin/users" \
+     -H "apikey: <service_role_key>" -H "Authorization: Bearer <service_role_key>" \
+     -H "Content-Type: application/json" \
+     -d '{"email":"editorial@havenly.app","password":"<any-strong-random-string>","email_confirm":true}'
+   ```
+   Nobody ever logs in as this account — the password just needs to exist.
+   `supabase/migrations/20260912160509_seed_editorial_posts.sql` finds it by
+   email, sets its display name/bio, and attaches the editorial posts to it.
+6. `npx expo start`
 
 ## Priority order
 1. ~~Authentication (sign up/login/session)~~ — done: `src/lib/AuthContext.tsx`,
@@ -32,7 +43,16 @@ npm install
    CreatePost). Comment and Save show a "coming soon" alert — no comments or
    bookmarks table exists yet, so those are genuinely not built, not faked.
 3. ~~Load real fonts (Fraunces / Plus Jakarta Sans / JetBrains Mono)~~ — done
-4. True masonry feed layout (currently equal-height columns via FlatList numColumns)
-5. Safety layer UI (block/report — DB tables already exist)
-6. Message requests vs. accepted DMs
-7. Seed 30-40 real editorial posts before public launch
+4. ~~Safety layer UI~~ — done: block (actually enforced via RLS + the
+   `is_blocked_between()` function — hides posts, blocks new/existing
+   conversations both ways) and report, with a `BlockedUsersScreen` to
+   undo blocks
+5. ~~Message requests vs. accepted DMs~~ — done: conversations start
+   'pending', the recipient must accept before they can send anything
+   (enforced in RLS, not just the UI); real unread tracking too
+   (`conversation_reads`)
+6. ~~Seed 30-40 real editorial posts~~ — done: 32 posts across all 10
+   interest tags, attributed to a real "Havenly Editorial" system account
+7. True masonry feed layout (currently equal-height columns via FlatList numColumns)
+8. Comments + a "Saved" bookmarks feature — neither has a table yet;
+   PostDetail and Profile currently show honest placeholders instead

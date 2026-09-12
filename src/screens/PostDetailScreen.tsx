@@ -167,7 +167,7 @@ export default function PostDetailScreen() {
             <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
           )}
           <View style={{ flex: 1 }}>
-            <Text style={styles.username}>@{post.author?.username ?? 'user'}</Text>
+            <Text style={styles.username}>{post.is_editorial ? 'Havenly Editorial' : `@${post.author?.username ?? 'user'}`}</Text>
             <Text style={styles.meta}>{timeAgo(post.created_at)}</Text>
           </View>
           {!isOwnPost && (
