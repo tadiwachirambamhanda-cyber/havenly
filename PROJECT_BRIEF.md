@@ -138,30 +138,39 @@ valid choice.
 ## 6. What's actually built vs. what's left
 
 **Fully wired to a real Supabase backend (not mocked):**
-- Onboarding → writes interests to `profiles` table
-- Feed → real query with editorial/UGC distinction, pull-to-refresh
+- Authentication → sign up/login/session persistence, routes new users
+  through Onboarding once, returning users straight into the main app
+- Onboarding → writes interests + `has_completed_onboarding` to `profiles`
+- Feed → real query with editorial/UGC distinction, pull-to-refresh, refetches
+  on focus so new posts/likes show up without a manual refresh
 - Communities list + detail → join/leave persists to DB, interest-based sorting
+- Discover → search bar + trending spots + weekly events (static mock content
+  — designed to eventually pull from Google Places + Eventbrite APIs)
+- Profile → real posts/followers/following stats, interest chips, Posts grid
+  (Saved/Tagged tabs show an honest empty state — no bookmarks or tagging
+  table exists yet)
+- Post Detail → full action bar; Like is fully functional (`toggle_post_like`
+  RPC keeps `post_likes` and `posts.like_count` in sync atomically), Follow
+  works (`follows` table), Share uses the native share sheet; Comment and
+  Save show a "coming soon" alert rather than fake data
+- Create Post → real image upload to the `post-images` Storage bucket,
+  topic-chip picker (reuses the onboarding interest vocabulary — this
+  screen had no prototype spec to port, its prototype entry was just a
+  placeholder alert)
 - Inbox + Chat → real-time messaging via Supabase Realtime subscriptions
-
-**Structured with clear TODOs, needs UI ported from the HTML prototype:**
-- Discover screen (search, trending spots, weekly events)
-- Profile screen (stats row, interest chips, grid tabs)
-- Post Detail screen (full action bar)
-- Create Post screen (image upload to Supabase Storage not yet connected)
+- Real brand fonts loaded (Fraunces / Plus Jakarta Sans / JetBrains Mono)
+  and wired through `expo-font`; Feed/Discover/Profile image placeholders
+  use real two-stop gradients via `expo-linear-gradient`
 
 **Not started — build in this order:**
-1. **Authentication** (sign up / log in / session persistence) — everything
-   else currently assumes a logged-in user already exists, which is false on
-   first app launch. This is the actual first task.
-2. Finish the four stubbed screens above, using the HTML prototype as spec
-3. Load real fonts (Fraunces / Plus Jakarta Sans / JetBrains Mono via
-   `expo-font` + `@expo-google-fonts/*` — referenced in code but not installed)
-4. True masonry feed layout (currently equal-height columns, not variable)
-5. **Safety layer UI**: block/report screens — database tables already exist
+1. True masonry feed layout (currently equal-height columns, not variable)
+2. **Safety layer UI**: block/report screens — database tables already exist
    (`blocked_users`, `reports`) with RLS policies, just need UI
-6. Message requests vs. accepted DMs split (prevents spam/harassment)
-7. Seed 30-40 real editorial posts before any public user sees the app —
+3. Message requests vs. accepted DMs split (prevents spam/harassment)
+4. Seed 30-40 real editorial posts before any public user sees the app —
    this is the entire point of the cold-start strategy, don't skip it
+5. Comments + a bookmarks/"Saved" table — neither exists; PostDetail and
+   Profile currently show honest placeholders instead of fake data for these
 
 Database schema (`supabase/schema.sql`) already includes Row Level Security
 policies on every table — this was built security-first, not bolted on later.
