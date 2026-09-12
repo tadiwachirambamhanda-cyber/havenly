@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { colors, radius, spacing } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
+import UniversityPickerModal from '@/components/UniversityPickerModal';
 import type { Interest } from '@/types';
 
 export default function EditProfileScreen() {
@@ -25,6 +26,7 @@ export default function EditProfileScreen() {
   const [newAvatarPicked, setNewAvatarPicked] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [universityPickerVisible, setUniversityPickerVisible] = useState(false);
 
   const toggleInterest = (key: Interest) => {
     setInterests((prev) => {
@@ -120,7 +122,17 @@ export default function EditProfileScreen() {
       <TextInput style={[styles.input, styles.bioInput]} value={bio} onChangeText={setBio} multiline placeholder="Tell people a bit about you" placeholderTextColor={colors.inkSoft} />
 
       <Text style={styles.label}>University</Text>
-      <TextInput style={styles.input} value={university} onChangeText={setUniversity} placeholder="e.g. American University of Sharjah" placeholderTextColor={colors.inkSoft} />
+      <Pressable style={styles.input} onPress={() => setUniversityPickerVisible(true)}>
+        <Text style={university ? styles.universityValue : styles.universityPlaceholder}>
+          {university || 'Select your university'}
+        </Text>
+      </Pressable>
+      <UniversityPickerModal
+        visible={universityPickerVisible}
+        selected={university || null}
+        onClose={() => setUniversityPickerVisible(false)}
+        onSelect={(name) => setUniversity(name ?? '')}
+      />
 
       <Text style={styles.label}>Interests</Text>
       <View style={styles.chipGrid}>
@@ -158,6 +170,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm, padding: 14, fontSize: 14, color: colors.ink,
   },
   bioInput: { minHeight: 80, textAlignVertical: 'top' },
+  universityValue: { fontSize: 14, color: colors.ink },
+  universityPlaceholder: { fontSize: 14, color: colors.inkSoft },
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 9, paddingHorizontal: spacing.lg },
   chip: { paddingVertical: 9, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
   chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },

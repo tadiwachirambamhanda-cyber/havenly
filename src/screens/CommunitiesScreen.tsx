@@ -28,17 +28,19 @@ export default function CommunitiesScreen() {
 
   const userInterests = new Set(profile?.interests ?? []);
 
-  // Only the 'interest' category is personalized — matched communities move to the
-  // top but nothing is ever hidden.
+  // Both categories are personalized the same way — matched communities move
+  // to the top but nothing is ever hidden. Interest matches against the
+  // onboarding interest picks; campus matches against the user's own
+  // university (set via Edit Profile).
+  const matchesUser = (c: Community): boolean => {
+    if (c.category === 'interest') return !!c.related_interest && userInterests.has(c.related_interest);
+    if (c.category === 'campus') return !!c.related_university && c.related_university === profile?.university;
+    return false;
+  };
+
   const sections = (['interest', 'campus'] as CommunityCategory[]).map((cat) => {
     const data = communities.filter((c) => c.category === cat);
-    if (cat === 'interest') {
-      data.sort((a, b) => {
-        const aMatch = a.related_interest && userInterests.has(a.related_interest) ? 1 : 0;
-        const bMatch = b.related_interest && userInterests.has(b.related_interest) ? 1 : 0;
-        return bMatch - aMatch;
-      });
-    }
+    data.sort((a, b) => (matchesUser(b) ? 1 : 0) - (matchesUser(a) ? 1 : 0));
     return { title: SECTION_TITLES[cat], data };
   });
 
@@ -49,21 +51,18 @@ export default function CommunitiesScreen() {
       <SectionList
         sections={sections} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 40 }}
         renderSectionHeader={({ section }) => <Text style={styles.sectionLabel}>{section.title}</Text>}
-        renderItem={({ item }) => {
-          const matchesInterest = item.related_interest ? userInterests.has(item.related_interest) : false;
-          return (
-            <Pressable style={styles.card} onPress={() => navigation.navigate('CommunityDetail', { communityId: item.id })}>
-              <Text style={styles.emoji}>{item.emoji}</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.cardName}>{item.name}</Text>
-                <Text style={styles.cardMeta}>{item.member_count} members</Text>
-              </View>
-              {matchesInterest && (
-                <View style={styles.matchBadge}><Text style={styles.matchBadgeText}>For you</Text></View>
-              )}
-            </Pressable>
-          );
-        }}
+        renderItem={({ item }) => (
+          <Pressable style={styles.card} onPress={() => navigation.navigate('CommunityDetail', { communityId: item.id })}>
+            <Text style={styles.emoji}>{item.emoji}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.cardName}>{item.name}</Text>
+              <Text style={styles.cardMeta}>{item.member_count} members</Text>
+            </View>
+            {matchesUser(item) && (
+              <View style={styles.matchBadge}><Text style={styles.matchBadgeText}>For you</Text></View>
+            )}
+          </Pressable>
+        )}
       />
     </View>
   );

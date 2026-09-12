@@ -228,6 +228,9 @@ create table communities (
   related_interest text check (related_interest in (
     'cafes','fashion','nightlife','fitness','beach','study','travel','events','padel','beauty'
   )),
+  -- Only set for category='campus' communities — same personalization
+  -- pattern as related_interest, matched against profiles.university.
+  related_university text,
   member_count int default 0,
   created_at timestamptz default now()
 );

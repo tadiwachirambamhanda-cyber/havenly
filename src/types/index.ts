@@ -22,7 +22,7 @@ export type CommunityCategory = 'interest' | 'campus';
 
 export interface Community {
   id: string; name: string; emoji: string; description: string; category: CommunityCategory;
-  related_interest: Interest | null; member_count: number; created_at: string;
+  related_interest: Interest | null; related_university: string | null; member_count: number; created_at: string;
 }
 
 export type ConversationStatus = 'pending' | 'accepted' | 'declined';
