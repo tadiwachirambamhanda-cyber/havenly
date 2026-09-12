@@ -80,11 +80,15 @@ export default function PostDetailScreen() {
 
   const toggleSave = async () => {
     if (!post || !session?.user) return;
-    setSaved((prev) => !prev);
-    if (saved) {
-      await supabase.from('saved_posts').delete().eq('user_id', session.user.id).eq('post_id', post.id);
-    } else {
-      await supabase.from('saved_posts').insert({ user_id: session.user.id, post_id: post.id });
+    const wasSaved = saved;
+    setSaved(!wasSaved);
+    const { error } = wasSaved
+      ? await supabase.from('saved_posts').delete().eq('user_id', session.user.id).eq('post_id', post.id)
+      : await supabase.from('saved_posts').insert({ user_id: session.user.id, post_id: post.id });
+    if (error) {
+      console.error('Failed to toggle save:', error.message);
+      setSaved(wasSaved);
+      Alert.alert('Couldn\'t save post', error.message);
     }
   };
 
