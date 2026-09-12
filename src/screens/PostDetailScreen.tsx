@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Share } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
@@ -20,6 +21,7 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 export default function PostDetailScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
+  const insets = useSafeAreaInsets();
   const { session } = useAuth();
   const [post, setPost] = useState<Post | null>(null);
   const [liked, setLiked] = useState(false);
@@ -135,7 +137,7 @@ export default function PostDetailScreen() {
   if (!post) {
     return loaded ? (
       <View style={styles.notFound}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
+        <Pressable style={[styles.back, { top: insets.top + 12 }]} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
         <Text style={styles.notFoundText}>This post isn't available.</Text>
       </View>
     ) : null;
@@ -149,9 +151,9 @@ export default function PostDetailScreen() {
       <View style={styles.hero}>
         <LinearGradient colors={[heroFrom, heroTo]} style={StyleSheet.absoluteFill} />
         {post.image_url && <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" />}
-        <Pressable style={styles.back} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
+        <Pressable style={[styles.back, { top: insets.top + 12 }]} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
         {!isOwnPost && (
-          <Pressable style={styles.overflow} onPress={openOptions}><Text>•••</Text></Pressable>
+          <Pressable style={[styles.overflow, { top: insets.top + 12 }]} onPress={openOptions}><Text>•••</Text></Pressable>
         )}
       </View>
       <View style={styles.body}>
