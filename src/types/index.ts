@@ -20,8 +20,11 @@ export interface Community {
   related_interest: Interest | null; member_count: number; created_at: string;
 }
 
+export type ConversationStatus = 'pending' | 'accepted' | 'declined';
+
 export interface Conversation {
   id: string; participant_ids: string[]; last_message: string | null; last_message_at: string | null;
+  status: ConversationStatus; initiator_id: string;
 }
 
 export interface Message {

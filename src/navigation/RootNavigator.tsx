@@ -26,7 +26,7 @@ export type RootStackParamList = {
   Onboarding: undefined;
   MainTabs: undefined;
   PostDetail: { postId: string };
-  Chat: { conversationId: string; otherUserName: string };
+  Chat: { conversationId: string; otherUserId: string };
   Communities: undefined;
   CommunityDetail: { communityId: string };
   CreatePost: undefined;

@@ -1,34 +1,28 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Share } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
+import { findOrCreateConversation } from '@/lib/conversations';
 import { colors, gradients, spacing } from '@/theme/tokens';
+import { timeAgo } from '@/utils/timeAgo';
 import type { Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Route = RouteProp<RootStackParamList, 'PostDetail'>;
-
-function timeAgo(dateStr: string): string {
-  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-  if (seconds < 60) return 'just now';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function PostDetailScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const { session } = useAuth();
   const [post, setPost] = useState<Post | null>(null);
   const [liked, setLiked] = useState(false);
   const [following, setFollowing] = useState(false);
+  const [messaging, setMessaging] = useState(false);
 
   const load = useCallback(async () => {
     // Explicit FK hint (posts_author_id_fkey) — see FeedScreen.tsx for why it's needed.
@@ -77,6 +71,19 @@ export default function PostDetailScreen() {
     Share.share({ message: `${post.title} — via Havenly` }).catch(() => {});
   };
 
+  const onMessage = async () => {
+    if (!post || !session?.user || messaging) return;
+    setMessaging(true);
+    try {
+      const conversationId = await findOrCreateConversation(session.user.id, post.author_id);
+      navigation.navigate('Chat', { conversationId, otherUserId: post.author_id });
+    } catch (e) {
+      Alert.alert('Couldn\'t start conversation', e instanceof Error ? e.message : 'Try again.');
+    } finally {
+      setMessaging(false);
+    }
+  };
+
   if (!post) return null;
 
   const isOwnPost = post.author_id === session?.user.id;
@@ -104,11 +111,16 @@ export default function PostDetailScreen() {
             <Text style={styles.meta}>{timeAgo(post.created_at)}</Text>
           </View>
           {!isOwnPost && (
-            <Pressable style={[styles.followBtn, following && styles.followBtnActive]} onPress={toggleFollow}>
-              <Text style={[styles.followBtnText, following && styles.followBtnTextActive]}>
-                {following ? 'Following' : 'Follow'}
-              </Text>
-            </Pressable>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <Pressable style={styles.messageBtn} onPress={onMessage}>
+                <Text style={styles.messageBtnText}>💬</Text>
+              </Pressable>
+              <Pressable style={[styles.followBtn, following && styles.followBtnActive]} onPress={toggleFollow}>
+                <Text style={[styles.followBtnText, following && styles.followBtnTextActive]}>
+                  {following ? 'Following' : 'Follow'}
+                </Text>
+              </Pressable>
+            </View>
           )}
         </View>
 
@@ -147,6 +159,8 @@ const styles = StyleSheet.create({
   avatar: { width: 32, height: 32, borderRadius: 16 },
   username: { fontSize: 13, fontWeight: '700', color: colors.ink },
   meta: { fontSize: 11, color: colors.inkSoft },
+  messageBtn: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
+  messageBtnText: { fontSize: 13 },
   followBtn: { paddingHorizontal: 16, paddingVertical: 7, borderRadius: 100, backgroundColor: colors.ink },
   followBtnActive: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   followBtnText: { fontSize: 11.5, fontWeight: '700', color: colors.sand },
