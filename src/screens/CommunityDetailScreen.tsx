@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/lib/AuthContext';
 import { colors, spacing } from '@/theme/tokens';
 import type { Community } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -12,34 +13,54 @@ export default function CommunityDetailScreen() {
   const navigation = useNavigation();
   const route = useRoute<Route>();
   const { communityId } = route.params;
+  const { session } = useAuth();
   const [community, setCommunity] = useState<Community | null>(null);
   const [joined, setJoined] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    const userId = session?.user.id;
+
     supabase.from('communities').select('*').eq('id', communityId).single().then(({ data }) => {
       setCommunity(data as Community);
+      setLoaded(true);
     });
 
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) return;
-      const { data } = await supabase.from('community_members').select('*')
-        .eq('community_id', communityId).eq('user_id', user.id).maybeSingle();
-      setJoined(!!data);
-    });
-  }, [communityId]);
+    if (userId) {
+      supabase.from('community_members').select('*')
+        .eq('community_id', communityId).eq('user_id', userId).maybeSingle()
+        .then(({ data }) => setJoined(!!data));
+    }
+  }, [communityId, session]);
 
   const toggleJoin = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    if (joined) {
-      await supabase.from('community_members').delete().eq('community_id', communityId).eq('user_id', user.id);
-    } else {
-      await supabase.from('community_members').insert({ community_id: communityId, user_id: user.id });
+    const userId = session?.user.id;
+    if (!userId || !community) return;
+    const wasJoined = joined;
+    setJoined(!wasJoined);
+    setCommunity((prev) => prev && { ...prev, member_count: prev.member_count + (wasJoined ? -1 : 1) });
+
+    const { error } = wasJoined
+      ? await supabase.from('community_members').delete().eq('community_id', communityId).eq('user_id', userId)
+      : await supabase.from('community_members').insert({ community_id: communityId, user_id: userId });
+
+    if (error) {
+      // Revert the optimistic update if the write actually failed.
+      setJoined(wasJoined);
+      setCommunity((prev) => prev && { ...prev, member_count: prev.member_count + (wasJoined ? 1 : -1) });
     }
-    setJoined(!joined);
   };
 
-  if (!community) return null;
+  if (!community) {
+    return loaded ? (
+      <View style={styles.notFound}>
+        <Pressable style={styles.back} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
+        <Text style={styles.notFoundText}>This community isn't available.</Text>
+      </View>
+    ) : (
+      <View style={styles.centered}><ActivityIndicator color={colors.coral} /></View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -59,7 +80,10 @@ export default function CommunityDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
+  centered: { flex: 1, backgroundColor: colors.sand, alignItems: 'center', justifyContent: 'center' },
   back: { marginTop: 50, marginLeft: 16, width: 34, height: 34, borderRadius: 17, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
+  notFound: { flex: 1, backgroundColor: colors.sand, paddingTop: 60, paddingHorizontal: spacing.lg },
+  notFoundText: { color: colors.inkSoft, textAlign: 'center', marginTop: 100 },
   body: { padding: spacing.lg },
   emoji: { fontSize: 40 },
   name: { fontFamily: 'Fraunces_600SemiBold', fontSize: 21, color: colors.ink, marginTop: 8 },

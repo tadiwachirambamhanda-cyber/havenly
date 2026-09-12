@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SectionList, Pressable } from 'react-native';
+import { View, Text, StyleSheet, SectionList, Pressable, RefreshControl } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -18,6 +18,7 @@ export default function InboxScreen() {
   const navigation = useNavigation<Nav>();
   const { session } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const myId = session?.user.id;
 
   const load = useCallback(async () => {
@@ -47,6 +48,12 @@ export default function InboxScreen() {
   }, [myId]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await load();
+    setRefreshing(false);
+  }, [load]);
 
   // Keep the list live while sitting on this tab, not just on re-focus —
   // both a new message and someone else's read state changing (irrelevant
@@ -85,6 +92,7 @@ export default function InboxScreen() {
         sections={sections}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingBottom: 40 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
         renderSectionHeader={({ section }) => (
           sections.length > 1 ? <Text style={styles.sectionLabel}>{section.title}</Text> : null
         )}

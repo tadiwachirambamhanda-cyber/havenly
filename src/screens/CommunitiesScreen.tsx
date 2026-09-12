@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SectionList, Pressable } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useCallback, useState } from 'react';
+import { View, Text, StyleSheet, SectionList, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -17,14 +17,35 @@ export default function CommunitiesScreen() {
   const navigation = useNavigation<Nav>();
   const { profile } = useAuth();
   const [communities, setCommunities] = useState<Community[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
-  useEffect(() => {
-    supabase.from('communities').select('*').order('member_count', { ascending: false })
-      .then(({ data, error }) => {
-        if (error) { console.error(error.message); return; }
-        setCommunities((data as Community[]) ?? []);
-      });
+  const load = useCallback(async () => {
+    const { data, error } = await supabase.from('communities').select('*').order('member_count', { ascending: false });
+    if (error) { console.error(error.message); return; }
+    setCommunities((data as Community[]) ?? []);
   }, []);
+
+  // Refetches on focus (not just mount) so joining/leaving elsewhere, or
+  // changing your interests/university in Edit Profile, is reflected here
+  // without needing an app restart — this screen never refreshed at all before.
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        if (!hasLoadedOnce) setLoading(true);
+        await load();
+        setLoading(false);
+        setHasLoadedOnce(true);
+      })();
+    }, [load, hasLoadedOnce])
+  );
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await load();
+    setRefreshing(false);
+  }, [load]);
 
   const userInterests = new Set(profile?.interests ?? []);
 
@@ -44,12 +65,15 @@ export default function CommunitiesScreen() {
     return { title: SECTION_TITLES[cat], data };
   });
 
+  if (loading) return <View style={styles.centered}><ActivityIndicator color={colors.coral} /></View>;
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Communities</Text>
       <Text style={styles.sub}>Join groups around your interests or campus.</Text>
       <SectionList
         sections={sections} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 40 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
         renderSectionHeader={({ section }) => <Text style={styles.sectionLabel}>{section.title}</Text>}
         renderItem={({ item }) => (
           <Pressable style={styles.card} onPress={() => navigation.navigate('CommunityDetail', { communityId: item.id })}>
@@ -70,6 +94,7 @@ export default function CommunitiesScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand, paddingTop: 60 },
+  centered: { flex: 1, backgroundColor: colors.sand, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 26, color: colors.ink, paddingHorizontal: spacing.lg },
   sub: { color: colors.inkSoft, fontSize: 12.5, paddingHorizontal: spacing.lg, marginTop: 4, marginBottom: 8 },
   sectionLabel: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingVertical: 10 },

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -30,6 +30,8 @@ export default function ProfileScreen() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [savedPosts, setSavedPosts] = useState<Post[]>([]);
   const [activeTab, setActiveTab] = useState<GridTab>('posts');
+  const [refreshing, setRefreshing] = useState(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   const load = useCallback(async () => {
     const userId = session?.user.id;
@@ -51,9 +53,21 @@ export default function ProfileScreen() {
     setSavedPosts(((savedData ?? []) as unknown as { post: Post }[]).map((row) => row.post).filter(Boolean));
   }, [session]);
 
-  useFocusEffect(useCallback(() => { load(); }, [load]));
+  useFocusEffect(
+    useCallback(() => {
+      (async () => { await load(); setHasLoadedOnce(true); })();
+    }, [load])
+  );
 
-  if (!profile) return null;
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await load();
+    setRefreshing(false);
+  }, [load]);
+
+  if (!profile) {
+    return hasLoadedOnce ? null : <View style={styles.centered}><ActivityIndicator color={colors.coral} /></View>;
+  }
 
   const interestChips = INTEREST_OPTIONS.filter((opt) => profile.interests.includes(opt.key));
 
@@ -65,6 +79,7 @@ export default function ProfileScreen() {
       numColumns={3}
       columnWrapperStyle={{ gap: 2 }}
       contentContainerStyle={{ paddingBottom: 40 }}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
       renderItem={({ item, index }) => {
         const [from, to] = gradients[index % gradients.length];
         return (
@@ -131,6 +146,7 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
+  centered: { flex: 1, backgroundColor: colors.sand, alignItems: 'center', justifyContent: 'center' },
   cover: { height: 110 },
   settingsBtn: {
     position: 'absolute', right: 16, width: 34, height: 34, borderRadius: 17,
