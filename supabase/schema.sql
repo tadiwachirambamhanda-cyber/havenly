@@ -330,3 +330,31 @@ create index follows_follower_idx on follows (follower_id);
 create index follows_following_idx on follows (following_id);
 create index comments_post_idx on comments (post_id, created_at);
 create index saved_posts_user_idx on saved_posts (user_id);
+
+-- ==================== STORAGE ====================
+-- Path convention for both buckets: <user_id>/<filename>, checked against
+-- auth.uid() via storage.foldername(name)[1].
+insert into storage.buckets (id, name, public) values ('post-images', 'post-images', true)
+on conflict (id) do nothing;
+create policy "Post images are publicly viewable" on storage.objects for select using (bucket_id = 'post-images');
+create policy "Users can upload their own post images" on storage.objects for insert with check (
+  bucket_id = 'post-images' and auth.uid()::text = (storage.foldername(name))[1]
+);
+create policy "Users can delete their own post images" on storage.objects for delete using (
+  bucket_id = 'post-images' and auth.uid()::text = (storage.foldername(name))[1]
+);
+
+-- Separate from post-images (one profile photo per user vs. many post
+-- photos) even though the RLS pattern is identical.
+insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true)
+on conflict (id) do nothing;
+create policy "Avatars are publicly viewable" on storage.objects for select using (bucket_id = 'avatars');
+create policy "Users can upload their own avatar" on storage.objects for insert with check (
+  bucket_id = 'avatars' and auth.uid()::text = (storage.foldername(name))[1]
+);
+create policy "Users can update their own avatar" on storage.objects for update using (
+  bucket_id = 'avatars' and auth.uid()::text = (storage.foldername(name))[1]
+);
+create policy "Users can delete their own avatar" on storage.objects for delete using (
+  bucket_id = 'avatars' and auth.uid()::text = (storage.foldername(name))[1]
+);

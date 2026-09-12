@@ -21,6 +21,7 @@ import CommunityDetailScreen from '@/screens/CommunityDetailScreen';
 import CreatePostScreen from '@/screens/CreatePostScreen';
 import BlockedUsersScreen from '@/screens/BlockedUsersScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
+import EditProfileScreen from '@/screens/EditProfileScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -34,6 +35,7 @@ export type RootStackParamList = {
   CreatePost: undefined;
   BlockedUsers: undefined;
   Settings: undefined;
+  EditProfile: undefined;
 };
 
 export type MainTabParamList = {
@@ -93,6 +95,7 @@ export default function RootNavigator() {
             <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="BlockedUsers" component={BlockedUsersScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ presentation: 'modal' }} />
           </>
         )}
       </Stack.Navigator>

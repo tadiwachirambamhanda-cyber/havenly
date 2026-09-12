@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -91,7 +91,7 @@ export default function ProfileScreen() {
             ) : (
               <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
             )}
-            <Pressable style={styles.editBtn} onPress={() => Alert.alert('Coming soon', 'Editing your profile isn\'t built yet.')}>
+            <Pressable style={styles.editBtn} onPress={() => navigation.navigate('EditProfile')}>
               <Text style={styles.editBtnText}>Edit profile</Text>
             </Pressable>
           </View>
