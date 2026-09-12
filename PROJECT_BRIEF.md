@@ -172,10 +172,12 @@ valid choice.
   attributed to a real "Havenly Editorial" system account (auth user
   created via the Admin API, not a fake profiles row with no matching
   login — see README.md for how to recreate it on a fresh project)
+- True masonry feed layout — a manual two-column layout with deterministic
+  per-post image heights and greedy column balancing, replacing FlatList's
+  numColumns (which forces equal-height rows, not real masonry)
 
-**Not started — build in this order:**
-1. True masonry feed layout (currently equal-height columns, not variable)
-2. Comments + a bookmarks/"Saved" table — neither exists; PostDetail and
+**Not started:**
+1. Comments + a bookmarks/"Saved" table — neither exists; PostDetail and
    Profile currently show honest placeholders instead of fake data for these
 
 Database schema (`supabase/schema.sql`) already includes Row Level Security

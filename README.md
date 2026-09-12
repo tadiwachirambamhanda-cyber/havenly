@@ -53,6 +53,8 @@ npm install
    (`conversation_reads`)
 6. ~~Seed 30-40 real editorial posts~~ — done: 32 posts across all 10
    interest tags, attributed to a real "Havenly Editorial" system account
-7. True masonry feed layout (currently equal-height columns via FlatList numColumns)
+7. ~~True masonry feed layout~~ — done: manual two-column layout with
+   deterministic per-post image heights + greedy column balancing
+   (`FeedScreen.tsx`), replacing FlatList's equal-height-row numColumns
 8. Comments + a "Saved" bookmarks feature — neither has a table yet;
    PostDetail and Profile currently show honest placeholders instead
