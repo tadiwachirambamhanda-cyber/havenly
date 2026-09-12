@@ -2,8 +2,10 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, Alert } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { colors, radius, spacing, gradients } from '@/theme/tokens';
@@ -21,6 +23,7 @@ const GRID_TABS: { key: GridTab; label: string }[] = [
 
 export default function ProfileScreen() {
   const navigation = useNavigation<Nav>();
+  const insets = useSafeAreaInsets();
   const { session } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState({ posts: 0, followers: 0, following: 0 });
@@ -79,6 +82,9 @@ export default function ProfileScreen() {
       ListHeaderComponent={
         <View>
           <LinearGradient colors={['#FF7A5C', '#E3A23A', '#0F8B82']} locations={[0, 0.6, 1]} style={styles.cover} />
+          <Pressable style={[styles.settingsBtn, { top: insets.top + 12 }]} onPress={() => navigation.navigate('Settings')}>
+            <Feather name="settings" size={17} color={colors.ink} />
+          </Pressable>
           <View style={styles.avatarRow}>
             {profile.avatar_url ? (
               <Image source={{ uri: profile.avatar_url }} style={styles.avatar} />
@@ -118,16 +124,7 @@ export default function ProfileScreen() {
           </View>
         </View>
       }
-      ListFooterComponent={
-        <View>
-          <Pressable style={styles.footerLink} onPress={() => navigation.navigate('BlockedUsers')}>
-            <Text style={styles.footerLinkText}>Blocked accounts</Text>
-          </Pressable>
-          <Pressable style={styles.logoutBtn} onPress={() => supabase.auth.signOut()}>
-            <Text style={styles.logoutText}>Log out</Text>
-          </Pressable>
-        </View>
-      }
+      ListFooterComponent={<View style={{ height: 24 }} />}
     />
   );
 }
@@ -135,6 +132,10 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   cover: { height: 110 },
+  settingsBtn: {
+    position: 'absolute', right: 16, width: 34, height: 34, borderRadius: 17,
+    backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center',
+  },
   avatarRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', paddingHorizontal: spacing.lg, marginTop: -38 },
   avatar: { width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand },
   editBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white, marginBottom: 6 },
@@ -155,8 +156,4 @@ const styles = StyleSheet.create({
   tabUnderline: { position: 'absolute', bottom: -1, height: 2, width: '60%', backgroundColor: colors.coral, borderRadius: 1 },
   gridCell: { flex: 1, aspectRatio: 1 / 1.15, overflow: 'hidden', marginBottom: 2 },
   gridEmpty: { color: colors.inkSoft, textAlign: 'center', paddingVertical: 40, fontSize: 13 },
-  footerLink: { alignItems: 'center', paddingTop: 24 },
-  footerLinkText: { color: colors.inkSoft, fontWeight: '600', fontSize: 13 },
-  logoutBtn: { alignItems: 'center', paddingVertical: 24 },
-  logoutText: { color: colors.coral, fontWeight: '700', fontSize: 13.5 },
 });
