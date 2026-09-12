@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { supabase } from '@/lib/supabase';
 import { colors, radius, spacing, gradients } from '@/theme/tokens';
@@ -17,6 +17,7 @@ export default function FeedScreen() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   const fetchPosts = useCallback(async () => {
     const { data, error } = await supabase
@@ -30,7 +31,19 @@ export default function FeedScreen() {
     setPosts((data as unknown as Post[]) ?? []);
   }, []);
 
-  useEffect(() => { setLoading(true); fetchPosts().finally(() => setLoading(false)); }, [fetchPosts]);
+  // Refetches every time Feed regains focus (not just on mount) so a post
+  // made in CreatePost, or a like toggled in PostDetail, shows up immediately
+  // without needing a manual pull-to-refresh.
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        if (!hasLoadedOnce) setLoading(true);
+        await fetchPosts();
+        setLoading(false);
+        setHasLoadedOnce(true);
+      })();
+    }, [fetchPosts, hasLoadedOnce])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true); await fetchPosts(); setRefreshing(false);
