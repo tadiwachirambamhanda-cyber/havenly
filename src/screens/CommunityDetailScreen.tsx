@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
-import { colors, radius, spacing } from '@/theme/tokens';
-import type { Community, WorshipPlace } from '@/types';
+import { colors, spacing } from '@/theme/tokens';
+import type { Community } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Route = RouteProp<RootStackParamList, 'CommunityDetail'>;
@@ -13,17 +13,11 @@ export default function CommunityDetailScreen() {
   const route = useRoute<Route>();
   const { communityId } = route.params;
   const [community, setCommunity] = useState<Community | null>(null);
-  const [worshipPlaces, setWorshipPlaces] = useState<WorshipPlace[]>([]);
   const [joined, setJoined] = useState(false);
 
   useEffect(() => {
     supabase.from('communities').select('*').eq('id', communityId).single().then(({ data }) => {
       setCommunity(data as Community);
-      if (data?.worship_type) {
-        // TODO(claude-code): order by real distance once location permission is granted.
-        supabase.from('worship_places').select('*').eq('worship_type', data.worship_type)
-          .then(({ data: places }) => setWorshipPlaces((places as WorshipPlace[]) ?? []));
-      }
     });
 
     supabase.auth.getUser().then(async ({ data: { user } }) => {
@@ -58,20 +52,6 @@ export default function CommunityDetailScreen() {
         <Pressable style={[styles.joinBtn, joined && styles.joinBtnJoined]} onPress={toggleJoin}>
           <Text style={styles.joinBtnText}>{joined ? 'Joined ✓' : 'Join community'}</Text>
         </Pressable>
-        {community.worship_type && (
-          <View style={{ marginTop: 20 }}>
-            <Text style={styles.sectionLabel}>Nearest places of worship</Text>
-            {worshipPlaces.map((place) => (
-              <View key={place.id} style={styles.worshipCard}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.worshipName}>{place.name}</Text>
-                  <Text style={styles.worshipMeta}>{place.area}</Text>
-                </View>
-              </View>
-            ))}
-            {worshipPlaces.length === 0 && <Text style={styles.placeholder}>No places seeded yet for this category.</Text>}
-          </View>
-        )}
       </View>
     </ScrollView>
   );
@@ -88,9 +68,4 @@ const styles = StyleSheet.create({
   joinBtn: { marginTop: 16, backgroundColor: colors.coral, paddingVertical: 13, borderRadius: 100, alignItems: 'center' },
   joinBtnJoined: { backgroundColor: colors.ink },
   joinBtnText: { color: 'white', fontWeight: '700', fontSize: 14 },
-  sectionLabel: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft, marginBottom: 10 },
-  worshipCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: radius.md, padding: 12, marginBottom: 9 },
-  worshipName: { fontSize: 12.5, fontWeight: '700', color: colors.ink },
-  worshipMeta: { fontSize: 10.5, color: colors.inkSoft, marginTop: 2 },
-  placeholder: { color: colors.inkSoft, fontSize: 12 },
 });

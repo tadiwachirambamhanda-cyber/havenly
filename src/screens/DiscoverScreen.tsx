@@ -4,7 +4,7 @@ import { colors, spacing } from '@/theme/tokens';
 
 // STUB — port search bar, horizontal-scroll "Trending spots" cards, and
 // "This week on campus" event list from the HTML prototype's #discover screen.
-// Query `worship_places` + a future `spots`/`events` table.
+// Needs a future `spots`/`events` table.
 
 export default function DiscoverScreen() {
   return (

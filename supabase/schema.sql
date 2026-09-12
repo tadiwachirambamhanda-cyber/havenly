@@ -90,12 +90,9 @@ create table communities (
   name text not null,
   emoji text not null,
   description text,
-  category text not null check (category in ('interest', 'faith', 'campus')),
-  worship_type text check (worship_type in ('mosque','church','temple','synagogue','gurdwara','general')),
+  category text not null check (category in ('interest', 'campus')),
   -- Only set for category='interest' communities — lets the Communities screen surface
-  -- ones matching the interests a user picked in onboarding. Deliberately unused for
-  -- 'faith' and 'campus': every faith community gets identical treatment (see
-  -- PROJECT_BRIEF.md section 4), so there's no "preferred faith" to sort by.
+  -- ones matching the interests a user picked in onboarding.
   related_interest text check (related_interest in (
     'cafes','fashion','nightlife','fitness','beach','study','travel','events','padel','beauty'
   )),
@@ -115,18 +112,6 @@ alter table community_members enable row level security;
 create policy "Memberships are viewable by everyone" on community_members for select using (true);
 create policy "Users can join communities" on community_members for insert with check (auth.uid() = user_id);
 create policy "Users can leave communities" on community_members for delete using (auth.uid() = user_id);
-
--- ==================== WORSHIP PLACES ====================
-create table worship_places (
-  id uuid primary key default gen_random_uuid(),
-  worship_type text not null check (worship_type in ('mosque','church','temple','synagogue','gurdwara','general')),
-  name text not null,
-  area text,
-  latitude double precision not null,
-  longitude double precision not null
-);
-alter table worship_places enable row level security;
-create policy "Worship places are viewable by everyone" on worship_places for select using (true);
 
 -- ==================== MESSAGING ====================
 create table conversations (
@@ -184,4 +169,3 @@ create policy "Users can view their own reports" on reports for select using (au
 create index posts_created_at_idx on posts (created_at desc);
 create index posts_author_idx on posts (author_id);
 create index messages_conversation_idx on messages (conversation_id, created_at);
-create index worship_places_type_idx on worship_places (worship_type);

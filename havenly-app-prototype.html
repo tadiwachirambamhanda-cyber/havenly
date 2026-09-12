@@ -273,11 +273,6 @@
   .cd-members{ font-size:12px; color:var(--ink-soft); margin-top:4px; }
   .cd-desc{ font-size:13px; color:#3A4038; line-height:1.55; margin-top:12px; }
   .cd-join-btn{ margin-top:16px; width:100%; padding:13px; border-radius:100px; background:var(--coral); color:white; border:none; font-weight:700; font-size:14px; cursor:pointer; }
-  .worship-card{ display:flex; gap:12px; align-items:center; background:var(--white); border:1px solid var(--line); border-radius:var(--radius-md); padding:12px; margin-bottom:9px; }
-  .worship-icon{ width:42px; height:42px; border-radius:12px; background:var(--teal-soft); color:var(--teal); display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; }
-  .worship-name{ font-size:12.5px; font-weight:700; }
-  .worship-meta{ font-size:10.5px; color:var(--ink-soft); margin-top:2px; }
-  .worship-dist{ margin-left:auto; font-family:var(--font-mono); font-size:11px; color:var(--teal); font-weight:700; text-align:right; flex-shrink:0; }
   .comm-members-row{ display:flex; margin-top:10px; }
   .cm-avatar{ width:26px; height:26px; border-radius:50%; border:2px solid var(--sand); margin-left:-8px; }
   .cm-avatar:first-child{ margin-left:0; }
@@ -442,13 +437,10 @@
       <div class="comm-header">
         <div class="comm-title">Communities</div>
       </div>
-      <div class="comm-sub">Join groups around your interests, faith, or campus.</div>
+      <div class="comm-sub">Join groups around your interests or campus.</div>
 
       <div class="comm-section-label">Based on your interests</div>
       <div class="comm-grid" id="commGridInterest"></div>
-
-      <div class="comm-section-label">Faith & belief communities</div>
-      <div class="comm-grid" id="commGridFaith"></div>
 
       <div class="comm-section-label">Campus communities</div>
       <div class="comm-grid" id="commGridCampus"></div>
@@ -458,19 +450,14 @@
     <div class="screen" id="commDetail">
       <div class="cd-cover" id="cdCover">
         <div class="cd-back" onclick="goTo('communities')">←</div>
-        <div class="cd-emoji" id="cdEmoji">🕌</div>
+        <div class="cd-emoji" id="cdEmoji">🏓</div>
       </div>
       <div class="cd-body">
-        <div class="cd-name" id="cdName">Muslim Students of Dubai</div>
-        <div class="cd-members" id="cdMembers">2,140 members</div>
+        <div class="cd-name" id="cdName">Padel Club Dubai</div>
+        <div class="cd-members" id="cdMembers">1,860 members</div>
         <div class="comm-members-row" id="cdAvatars"></div>
-        <div class="cd-desc" id="cdDesc">A space to connect, share halal spots, and never miss Jummah.</div>
+        <div class="cd-desc" id="cdDesc">Find partners, join weekly meetups, and track your rank across Dubai courts.</div>
         <button class="cd-join-btn" id="cdJoinBtn" onclick="toggleDetailJoin()">Join community</button>
-
-        <div id="worshipSection" style="display:none;">
-          <div class="comm-section-label" style="padding-left:0;">Nearest places of worship</div>
-          <div id="worshipList"></div>
-        </div>
       </div>
     </div>
 
@@ -678,50 +665,10 @@ const communitiesInterest = [
   {id:'study', name:'Study Grind', emoji:'📚', members:'2,780', cover:gradients[1], desc:'Silent co-study sessions, best study spots, and exam-season survival tips.'},
 ];
 
-const communitiesFaith = [
-  {id:'muslim', name:'Muslim Students of Dubai', emoji:'🕌', members:'4,120', cover:gradients[5], desc:'A space to connect, share halal spots, and never miss Jummah.', worship:'mosque'},
-  {id:'christian', name:'Christian Fellowship', emoji:'✝️', members:'1,340', cover:gradients[3], desc:'Weekly fellowship, worship nights, and finding a church community away from home.', worship:'church'},
-  {id:'hindu', name:'Hindu Students Circle', emoji:'🕉️', members:'980', cover:gradients[4], desc:'Festivals, temple visits, and community gatherings for Hindu students in Dubai.', worship:'temple'},
-  {id:'jewish', name:'Jewish Community Dubai', emoji:'✡️', members:'210', cover:gradients[7], desc:'Shabbat dinners, holidays, and connecting with the Jewish community in the UAE.', worship:'synagogue'},
-  {id:'sikh', name:'Sikh Sangat Dubai', emoji:'☬', members:'340', cover:gradients[2], desc:'Gurdwara visits, seva opportunities, and community events.', worship:'gurdwara'},
-  {id:'other-faith', name:'Interfaith & Spiritual', emoji:'🙏', members:'560', cover:gradients[6], desc:'Open space for any faith, philosophy, or spiritual practice not listed above.', worship:'general'},
-];
-
 const communitiesCampus = [
   {id:'aus', name:'AUS Freshers', emoji:'🎓', members:'1,120', cover:gradients[1], desc:'American University of Sharjah — new student meetups & housing tips.'},
   {id:'uowd', name:'UOWD Connect', emoji:'🏫', members:'890', cover:gradients[4], desc:'University of Wollongong Dubai student community.'},
 ];
-
-const worshipPlaces = {
-  mosque: [
-    {name:'Al Farooq Omar Bin Al Khattab Mosque', meta:'Jumeirah 1', dist:'0.8 km'},
-    {name:'Al Rashidiya Mosque', meta:'Al Rashidiya', dist:'1.4 km'},
-    {name:'Jumeirah Mosque', meta:'Jumeirah 1', dist:'2.1 km'},
-  ],
-  church: [
-    {name:'Holy Trinity Church', meta:'Oud Metha', dist:'1.1 km'},
-    {name:'St. Mary\'s Catholic Church', meta:'Oud Metha', dist:'1.3 km'},
-    {name:'Emirates Baptist Church', meta:'Al Qusais', dist:'3.6 km'},
-  ],
-  temple: [
-    {name:'Shiva & Krishna Temple', meta:'Bur Dubai', dist:'2.4 km'},
-    {name:'Guru Nanak Darbar (Shared Complex)', meta:'Jebel Ali', dist:'6.8 km'},
-    {name:'Sindhi Guru Darbar Temple', meta:'Bur Dubai', dist:'2.6 km'},
-  ],
-  synagogue: [
-    {name:'The Sephardic Synagogue of Dubai', meta:'Jumeirah', dist:'2.0 km'},
-    {name:'Jewish Community Centre', meta:'Downtown', dist:'3.2 km'},
-  ],
-  gurdwara: [
-    {name:'Guru Nanak Darbar Gurdwara', meta:'Jebel Ali', dist:'6.8 km'},
-  ],
-  general: [
-    {name:'Interfaith Meeting Space — Alserkal', meta:'Al Quoz', dist:'2.9 km'},
-    {name:'Dubai Community Centre', meta:'Al Qusais', dist:'3.5 km'},
-  ],
-};
-
-const worshipIcons = {mosque:'🕌', church:'✝️', temple:'🕉️', synagogue:'✡️', gurdwara:'☬', general:'🙏'};
 
 const joinedState = {};
 
@@ -742,11 +689,10 @@ function commCard(c){
 
 function buildCommunities(){
   document.getElementById('commGridInterest').innerHTML = communitiesInterest.map(commCard).join('');
-  document.getElementById('commGridFaith').innerHTML = communitiesFaith.map(commCard).join('');
   document.getElementById('commGridCampus').innerHTML = communitiesCampus.map(commCard).join('');
 }
 
-function allCommunities(){ return [...communitiesInterest, ...communitiesFaith, ...communitiesCampus]; }
+function allCommunities(){ return [...communitiesInterest, ...communitiesCampus]; }
 
 function toggleJoin(id){
   joinedState[id] = !joinedState[id];
@@ -777,21 +723,6 @@ function openCommunity(id){
   btn.textContent = joined ? 'Joined ✓' : 'Join community';
   btn.style.background = joined ? 'var(--ink)' : 'var(--coral)';
 
-  const worshipSection = document.getElementById('worshipSection');
-  if(c.worship){
-    worshipSection.style.display = 'block';
-    document.getElementById('worshipList').innerHTML = worshipPlaces[c.worship].map(w=>`
-      <div class="worship-card">
-        <div class="worship-icon">${worshipIcons[c.worship]}</div>
-        <div>
-          <div class="worship-name">${w.name}</div>
-          <div class="worship-meta">${w.meta}</div>
-        </div>
-        <div class="worship-dist">${w.dist}</div>
-      </div>`).join('');
-  } else {
-    worshipSection.style.display = 'none';
-  }
   goTo('commDetail');
 }
 

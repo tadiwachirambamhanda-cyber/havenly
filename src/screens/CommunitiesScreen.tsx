@@ -10,7 +10,7 @@ import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 const SECTION_TITLES: Record<CommunityCategory, string> = {
-  interest: 'Based on your interests', faith: 'Faith & belief communities', campus: 'Campus communities',
+  interest: 'Based on your interests', campus: 'Campus communities',
 };
 
 export default function CommunitiesScreen() {
@@ -29,10 +29,8 @@ export default function CommunitiesScreen() {
   const userInterests = new Set(profile?.interests ?? []);
 
   // Only the 'interest' category is personalized — matched communities move to the
-  // top but nothing is ever hidden. 'faith' and 'campus' keep their default order:
-  // every faith community gets identical treatment (PROJECT_BRIEF.md section 4), so
-  // there's no per-user signal to sort faith communities by.
-  const sections = (['interest', 'faith', 'campus'] as CommunityCategory[]).map((cat) => {
+  // top but nothing is ever hidden.
+  const sections = (['interest', 'campus'] as CommunityCategory[]).map((cat) => {
     const data = communities.filter((c) => c.category === cat);
     if (cat === 'interest') {
       data.sort((a, b) => {
@@ -47,7 +45,7 @@ export default function CommunitiesScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Communities</Text>
-      <Text style={styles.sub}>Join groups around your interests, faith, or campus.</Text>
+      <Text style={styles.sub}>Join groups around your interests or campus.</Text>
       <SectionList
         sections={sections} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 40 }}
         renderSectionHeader={({ section }) => <Text style={styles.sectionLabel}>{section.title}</Text>}

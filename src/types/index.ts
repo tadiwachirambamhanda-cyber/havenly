@@ -13,16 +13,11 @@ export interface Post {
   image_url: string | null; tag: string; is_editorial: boolean; like_count: number; created_at: string;
 }
 
-export type CommunityCategory = 'interest' | 'faith' | 'campus';
-export type WorshipType = 'mosque' | 'church' | 'temple' | 'synagogue' | 'gurdwara' | 'general';
+export type CommunityCategory = 'interest' | 'campus';
 
 export interface Community {
   id: string; name: string; emoji: string; description: string; category: CommunityCategory;
-  worship_type: WorshipType | null; related_interest: Interest | null; member_count: number; created_at: string;
-}
-
-export interface WorshipPlace {
-  id: string; worship_type: WorshipType; name: string; area: string; latitude: number; longitude: number;
+  related_interest: Interest | null; member_count: number; created_at: string;
 }
 
 export interface Conversation {

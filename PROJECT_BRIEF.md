@@ -11,16 +11,16 @@ built, and what comes next. Read this first before touching any code.
 Havenly is a visual-first lifestyle discovery and community app for students
 and young adults living in or moving to Dubai. Think Lemon8's aesthetic,
 card-based feed — but localized to Dubai, and extended with two things Lemon8
-doesn't have: **interest/faith-based communities** and **direct messaging**.
+doesn't have: **interest-based communities** and **direct messaging**.
 
 **Target user:** university students and young professionals (18-28) in
 Dubai — many of them expats or new arrivals looking to find their people,
-their café, their community, and their place of worship in a new city.
+their café, and their community in a new city.
 
 **Core problem it solves:** Dubai is a transient, highly international city.
 Young people arrive constantly with no local network. Havenly gives them a
 curated, visual way to discover the city (cafés, events, spots) *and* a way
-to immediately plug into a community that matches their interests or faith.
+to immediately plug into a community that matches their interests.
 
 ---
 
@@ -41,18 +41,14 @@ to immediately plug into a community that matches their interests or faith.
 - Designed to eventually pull from Google Places API + Eventbrite API for live data
 
 ### Communities
-- Three categories, presented with **equal visual weight** — this matters,
-  see section 4 below:
+- Two categories:
   - **Interest-based:** Padel Club, Café Hoppers, Thrift & Style, Study Grind
-  - **Faith & belief:** Muslim, Christian, Hindu, Jewish, Sikh communities,
-    plus an open "Interfaith & Spiritual" catch-all for anyone not covered
+    — surfaced/sorted by the interests a user picked in onboarding
   - **Campus-based:** grouped by university (AUS, UOWD, etc.)
 - Users can join/leave communities
-- Community detail page shows member count, description, and — for faith
-  communities specifically — a **"Nearest places of worship"** list with
-  distance, pulling from a dedicated `worship_places` table
-- This same "nearest places" pattern is designed to be reusable for other
-  categories later (e.g. "nearest padel courts" for the Padel Club)
+- Community detail page shows member count and description
+- See section 4 — faith/belief communities were considered and deliberately
+  removed; don't reintroduce them without reading that section first
 
 ### Messages (DMs)
 - TikTok/Instagram-style inbox: list of conversations with unread indicators
@@ -102,18 +98,26 @@ decisions already made there.
 
 ---
 
-## 4. Important design principle: faith & inclusion
+## 4. Decision log: faith & belief communities were removed
 
-The Communities feature deliberately treats every faith/belief community
-with **identical visual and functional treatment** — same card layout, same
-detail-page template, same "nearest places of worship" feature. No faith is
-positioned as default, larger, or higher-priority than others. This isn't
-just an ethical choice — it's a practical one for Dubai's genuinely diverse,
-multi-national student population.
+Havenly originally shipped with a third Communities category — faith/belief
+groups (Muslim, Christian, Hindu, Jewish, Sikh, plus an open "Interfaith &
+Spiritual" catch-all), each with a "Nearest places of worship" feature
+pulling from a `worship_places` table. Every faith got identical visual and
+functional treatment by design, specifically for Dubai's diverse,
+multi-national student population — no faith was positioned as default or
+higher-priority.
 
-The "Interfaith & Spiritual" category exists so nobody who doesn't fit the
-five listed faiths feels unlisted. **This list should expand based on real
-early users' needs, not be treated as final.**
+**That feature was deliberately removed** (not just deprioritized) as a
+product decision: labeling users by religion inside a social app was judged
+too much moderation/reputational risk for a small team to take on well,
+especially pre-launch with no real content moderation infrastructure yet.
+The `communities` category enum, `worship_places` table, and all related UI
+were dropped in a migration rather than just hidden.
+
+If faith-based communities come back later, revisit this section first —
+the "equal treatment for every faith" principle above is still the right
+bar to design against if it does.
 
 ---
 
@@ -136,7 +140,7 @@ valid choice.
 **Fully wired to a real Supabase backend (not mocked):**
 - Onboarding → writes interests to `profiles` table
 - Feed → real query with editorial/UGC distinction, pull-to-refresh
-- Communities list + detail → join/leave persists to DB, worship-places query works
+- Communities list + detail → join/leave persists to DB, interest-based sorting
 - Inbox + Chat → real-time messaging via Supabase Realtime subscriptions
 
 **Structured with clear TODOs, needs UI ported from the HTML prototype:**
@@ -200,7 +204,7 @@ Original goal: testable/launchable by end of year. Realistic path:
 - `havenly-app-prototype.html` — clickable visual reference, every screen
 - `src/` — React Native source (screens, navigation, theme tokens, types)
 - `supabase/schema.sql` — full database schema with RLS policies
-- `supabase/seed.sql` — seed data for communities + worship places
+- `supabase/seed.sql` — seed data for communities
 - `app.json`, `package.json`, `tsconfig.json` — Expo project config
 
 **First message to send in Claude Code:** something like *"Read
