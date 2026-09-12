@@ -18,7 +18,7 @@ export type WorshipType = 'mosque' | 'church' | 'temple' | 'synagogue' | 'gurdwa
 
 export interface Community {
   id: string; name: string; emoji: string; description: string; category: CommunityCategory;
-  worship_type: WorshipType | null; member_count: number; created_at: string;
+  worship_type: WorshipType | null; related_interest: Interest | null; member_count: number; created_at: string;
 }
 
 export interface WorshipPlace {

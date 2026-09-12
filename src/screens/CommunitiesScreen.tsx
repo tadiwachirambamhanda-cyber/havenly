@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, SectionList, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/lib/AuthContext';
 import { colors, radius, spacing } from '@/theme/tokens';
 import type { Community, CommunityCategory } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -14,6 +15,7 @@ const SECTION_TITLES: Record<CommunityCategory, string> = {
 
 export default function CommunitiesScreen() {
   const navigation = useNavigation<Nav>();
+  const { profile } = useAuth();
   const [communities, setCommunities] = useState<Community[]>([]);
 
   useEffect(() => {
@@ -24,9 +26,23 @@ export default function CommunitiesScreen() {
       });
   }, []);
 
-  const sections = (['interest', 'faith', 'campus'] as CommunityCategory[]).map((cat) => ({
-    title: SECTION_TITLES[cat], data: communities.filter((c) => c.category === cat),
-  }));
+  const userInterests = new Set(profile?.interests ?? []);
+
+  // Only the 'interest' category is personalized — matched communities move to the
+  // top but nothing is ever hidden. 'faith' and 'campus' keep their default order:
+  // every faith community gets identical treatment (PROJECT_BRIEF.md section 4), so
+  // there's no per-user signal to sort faith communities by.
+  const sections = (['interest', 'faith', 'campus'] as CommunityCategory[]).map((cat) => {
+    const data = communities.filter((c) => c.category === cat);
+    if (cat === 'interest') {
+      data.sort((a, b) => {
+        const aMatch = a.related_interest && userInterests.has(a.related_interest) ? 1 : 0;
+        const bMatch = b.related_interest && userInterests.has(b.related_interest) ? 1 : 0;
+        return bMatch - aMatch;
+      });
+    }
+    return { title: SECTION_TITLES[cat], data };
+  });
 
   return (
     <View style={styles.container}>
@@ -35,15 +51,21 @@ export default function CommunitiesScreen() {
       <SectionList
         sections={sections} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 40 }}
         renderSectionHeader={({ section }) => <Text style={styles.sectionLabel}>{section.title}</Text>}
-        renderItem={({ item }) => (
-          <Pressable style={styles.card} onPress={() => navigation.navigate('CommunityDetail', { communityId: item.id })}>
-            <Text style={styles.emoji}>{item.emoji}</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.cardName}>{item.name}</Text>
-              <Text style={styles.cardMeta}>{item.member_count} members</Text>
-            </View>
-          </Pressable>
-        )}
+        renderItem={({ item }) => {
+          const matchesInterest = item.related_interest ? userInterests.has(item.related_interest) : false;
+          return (
+            <Pressable style={styles.card} onPress={() => navigation.navigate('CommunityDetail', { communityId: item.id })}>
+              <Text style={styles.emoji}>{item.emoji}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.cardName}>{item.name}</Text>
+                <Text style={styles.cardMeta}>{item.member_count} members</Text>
+              </View>
+              {matchesInterest && (
+                <View style={styles.matchBadge}><Text style={styles.matchBadgeText}>For you</Text></View>
+              )}
+            </Pressable>
+          );
+        }}
       />
     </View>
   );
@@ -58,4 +80,6 @@ const styles = StyleSheet.create({
   emoji: { fontSize: 22 },
   cardName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   cardMeta: { fontSize: 11, color: colors.inkSoft, marginTop: 2 },
+  matchBadge: { backgroundColor: colors.tealSoft, paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.pill },
+  matchBadgeText: { fontSize: 10, fontWeight: '700', color: colors.teal },
 });

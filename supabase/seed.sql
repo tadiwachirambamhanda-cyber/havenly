@@ -1,17 +1,17 @@
 -- Havenly seed data — run after schema.sql
-insert into communities (name, emoji, description, category, worship_type, member_count) values
-  ('Padel Club Dubai', '🏓', 'Find partners, join weekly meetups, and track your rank across Dubai courts.', 'interest', null, 1860),
-  ('Café Hoppers', '☕', 'For people who plan their week around new café openings.', 'interest', null, 3210),
-  ('Thrift & Style', '👗', 'Swap fits, find thrift spots, and share styling inspo.', 'interest', null, 2040),
-  ('Study Grind', '📚', 'Silent co-study sessions, best study spots, and exam-season survival tips.', 'interest', null, 2780),
-  ('Muslim Students of Dubai', '🕌', 'A space to connect, share halal spots, and never miss Jummah.', 'faith', 'mosque', 4120),
-  ('Christian Fellowship', '✝️', 'Weekly fellowship, worship nights, and finding a church community away from home.', 'faith', 'church', 1340),
-  ('Hindu Students Circle', '🕉️', 'Festivals, temple visits, and community gatherings for Hindu students in Dubai.', 'faith', 'temple', 980),
-  ('Jewish Community Dubai', '✡️', 'Shabbat dinners, holidays, and connecting with the Jewish community in the UAE.', 'faith', 'synagogue', 210),
-  ('Sikh Sangat Dubai', '☬', 'Gurdwara visits, seva opportunities, and community events.', 'faith', 'gurdwara', 340),
-  ('Interfaith & Spiritual', '🙏', 'Open space for any faith, philosophy, or spiritual practice not listed above.', 'faith', 'general', 560),
-  ('AUS Freshers', '🎓', 'American University of Sharjah — new student meetups & housing tips.', 'campus', null, 1120),
-  ('UOWD Connect', '🏫', 'University of Wollongong Dubai student community.', 'campus', null, 890);
+insert into communities (name, emoji, description, category, worship_type, related_interest, member_count) values
+  ('Padel Club Dubai', '🏓', 'Find partners, join weekly meetups, and track your rank across Dubai courts.', 'interest', null, 'padel', 1860),
+  ('Café Hoppers', '☕', 'For people who plan their week around new café openings.', 'interest', null, 'cafes', 3210),
+  ('Thrift & Style', '👗', 'Swap fits, find thrift spots, and share styling inspo.', 'interest', null, 'fashion', 2040),
+  ('Study Grind', '📚', 'Silent co-study sessions, best study spots, and exam-season survival tips.', 'interest', null, 'study', 2780),
+  ('Muslim Students of Dubai', '🕌', 'A space to connect, share halal spots, and never miss Jummah.', 'faith', 'mosque', null, 4120),
+  ('Christian Fellowship', '✝️', 'Weekly fellowship, worship nights, and finding a church community away from home.', 'faith', 'church', null, 1340),
+  ('Hindu Students Circle', '🕉️', 'Festivals, temple visits, and community gatherings for Hindu students in Dubai.', 'faith', 'temple', null, 980),
+  ('Jewish Community Dubai', '✡️', 'Shabbat dinners, holidays, and connecting with the Jewish community in the UAE.', 'faith', 'synagogue', null, 210),
+  ('Sikh Sangat Dubai', '☬', 'Gurdwara visits, seva opportunities, and community events.', 'faith', 'gurdwara', null, 340),
+  ('Interfaith & Spiritual', '🙏', 'Open space for any faith, philosophy, or spiritual practice not listed above.', 'faith', 'general', null, 560),
+  ('AUS Freshers', '🎓', 'American University of Sharjah — new student meetups & housing tips.', 'campus', null, null, 1120),
+  ('UOWD Connect', '🏫', 'University of Wollongong Dubai student community.', 'campus', null, null, 890);
 
 insert into worship_places (worship_type, name, area, latitude, longitude) values
   ('mosque', 'Al Farooq Omar Bin Al Khattab Mosque', 'Jumeirah 1', 25.2100, 55.2500),

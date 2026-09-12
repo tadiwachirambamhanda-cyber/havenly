@@ -92,6 +92,13 @@ create table communities (
   description text,
   category text not null check (category in ('interest', 'faith', 'campus')),
   worship_type text check (worship_type in ('mosque','church','temple','synagogue','gurdwara','general')),
+  -- Only set for category='interest' communities — lets the Communities screen surface
+  -- ones matching the interests a user picked in onboarding. Deliberately unused for
+  -- 'faith' and 'campus': every faith community gets identical treatment (see
+  -- PROJECT_BRIEF.md section 4), so there's no "preferred faith" to sort by.
+  related_interest text check (related_interest in (
+    'cafes','fashion','nightlife','fitness','beach','study','travel','events','padel','beauty'
+  )),
   member_count int default 0,
   created_at timestamptz default now()
 );
