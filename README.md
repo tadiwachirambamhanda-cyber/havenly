@@ -56,5 +56,8 @@ npm install
 7. ~~True masonry feed layout~~ — done: manual two-column layout with
    deterministic per-post image heights + greedy column balancing
    (`FeedScreen.tsx`), replacing FlatList's equal-height-row numColumns
-8. Comments + a "Saved" bookmarks feature — neither has a table yet;
-   PostDetail and Profile currently show honest placeholders instead
+8. ~~Comments + a "Saved" bookmarks feature~~ — done: `comments` table
+   (with a trigger keeping `posts.comment_count` in sync) and
+   `saved_posts`, both respecting the blocking rules. PostDetail has a
+   real comment thread + input bar and a working Save toggle; Profile's
+   Saved tab shows real data and grid cells are tappable now.

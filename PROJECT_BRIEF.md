@@ -175,10 +175,14 @@ valid choice.
 - True masonry feed layout — a manual two-column layout with deterministic
   per-post image heights and greedy column balancing, replacing FlatList's
   numColumns (which forces equal-height rows, not real masonry)
+- Comments (`comments` table + a trigger keeping `posts.comment_count` in
+  sync) and Saved posts (`saved_posts`) — PostDetail has a real comment
+  thread with a persistent input bar and a working Save toggle; Profile's
+  Saved grid tab shows real data. Both respect blocking.
 
-**Not started:**
-1. Comments + a bookmarks/"Saved" table — neither exists; PostDetail and
-   Profile currently show honest placeholders instead of fake data for these
+**Not started:** nothing from the original build-priority list — every item
+is done. Next real milestone is closed beta (section 8): TestFlight/Play
+Store internal testing with real Dubai students.
 
 Database schema (`supabase/schema.sql`) already includes Row Level Security
 policies on every table — this was built security-first, not bolted on later.
