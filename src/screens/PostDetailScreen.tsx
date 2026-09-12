@@ -17,7 +17,8 @@ export default function PostDetailScreen() {
   const [post, setPost] = useState<Post | null>(null);
 
   useEffect(() => {
-    supabase.from('posts').select('*, author:profiles(*)').eq('id', route.params.postId).single()
+    // Explicit FK hint (posts_author_id_fkey) — see FeedScreen.tsx for why it's needed.
+    supabase.from('posts').select('*, author:profiles!posts_author_id_fkey(*)').eq('id', route.params.postId).single()
       .then(({ data }) => setPost(data as unknown as Post));
   }, [route.params.postId]);
 

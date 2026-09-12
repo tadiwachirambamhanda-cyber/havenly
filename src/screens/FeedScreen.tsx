@@ -20,7 +20,9 @@ export default function FeedScreen() {
   const fetchPosts = useCallback(async () => {
     const { data, error } = await supabase
       .from('posts')
-      .select('*, author:profiles(*)')
+      // Explicit FK hint (posts_author_id_fkey) because post_likes creates a second,
+      // indirect posts<->profiles path that makes the relationship ambiguous otherwise.
+      .select('*, author:profiles!posts_author_id_fkey(*)')
       .order('created_at', { ascending: false })
       .limit(PAGE_SIZE);
     if (error) { console.error('Failed to fetch posts:', error.message); return; }
