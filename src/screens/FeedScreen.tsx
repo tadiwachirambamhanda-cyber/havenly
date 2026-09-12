@@ -69,7 +69,10 @@ export default function FeedScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Text style={styles.brand}>havenly.</Text>
+        <View style={styles.brandRow}>
+          <View style={styles.brandDot} />
+          <Text style={styles.brand}>havenly.</Text>
+        </View>
         <View style={styles.topBarActions}>
           <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Communities')}><Text>👥</Text></Pressable>
         </View>
@@ -92,6 +95,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.md },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  brandDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral },
   brand: { fontFamily: 'Fraunces_700Bold', fontStyle: 'italic', fontSize: 24, color: colors.ink },
   topBarActions: { flexDirection: 'row', gap: spacing.sm },
   iconBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
