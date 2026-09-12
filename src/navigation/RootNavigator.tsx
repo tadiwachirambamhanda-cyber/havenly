@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { colors } from '@/theme/tokens';
 import { useAuth } from '@/lib/AuthContext';
+import TabBar from '@/navigation/TabBar';
 
 import LoginScreen from '@/screens/LoginScreen';
 import SignUpScreen from '@/screens/SignUpScreen';
@@ -43,15 +44,8 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 
 function MainTabs() {
   return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.coral,
-        tabBarInactiveTintColor: colors.inkSoft,
-        tabBarStyle: { backgroundColor: colors.ink, borderTopWidth: 0, height: 82, paddingTop: 10 },
-      }}
-    >
-      <Tab.Screen name="Feed" component={FeedScreen} options={{ tabBarLabel: 'Home' }} />
+    <Tab.Navigator screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
+      <Tab.Screen name="Feed" component={FeedScreen} />
       <Tab.Screen name="Discover" component={DiscoverScreen} />
       <Tab.Screen name="Inbox" component={InboxScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
