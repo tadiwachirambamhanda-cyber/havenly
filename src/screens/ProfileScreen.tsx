@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
@@ -7,6 +9,9 @@ import { useAuth } from '@/lib/AuthContext';
 import { colors, radius, spacing, gradients } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
 import type { Post, Profile } from '@/types';
+import type { RootStackParamList } from '@/navigation/RootNavigator';
+
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 type GridTab = 'posts' | 'saved' | 'tagged';
 
@@ -15,6 +20,7 @@ const GRID_TABS: { key: GridTab; label: string }[] = [
 ];
 
 export default function ProfileScreen() {
+  const navigation = useNavigation<Nav>();
   const { session } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState({ posts: 0, followers: 0, following: 0 });
@@ -110,9 +116,14 @@ export default function ProfileScreen() {
         </View>
       }
       ListFooterComponent={
-        <Pressable style={styles.logoutBtn} onPress={() => supabase.auth.signOut()}>
-          <Text style={styles.logoutText}>Log out</Text>
-        </Pressable>
+        <View>
+          <Pressable style={styles.footerLink} onPress={() => navigation.navigate('BlockedUsers')}>
+            <Text style={styles.footerLinkText}>Blocked accounts</Text>
+          </Pressable>
+          <Pressable style={styles.logoutBtn} onPress={() => supabase.auth.signOut()}>
+            <Text style={styles.logoutText}>Log out</Text>
+          </Pressable>
+        </View>
       }
     />
   );
@@ -141,6 +152,8 @@ const styles = StyleSheet.create({
   tabUnderline: { position: 'absolute', bottom: -1, height: 2, width: '60%', backgroundColor: colors.coral, borderRadius: 1 },
   gridCell: { flex: 1, aspectRatio: 1 / 1.15, overflow: 'hidden', marginBottom: 2 },
   gridEmpty: { color: colors.inkSoft, textAlign: 'center', paddingVertical: 40, fontSize: 13 },
+  footerLink: { alignItems: 'center', paddingTop: 24 },
+  footerLinkText: { color: colors.inkSoft, fontWeight: '600', fontSize: 13 },
   logoutBtn: { alignItems: 'center', paddingVertical: 24 },
   logoutText: { color: colors.coral, fontWeight: '700', fontSize: 13.5 },
 });

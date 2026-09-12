@@ -7,6 +7,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { findOrCreateConversation } from '@/lib/conversations';
+import { blockUser, submitReport } from '@/lib/safety';
+import ReportModal from '@/components/ReportModal';
 import { colors, gradients, spacing } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
 import type { Post } from '@/types';
@@ -23,12 +25,17 @@ export default function PostDetailScreen() {
   const [liked, setLiked] = useState(false);
   const [following, setFollowing] = useState(false);
   const [messaging, setMessaging] = useState(false);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   const load = useCallback(async () => {
     // Explicit FK hint (posts_author_id_fkey) — see FeedScreen.tsx for why it's needed.
+    // A null result here can legitimately mean "blocked" (RLS hides posts
+    // between blocked users), not just "doesn't exist" — same UI either way.
     const { data } = await supabase.from('posts').select('*, author:profiles!posts_author_id_fkey(*)')
       .eq('id', route.params.postId).single();
     setPost(data as unknown as Post);
+    setLoaded(true);
 
     const userId = session?.user.id;
     if (!userId || !data) return;
@@ -84,7 +91,55 @@ export default function PostDetailScreen() {
     }
   };
 
-  if (!post) return null;
+  const handleBlock = () => {
+    if (!post || !session?.user) return;
+    Alert.alert(
+      `Block @${post.author?.username ?? 'this user'}?`,
+      'They won\'t be able to message you or see each other\'s posts anymore.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Block', style: 'destructive', onPress: async () => {
+            try {
+              await blockUser(session.user.id, post.author_id);
+              navigation.goBack();
+            } catch (e) {
+              Alert.alert('Couldn\'t block', e instanceof Error ? e.message : 'Try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const openOptions = () => {
+    if (!post) return;
+    Alert.alert('', undefined, [
+      { text: 'Report post', onPress: () => setReportModalVisible(true) },
+      { text: `Block @${post.author?.username ?? 'user'}`, style: 'destructive', onPress: handleBlock },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  };
+
+  const handleReportSubmit = async (reason: string) => {
+    setReportModalVisible(false);
+    if (!post || !session?.user) return;
+    try {
+      await submitReport(session.user.id, 'post', post.id, reason);
+      Alert.alert('Thanks', 'We\'ve got your report.');
+    } catch (e) {
+      Alert.alert('Couldn\'t submit report', e instanceof Error ? e.message : 'Try again.');
+    }
+  };
+
+  if (!post) {
+    return loaded ? (
+      <View style={styles.notFound}>
+        <Pressable style={styles.back} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
+        <Text style={styles.notFoundText}>This post isn't available.</Text>
+      </View>
+    ) : null;
+  }
 
   const isOwnPost = post.author_id === session?.user.id;
   const [heroFrom, heroTo] = gradients[post.id.charCodeAt(0) % gradients.length];
@@ -95,6 +150,9 @@ export default function PostDetailScreen() {
         <LinearGradient colors={[heroFrom, heroTo]} style={StyleSheet.absoluteFill} />
         {post.image_url && <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" />}
         <Pressable style={styles.back} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
+        {!isOwnPost && (
+          <Pressable style={styles.overflow} onPress={openOptions}><Text>•••</Text></Pressable>
+        )}
       </View>
       <View style={styles.body}>
         <Text style={styles.tag}>{post.tag}</Text>
@@ -141,6 +199,7 @@ export default function PostDetailScreen() {
           </Pressable>
         </View>
       </View>
+      <ReportModal visible={reportModalVisible} onClose={() => setReportModalVisible(false)} onSubmit={handleReportSubmit} />
     </ScrollView>
   );
 }
@@ -152,6 +211,12 @@ const styles = StyleSheet.create({
     position: 'absolute', top: 16, left: 16, width: 34, height: 34, borderRadius: 17,
     backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center',
   },
+  overflow: {
+    position: 'absolute', top: 16, right: 16, width: 34, height: 34, borderRadius: 17,
+    backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center',
+  },
+  notFound: { flex: 1, backgroundColor: colors.sand, paddingTop: 60, paddingHorizontal: spacing.lg },
+  notFoundText: { color: colors.inkSoft, textAlign: 'center', marginTop: 100 },
   body: { padding: spacing.lg },
   tag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 10.5, color: colors.teal, textTransform: 'uppercase' },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 22, color: colors.ink, marginTop: 8, lineHeight: 28 },

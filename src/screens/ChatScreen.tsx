@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { markConversationRead } from '@/lib/conversations';
+import { blockUser, submitReport } from '@/lib/safety';
+import ReportModal from '@/components/ReportModal';
 import { colors, radius, spacing } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
 import type { Conversation, Message, Profile } from '@/types';
@@ -24,6 +26,7 @@ export default function ChatScreen() {
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
+  const [reportModalVisible, setReportModalVisible] = useState(false);
   const listRef = useRef<FlatList>(null);
 
   useEffect(() => {
@@ -71,6 +74,46 @@ export default function ChatScreen() {
     if (status === 'declined') navigation.goBack();
   };
 
+  const handleBlock = () => {
+    if (!myId) return;
+    Alert.alert(
+      `Block @${otherUser?.username ?? 'this user'}?`,
+      'They won\'t be able to message you or see each other\'s posts anymore.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Block', style: 'destructive', onPress: async () => {
+            try {
+              await blockUser(myId, otherUserId);
+              navigation.goBack();
+            } catch (e) {
+              Alert.alert('Couldn\'t block', e instanceof Error ? e.message : 'Try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const openOptions = () => {
+    Alert.alert('', undefined, [
+      { text: 'Report user', onPress: () => setReportModalVisible(true) },
+      { text: `Block @${otherUser?.username ?? 'user'}`, style: 'destructive', onPress: handleBlock },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  };
+
+  const handleReportSubmit = async (reason: string) => {
+    setReportModalVisible(false);
+    if (!myId) return;
+    try {
+      await submitReport(myId, 'user', otherUserId, reason);
+      Alert.alert('Thanks', 'We\'ve got your report.');
+    } catch (e) {
+      Alert.alert('Couldn\'t submit report', e instanceof Error ? e.message : 'Try again.');
+    }
+  };
+
   const isInitiator = conversation?.initiator_id === myId;
   const isPending = conversation?.status === 'pending';
   const isDeclined = conversation?.status === 'declined';
@@ -87,6 +130,8 @@ export default function ChatScreen() {
             <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.headerAvatar} />
           )}
           <Text style={styles.headerName}>{otherUser?.display_name ?? '…'}</Text>
+          <View style={{ flex: 1 }} />
+          <Pressable style={styles.overflow} onPress={openOptions}><Text>•••</Text></Pressable>
         </View>
 
         <FlatList
@@ -127,6 +172,7 @@ export default function ChatScreen() {
           </View>
         )}
       </View>
+      <ReportModal visible={reportModalVisible} onClose={() => setReportModalVisible(false)} onSubmit={handleReportSubmit} />
     </KeyboardAvoidingView>
   );
 }
@@ -138,6 +184,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg, borderBottomWidth: 1, borderColor: colors.line,
   },
   back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+  overflow: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   headerAvatar: { width: 34, height: 34, borderRadius: 17 },
   headerName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   bubble: { maxWidth: '75%', padding: 12, borderRadius: 18 },

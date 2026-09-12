@@ -1,0 +1,79 @@
+import React, { useCallback, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/lib/AuthContext';
+import { colors, radius, spacing } from '@/theme/tokens';
+import type { Profile } from '@/types';
+
+export default function BlockedUsersScreen() {
+  const navigation = useNavigation();
+  const { session } = useAuth();
+  const [blocked, setBlocked] = useState<Profile[]>([]);
+
+  const load = useCallback(async () => {
+    const myId = session?.user.id;
+    if (!myId) return;
+    const { data: blocks } = await supabase.from('blocked_users').select('blocked_id').eq('blocker_id', myId);
+    const blockedIds = (blocks ?? []).map((b) => b.blocked_id);
+    if (!blockedIds.length) { setBlocked([]); return; }
+    const { data: profiles } = await supabase.from('profiles').select('*').in('id', blockedIds);
+    setBlocked((profiles as Profile[]) ?? []);
+  }, [session]);
+
+  useFocusEffect(useCallback(() => { load(); }, [load]));
+
+  const unblock = async (blockedId: string) => {
+    const myId = session?.user.id;
+    if (!myId) return;
+    await supabase.from('blocked_users').delete().eq('blocker_id', myId).eq('blocked_id', blockedId);
+    setBlocked((prev) => prev.filter((p) => p.id !== blockedId));
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Pressable style={styles.back} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
+        <Text style={styles.title}>Blocked accounts</Text>
+      </View>
+      <FlatList
+        data={blocked}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ padding: spacing.lg }}
+        renderItem={({ item }) => (
+          <View style={styles.row}>
+            {item.avatar_url ? (
+              <Image source={{ uri: item.avatar_url }} style={styles.avatar} />
+            ) : (
+              <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+            )}
+            <View style={{ flex: 1 }}>
+              <Text style={styles.name}>{item.display_name}</Text>
+              <Text style={styles.handle}>@{item.username}</Text>
+            </View>
+            <Pressable style={styles.unblockBtn} onPress={() => unblock(item.id)}>
+              <Text style={styles.unblockText}>Unblock</Text>
+            </Pressable>
+          </View>
+        )}
+        ListEmptyComponent={<Text style={styles.placeholder}>You haven't blocked anyone.</Text>}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.sand },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 16, paddingHorizontal: spacing.lg },
+  back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  avatar: { width: 44, height: 44, borderRadius: 22 },
+  name: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
+  handle: { fontSize: 11.5, color: colors.inkSoft, fontFamily: 'JetBrainsMono_500Medium', marginTop: 2 },
+  unblockBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
+  unblockText: { fontSize: 12, fontWeight: '700', color: colors.ink },
+  placeholder: { color: colors.inkSoft, textAlign: 'center', marginTop: 40 },
+});

@@ -48,6 +48,38 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+-- ==================== SAFETY: BLOCKING ====================
+create table blocked_users (
+  blocker_id uuid references profiles(id) on delete cascade,
+  blocked_id uuid references profiles(id) on delete cascade,
+  created_at timestamptz default now(),
+  primary key (blocker_id, blocked_id)
+);
+alter table blocked_users enable row level security;
+create policy "Users can view their own blocks" on blocked_users for select using (auth.uid() = blocker_id);
+create policy "Users can block others" on blocked_users for insert with check (auth.uid() = blocker_id);
+create policy "Users can unblock others" on blocked_users for delete using (auth.uid() = blocker_id);
+
+-- security definer because "Users can view their own blocks" only lets a
+-- user see rows where they're the blocker — correct for privacy (you can't
+-- casually query who's blocked you), but it means a plain RLS subquery
+-- elsewhere couldn't see the other direction. This checks both directions
+-- without needing to loosen blocked_users' own visibility.
+create or replace function public.is_blocked_between(user_a uuid, user_b uuid)
+returns boolean
+language sql
+security definer set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from blocked_users
+    where (blocker_id = user_a and blocked_id = user_b)
+       or (blocker_id = user_b and blocked_id = user_a)
+  );
+$$;
+
+grant execute on function public.is_blocked_between(uuid, uuid) to authenticated;
+
 -- ==================== FOLLOWS ====================
 -- Backs Profile's followers/following stats and (later) the PostDetail Follow
 -- button and mutual-follow DM gating (PROJECT_BRIEF.md section 2, Messages).
@@ -76,7 +108,9 @@ create table posts (
   created_at timestamptz default now()
 );
 alter table posts enable row level security;
-create policy "Posts are viewable by everyone" on posts for select using (true);
+create policy "Posts are viewable unless blocked" on posts for select using (
+  not public.is_blocked_between(auth.uid(), author_id)
+);
 create policy "Users can create their own posts" on posts for insert with check (auth.uid() = author_id);
 create policy "Users can update their own posts" on posts for update using (auth.uid() = author_id);
 create policy "Users can delete their own posts" on posts for delete using (auth.uid() = author_id);
@@ -180,6 +214,7 @@ alter table conversations enable row level security;
 create policy "Users can view their own conversations" on conversations for select using (auth.uid() = any(participant_ids));
 create policy "Users can create conversations they're part of" on conversations for insert with check (
   auth.uid() = any(participant_ids) and auth.uid() = initiator_id
+  and not public.is_blocked_between(participant_ids[1], participant_ids[2])
 );
 create policy "Participants can update conversation status" on conversations for update using (auth.uid() = any(participant_ids));
 
@@ -199,6 +234,7 @@ create policy "Users can send messages in their conversations" on messages for i
     select 1 from conversations c where c.id = messages.conversation_id
       and auth.uid() = any(c.participant_ids)
       and (c.status = 'accepted' or (c.status = 'pending' and c.initiator_id = auth.uid()))
+      and not public.is_blocked_between(c.participant_ids[1], c.participant_ids[2])
   )
 );
 
@@ -222,18 +258,7 @@ alter publication supabase_realtime add table messages;
 alter publication supabase_realtime add table conversations;
 alter publication supabase_realtime add table conversation_reads;
 
--- SAFETY LAYER (flagged in planning — implement before public launch)
-create table blocked_users (
-  blocker_id uuid references profiles(id) on delete cascade,
-  blocked_id uuid references profiles(id) on delete cascade,
-  created_at timestamptz default now(),
-  primary key (blocker_id, blocked_id)
-);
-alter table blocked_users enable row level security;
-create policy "Users can view their own blocks" on blocked_users for select using (auth.uid() = blocker_id);
-create policy "Users can block others" on blocked_users for insert with check (auth.uid() = blocker_id);
-create policy "Users can unblock others" on blocked_users for delete using (auth.uid() = blocker_id);
-
+-- ==================== SAFETY: REPORTING ====================
 create table reports (
   id uuid primary key default gen_random_uuid(),
   reporter_id uuid references profiles(id) on delete cascade,
