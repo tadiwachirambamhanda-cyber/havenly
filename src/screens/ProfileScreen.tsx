@@ -106,7 +106,7 @@ export default function ProfileScreen() {
         <View>
           <LinearGradient colors={['#FF7A5C', '#E3A23A', '#0F8B82']} locations={[0, 0.6, 1]} style={styles.cover} />
           <Pressable style={[styles.settingsBtn, { top: insets.top + 12 }]} onPress={() => navigation.navigate('Settings')}>
-            <Feather name="settings" size={17} color={colors.ink} />
+            <Feather name="settings" size={17} color="#20261F" />
           </Pressable>
           <View style={styles.avatarRow}>
             {profile.avatar_url ? (

@@ -207,7 +207,7 @@ export default function PostDetailScreen() {
   if (!post) {
     return loaded ? (
       <View style={styles.notFound}>
-        <Pressable style={[styles.back, { top: insets.top + 12 }]} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={16} color={colors.ink} /></Pressable>
+        <Pressable style={[styles.back, { top: insets.top + 12 }]} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={16} color="#20261F" /></Pressable>
         <Text style={styles.notFoundText}>This post isn't available.</Text>
       </View>
     ) : null;
@@ -224,9 +224,9 @@ export default function PostDetailScreen() {
         <LinearGradient colors={[heroFrom, heroTo]} style={StyleSheet.absoluteFill} />
         {post.image_url && <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" />}
         {post.video_url && <PostVideo uri={post.video_url} />}
-        <Pressable style={[styles.back, { top: insets.top + 12 }]} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={16} color={colors.ink} /></Pressable>
+        <Pressable style={[styles.back, { top: insets.top + 12 }]} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={16} color="#20261F" /></Pressable>
         {!isOwnPost && (
-          <Pressable style={[styles.overflow, { top: insets.top + 12 }]} onPress={openOptions}><Feather name="more-horizontal" size={17} color={colors.ink} /></Pressable>
+          <Pressable style={[styles.overflow, { top: insets.top + 12 }]} onPress={openOptions}><Feather name="more-horizontal" size={17} color="#20261F" /></Pressable>
         )}
       </View>
       <View style={styles.body}>
