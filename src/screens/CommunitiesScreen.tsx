@@ -22,6 +22,7 @@ export default function CommunitiesScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const [showAllCampuses, setShowAllCampuses] = useState(false);
 
   const load = useCallback(async () => {
     const { data, error } = await supabase.from('communities').select('*').order('member_count', { ascending: false });
@@ -61,10 +62,19 @@ export default function CommunitiesScreen() {
     return false;
   };
 
+  const hasUniversity = !!profile?.university;
+
+  // Once you've set a university, the Campus section defaults to just your
+  // own — with 44 campus communities total, seeing every other school's is
+  // pure clutter once you can only actually join one of them. "Show all"
+  // brings the rest back for anyone who wants to browse.
   const sections = (['interest', 'campus'] as CommunityCategory[]).map((cat) => {
-    const data = communities.filter((c) => c.category === cat);
+    let data = communities.filter((c) => c.category === cat);
+    if (cat === 'campus' && hasUniversity && !showAllCampuses) {
+      data = data.filter((c) => c.related_university === profile?.university);
+    }
     data.sort((a, b) => (matchesUser(b) ? 1 : 0) - (matchesUser(a) ? 1 : 0));
-    return { title: SECTION_TITLES[cat], data };
+    return { title: SECTION_TITLES[cat], category: cat, data };
   });
 
   if (loading) return <View style={styles.centered}><ActivityIndicator color={colors.coral} /></View>;
@@ -76,7 +86,16 @@ export default function CommunitiesScreen() {
       <SectionList
         sections={sections} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 40 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
-        renderSectionHeader={({ section }) => <Text style={styles.sectionLabel}>{section.title}</Text>}
+        renderSectionHeader={({ section }) => (
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionLabel}>{section.title}</Text>
+            {section.category === 'campus' && hasUniversity && (
+              <Pressable onPress={() => setShowAllCampuses((v) => !v)}>
+                <Text style={styles.sectionToggle}>{showAllCampuses ? 'Show only mine' : 'Show all'}</Text>
+              </Pressable>
+            )}
+          </View>
+        )}
         renderItem={({ item }) => (
           <Pressable style={styles.card} onPress={() => navigation.navigate('CommunityDetail', { communityId: item.id })}>
             <View style={styles.iconChip}>
@@ -101,7 +120,12 @@ const styles = StyleSheet.create({
   centered: { flex: 1, backgroundColor: colors.sand, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 26, color: colors.ink, paddingHorizontal: spacing.lg },
   sub: { color: colors.inkSoft, fontSize: 12.5, paddingHorizontal: spacing.lg, marginTop: 4, marginBottom: 8 },
-  sectionLabel: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingVertical: 10 },
+  sectionHeaderRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg, paddingVertical: 10,
+  },
+  sectionLabel: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft },
+  sectionToggle: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 10.5, textTransform: 'uppercase', fontWeight: '700', color: colors.coral },
   card: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginHorizontal: spacing.lg, marginBottom: spacing.sm, backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, padding: spacing.md },
   iconChip: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
   cardName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
