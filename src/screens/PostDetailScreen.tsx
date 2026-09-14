@@ -5,6 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { findOrCreateConversation } from '@/lib/conversations';
@@ -17,6 +18,16 @@ import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Route = RouteProp<RootStackParamList, 'PostDetail'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
+
+// Paused until the viewer taps play (native controls) — no autoplay, so
+// opening a post never burns data on its own. This version of expo-video
+// has no poster-image prop, so the generated thumbnail is rendered as a
+// backdrop behind it (see the hero markup below) for the moment before the
+// player has a frame to show.
+function PostVideo({ uri }: { uri: string }) {
+  const player = useVideoPlayer(uri);
+  return <VideoView player={player} style={StyleSheet.absoluteFill} contentFit="cover" nativeControls />;
+}
 
 export default function PostDetailScreen() {
   const navigation = useNavigation<Nav>();
@@ -207,6 +218,7 @@ export default function PostDetailScreen() {
       <View style={styles.hero}>
         <LinearGradient colors={[heroFrom, heroTo]} style={StyleSheet.absoluteFill} />
         {post.image_url && <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" />}
+        {post.video_url && <PostVideo uri={post.video_url} />}
         <Pressable style={[styles.back, { top: insets.top + 12 }]} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
         {!isOwnPost && (
           <Pressable style={[styles.overflow, { top: insets.top + 12 }]} onPress={openOptions}><Text>•••</Text></Pressable>

@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Feather } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { supabase } from '@/lib/supabase';
@@ -100,6 +101,9 @@ export default function FeedScreen() {
           {item.is_editorial && (
             <View style={styles.editorialBadge}><Text style={styles.editorialBadgeText}>★ Havenly Picks</Text></View>
           )}
+          {item.video_url && (
+            <View style={styles.playBadge}><Feather name="play" size={14} color="white" /></View>
+          )}
         </View>
         <View style={styles.cardBody}>
           <Text style={styles.cardTag}>{item.tag}</Text>
@@ -164,6 +168,10 @@ const styles = StyleSheet.create({
   cardImage: { justifyContent: 'flex-start' },
   editorialBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: colors.ink, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 100 },
   editorialBadgeText: { color: colors.gold, fontSize: 9, fontWeight: '700' },
+  playBadge: {
+    position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: 13,
+    backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center',
+  },
   cardBody: { padding: 11 },
   cardTag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 9.5, color: colors.teal, textTransform: 'uppercase' },
   cardTitle: { fontSize: 13.5, fontWeight: '700', marginTop: 5, color: colors.ink, lineHeight: 18 },

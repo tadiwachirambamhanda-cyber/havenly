@@ -101,7 +101,12 @@ create table posts (
   author_id uuid references profiles(id) on delete cascade not null,
   title text not null,
   body text,
+  -- For a video post, image_url holds the generated poster/thumbnail frame
+  -- (used anywhere a thumbnail already renders — Feed grid, Profile grid,
+  -- Discover) and video_url holds the actual clip, played only from
+  -- PostDetail. Client enforces a 60s cap at pick time.
   image_url text,
+  video_url text,
   tag text not null,
   is_editorial boolean default false,
   like_count int default 0,
@@ -366,6 +371,18 @@ create policy "Users can upload their own post images" on storage.objects for in
 );
 create policy "Users can delete their own post images" on storage.objects for delete using (
   bucket_id = 'post-images' and auth.uid()::text = (storage.foldername(name))[1]
+);
+
+-- file_size_limit is a backstop against an unexpectedly high-bitrate file
+-- slipping past the client's 60s duration cap, not the primary cost control.
+insert into storage.buckets (id, name, public, file_size_limit) values ('post-videos', 'post-videos', true, 104857600)
+on conflict (id) do nothing;
+create policy "Post videos are publicly viewable" on storage.objects for select using (bucket_id = 'post-videos');
+create policy "Users can upload their own post videos" on storage.objects for insert with check (
+  bucket_id = 'post-videos' and auth.uid()::text = (storage.foldername(name))[1]
+);
+create policy "Users can delete their own post videos" on storage.objects for delete using (
+  bucket_id = 'post-videos' and auth.uid()::text = (storage.foldername(name))[1]
 );
 
 -- Separate from post-images (one profile photo per user vs. many post

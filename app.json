@@ -26,7 +26,8 @@
           "backgroundColor": "#FBF5EA"
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-video"
     ]
   }
 }

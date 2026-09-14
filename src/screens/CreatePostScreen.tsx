@@ -1,13 +1,26 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as VideoThumbnails from 'expo-video-thumbnails';
 import { Image } from 'expo-image';
+import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { colors, radius, spacing } from '@/theme/tokens';
 
 const TAG_OPTIONS = ['Cafés', 'Fashion', 'Nightlife', 'Fitness', 'Beach Days', 'Study Spots', 'Travel', 'Events', 'Padel', 'Beauty'];
+const MAX_VIDEO_SECONDS = 60;
+
+async function uploadFile(bucket: string, uri: string, userId: string, fallbackExt: string, mimePrefix: string): Promise<string> {
+  const ext = uri.split('.').pop()?.toLowerCase() || fallbackExt;
+  const path = `${userId}/${Date.now()}.${ext}`;
+  const arrayBuffer = await fetch(uri).then((r) => r.arrayBuffer());
+  const contentType = ext === 'jpg' ? `${mimePrefix}/jpeg` : ext === 'mov' ? `${mimePrefix}/quicktime` : `${mimePrefix}/${ext}`;
+  const { error: uploadError } = await supabase.storage.from(bucket).upload(path, arrayBuffer, { contentType });
+  if (uploadError) throw uploadError;
+  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+}
 
 export default function CreatePostScreen() {
   const navigation = useNavigation();
@@ -16,12 +29,40 @@ export default function CreatePostScreen() {
   const [body, setBody] = useState('');
   const [tag, setTag] = useState(TAG_OPTIONS[0]);
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [videoUri, setVideoUri] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 });
-    if (!result.canceled) setImageUri(result.assets[0].uri);
+  const pickMedia = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images', 'videos'],
+      quality: 0.8,
+      videoMaxDuration: MAX_VIDEO_SECONDS,
+    });
+    if (result.canceled) return;
+    const asset = result.assets[0];
+
+    if (asset.type === 'video') {
+      if (asset.duration && asset.duration > MAX_VIDEO_SECONDS * 1000) {
+        setError(`Videos can be up to ${MAX_VIDEO_SECONDS} seconds — that one's longer.`);
+        return;
+      }
+      setError(null);
+      try {
+        // time: 0 exactly can fail to decode on some codecs where the very
+        // first frame isn't a keyframe — a small positive offset avoids that.
+        const thumbnail = await VideoThumbnails.getThumbnailAsync(asset.uri, { time: 100 });
+        setVideoUri(asset.uri);
+        setImageUri(thumbnail.uri);
+      } catch {
+        setError('Couldn\'t process that video — try a different one.');
+      }
+    } else {
+      setError(null);
+      setVideoUri(null);
+      setImageUri(asset.uri);
+    }
   };
 
   const publish = async () => {
@@ -32,15 +73,15 @@ export default function CreatePostScreen() {
     setPublishing(true);
     try {
       let imageUrl: string | null = null;
+      let videoUrl: string | null = null;
+
       if (imageUri) {
-        const ext = imageUri.split('.').pop()?.toLowerCase() ?? 'jpg';
-        const path = `${session.user.id}/${Date.now()}.${ext}`;
-        const arrayBuffer = await fetch(imageUri).then((r) => r.arrayBuffer());
-        const { error: uploadError } = await supabase.storage.from('post-images').upload(path, arrayBuffer, {
-          contentType: `image/${ext === 'jpg' ? 'jpeg' : ext}`,
-        });
-        if (uploadError) throw uploadError;
-        imageUrl = supabase.storage.from('post-images').getPublicUrl(path).data.publicUrl;
+        setUploadStatus(videoUri ? 'Uploading thumbnail…' : 'Uploading photo…');
+        imageUrl = await uploadFile('post-images', imageUri, session.user.id, 'jpg', 'image');
+      }
+      if (videoUri) {
+        setUploadStatus('Uploading video…');
+        videoUrl = await uploadFile('post-videos', videoUri, session.user.id, 'mp4', 'video');
       }
 
       const { error: insertError } = await supabase.from('posts').insert({
@@ -49,6 +90,7 @@ export default function CreatePostScreen() {
         body: body.trim() || null,
         tag,
         image_url: imageUrl,
+        video_url: videoUrl,
       });
       if (insertError) throw insertError;
 
@@ -57,6 +99,7 @@ export default function CreatePostScreen() {
       setError(e instanceof Error ? e.message : 'Failed to publish post.');
     } finally {
       setPublishing(false);
+      setUploadStatus(null);
     }
   };
 
@@ -69,12 +112,18 @@ export default function CreatePostScreen() {
           {publishing ? <ActivityIndicator color={colors.coral} /> : <Text style={[styles.headerBtn, styles.postBtn]}>Post</Text>}
         </Pressable>
       </View>
+      {uploadStatus && <Text style={styles.uploadStatus}>{uploadStatus}</Text>}
 
-      <Pressable onPress={pickImage} style={styles.imagePicker}>
+      <Pressable onPress={pickMedia} style={styles.imagePicker}>
         {imageUri ? (
-          <Image source={{ uri: imageUri }} style={StyleSheet.absoluteFill} contentFit="cover" />
+          <>
+            <Image source={{ uri: imageUri }} style={StyleSheet.absoluteFill} contentFit="cover" />
+            {videoUri && (
+              <View style={styles.playBadge}><Feather name="play" size={16} color="white" /></View>
+            )}
+          </>
         ) : (
-          <Text style={styles.imagePickerText}>+ Add a photo</Text>
+          <Text style={styles.imagePickerText}>+ Add a photo or video</Text>
         )}
       </Pressable>
 
@@ -121,11 +170,16 @@ const styles = StyleSheet.create({
   headerTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 17, color: colors.ink },
   headerBtn: { fontSize: 14, fontWeight: '600', color: colors.inkSoft },
   postBtn: { color: colors.coral, fontWeight: '700' },
+  uploadStatus: { fontSize: 12, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginBottom: 8, textAlign: 'center' },
   imagePicker: {
     height: 200, marginHorizontal: spacing.lg, borderRadius: radius.md, backgroundColor: colors.sandDeep,
     alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.line, overflow: 'hidden',
   },
   imagePickerText: { color: colors.inkSoft, fontWeight: '600' },
+  playBadge: {
+    position: 'absolute', width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(0,0,0,0.55)',
+    alignItems: 'center', justifyContent: 'center',
+  },
   titleInput: {
     marginHorizontal: spacing.lg, marginTop: spacing.md, backgroundColor: colors.white, borderWidth: 1,
     borderColor: colors.line, borderRadius: radius.sm, padding: 14, fontSize: 15, fontWeight: '600', color: colors.ink,

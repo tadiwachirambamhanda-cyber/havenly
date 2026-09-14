@@ -10,7 +10,7 @@ export interface Profile {
 
 export interface Post {
   id: string; author_id: string; author?: Profile; title: string; body: string | null;
-  image_url: string | null; tag: string; is_editorial: boolean; like_count: number;
+  image_url: string | null; video_url: string | null; tag: string; is_editorial: boolean; like_count: number;
   comment_count: number; created_at: string;
 }
 
