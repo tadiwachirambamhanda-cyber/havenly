@@ -155,10 +155,10 @@ begin
 
   if already_liked then
     delete from post_likes where post_id = post_id_input and user_id = uid;
-    update posts set like_count = greatest(like_count - 1, 0) where id = post_id_input;
+    update posts set like_count = greatest(posts.like_count - 1, 0) where id = post_id_input;
   else
     insert into post_likes (post_id, user_id) values (post_id_input, uid);
-    update posts set like_count = like_count + 1 where id = post_id_input;
+    update posts set like_count = posts.like_count + 1 where id = post_id_input;
   end if;
 
   return query select not already_liked, posts.like_count from posts where posts.id = post_id_input;
