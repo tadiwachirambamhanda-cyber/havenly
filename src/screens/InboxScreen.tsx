@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SectionList, Pressable, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, SectionList, Pressable, RefreshControl, TextInput } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -19,6 +19,7 @@ export default function InboxScreen() {
   const { session } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [query, setQuery] = useState('');
   const myId = session?.user.id;
 
   const load = useCallback(async () => {
@@ -68,8 +69,15 @@ export default function InboxScreen() {
     return () => { supabase.removeChannel(channel); };
   }, [myId, load]);
 
-  const requests = rows.filter((r) => r.status === 'pending' && r.initiator_id !== myId);
-  const messages = rows.filter((r) => r.status === 'accepted' || (r.status === 'pending' && r.initiator_id === myId));
+  const trimmed = query.trim().toLowerCase();
+  const filteredRows = trimmed
+    ? rows.filter((r) =>
+        r.otherUser?.display_name.toLowerCase().includes(trimmed) ||
+        r.otherUser?.username.toLowerCase().includes(trimmed))
+    : rows;
+
+  const requests = filteredRows.filter((r) => r.status === 'pending' && r.initiator_id !== myId);
+  const messages = filteredRows.filter((r) => r.status === 'accepted' || (r.status === 'pending' && r.initiator_id === myId));
 
   const sections = [
     ...(requests.length ? [{ title: 'Message requests', data: requests }] : []),
@@ -86,8 +94,22 @@ export default function InboxScreen() {
       <Text style={styles.title}>Messages</Text>
       <View style={styles.searchBar}>
         <Text style={styles.searchIcon}>🔍</Text>
-        <Text style={styles.searchPlaceholder}>Search messages…</Text>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search messages…"
+          placeholderTextColor={colors.inkSoft}
+          value={query}
+          onChangeText={setQuery}
+        />
+        {trimmed.length > 0 && (
+          <Pressable onPress={() => setQuery('')}><Text style={styles.clearBtn}>✕</Text></Pressable>
+        )}
       </View>
+      {requests.length === 0 && messages.length === 0 ? (
+        <Text style={styles.placeholder}>
+          {trimmed ? `No conversations matching "${query.trim()}"` : 'No conversations yet.'}
+        </Text>
+      ) : (
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
@@ -115,8 +137,8 @@ export default function InboxScreen() {
             {item.last_message_at && <Text style={styles.time}>{timeAgo(item.last_message_at)}</Text>}
           </Pressable>
         )}
-        ListEmptyComponent={<Text style={styles.placeholder}>No conversations yet.</Text>}
       />
+      )}
     </View>
   );
 }
@@ -130,7 +152,8 @@ const styles = StyleSheet.create({
     borderColor: colors.line, borderRadius: radius.pill,
   },
   searchIcon: { fontSize: 13 },
-  searchPlaceholder: { fontSize: 13, color: colors.inkSoft },
+  searchInput: { flex: 1, fontSize: 13, color: colors.ink },
+  clearBtn: { fontSize: 13, color: colors.inkSoft, paddingHorizontal: 4 },
   sectionLabel: {
     fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
     fontWeight: '600', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 8,
