@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { Image } from 'expo-image';
@@ -34,12 +34,7 @@ export default function CreatePostScreen() {
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const pickMedia = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images', 'videos'],
-      quality: 0.8,
-      videoMaxDuration: MAX_VIDEO_SECONDS,
-    });
+  const handlePickerResult = async (result: ImagePicker.ImagePickerResult) => {
     if (result.canceled) return;
     const asset = result.assets[0];
 
@@ -63,6 +58,37 @@ export default function CreatePostScreen() {
       setVideoUri(null);
       setImageUri(asset.uri);
     }
+  };
+
+  const pickFromLibrary = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images', 'videos'],
+      quality: 0.8,
+      videoMaxDuration: MAX_VIDEO_SECONDS,
+    });
+    await handlePickerResult(result);
+  };
+
+  const captureFromCamera = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      setError('Camera access is off for Havenly — enable it in your phone\'s Settings to take a photo or video.');
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images', 'videos'],
+      quality: 0.8,
+      videoMaxDuration: MAX_VIDEO_SECONDS,
+    });
+    await handlePickerResult(result);
+  };
+
+  const pickMedia = () => {
+    Alert.alert('Add to your post', undefined, [
+      { text: 'Take Photo or Video', onPress: captureFromCamera },
+      { text: 'Choose from Library', onPress: pickFromLibrary },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
   };
 
   const publish = async () => {

@@ -27,7 +27,15 @@
         }
       ],
       "expo-font",
-      "expo-video"
+      "expo-video",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Havenly needs access to your photos to share them in a post.",
+          "cameraPermission": "Havenly needs access to your camera to take a photo or video for a post.",
+          "microphonePermission": "Havenly needs access to your microphone to record video for a post."
+        }
+      ]
     ]
   }
 }
