@@ -5,10 +5,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { colors, radius, spacing } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
+import { interestIcon } from '@/constants/topicIcons';
 import UniversityPickerModal from '@/components/UniversityPickerModal';
 import type { Interest } from '@/types';
 
@@ -140,6 +142,7 @@ export default function EditProfileScreen() {
           const isSelected = interests.has(opt.key);
           return (
             <Pressable key={opt.key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => toggleInterest(opt.key)}>
+              <Feather name={interestIcon(opt.key)} size={13} color={isSelected ? colors.sand : colors.ink} />
               <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt.label}</Text>
             </Pressable>
           );
@@ -173,7 +176,7 @@ const styles = StyleSheet.create({
   universityValue: { fontSize: 14, color: colors.ink },
   universityPlaceholder: { fontSize: 14, color: colors.inkSoft },
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 9, paddingHorizontal: spacing.lg },
-  chip: { paddingVertical: 9, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: 9, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
   chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
   chipText: { fontSize: 12.5, fontWeight: '600', color: colors.ink },
   chipTextSelected: { color: colors.sand },

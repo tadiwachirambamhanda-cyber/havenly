@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { colors, spacing } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
+import { interestIcon } from '@/constants/topicIcons';
 import type { Interest } from '@/types';
 
 export default function OnboardingScreen() {
@@ -48,6 +50,7 @@ export default function OnboardingScreen() {
             const isSelected = selected.has(opt.key);
             return (
               <Pressable key={opt.key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => toggle(opt.key)}>
+                <Feather name={interestIcon(opt.key)} size={13} color={isSelected ? colors.sand : colors.ink} />
                 <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt.label}</Text>
               </Pressable>
             );
@@ -69,7 +72,7 @@ const styles = StyleSheet.create({
   panel: { backgroundColor: colors.sand, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, marginTop: 20 },
   question: { fontFamily: 'Fraunces_600SemiBold', fontSize: 22, color: colors.ink, marginBottom: 16 },
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 9, marginBottom: 20 },
-  chip: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 100, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: 10, paddingHorizontal: 16, borderRadius: 100, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
   chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
   chipText: { fontSize: 13.5, fontWeight: '600', color: colors.ink },
   chipTextSelected: { color: colors.sand },

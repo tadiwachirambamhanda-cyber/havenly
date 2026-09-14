@@ -18,3 +18,7 @@ export function communityIcon(community: Pick<Community, 'category' | 'related_i
   if (community.category === 'campus') return CAMPUS_ICON;
   return (community.related_interest && INTEREST_ICONS[community.related_interest]) || 'users';
 }
+
+export function interestIcon(interest: Interest): FeatherName {
+  return INTEREST_ICONS[interest];
+}

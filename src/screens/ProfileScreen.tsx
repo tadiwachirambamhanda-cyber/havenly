@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { colors, radius, spacing, gradients } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
+import { interestIcon } from '@/constants/topicIcons';
 import type { Post, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -127,7 +128,10 @@ export default function ProfileScreen() {
           {interestChips.length > 0 && (
             <View style={styles.chipRow}>
               {interestChips.map((chip) => (
-                <View key={chip.key} style={styles.chip}><Text style={styles.chipText}>{chip.label}</Text></View>
+                <View key={chip.key} style={styles.chip}>
+                  <Feather name={interestIcon(chip.key)} size={11} color={colors.coral} />
+                  <Text style={styles.chipText}>{chip.label}</Text>
+                </View>
               ))}
             </View>
           )}
@@ -166,7 +170,7 @@ const styles = StyleSheet.create({
   statNum: { fontSize: 16, fontWeight: '800', color: colors.ink },
   statLabel: { fontSize: 10.5, color: colors.inkSoft, fontWeight: '600', marginTop: 2 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, paddingHorizontal: spacing.lg, paddingVertical: 14 },
-  chip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill, backgroundColor: colors.coralSoft },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill, backgroundColor: colors.coralSoft },
   chipText: { fontSize: 11, fontWeight: '700', color: colors.coral },
   tabRow: { flexDirection: 'row', borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.line, marginTop: 6 },
   tab: { flex: 1, alignItems: 'center', paddingVertical: 11 },

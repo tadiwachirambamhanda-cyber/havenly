@@ -5,7 +5,7 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { colors, spacing } from '@/theme/tokens';
-import { communityIcon } from '@/constants/communityIcons';
+import { communityIcon } from '@/constants/topicIcons';
 import type { Community } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 

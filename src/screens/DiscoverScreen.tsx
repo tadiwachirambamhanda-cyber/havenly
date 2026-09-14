@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { colors, radius, spacing, gradients } from '@/theme/tokens';
-import { communityIcon } from '@/constants/communityIcons';
+import { communityIcon } from '@/constants/topicIcons';
 import type { Community, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
