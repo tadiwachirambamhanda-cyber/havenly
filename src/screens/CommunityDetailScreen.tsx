@@ -19,7 +19,7 @@ export default function CommunityDetailScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const { communityId } = route.params;
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
   const [community, setCommunity] = useState<Community | null>(null);
   const [joined, setJoined] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -77,6 +77,13 @@ export default function CommunityDetailScreen() {
     );
   }
 
+  // Campus communities are restricted to students of that specific
+  // university (enforced for real by the join RLS policy) — this only gates
+  // the *join* action. Someone already a member (e.g. before this existed,
+  // or after changing their university) can still see the button as "Joined"
+  // and leave normally.
+  const canJoin = joined || community.category !== 'campus' || profile?.university === community.related_university;
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
       <Pressable style={styles.back} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={17} color={colors.ink} /></Pressable>
@@ -87,9 +94,21 @@ export default function CommunityDetailScreen() {
         <Text style={styles.name}>{community.name}</Text>
         <Text style={styles.members}>{community.member_count} members</Text>
         <Text style={styles.desc}>{community.description}</Text>
-        <Pressable style={[styles.joinBtn, joined && styles.joinBtnJoined]} onPress={toggleJoin}>
-          <Text style={styles.joinBtnText}>{joined ? 'Joined ✓' : 'Join community'}</Text>
-        </Pressable>
+        {canJoin ? (
+          <Pressable style={[styles.joinBtn, joined && styles.joinBtnJoined]} onPress={toggleJoin}>
+            <Text style={styles.joinBtnText}>{joined ? 'Joined ✓' : 'Join community'}</Text>
+          </Pressable>
+        ) : profile?.university ? (
+          <View style={styles.restrictedBox}>
+            <Feather name="lock" size={13} color={colors.inkSoft} />
+            <Text style={styles.restrictedText}>This community is for {community.related_university} students.</Text>
+          </View>
+        ) : (
+          <Pressable style={styles.restrictedBox} onPress={() => navigation.navigate('EditProfile')}>
+            <Feather name="lock" size={13} color={colors.inkSoft} />
+            <Text style={styles.restrictedText}>Set your university in Edit Profile to join this community.</Text>
+          </Pressable>
+        )}
       </View>
 
       <View style={styles.feedHeader}>
@@ -153,6 +172,11 @@ const styles = StyleSheet.create({
   joinBtn: { marginTop: 16, backgroundColor: colors.coral, paddingVertical: 13, borderRadius: 100, alignItems: 'center' },
   joinBtnJoined: { backgroundColor: colors.ink },
   joinBtnText: { color: 'white', fontWeight: '700', fontSize: 14 },
+  restrictedBox: {
+    flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 16, backgroundColor: colors.sandDeep,
+    paddingVertical: 13, paddingHorizontal: 16, borderRadius: 100,
+  },
+  restrictedText: { flex: 1, color: colors.inkSoft, fontSize: 12.5, fontWeight: '600' },
   feedHeader: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: spacing.lg, marginTop: 8, marginBottom: 10,

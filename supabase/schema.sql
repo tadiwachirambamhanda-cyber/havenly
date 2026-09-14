@@ -250,7 +250,18 @@ create table community_members (
 );
 alter table community_members enable row level security;
 create policy "Memberships are viewable by everyone" on community_members for select using (true);
-create policy "Users can join communities" on community_members for insert with check (auth.uid() = user_id);
+-- Campus communities are meant to be an authentic space for that specific
+-- university's students, not open to anyone — you can still browse/see
+-- every campus community, but can only join the one matching your own
+-- profile.university. Interest communities (Padel, Cafés, etc.) stay open
+-- to everyone.
+create policy "Users can join communities" on community_members for insert with check (
+  auth.uid() = user_id
+  and (
+    (select category from communities where id = community_id) = 'interest'
+    or (select related_university from communities where id = community_id) = (select university from profiles where id = auth.uid())
+  )
+);
 create policy "Users can leave communities" on community_members for delete using (auth.uid() = user_id);
 
 -- Keeps communities.member_count in sync with actual joins/leaves. Existing
