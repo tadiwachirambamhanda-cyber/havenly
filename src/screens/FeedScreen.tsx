@@ -94,7 +94,7 @@ export default function FeedScreen() {
     for (const post of posts) {
       const shortest = colHeights.indexOf(Math.min(...colHeights));
       cols[shortest].push(post);
-      colHeights[shortest] += estimateCardHeight(post, 130 + (hashString(post.id) % 90));
+      colHeights[shortest] += estimateCardHeight(post, 110 + (hashString(post.id) % 60));
     }
     return cols;
   }, [posts]);
@@ -102,7 +102,7 @@ export default function FeedScreen() {
   const renderCard = (item: Post) => {
     const hash = hashString(item.id);
     const [from, to] = gradients[hash % gradients.length];
-    const imageHeight = 130 + (hash % 90);
+    const imageHeight = 110 + (hash % 60);
     return (
       <Pressable
         key={item.id}
