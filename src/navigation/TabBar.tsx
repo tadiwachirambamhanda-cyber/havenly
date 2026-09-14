@@ -6,6 +6,7 @@ import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useTheme } from '@/lib/ThemeContext';
 import type { ColorTokens } from '@/theme/tokens';
 import { useUnreadMessages } from '@/lib/useUnreadMessages';
+import { haptics } from '@/lib/haptics';
 
 const INACTIVE_COLOR = '#8D8977';
 
@@ -31,9 +32,13 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
       <Pressable
         key={route.key}
         style={[styles.pillItem, isFocused && styles.pillItemActive]}
+        accessibilityLabel={route.name}
         onPress={() => {
           const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-          if (!isFocused && !event.defaultPrevented) navigation.navigate(route.name);
+          if (!isFocused && !event.defaultPrevented) {
+            haptics.tap();
+            navigation.navigate(route.name);
+          }
         }}
       >
         <Feather name={config.icon} size={18} color={isFocused ? 'white' : INACTIVE_COLOR} />
@@ -45,7 +50,14 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
   return (
     <View style={[styles.container, { bottom: insets.bottom + 14 }]}>
       <View style={styles.pill}>{state.routes.map(renderTab)}</View>
-      <Pressable style={styles.fab} onPress={() => navigation.getParent()?.navigate('CreatePost')}>
+      <Pressable
+        style={styles.fab}
+        accessibilityLabel="Create post"
+        onPress={() => {
+          haptics.tap();
+          navigation.getParent()?.navigate('CreatePost');
+        }}
+      >
         <Feather name="plus" size={20} color="white" />
       </Pressable>
     </View>

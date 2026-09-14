@@ -9,6 +9,8 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { useToast } from '@/lib/ToastContext';
+import { haptics } from '@/lib/haptics';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
@@ -21,6 +23,7 @@ export default function EditProfileScreen() {
   const insets = useSafeAreaInsets();
   const { session, profile, refreshProfile } = useAuth();
   const { colors } = useTheme();
+  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [displayName, setDisplayName] = useState(profile?.display_name ?? '');
@@ -85,7 +88,9 @@ export default function EditProfileScreen() {
       }
 
       await refreshProfile();
+      haptics.success();
       navigation.goBack();
+      showToast('Profile updated');
     } catch (e) {
       // Supabase/PostgREST errors are plain objects with a `message` field,
       // not real Error instances — `e instanceof Error` misses them and was
@@ -102,16 +107,16 @@ export default function EditProfileScreen() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <Pressable onPress={() => navigation.goBack()}><Text style={styles.headerBtn}>Cancel</Text></Pressable>
+        <Pressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></Pressable>
         <Text style={styles.headerTitle}>Edit profile</Text>
-        <Pressable onPress={save} disabled={saving}>
+        <Pressable onPress={save} disabled={saving} accessibilityLabel="Save profile">
           {saving ? <ActivityIndicator color={colors.coral} /> : <Text style={[styles.headerBtn, styles.saveBtn]}>Save</Text>}
         </Pressable>
       </View>
 
-      <Pressable style={styles.avatarWrap} onPress={pickAvatar}>
+      <Pressable style={styles.avatarWrap} onPress={pickAvatar} accessibilityLabel="Change profile photo">
         {avatarUri ? (
-          <Image source={{ uri: avatarUri }} style={styles.avatar} />
+          <Image source={{ uri: avatarUri }} style={styles.avatar} transition={200} />
         ) : (
           <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
         )}
@@ -145,7 +150,7 @@ export default function EditProfileScreen() {
         {INTEREST_OPTIONS.map((opt) => {
           const isSelected = interests.has(opt.key);
           return (
-            <Pressable key={opt.key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => toggleInterest(opt.key)}>
+            <Pressable key={opt.key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); toggleInterest(opt.key); }}>
               <Feather name={interestIcon(opt.key)} size={13} color={isSelected ? colors.sand : colors.ink} />
               <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt.label}</Text>
             </Pressable>

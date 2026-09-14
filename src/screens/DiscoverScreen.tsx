@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Pressable } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -41,22 +41,31 @@ export default function DiscoverScreen() {
   const [query, setQuery] = useState('');
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [communities, setCommunities] = useState<Community[] | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const runSearch = useCallback(async (trimmed: string) => {
+    const [{ data: postData }, { data: communityData }] = await Promise.all([
+      supabase.from('posts').select('*, author:profiles!posts_author_id_fkey(*)').ilike('title', `%${trimmed}%`).limit(10),
+      supabase.from('communities').select('*').ilike('name', `%${trimmed}%`).limit(10),
+    ]);
+    setPosts((postData as unknown as Post[]) ?? []);
+    setCommunities((communityData as Community[]) ?? []);
+  }, []);
 
   useEffect(() => {
     const trimmed = query.trim();
     if (!trimmed) { setPosts(null); setCommunities(null); return; }
-
-    const timeout = setTimeout(async () => {
-      const [{ data: postData }, { data: communityData }] = await Promise.all([
-        supabase.from('posts').select('*, author:profiles!posts_author_id_fkey(*)').ilike('title', `%${trimmed}%`).limit(10),
-        supabase.from('communities').select('*').ilike('name', `%${trimmed}%`).limit(10),
-      ]);
-      setPosts((postData as unknown as Post[]) ?? []);
-      setCommunities((communityData as Community[]) ?? []);
-    }, 300);
-
+    const timeout = setTimeout(() => runSearch(trimmed), 300);
     return () => clearTimeout(timeout);
-  }, [query]);
+  }, [query, runSearch]);
+
+  const onRefresh = useCallback(async () => {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    setRefreshing(true);
+    await runSearch(trimmed);
+    setRefreshing(false);
+  }, [query, runSearch]);
 
   const trimmed = query.trim().toLowerCase();
   const isSearching = trimmed.length > 0;
@@ -66,7 +75,12 @@ export default function DiscoverScreen() {
     && posts.length === 0 && communities.length === 0 && filteredSpots.length === 0 && filteredEvents.length === 0;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 100 }}
+      keyboardShouldPersistTaps="handled"
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
+    >
       <Text style={styles.title}>Discover Dubai</Text>
 
       <View style={styles.searchBar}>
@@ -79,7 +93,9 @@ export default function DiscoverScreen() {
           onChangeText={setQuery}
         />
         {isSearching && (
-          <Pressable style={styles.clearBtn} onPress={() => setQuery('')}><Feather name="x" size={14} color={colors.inkSoft} /></Pressable>
+          <Pressable style={styles.clearBtn} onPress={() => setQuery('')} accessibilityLabel="Clear search">
+            <Feather name="x" size={14} color={colors.inkSoft} />
+          </Pressable>
         )}
       </View>
 

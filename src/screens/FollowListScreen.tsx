@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, ActivityIndicator, RefreshControl } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,6 +7,7 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { haptics } from '@/lib/haptics';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { Profile } from '@/types';
@@ -32,9 +33,10 @@ export default function FollowListScreen() {
   const [list, setList] = useState<Profile[]>([]);
   const [myFollowingIds, setMyFollowingIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  const load = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true); else setLoading(true);
     const myId = session?.user.id;
     const listQuery =
       tab === 'followers'
@@ -50,6 +52,7 @@ export default function FollowListScreen() {
     setList(profiles);
     setMyFollowingIds(new Set((myFollows ?? []).map((f) => f.following_id)));
     setLoading(false);
+    setRefreshing(false);
   }, [tab, userId, session]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
@@ -57,6 +60,7 @@ export default function FollowListScreen() {
   const toggleFollow = async (targetId: string) => {
     const myId = session?.user.id;
     if (!myId || targetId === myId) return;
+    haptics.tap();
     const isFollowing = myFollowingIds.has(targetId);
     setMyFollowingIds((prev) => {
       const next = new Set(prev);
@@ -73,7 +77,9 @@ export default function FollowListScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={17} color={colors.ink} /></Pressable>
+        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+          <Feather name="arrow-left" size={17} color={colors.ink} />
+        </Pressable>
         <Text style={styles.title}>{displayName}</Text>
       </View>
 
@@ -93,13 +99,14 @@ export default function FollowListScreen() {
           data={list}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: spacing.lg }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.coral} />}
           renderItem={({ item }) => {
             const isMe = item.id === session?.user.id;
             const isFollowing = myFollowingIds.has(item.id);
             return (
               <View style={styles.row}>
                 {item.avatar_url ? (
-                  <Image source={{ uri: item.avatar_url }} style={styles.avatar} />
+                  <Image source={{ uri: item.avatar_url }} style={styles.avatar} transition={200} />
                 ) : (
                   <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
                 )}
@@ -108,7 +115,11 @@ export default function FollowListScreen() {
                   <Text style={styles.handle}>@{item.username}{item.university ? ` · ${item.university}` : ''}</Text>
                 </View>
                 {!isMe && (
-                  <Pressable style={[styles.followBtn, isFollowing && styles.followBtnActive]} onPress={() => toggleFollow(item.id)}>
+                  <Pressable
+                    style={[styles.followBtn, isFollowing && styles.followBtnActive]}
+                    onPress={() => toggleFollow(item.id)}
+                    accessibilityLabel={isFollowing ? `Unfollow ${item.display_name}` : `Follow ${item.display_name}`}
+                  >
                     <Text style={[styles.followBtnText, isFollowing && styles.followBtnTextActive]}>
                       {isFollowing ? 'Following' : 'Follow'}
                     </Text>

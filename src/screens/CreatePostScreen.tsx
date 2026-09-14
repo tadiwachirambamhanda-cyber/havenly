@@ -8,6 +8,8 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { useToast } from '@/lib/ToastContext';
+import { haptics } from '@/lib/haptics';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
@@ -37,6 +39,7 @@ export default function CreatePostScreen() {
   const route = useRoute<Route>();
   const { session } = useAuth();
   const { colors } = useTheme();
+  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -145,7 +148,9 @@ export default function CreatePostScreen() {
       });
       if (insertError) throw insertError;
 
+      haptics.success();
       navigation.goBack();
+      showToast('Posted!');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to publish post.');
     } finally {
@@ -157,18 +162,18 @@ export default function CreatePostScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()}><Text style={styles.headerBtn}>Cancel</Text></Pressable>
+        <Pressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></Pressable>
         <Text style={styles.headerTitle}>New post</Text>
-        <Pressable onPress={publish} disabled={publishing}>
+        <Pressable onPress={publish} disabled={publishing} accessibilityLabel="Publish post">
           {publishing ? <ActivityIndicator color={colors.coral} /> : <Text style={[styles.headerBtn, styles.postBtn]}>Post</Text>}
         </Pressable>
       </View>
       {uploadStatus && <Text style={styles.uploadStatus}>{uploadStatus}</Text>}
 
-      <Pressable onPress={pickMedia} style={styles.imagePicker}>
+      <Pressable onPress={pickMedia} style={styles.imagePicker} accessibilityLabel="Add a photo or video">
         {imageUri ? (
           <>
-            <Image source={{ uri: imageUri }} style={StyleSheet.absoluteFill} contentFit="cover" />
+            <Image source={{ uri: imageUri }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
             {videoUri && (
               <View style={styles.playBadge}><Feather name="play" size={16} color="white" /></View>
             )}
@@ -200,7 +205,7 @@ export default function CreatePostScreen() {
         {TAG_OPTIONS.map((opt) => {
           const isSelected = tag === opt;
           return (
-            <Pressable key={opt} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => setTag(opt)}>
+            <Pressable key={opt} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); setTag(opt); }}>
               <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt}</Text>
             </Pressable>
           );

@@ -7,6 +7,7 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { haptics } from '@/lib/haptics';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { Profile } from '@/types';
@@ -33,6 +34,7 @@ export default function BlockedUsersScreen() {
   const unblock = async (blockedId: string) => {
     const myId = session?.user.id;
     if (!myId) return;
+    haptics.tap();
     await supabase.from('blocked_users').delete().eq('blocker_id', myId).eq('blocked_id', blockedId);
     setBlocked((prev) => prev.filter((p) => p.id !== blockedId));
   };
@@ -40,7 +42,9 @@ export default function BlockedUsersScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={17} color={colors.ink} /></Pressable>
+        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+          <Feather name="arrow-left" size={17} color={colors.ink} />
+        </Pressable>
         <Text style={styles.title}>Blocked accounts</Text>
       </View>
       <FlatList
@@ -50,7 +54,7 @@ export default function BlockedUsersScreen() {
         renderItem={({ item }) => (
           <View style={styles.row}>
             {item.avatar_url ? (
-              <Image source={{ uri: item.avatar_url }} style={styles.avatar} />
+              <Image source={{ uri: item.avatar_url }} style={styles.avatar} transition={200} />
             ) : (
               <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
             )}
@@ -58,7 +62,7 @@ export default function BlockedUsersScreen() {
               <Text style={styles.name}>{item.display_name}</Text>
               <Text style={styles.handle}>@{item.username}</Text>
             </View>
-            <Pressable style={styles.unblockBtn} onPress={() => unblock(item.id)}>
+            <Pressable style={styles.unblockBtn} onPress={() => unblock(item.id)} accessibilityLabel={`Unblock ${item.display_name}`}>
               <Text style={styles.unblockText}>Unblock</Text>
             </Pressable>
           </View>

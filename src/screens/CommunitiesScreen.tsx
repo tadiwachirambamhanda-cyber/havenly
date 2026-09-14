@@ -9,6 +9,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
+import { haptics } from '@/lib/haptics';
 import type { Community, CommunityCategory } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -102,12 +103,12 @@ export default function CommunitiesScreen() {
           <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionLabel}>{section.title}</Text>
             {section.category === 'campus' && hasUniversity && (
-              <Pressable onPress={() => setShowAllCampuses((v) => !v)}>
+              <Pressable onPress={() => { haptics.tap(); setShowAllCampuses((v) => !v); }}>
                 <Text style={styles.sectionToggle}>{showAllCampuses ? 'Show only mine' : 'Show all'}</Text>
               </Pressable>
             )}
             {section.category === 'interest' && hasInterests && (
-              <Pressable onPress={() => setShowAllInterests((v) => !v)}>
+              <Pressable onPress={() => { haptics.tap(); setShowAllInterests((v) => !v); }}>
                 <Text style={styles.sectionToggle}>{showAllInterests ? 'Show only mine' : 'Show all'}</Text>
               </Pressable>
             )}

@@ -7,6 +7,8 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { useToast } from '@/lib/ToastContext';
+import { haptics } from '@/lib/haptics';
 import { markConversationRead } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
@@ -24,6 +26,7 @@ export default function ChatScreen() {
   const { conversationId, otherUserId } = route.params;
   const { session } = useAuth();
   const { colors } = useTheme();
+  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
 
@@ -70,15 +73,17 @@ export default function ChatScreen() {
     if (error) {
       console.error('Failed to send message:', error.message);
       setInput(body);
-      Alert.alert('Couldn\'t send message', 'This conversation may no longer be available.');
+      showToast('Couldn’t send — this conversation may no longer be available.', 'error');
       return;
     }
+    haptics.confirm();
     setMessages((prev) => (prev.some((m) => m.id === inserted.id) ? prev : [...prev, inserted as Message]));
     await supabase.from('conversations').update({ last_message: body, last_message_at: new Date().toISOString() }).eq('id', conversationId);
     await markConversationRead(conversationId, myId);
   };
 
   const respondToRequest = async (status: 'accepted' | 'declined') => {
+    haptics.tap();
     await supabase.from('conversations').update({ status }).eq('id', conversationId);
     setConversation((prev) => prev && { ...prev, status });
     if (status === 'declined') navigation.goBack();
@@ -95,9 +100,10 @@ export default function ChatScreen() {
           text: 'Block', style: 'destructive', onPress: async () => {
             try {
               await blockUser(myId, otherUserId);
+              haptics.success();
               navigation.goBack();
             } catch (e) {
-              Alert.alert('Couldn\'t block', e instanceof Error ? e.message : 'Try again.');
+              showToast(e instanceof Error ? e.message : 'Couldn’t block. Try again.', 'error');
             }
           },
         },
@@ -118,9 +124,9 @@ export default function ChatScreen() {
     if (!myId) return;
     try {
       await submitReport(myId, 'user', otherUserId, reason);
-      Alert.alert('Thanks', 'We\'ve got your report.');
+      showToast('Thanks — we’ve got your report.');
     } catch (e) {
-      Alert.alert('Couldn\'t submit report', e instanceof Error ? e.message : 'Try again.');
+      showToast(e instanceof Error ? e.message : 'Couldn’t submit report.', 'error');
     }
   };
 
@@ -133,15 +139,19 @@ export default function ChatScreen() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Pressable style={styles.back} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={16} color={colors.ink} /></Pressable>
+          <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+            <Feather name="arrow-left" size={16} color={colors.ink} />
+          </Pressable>
           {otherUser?.avatar_url ? (
-            <Image source={{ uri: otherUser.avatar_url }} style={styles.headerAvatar} />
+            <Image source={{ uri: otherUser.avatar_url }} style={styles.headerAvatar} transition={200} />
           ) : (
             <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.headerAvatar} />
           )}
           <Text style={styles.headerName}>{otherUser?.display_name ?? '…'}</Text>
           <View style={{ flex: 1 }} />
-          <Pressable style={styles.overflow} onPress={openOptions}><Feather name="more-horizontal" size={18} color={colors.ink} /></Pressable>
+          <Pressable style={styles.overflow} onPress={openOptions} accessibilityLabel="More options">
+            <Feather name="more-horizontal" size={18} color={colors.ink} />
+          </Pressable>
         </View>
 
         <FlatList
@@ -162,10 +172,10 @@ export default function ChatScreen() {
           <View style={styles.requestBar}>
             <Text style={styles.requestText}>{otherUser?.display_name ?? 'This person'} wants to message you.</Text>
             <View style={styles.requestActions}>
-              <Pressable style={styles.declineBtn} onPress={() => respondToRequest('declined')}>
+              <Pressable style={styles.declineBtn} onPress={() => respondToRequest('declined')} accessibilityLabel="Decline conversation">
                 <Text style={styles.declineBtnText}>Decline</Text>
               </Pressable>
-              <Pressable style={styles.acceptBtn} onPress={() => respondToRequest('accepted')}>
+              <Pressable style={styles.acceptBtn} onPress={() => respondToRequest('accepted')} accessibilityLabel="Accept conversation">
                 <Text style={styles.acceptBtnText}>Accept</Text>
               </Pressable>
             </View>
@@ -184,7 +194,9 @@ export default function ChatScreen() {
                 onChangeText={setInput}
                 onSubmitEditing={send}
               />
-              <Pressable style={styles.sendBtn} onPress={send}><Feather name="send" size={15} color={colors.sand} /></Pressable>
+              <Pressable style={styles.sendBtn} onPress={send} accessibilityLabel="Send message">
+                <Feather name="send" size={15} color={colors.sand} />
+              </Pressable>
             </View>
           </View>
         )}

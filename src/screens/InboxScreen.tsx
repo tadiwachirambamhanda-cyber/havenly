@@ -107,7 +107,9 @@ export default function InboxScreen() {
           onChangeText={setQuery}
         />
         {trimmed.length > 0 && (
-          <Pressable style={styles.clearBtn} onPress={() => setQuery('')}><Feather name="x" size={14} color={colors.inkSoft} /></Pressable>
+          <Pressable style={styles.clearBtn} onPress={() => setQuery('')} accessibilityLabel="Clear search">
+            <Feather name="x" size={14} color={colors.inkSoft} />
+          </Pressable>
         )}
       </View>
       {requests.length === 0 && messages.length === 0 ? (
@@ -127,7 +129,7 @@ export default function InboxScreen() {
           <Pressable style={styles.row} onPress={() => openChat(item)}>
             <View>
               {item.otherUser?.avatar_url ? (
-                <Image source={{ uri: item.otherUser.avatar_url }} style={styles.avatar} />
+                <Image source={{ uri: item.otherUser.avatar_url }} style={styles.avatar} transition={200} />
               ) : (
                 <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
               )}

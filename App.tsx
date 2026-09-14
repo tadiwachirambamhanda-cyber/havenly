@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { Fraunces_500Medium_Italic, Fraunces_600SemiBold, Fraunces_700Bold, Fraunces_700Bold_Italic } from '@expo-google-fonts/fraunces';
@@ -11,6 +12,7 @@ import {
 import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
 import { AuthProvider } from '@/lib/AuthContext';
 import { ThemeProvider, useTheme } from '@/lib/ThemeContext';
+import { ToastProvider } from '@/lib/ToastContext';
 import RootNavigator from '@/navigation/RootNavigator';
 import LaunchAnimation from '@/components/LaunchAnimation';
 
@@ -52,10 +54,14 @@ export default function App() {
   }
 
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <AppContent />
+          </ToastProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

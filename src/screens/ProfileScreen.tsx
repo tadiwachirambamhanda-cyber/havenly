@@ -9,6 +9,7 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { haptics } from '@/lib/haptics';
 import { radius, spacing, gradients } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
@@ -90,7 +91,7 @@ export default function ProfileScreen() {
         return (
           <Pressable style={styles.gridCell} onPress={() => navigation.navigate('PostDetail', { postId: item.id })}>
             <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
-            {item.image_url && <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" />}
+            {item.image_url && <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />}
             {item.video_url && (
               <View style={styles.gridPlayBadge}><Feather name="play" size={12} color="white" /></View>
             )}
@@ -105,16 +106,20 @@ export default function ProfileScreen() {
       ListHeaderComponent={
         <View>
           <LinearGradient colors={['#FF7A5C', '#E3A23A', '#0F8B82']} locations={[0, 0.6, 1]} style={styles.cover} />
-          <Pressable style={[styles.settingsBtn, { top: insets.top + 12 }]} onPress={() => navigation.navigate('Settings')}>
+          <Pressable
+            style={[styles.settingsBtn, { top: insets.top + 12 }]}
+            onPress={() => navigation.navigate('Settings')}
+            accessibilityLabel="Settings"
+          >
             <Feather name="settings" size={17} color="#20261F" />
           </Pressable>
           <View style={styles.avatarRow}>
             {profile.avatar_url ? (
-              <Image source={{ uri: profile.avatar_url }} style={styles.avatar} />
+              <Image source={{ uri: profile.avatar_url }} style={styles.avatar} transition={200} />
             ) : (
               <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
             )}
-            <Pressable style={styles.editBtn} onPress={() => navigation.navigate('EditProfile')}>
+            <Pressable style={styles.editBtn} onPress={() => navigation.navigate('EditProfile')} accessibilityLabel="Edit profile">
               <Text style={styles.editBtnText}>Edit profile</Text>
             </Pressable>
           </View>
@@ -125,10 +130,16 @@ export default function ProfileScreen() {
 
           <View style={styles.statsRow}>
             <View><Text style={styles.statNum}>{stats.posts}</Text><Text style={styles.statLabel}>Posts</Text></View>
-            <Pressable onPress={() => navigation.navigate('FollowList', { userId: profile.id, initialTab: 'followers', displayName: profile.display_name })}>
+            <Pressable
+              onPress={() => navigation.navigate('FollowList', { userId: profile.id, initialTab: 'followers', displayName: profile.display_name })}
+              accessibilityLabel="View followers"
+            >
               <Text style={styles.statNum}>{stats.followers}</Text><Text style={styles.statLabel}>Followers</Text>
             </Pressable>
-            <Pressable onPress={() => navigation.navigate('FollowList', { userId: profile.id, initialTab: 'following', displayName: profile.display_name })}>
+            <Pressable
+              onPress={() => navigation.navigate('FollowList', { userId: profile.id, initialTab: 'following', displayName: profile.display_name })}
+              accessibilityLabel="View following"
+            >
               <Text style={styles.statNum}>{stats.following}</Text><Text style={styles.statLabel}>Following</Text>
             </Pressable>
           </View>
@@ -146,7 +157,7 @@ export default function ProfileScreen() {
 
           <View style={styles.tabRow}>
             {GRID_TABS.map((tab) => (
-              <Pressable key={tab.key} style={styles.tab} onPress={() => setActiveTab(tab.key)}>
+              <Pressable key={tab.key} style={styles.tab} onPress={() => { haptics.tap(); setActiveTab(tab.key); }}>
                 <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>{tab.label}</Text>
                 {activeTab === tab.key && <View style={styles.tabUnderline} />}
               </Pressable>

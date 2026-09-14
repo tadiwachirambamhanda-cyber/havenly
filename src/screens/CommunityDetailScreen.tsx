@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, RefreshControl } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -8,6 +8,7 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { haptics } from '@/lib/haptics';
 import { gradients, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
@@ -28,6 +29,7 @@ export default function CommunityDetailScreen() {
   const [joined, setJoined] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     const userId = session?.user.id;
@@ -52,10 +54,17 @@ export default function CommunityDetailScreen() {
   // which navigates away to CreatePost) shows up on return without a manual pull.
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await load();
+    setRefreshing(false);
+  }, [load]);
+
   const toggleJoin = async () => {
     const userId = session?.user.id;
     if (!userId || !community) return;
     const wasJoined = joined;
+    haptics.tap();
     setJoined(!wasJoined);
     setCommunity((prev) => prev && { ...prev, member_count: prev.member_count + (wasJoined ? -1 : 1) });
 
@@ -73,7 +82,9 @@ export default function CommunityDetailScreen() {
   if (!community) {
     return loaded ? (
       <View style={styles.notFound}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={17} color={colors.ink} /></Pressable>
+        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+          <Feather name="arrow-left" size={17} color={colors.ink} />
+        </Pressable>
         <Text style={styles.notFoundText}>This community isn't available.</Text>
       </View>
     ) : (
@@ -89,8 +100,14 @@ export default function CommunityDetailScreen() {
   const canJoin = joined || community.category !== 'campus' || profile?.university === community.related_university;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
-      <Pressable style={styles.back} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={17} color={colors.ink} /></Pressable>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 40 }}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
+    >
+      <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <Feather name="arrow-left" size={17} color={colors.ink} />
+      </Pressable>
       <View style={styles.body}>
         <View style={styles.iconChip}>
           <Feather name={communityIcon(community)} size={28} color={colors.teal} />
@@ -99,7 +116,11 @@ export default function CommunityDetailScreen() {
         <Text style={styles.members}>{community.member_count} members</Text>
         <Text style={styles.desc}>{community.description}</Text>
         {canJoin ? (
-          <Pressable style={[styles.joinBtn, joined && styles.joinBtnJoined]} onPress={toggleJoin}>
+          <Pressable
+            style={[styles.joinBtn, joined && styles.joinBtnJoined]}
+            onPress={toggleJoin}
+            accessibilityLabel={joined ? 'Leave community' : 'Join community'}
+          >
             <Text style={[styles.joinBtnText, joined && styles.joinBtnTextJoined]}>{joined ? 'Joined ✓' : 'Join community'}</Text>
           </Pressable>
         ) : profile?.university ? (
@@ -136,7 +157,7 @@ export default function CommunityDetailScreen() {
             <Pressable key={post.id} style={styles.postCard} onPress={() => navigation.navigate('PostDetail', { postId: post.id })}>
               <View style={styles.postImage}>
                 <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
-                {post.image_url && <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" />}
+                {post.image_url && <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />}
                 {post.video_url && (
                   <View style={styles.playBadge}><Feather name="play" size={11} color="white" /></View>
                 )}

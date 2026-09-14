@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Share, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Animated, Share, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,6 +10,8 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { useToast } from '@/lib/ToastContext';
+import { haptics } from '@/lib/haptics';
 import { findOrCreateConversation } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
@@ -38,7 +40,12 @@ export default function PostDetailScreen() {
   const insets = useSafeAreaInsets();
   const { session } = useAuth();
   const { colors } = useTheme();
+  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const lastTapRef = useRef(0);
+  const heartPopScale = useRef(new Animated.Value(0.5)).current;
+  const heartPopOpacity = useRef(new Animated.Value(0)).current;
+  const likeIconScale = useRef(new Animated.Value(1)).current;
   const [post, setPost] = useState<Post | null>(null);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -81,10 +88,33 @@ export default function PostDetailScreen() {
 
   useEffect(() => { load(); }, [load]);
 
-  const toggleLike = async () => {
-    if (!post) return;
-    setLiked((prev) => !prev);
-    setPost((prev) => prev && { ...prev, like_count: prev.like_count + (liked ? -1 : 1) });
+  const playLikeBounce = () => {
+    likeIconScale.setValue(1);
+    Animated.sequence([
+      Animated.spring(likeIconScale, { toValue: 1.35, friction: 3, tension: 200, useNativeDriver: true }),
+      Animated.spring(likeIconScale, { toValue: 1, friction: 3, tension: 200, useNativeDriver: true }),
+    ]).start();
+  };
+
+  const playHeartPop = () => {
+    heartPopScale.setValue(0.5);
+    heartPopOpacity.setValue(1);
+    Animated.sequence([
+      Animated.spring(heartPopScale, { toValue: 1.15, friction: 4, tension: 120, useNativeDriver: true }),
+      Animated.delay(280),
+      Animated.timing(heartPopOpacity, { toValue: 0, duration: 220, useNativeDriver: true }),
+    ]).start();
+  };
+
+  // Shared by the inline heart button (toggles both ways) and double-tapping
+  // the photo (only ever sets liked=true — matches how double-tap works
+  // everywhere else, it never unlikes).
+  const setLikedState = async (next: boolean) => {
+    if (!post || next === liked) return;
+    setLiked(next);
+    setPost((prev) => prev && { ...prev, like_count: prev.like_count + (next ? 1 : -1) });
+    haptics.tap();
+    if (next) playLikeBounce();
     const { data, error } = await supabase.rpc('toggle_post_like', { post_id_input: post.id });
     if (error) { console.error('Failed to toggle like:', error.message); return; }
     const result = data?.[0];
@@ -94,17 +124,29 @@ export default function PostDetailScreen() {
     }
   };
 
+  const toggleLike = () => setLikedState(!liked);
+
+  const handleImageTap = () => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      playHeartPop();
+      setLikedState(true);
+    }
+    lastTapRef.current = now;
+  };
+
   const toggleSave = async () => {
     if (!post || !session?.user) return;
     const wasSaved = saved;
     setSaved(!wasSaved);
+    haptics.tap();
     const { error } = wasSaved
       ? await supabase.from('saved_posts').delete().eq('user_id', session.user.id).eq('post_id', post.id)
       : await supabase.from('saved_posts').insert({ user_id: session.user.id, post_id: post.id });
     if (error) {
       console.error('Failed to toggle save:', error.message);
       setSaved(wasSaved);
-      Alert.alert('Couldn\'t save post', error.message);
+      showToast('Couldn’t save post', 'error');
     }
   };
 
@@ -117,7 +159,8 @@ export default function PostDetailScreen() {
       .insert({ post_id: post.id, author_id: session.user.id, body })
       .select('*, author:profiles(*)').single();
     setPostingComment(false);
-    if (error) { Alert.alert('Couldn\'t post comment', error.message); return; }
+    if (error) { showToast('Couldn’t post comment', 'error'); return; }
+    haptics.confirm();
     setComments((prev) => [...prev, data as unknown as Comment]);
     setPost((prev) => prev && { ...prev, comment_count: prev.comment_count + 1 });
   };
@@ -128,6 +171,7 @@ export default function PostDetailScreen() {
       {
         text: 'Delete', style: 'destructive', onPress: async () => {
           await supabase.from('comments').delete().eq('id', comment.id);
+          haptics.tap();
           setComments((prev) => prev.filter((c) => c.id !== comment.id));
           setPost((prev) => prev && { ...prev, comment_count: Math.max(prev.comment_count - 1, 0) });
         },
@@ -137,6 +181,7 @@ export default function PostDetailScreen() {
 
   const toggleFollow = async () => {
     if (!post || !session?.user) return;
+    haptics.tap();
     if (following) {
       await supabase.from('follows').delete().eq('follower_id', session.user.id).eq('following_id', post.author_id);
     } else {
@@ -157,7 +202,7 @@ export default function PostDetailScreen() {
       const conversationId = await findOrCreateConversation(session.user.id, post.author_id);
       navigation.navigate('Chat', { conversationId, otherUserId: post.author_id });
     } catch (e) {
-      Alert.alert('Couldn\'t start conversation', e instanceof Error ? e.message : 'Try again.');
+      showToast(e instanceof Error ? e.message : 'Couldn’t start conversation.', 'error');
     } finally {
       setMessaging(false);
     }
@@ -174,9 +219,10 @@ export default function PostDetailScreen() {
           text: 'Block', style: 'destructive', onPress: async () => {
             try {
               await blockUser(session.user.id, post.author_id);
+              haptics.success();
               navigation.goBack();
             } catch (e) {
-              Alert.alert('Couldn\'t block', e instanceof Error ? e.message : 'Try again.');
+              showToast(e instanceof Error ? e.message : 'Couldn’t block. Try again.', 'error');
             }
           },
         },
@@ -198,16 +244,22 @@ export default function PostDetailScreen() {
     if (!post || !session?.user) return;
     try {
       await submitReport(session.user.id, 'post', post.id, reason);
-      Alert.alert('Thanks', 'We\'ve got your report.');
+      showToast('Thanks — we’ve got your report.');
     } catch (e) {
-      Alert.alert('Couldn\'t submit report', e instanceof Error ? e.message : 'Try again.');
+      showToast(e instanceof Error ? e.message : 'Couldn’t submit report.', 'error');
     }
   };
 
   if (!post) {
     return loaded ? (
       <View style={styles.notFound}>
-        <Pressable style={[styles.back, { top: insets.top + 12 }]} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={16} color="#20261F" /></Pressable>
+        <Pressable
+          style={[styles.back, { top: insets.top + 12 }]}
+          onPress={() => navigation.goBack()}
+          accessibilityLabel="Go back"
+        >
+          <Feather name="arrow-left" size={16} color="#20261F" />
+        </Pressable>
         <Text style={styles.notFoundText}>This post isn't available.</Text>
       </View>
     ) : null;
@@ -222,11 +274,33 @@ export default function PostDetailScreen() {
     <ScrollView>
       <View style={styles.hero}>
         <LinearGradient colors={[heroFrom, heroTo]} style={StyleSheet.absoluteFill} />
-        {post.image_url && <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" />}
+        {post.image_url && (
+          <Pressable style={StyleSheet.absoluteFill} onPress={handleImageTap}>
+            <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+          </Pressable>
+        )}
         {post.video_url && <PostVideo uri={post.video_url} />}
-        <Pressable style={[styles.back, { top: insets.top + 12 }]} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={16} color="#20261F" /></Pressable>
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.heartPop, { opacity: heartPopOpacity, transform: [{ scale: heartPopScale }] }]}
+        >
+          <Feather name="heart" size={84} color="white" />
+        </Animated.View>
+        <Pressable
+          style={[styles.back, { top: insets.top + 12 }]}
+          onPress={() => navigation.goBack()}
+          accessibilityLabel="Go back"
+        >
+          <Feather name="arrow-left" size={16} color="#20261F" />
+        </Pressable>
         {!isOwnPost && (
-          <Pressable style={[styles.overflow, { top: insets.top + 12 }]} onPress={openOptions}><Feather name="more-horizontal" size={17} color="#20261F" /></Pressable>
+          <Pressable
+            style={[styles.overflow, { top: insets.top + 12 }]}
+            onPress={openOptions}
+            accessibilityLabel="More options"
+          >
+            <Feather name="more-horizontal" size={17} color="#20261F" />
+          </Pressable>
         )}
       </View>
       <View style={styles.body}>
@@ -235,7 +309,7 @@ export default function PostDetailScreen() {
 
         <View style={styles.userRow}>
           {post.author?.avatar_url ? (
-            <Image source={{ uri: post.author.avatar_url }} style={styles.avatar} />
+            <Image source={{ uri: post.author.avatar_url }} style={styles.avatar} transition={200} />
           ) : (
             <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
           )}
@@ -245,10 +319,14 @@ export default function PostDetailScreen() {
           </View>
           {!isOwnPost && (
             <View style={{ flexDirection: 'row', gap: 8 }}>
-              <Pressable style={styles.messageBtn} onPress={onMessage}>
+              <Pressable style={styles.messageBtn} onPress={onMessage} accessibilityLabel="Message this user">
                 <Feather name="message-circle" size={14} color={colors.ink} />
               </Pressable>
-              <Pressable style={[styles.followBtn, following && styles.followBtnActive]} onPress={toggleFollow}>
+              <Pressable
+                style={[styles.followBtn, following && styles.followBtnActive]}
+                onPress={toggleFollow}
+                accessibilityLabel={following ? 'Unfollow this user' : 'Follow this user'}
+              >
                 <Text style={[styles.followBtnText, following && styles.followBtnTextActive]}>
                   {following ? 'Following' : 'Follow'}
                 </Text>
@@ -260,19 +338,21 @@ export default function PostDetailScreen() {
         {post.body ? <Text style={styles.text}>{post.body}</Text> : null}
 
         <View style={styles.actionBar}>
-          <Pressable style={styles.actionItem} onPress={toggleLike}>
-            <Feather name="heart" size={15} color={liked ? colors.coral : colors.inkSoft} />
+          <Pressable style={styles.actionItem} onPress={toggleLike} accessibilityLabel={liked ? 'Unlike' : 'Like'}>
+            <Animated.View style={{ transform: [{ scale: likeIconScale }] }}>
+              <Feather name="heart" size={15} color={liked ? colors.coral : colors.inkSoft} />
+            </Animated.View>
             <Text style={[styles.actionText, liked && styles.actionTextActive]}>{post.like_count}</Text>
           </Pressable>
           <View style={styles.actionItem}>
             <Feather name="message-circle" size={15} color={colors.inkSoft} />
             <Text style={styles.actionText}>{post.comment_count}</Text>
           </View>
-          <Pressable style={styles.actionItem} onPress={onShare}>
+          <Pressable style={styles.actionItem} onPress={onShare} accessibilityLabel="Share this post">
             <Feather name="share-2" size={15} color={colors.inkSoft} />
             <Text style={styles.actionText}>Share</Text>
           </Pressable>
-          <Pressable style={styles.actionItem} onPress={toggleSave}>
+          <Pressable style={styles.actionItem} onPress={toggleSave} accessibilityLabel={saved ? 'Remove from saved' : 'Save this post'}>
             <Feather name="bookmark" size={15} color={saved ? colors.coral : colors.inkSoft} />
             <Text style={[styles.actionText, saved && styles.actionTextActive]}>{saved ? 'Saved' : 'Save'}</Text>
           </Pressable>
@@ -287,7 +367,7 @@ export default function PostDetailScreen() {
               onLongPress={() => comment.author_id === session?.user.id && deleteComment(comment)}
             >
               {comment.author?.avatar_url ? (
-                <Image source={{ uri: comment.author.avatar_url }} style={styles.commentAvatar} />
+                <Image source={{ uri: comment.author.avatar_url }} style={styles.commentAvatar} transition={200} />
               ) : (
                 <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.commentAvatar} />
               )}
@@ -313,7 +393,9 @@ export default function PostDetailScreen() {
         onChangeText={setCommentInput}
         onSubmitEditing={addComment}
       />
-      <Pressable style={styles.commentSendBtn} onPress={addComment}><Feather name="send" size={15} color={colors.sand} /></Pressable>
+      <Pressable style={styles.commentSendBtn} onPress={addComment} accessibilityLabel="Post comment">
+        <Feather name="send" size={15} color={colors.sand} />
+      </Pressable>
     </View>
     </View>
     </KeyboardAvoidingView>
@@ -324,6 +406,10 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   hero: { width: '100%', height: 340 },
+  heartPop: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center',
+    shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 12, shadowOffset: { width: 0, height: 2 },
+  },
   back: {
     position: 'absolute', top: 16, left: 16, width: 34, height: 34, borderRadius: 17,
     backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center',

@@ -8,6 +8,8 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import type { ThemeMode } from '@/lib/ThemeContext';
+import { useToast } from '@/lib/ToastContext';
+import { haptics } from '@/lib/haptics';
 import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -26,6 +28,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { session } = useAuth();
   const { colors, mode, setMode } = useTheme();
+  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [deleting, setDeleting] = useState(false);
 
@@ -53,7 +56,7 @@ export default function SettingsScreen() {
               await deleteOwnAccount(userId);
             } catch (e) {
               setDeleting(false);
-              Alert.alert('Couldn’t delete your account', e instanceof Error ? e.message : 'Please try again.');
+              showToast(e instanceof Error ? e.message : 'Couldn’t delete your account. Please try again.', 'error');
             }
           },
         },
@@ -64,7 +67,9 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={17} color={colors.ink} /></Pressable>
+        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+          <Feather name="arrow-left" size={17} color={colors.ink} />
+        </Pressable>
         <Text style={styles.title}>Settings</Text>
       </View>
 
@@ -73,7 +78,12 @@ export default function SettingsScreen() {
         {MODE_OPTIONS.map((opt) => {
           const isSelected = mode === opt.key;
           return (
-            <Pressable key={opt.key} style={[styles.segment, isSelected && styles.segmentActive]} onPress={() => setMode(opt.key)}>
+            <Pressable
+              key={opt.key}
+              style={[styles.segment, isSelected && styles.segmentActive]}
+              onPress={() => { haptics.tap(); setMode(opt.key); }}
+              accessibilityLabel={`${opt.label} appearance`}
+            >
               <Feather name={opt.icon} size={14} color={isSelected ? colors.sand : colors.inkSoft} />
               <Text style={[styles.segmentText, isSelected && styles.segmentTextActive]}>{opt.label}</Text>
             </Pressable>

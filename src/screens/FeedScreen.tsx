@@ -112,7 +112,7 @@ export default function FeedScreen() {
         <View style={[styles.cardImage, { height: imageHeight }]}>
           <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
           {item.image_url ? (
-            <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" />
+            <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
           ) : null}
           {item.is_editorial && (
             <View style={styles.editorialBadge}><Text style={styles.editorialBadgeText}>★ Havenly Picks</Text></View>
@@ -154,7 +154,7 @@ export default function FeedScreen() {
           <Text style={styles.brand}>havenly.</Text>
         </View>
         <View style={styles.topBarActions}>
-          <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Communities')}>
+          <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Communities')} accessibilityLabel="Communities">
             <Feather name="users" size={17} color={colors.ink} />
           </Pressable>
         </View>
