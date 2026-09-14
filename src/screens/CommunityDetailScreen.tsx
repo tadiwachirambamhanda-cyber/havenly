@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -7,7 +7,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
-import { colors, gradients, spacing } from '@/theme/tokens';
+import { useTheme } from '@/lib/ThemeContext';
+import { gradients, spacing } from '@/theme/tokens';
+import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
 import type { Community, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -20,6 +22,8 @@ export default function CommunityDetailScreen() {
   const route = useRoute<Route>();
   const { communityId } = route.params;
   const { session, profile } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [community, setCommunity] = useState<Community | null>(null);
   const [joined, setJoined] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -96,7 +100,7 @@ export default function CommunityDetailScreen() {
         <Text style={styles.desc}>{community.description}</Text>
         {canJoin ? (
           <Pressable style={[styles.joinBtn, joined && styles.joinBtnJoined]} onPress={toggleJoin}>
-            <Text style={styles.joinBtnText}>{joined ? 'Joined ✓' : 'Join community'}</Text>
+            <Text style={[styles.joinBtnText, joined && styles.joinBtnTextJoined]}>{joined ? 'Joined ✓' : 'Join community'}</Text>
           </Pressable>
         ) : profile?.university ? (
           <View style={styles.restrictedBox}>
@@ -158,7 +162,8 @@ export default function CommunityDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   centered: { flex: 1, backgroundColor: colors.sand, alignItems: 'center', justifyContent: 'center' },
   back: { marginTop: 50, marginLeft: 16, width: 34, height: 34, borderRadius: 17, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
@@ -168,10 +173,14 @@ const styles = StyleSheet.create({
   iconChip: { width: 68, height: 68, borderRadius: 34, backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
   name: { fontFamily: 'Fraunces_600SemiBold', fontSize: 21, color: colors.ink, marginTop: 8 },
   members: { fontSize: 12, color: colors.inkSoft, marginTop: 4 },
-  desc: { fontSize: 13, color: '#3A4038', lineHeight: 20, marginTop: 12 },
+  desc: { fontSize: 13, color: colors.inkSoft, lineHeight: 20, marginTop: 12 },
   joinBtn: { marginTop: 16, backgroundColor: colors.coral, paddingVertical: 13, borderRadius: 100, alignItems: 'center' },
   joinBtnJoined: { backgroundColor: colors.ink },
   joinBtnText: { color: 'white', fontWeight: '700', fontSize: 14 },
+  // joinBtn stays coral regardless of theme, so its text stays literal white;
+  // joinBtnJoined uses colors.ink (flips to cream in dark mode), so its text
+  // needs the paired colors.sand instead to stay readable.
+  joinBtnTextJoined: { color: colors.sand },
   restrictedBox: {
     flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 16, backgroundColor: colors.sandDeep,
     paddingVertical: 13, paddingHorizontal: 16, borderRadius: 100,
@@ -202,4 +211,5 @@ const styles = StyleSheet.create({
   postUser: { fontSize: 10.5, color: colors.inkSoft, fontWeight: '600', flex: 1 },
   postLikes: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   postLikesText: { fontSize: 10.5, color: colors.inkSoft, fontWeight: '600' },
-});
+  });
+}

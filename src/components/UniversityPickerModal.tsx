@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing } from '@/theme/tokens';
+import { useTheme } from '@/lib/ThemeContext';
+import { spacing } from '@/theme/tokens';
+import type { ColorTokens } from '@/theme/tokens';
 import { UNIVERSITIES } from '@/constants/universities';
 
 interface Props {
@@ -13,6 +15,8 @@ interface Props {
 
 export default function UniversityPickerModal({ visible, selected, onClose, onSelect }: Props) {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const emirates = Array.from(new Set(UNIVERSITIES.map((u) => u.emirate)));
 
   const pick = (name: string | null) => {
@@ -50,7 +54,8 @@ export default function UniversityPickerModal({ visible, selected, onClose, onSe
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
   headerTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 17, color: colors.ink },
@@ -65,4 +70,5 @@ const styles = StyleSheet.create({
   },
   rowText: { fontSize: 14, color: colors.ink, flex: 1, paddingRight: 12 },
   check: { fontSize: 15, fontWeight: '700', color: colors.coral },
-});
+  });
+}

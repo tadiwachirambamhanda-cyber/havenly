@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { supabase } from '@/lib/supabase';
-import { colors, spacing } from '@/theme/tokens';
+import { useTheme } from '@/lib/ThemeContext';
+import { spacing } from '@/theme/tokens';
+import type { ColorTokens } from '@/theme/tokens';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function LoginScreen() {
   const navigation = useNavigation<Nav>();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -64,7 +68,7 @@ export default function LoginScreen() {
           />
           {error ? <Text style={styles.error}>{error}</Text> : null}
           <Pressable style={styles.btnPrimary} onPress={handleLogin} disabled={loading}>
-            {loading ? <ActivityIndicator color={colors.white} /> : <Text style={styles.btnPrimaryText}>Log in</Text>}
+            {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnPrimaryText}>Log in</Text>}
           </Pressable>
           <Pressable onPress={() => navigation.navigate('SignUp')}>
             <Text style={styles.switchLink}>New to Havenly? <Text style={styles.switchLinkBold}>Create an account</Text></Text>
@@ -75,11 +79,16 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
+  // The hero block is a fixed dark brand moment regardless of app theme
+  // (same treatment as SignUp/Onboarding), so its own text stays literal
+  // cream/tan rather than colors.sand — which would flip to near-black
+  // text on this same dark background once dark mode is on.
   container: { flex: 1, backgroundColor: '#2A2118' },
   hero: { paddingHorizontal: spacing.xl, paddingTop: 90, paddingBottom: 20 },
   eyebrow: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, color: '#F0C79A', textTransform: 'uppercase' },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 34, color: colors.sand, marginTop: 14, lineHeight: 38 },
+  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 34, color: '#FBF5EA', marginTop: 14, lineHeight: 38 },
   sub: { fontSize: 14.5, color: '#E7D9C8', marginTop: 14, lineHeight: 21, maxWidth: 280 },
   panel: { backgroundColor: colors.sand, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, marginTop: 20, flexGrow: 1 },
   label: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, color: colors.inkSoft, textTransform: 'uppercase', marginBottom: 6, marginTop: 14 },
@@ -89,4 +98,5 @@ const styles = StyleSheet.create({
   btnPrimaryText: { color: 'white', fontWeight: '700', fontSize: 15 },
   switchLink: { textAlign: 'center', marginTop: 18, fontSize: 13.5, color: colors.inkSoft },
   switchLinkBold: { color: colors.teal, fontWeight: '700' },
-});
+  });
+}

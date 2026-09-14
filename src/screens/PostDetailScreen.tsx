@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Share, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -9,10 +9,12 @@ import { useVideoPlayer, VideoView } from 'expo-video';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
+import { useTheme } from '@/lib/ThemeContext';
 import { findOrCreateConversation } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
-import { colors, gradients, radius, spacing } from '@/theme/tokens';
+import { gradients, radius, spacing } from '@/theme/tokens';
+import type { ColorTokens } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
 import type { Comment, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -35,6 +37,8 @@ export default function PostDetailScreen() {
   const route = useRoute<Route>();
   const insets = useSafeAreaInsets();
   const { session } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [post, setPost] = useState<Post | null>(null);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -316,7 +320,8 @@ export default function PostDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   hero: { width: '100%', height: 340 },
   back: {
@@ -341,7 +346,7 @@ const styles = StyleSheet.create({
   followBtnActive: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   followBtnText: { fontSize: 11.5, fontWeight: '700', color: colors.sand },
   followBtnTextActive: { color: colors.ink },
-  text: { fontSize: 13.5, lineHeight: 22, color: '#3A4038' },
+  text: { fontSize: 13.5, lineHeight: 22, color: colors.inkSoft },
   actionBar: { flexDirection: 'row', gap: 18, marginTop: 20, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.line },
   actionItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   actionText: { fontSize: 12.5, fontWeight: '700', color: colors.inkSoft },
@@ -352,9 +357,10 @@ const styles = StyleSheet.create({
   commentAvatar: { width: 28, height: 28, borderRadius: 14 },
   commentMeta: { fontSize: 11, color: colors.inkSoft },
   commentUser: { fontWeight: '700', color: colors.ink },
-  commentBody: { fontSize: 13, color: '#3A4038', marginTop: 3, lineHeight: 18 },
+  commentBody: { fontSize: 13, color: colors.inkSoft, marginTop: 3, lineHeight: 18 },
   noComments: { fontSize: 12.5, color: colors.inkSoft },
   commentInputRow: { flexDirection: 'row', gap: 9, alignItems: 'center', padding: spacing.md, borderTopWidth: 1, borderColor: colors.line, backgroundColor: colors.sand },
-  commentInput: { flex: 1, backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line, borderRadius: radius.pill, paddingHorizontal: 16, paddingVertical: 11, fontSize: 13 },
+  commentInput: { flex: 1, backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line, borderRadius: radius.pill, paddingHorizontal: 16, paddingVertical: 11, fontSize: 13, color: colors.ink },
   commentSendBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' },
-});
+  });
+}

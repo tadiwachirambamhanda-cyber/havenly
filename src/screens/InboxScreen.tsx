@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, SectionList, Pressable, RefreshControl, TextInput } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -7,7 +7,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { useTheme } from '@/lib/ThemeContext';
+import { radius, spacing } from '@/theme/tokens';
+import type { ColorTokens } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
 import type { Conversation, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -18,6 +20,8 @@ type Row = Conversation & { otherUser: Profile | undefined; unread: boolean };
 export default function InboxScreen() {
   const navigation = useNavigation<Nav>();
   const { session } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [rows, setRows] = useState<Row[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState('');
@@ -144,7 +148,8 @@ export default function InboxScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 26, color: colors.ink, paddingHorizontal: spacing.lg, paddingTop: 60 },
   searchBar: {
@@ -166,4 +171,5 @@ const styles = StyleSheet.create({
   previewUnread: { color: colors.ink, fontWeight: '600' },
   time: { fontSize: 10.5, color: colors.inkSoft },
   placeholder: { color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 20 },
-});
+  });
+}

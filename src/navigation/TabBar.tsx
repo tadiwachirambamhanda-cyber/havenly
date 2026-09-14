@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { colors } from '@/theme/tokens';
+import { useTheme } from '@/lib/ThemeContext';
+import type { ColorTokens } from '@/theme/tokens';
 import { useUnreadMessages } from '@/lib/useUnreadMessages';
 
 const INACTIVE_COLOR = '#8D8977';
@@ -17,6 +18,8 @@ const TAB_CONFIG: Record<string, { icon: keyof typeof Feather.glyphMap }> = {
 
 export default function TabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const hasUnread = useUnreadMessages();
 
   const renderTab = (route: (typeof state.routes)[number], index: number) => {
@@ -49,7 +52,8 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
   container: {
     position: 'absolute', left: 16, right: 16, flexDirection: 'row', alignItems: 'center', gap: 10,
   },
@@ -60,13 +64,17 @@ const styles = StyleSheet.create({
   },
   pillItem: { flex: 1, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   pillItemActive: { backgroundColor: colors.coral },
+  // colors.sand, not literal white — this dot sits on the ink-colored pill,
+  // which flips to cream in dark mode, so the dot must flip the other way
+  // to stay visible against it.
   unreadDot: {
     position: 'absolute', top: 6, right: '30%', width: 7, height: 7, borderRadius: 3.5,
-    backgroundColor: 'white', borderWidth: 1.5, borderColor: colors.coral,
+    backgroundColor: colors.sand, borderWidth: 1.5, borderColor: colors.coral,
   },
   fab: {
     width: 46, height: 46, borderRadius: 23, backgroundColor: colors.coral, flexShrink: 0,
     alignItems: 'center', justifyContent: 'center',
     shadowColor: colors.coral, shadowOpacity: 0.5, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 8,
   },
-});
+  });
+}

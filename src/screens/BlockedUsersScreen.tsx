@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Image } from 'expo-image';
@@ -6,12 +6,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { useTheme } from '@/lib/ThemeContext';
+import { radius, spacing } from '@/theme/tokens';
+import type { ColorTokens } from '@/theme/tokens';
 import type { Profile } from '@/types';
 
 export default function BlockedUsersScreen() {
   const navigation = useNavigation();
   const { session } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [blocked, setBlocked] = useState<Profile[]>([]);
 
   const load = useCallback(async () => {
@@ -65,7 +69,8 @@ export default function BlockedUsersScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 16, paddingHorizontal: spacing.lg },
   back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
@@ -77,4 +82,5 @@ const styles = StyleSheet.create({
   unblockBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
   unblockText: { fontSize: 12, fontWeight: '700', color: colors.ink },
   placeholder: { color: colors.inkSoft, textAlign: 'center', marginTop: 40 },
-});
+  });
+}

@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
-import { colors, spacing } from '@/theme/tokens';
+import { useTheme } from '@/lib/ThemeContext';
+import { spacing } from '@/theme/tokens';
+import type { ColorTokens } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
 import { interestIcon } from '@/constants/topicIcons';
 import type { Interest } from '@/types';
 
 export default function OnboardingScreen() {
   const { session, refreshProfile } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [selected, setSelected] = useState<Set<Interest>>(new Set());
   const [saving, setSaving] = useState(false);
 
@@ -63,11 +67,14 @@ export default function OnboardingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
+  // Fixed dark hero regardless of app theme (same as Login/SignUp), so its
+  // text stays literal cream rather than colors.sand.
   container: { flex: 1, backgroundColor: '#2A2118' },
   hero: { paddingHorizontal: spacing.xl, paddingTop: 60, paddingBottom: 20 },
   eyebrow: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, color: '#F0C79A', textTransform: 'uppercase' },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 38, color: colors.sand, marginTop: 14, lineHeight: 42 },
+  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 38, color: '#FBF5EA', marginTop: 14, lineHeight: 42 },
   sub: { fontSize: 14.5, color: '#E7D9C8', marginTop: 14, lineHeight: 21, maxWidth: 280 },
   panel: { backgroundColor: colors.sand, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, marginTop: 20 },
   question: { fontFamily: 'Fraunces_600SemiBold', fontSize: 22, color: colors.ink, marginBottom: 16 },
@@ -79,4 +86,5 @@ const styles = StyleSheet.create({
   btnPrimary: { backgroundColor: colors.coral, paddingVertical: 16, borderRadius: 100, alignItems: 'center' },
   btnPrimaryText: { color: 'white', fontWeight: '700', fontSize: 15 },
   skip: { textAlign: 'center', marginTop: 12, fontSize: 12.5, color: colors.inkSoft, fontWeight: '600' },
-});
+  });
+}

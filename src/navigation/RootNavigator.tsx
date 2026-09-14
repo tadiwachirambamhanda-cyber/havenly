@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { colors } from '@/theme/tokens';
+import type { ColorTokens } from '@/theme/tokens';
 import { useAuth } from '@/lib/AuthContext';
+import { useTheme } from '@/lib/ThemeContext';
 import TabBar from '@/navigation/TabBar';
 
 import LoginScreen from '@/screens/LoginScreen';
@@ -59,9 +60,9 @@ function MainTabs() {
   );
 }
 
-function SplashLoading() {
+function SplashLoading({ colors }: { colors: ColorTokens }) {
   return (
-    <View style={styles.splash}>
+    <View style={[styles.splash, { backgroundColor: colors.sand }]}>
       <ActivityIndicator color={colors.coral} size="large" />
     </View>
   );
@@ -69,11 +70,17 @@ function SplashLoading() {
 
 export default function RootNavigator() {
   const { session, profile, loading } = useAuth();
+  const { colors, scheme } = useTheme();
 
-  if (loading) return <SplashLoading />;
+  const navTheme = useMemo(() => {
+    const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
+    return { ...base, colors: { ...base.colors, background: colors.sand, card: colors.sand, text: colors.ink, border: colors.line, primary: colors.coral } };
+  }, [scheme, colors]);
+
+  if (loading) return <SplashLoading colors={colors} />;
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={navTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!session ? (
           // Signed out — auth flow only.
@@ -104,5 +111,5 @@ export default function RootNavigator() {
 }
 
 const styles = StyleSheet.create({
-  splash: { flex: 1, backgroundColor: colors.sand, alignItems: 'center', justifyContent: 'center' },
+  splash: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });

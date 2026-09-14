@@ -7,7 +7,9 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
-import { colors, radius, spacing, gradients } from '@/theme/tokens';
+import { useTheme } from '@/lib/ThemeContext';
+import { radius, spacing, gradients } from '@/theme/tokens';
+import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
 import type { Community, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -36,6 +38,8 @@ function estimateCardHeight(post: Post, imageHeight: number): number {
 export default function FeedScreen() {
   const navigation = useNavigation<Nav>();
   const { session } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [myCommunities, setMyCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
@@ -185,7 +189,8 @@ export default function FeedScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 60 },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingTop: 60, paddingBottom: spacing.md },
@@ -207,7 +212,9 @@ const styles = StyleSheet.create({
   card: { borderRadius: radius.md, overflow: 'hidden', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   cardEditorial: { borderColor: colors.gold, borderWidth: 1.5 },
   cardImage: { justifyContent: 'flex-start' },
-  editorialBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: colors.ink, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 100 },
+  // Fixed dark plaque regardless of theme — colors.ink would flip to cream in
+  // dark mode and break the gold text's contrast, so this one stays literal.
+  editorialBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: '#20261F', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 100 },
   editorialBadgeText: { color: colors.gold, fontSize: 9, fontWeight: '700' },
   playBadge: {
     position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: 13,
@@ -220,4 +227,5 @@ const styles = StyleSheet.create({
   cardUser: { fontSize: 11, color: colors.inkSoft, fontWeight: '600', flex: 1 },
   cardLikesRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   cardLikes: { fontSize: 11, color: colors.inkSoft, fontWeight: '600' },
-});
+  });
+}

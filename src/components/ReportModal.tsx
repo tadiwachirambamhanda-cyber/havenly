@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { useTheme } from '@/lib/ThemeContext';
+import { radius, spacing } from '@/theme/tokens';
+import type { ColorTokens } from '@/theme/tokens';
 
 const REASONS = ['Spam', 'Harassment or bullying', 'Inappropriate content', 'Something else'];
 
@@ -11,6 +13,8 @@ interface Props {
 }
 
 export default function ReportModal({ visible, onClose, onSubmit }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
@@ -30,7 +34,8 @@ export default function ReportModal({ visible, onClose, onSubmit }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   card: { backgroundColor: colors.sand, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, padding: spacing.lg, paddingBottom: 36 },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 17, color: colors.ink, marginBottom: 14 },
@@ -38,4 +43,5 @@ const styles = StyleSheet.create({
   optionText: { fontSize: 14, color: colors.ink, fontWeight: '600' },
   cancel: { paddingVertical: 14, marginTop: 8, alignItems: 'center' },
   cancelText: { fontSize: 14, color: colors.inkSoft, fontWeight: '700' },
-});
+  });
+}

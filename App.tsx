@@ -10,13 +10,25 @@ import {
 } from '@expo-google-fonts/plus-jakarta-sans';
 import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
 import { AuthProvider } from '@/lib/AuthContext';
+import { ThemeProvider, useTheme } from '@/lib/ThemeContext';
 import RootNavigator from '@/navigation/RootNavigator';
 import LaunchAnimation from '@/components/LaunchAnimation';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function App() {
+function AppContent() {
   const [showIntro, setShowIntro] = useState(true);
+  const { scheme } = useTheme();
+
+  return (
+    <>
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      {showIntro ? <LaunchAnimation onFinish={() => setShowIntro(false)} /> : <RootNavigator />}
+    </>
+  );
+}
+
+export default function App() {
   const [fontsLoaded, fontError] = useFonts({
     Fraunces_500Medium_Italic,
     Fraunces_600SemiBold,
@@ -40,9 +52,10 @@ export default function App() {
   }
 
   return (
-    <AuthProvider>
-      <StatusBar style="dark" />
-      {showIntro ? <LaunchAnimation onFinish={() => setShowIntro(false)} /> : <RootNavigator />}
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

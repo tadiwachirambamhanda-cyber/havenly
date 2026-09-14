@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Image } from 'expo-image';
@@ -6,10 +6,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
+import { useTheme } from '@/lib/ThemeContext';
 import { markConversationRead } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
+import type { ColorTokens } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
 import type { Conversation, Message, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -21,6 +23,8 @@ export default function ChatScreen() {
   const route = useRoute<Route>();
   const { conversationId, otherUserId } = route.params;
   const { session } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
 
   const [otherUser, setOtherUser] = useState<Profile | null>(null);
@@ -172,7 +176,14 @@ export default function ChatScreen() {
           <View style={styles.inputRow}>
             {isPending && isInitiator && <Text style={styles.pendingHint}>Waiting for {otherUser?.display_name ?? 'them'} to accept your request</Text>}
             <View style={styles.inputInner}>
-              <TextInput style={styles.input} placeholder="Message…" value={input} onChangeText={setInput} onSubmitEditing={send} />
+              <TextInput
+                style={styles.input}
+                placeholder="Message…"
+                placeholderTextColor={colors.inkSoft}
+                value={input}
+                onChangeText={setInput}
+                onSubmitEditing={send}
+              />
               <Pressable style={styles.sendBtn} onPress={send}><Feather name="send" size={15} color={colors.sand} /></Pressable>
             </View>
           </View>
@@ -183,7 +194,8 @@ export default function ChatScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   header: {
     flexDirection: 'row', alignItems: 'center', gap: 10, paddingTop: 54, paddingBottom: 12,
@@ -203,7 +215,7 @@ const styles = StyleSheet.create({
   inputRow: { padding: spacing.md, borderTopWidth: 1, borderColor: colors.line },
   inputInner: { flexDirection: 'row', gap: 9, alignItems: 'center' },
   pendingHint: { fontSize: 11, color: colors.inkSoft, marginBottom: 8, textAlign: 'center' },
-  input: { flex: 1, backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line, borderRadius: 100, paddingHorizontal: 16, paddingVertical: 11, fontSize: 13 },
+  input: { flex: 1, backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line, borderRadius: 100, paddingHorizontal: 16, paddingVertical: 11, fontSize: 13, color: colors.ink },
   sendBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' },
   requestBar: { padding: spacing.lg, borderTopWidth: 1, borderColor: colors.line, alignItems: 'center' },
   requestText: { fontSize: 12.5, color: colors.inkSoft, marginBottom: 12, textAlign: 'center' },
@@ -212,4 +224,5 @@ const styles = StyleSheet.create({
   declineBtnText: { fontSize: 13, fontWeight: '700', color: colors.ink },
   acceptBtn: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: radius.pill, backgroundColor: colors.coral },
   acceptBtnText: { fontSize: 13, fontWeight: '700', color: 'white' },
-});
+  });
+}

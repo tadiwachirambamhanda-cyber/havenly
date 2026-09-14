@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
-import { colors, radius, spacing, gradients } from '@/theme/tokens';
+import { useTheme } from '@/lib/ThemeContext';
+import { radius, spacing, gradients } from '@/theme/tokens';
+import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
 import type { Community, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -34,6 +36,8 @@ const EVENTS: DiscoverEvent[] = [
 
 export default function DiscoverScreen() {
   const navigation = useNavigation<Nav>();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [query, setQuery] = useState('');
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [communities, setCommunities] = useState<Community[] | null>(null);
@@ -152,7 +156,8 @@ export default function DiscoverScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 26, color: colors.ink, paddingHorizontal: spacing.lg, paddingTop: 60 },
   searchBar: {
@@ -189,4 +194,5 @@ const styles = StyleSheet.create({
   eventMonth: { fontSize: 8.5, textTransform: 'uppercase', fontWeight: '800', color: colors.teal },
   eventName: { fontSize: 12.5, fontWeight: '700', color: colors.ink },
   eventLoc: { fontSize: 10.5, color: colors.inkSoft, marginTop: 2 },
-});
+  });
+}

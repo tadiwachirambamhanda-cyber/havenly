@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
@@ -7,7 +7,9 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { useTheme } from '@/lib/ThemeContext';
+import { radius, spacing } from '@/theme/tokens';
+import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import type { Community } from '@/types';
@@ -34,6 +36,8 @@ export default function CreatePostScreen() {
   const navigation = useNavigation();
   const route = useRoute<Route>();
   const { session } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [tag, setTag] = useState(TAG_OPTIONS[0]);
@@ -228,7 +232,8 @@ export default function CreatePostScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
@@ -266,4 +271,5 @@ const styles = StyleSheet.create({
   chipText: { fontSize: 12.5, fontWeight: '600', color: colors.ink },
   chipTextSelected: { color: colors.sand },
   error: { color: colors.coral, fontSize: 13, marginTop: 16, marginHorizontal: spacing.lg },
-});
+  });
+}
