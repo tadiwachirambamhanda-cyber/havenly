@@ -6,9 +6,11 @@ export async function blockUser(blockerId: string, blockedId: string): Promise<v
   const { error } = await supabase.from('blocked_users').insert({ blocker_id: blockerId, blocked_id: blockedId });
   if (error) throw error;
   // Blocking implies unfollowing each other — a block that leaves a stale
-  // follow relationship in place would be a confusing half-measure.
-  await supabase.from('follows').delete().eq('follower_id', blockerId).eq('following_id', blockedId);
-  await supabase.from('follows').delete().eq('follower_id', blockedId).eq('following_id', blockerId);
+  // follow relationship in place would be a confusing half-measure. RPC
+  // because "Users can unfollow" only lets you delete rows where you're the
+  // follower, so a plain delete can't remove the other direction (them
+  // following you).
+  await supabase.rpc('unfollow_both_directions', { user_a: blockerId, user_b: blockedId });
 }
 
 export async function submitReport(

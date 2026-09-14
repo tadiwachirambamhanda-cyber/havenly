@@ -95,6 +95,28 @@ create policy "Follows are viewable by everyone" on follows for select using (tr
 create policy "Users can follow others" on follows for insert with check (auth.uid() = follower_id);
 create policy "Users can unfollow" on follows for delete using (auth.uid() = follower_id);
 
+-- "Users can unfollow" only lets a user delete rows where they're the
+-- follower — correct for normal unfollowing, but it means blockUser()'s
+-- plain client-side deletes can't remove the *other* direction (them
+-- following you) when you block someone. security definer lets a block
+-- cleanly remove both sides in one call, same pattern as is_blocked_between.
+create or replace function public.unfollow_both_directions(user_a uuid, user_b uuid)
+returns void
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  if auth.uid() is distinct from user_a and auth.uid() is distinct from user_b then
+    raise exception 'Not authorized';
+  end if;
+  delete from follows
+  where (follower_id = user_a and following_id = user_b)
+     or (follower_id = user_b and following_id = user_a);
+end;
+$$;
+
+grant execute on function public.unfollow_both_directions(uuid, uuid) to authenticated;
+
 -- ==================== POSTS ====================
 create table posts (
   id uuid primary key default gen_random_uuid(),
@@ -118,15 +140,14 @@ create policy "Posts are viewable unless blocked" on posts for select using (
   not public.is_blocked_between(auth.uid(), author_id)
 );
 create policy "Users can create their own posts" on posts for insert with check (auth.uid() = author_id);
-create policy "Users can update their own posts" on posts for update using (auth.uid() = author_id);
 create policy "Users can delete their own posts" on posts for delete using (auth.uid() = author_id);
 
--- Editorial posts should only be insertable by an admin/editor role.
--- Recommended: add an `is_editor` boolean to profiles, checked here:
--- create policy "Only editors can post editorial content" on posts for insert with check (
---   (is_editorial = false) or
---   (is_editorial = true and exists (select 1 from profiles where id = auth.uid() and is_editor = true))
--- );
+-- No "update posts" policy: no screen ever edits a post after it's created
+-- (likes go through toggle_post_like(), comment_count through a trigger,
+-- both security definer). Leaving an unused, unscoped update policy around
+-- would let any user set like_count/comment_count/is_editorial to whatever
+-- they want on their own posts, since a plain "using (auth.uid() =
+-- author_id)" doesn't restrict which columns change.
 
 create table post_likes (
   post_id uuid references posts(id) on delete cascade,
@@ -295,9 +316,15 @@ create trigger on_community_member_change
 alter table posts add column community_id uuid references communities(id) on delete set null;
 create index posts_community_idx on posts (community_id, created_at);
 
+-- is_editorial = false because editorial posts are only ever inserted
+-- directly in the database (see 20260912160509_seed_editorial_posts.sql),
+-- never through the app — this closes the self-publish-as-editorial gap the
+-- original comment on the first version of this policy above flagged as a
+-- TODO but never enforced.
 drop policy "Users can create their own posts" on posts;
 create policy "Users can create their own posts" on posts for insert with check (
   auth.uid() = author_id
+  and is_editorial = false
   and (
     community_id is null
     or exists (select 1 from community_members where community_id = posts.community_id and user_id = auth.uid())
@@ -325,7 +352,22 @@ create policy "Users can create conversations they're part of" on conversations 
   auth.uid() = any(participant_ids) and auth.uid() = initiator_id
   and not public.is_blocked_between(participant_ids[1], participant_ids[2])
 );
-create policy "Participants can update conversation status" on conversations for update using (auth.uid() = any(participant_ids));
+-- Column-scoped: ChatScreen only ever updates status, last_message and
+-- last_message_at, never participant_ids or initiator_id. Without this
+-- grant, either participant could add an uninvited third person into
+-- participant_ids and hand them live read access to the whole message
+-- history via the select policy above. The with check also stops the
+-- initiator from self-accepting/declining their own pending request — only
+-- the recipient should be able to move status off 'pending', matching what
+-- the UI already only shows them (ChatScreen's isPending && !isInitiator).
+revoke update on conversations from authenticated;
+grant update (status, last_message, last_message_at) on conversations to authenticated;
+create policy "Participants can update conversation status" on conversations for update
+  using (auth.uid() = any(participant_ids))
+  with check (
+    auth.uid() = any(participant_ids)
+    and (status = 'pending' or auth.uid() <> initiator_id)
+  );
 
 create table messages (
   id uuid primary key default gen_random_uuid(),
