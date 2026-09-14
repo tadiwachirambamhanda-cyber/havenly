@@ -129,7 +129,9 @@ export default function FeedScreen() {
           <Text style={styles.brand}>havenly.</Text>
         </View>
         <View style={styles.topBarActions}>
-          <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Communities')}><Text>👥</Text></Pressable>
+          <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Communities')}>
+            <Feather name="users" size={17} color={colors.ink} />
+          </Pressable>
         </View>
       </View>
       <ScrollView
