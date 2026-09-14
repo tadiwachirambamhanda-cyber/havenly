@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
@@ -11,10 +11,12 @@ import {
 import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
 import { AuthProvider } from '@/lib/AuthContext';
 import RootNavigator from '@/navigation/RootNavigator';
+import LaunchAnimation from '@/components/LaunchAnimation';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  const [showIntro, setShowIntro] = useState(true);
   const [fontsLoaded, fontError] = useFonts({
     Fraunces_500Medium_Italic,
     Fraunces_600SemiBold,
@@ -40,7 +42,7 @@ export default function App() {
   return (
     <AuthProvider>
       <StatusBar style="dark" />
-      <RootNavigator />
+      {showIntro ? <LaunchAnimation onFinish={() => setShowIntro(false)} /> : <RootNavigator />}
     </AuthProvider>
   );
 }
