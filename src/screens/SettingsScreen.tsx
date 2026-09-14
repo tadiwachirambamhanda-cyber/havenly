@@ -1,15 +1,17 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Alert, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import type { ThemeMode } from '@/lib/ThemeContext';
 import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
+import { deleteOwnAccount } from '@/lib/account';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -22,14 +24,41 @@ const MODE_OPTIONS: { key: ThemeMode; label: string; icon: keyof typeof Feather.
 export default function SettingsScreen() {
   const navigation = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
+  const { session } = useAuth();
   const { colors, mode, setMode } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const [deleting, setDeleting] = useState(false);
 
   const handleLogout = () => {
     Alert.alert('Log out?', undefined, [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Log out', style: 'destructive', onPress: () => supabase.auth.signOut() },
     ]);
+  };
+
+  const handleDeleteAccount = () => {
+    const userId = session?.user.id;
+    if (!userId) return;
+    Alert.alert(
+      'Delete your account?',
+      'This permanently deletes your profile, posts, comments, and messages. This can’t be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete account',
+          style: 'destructive',
+          onPress: async () => {
+            setDeleting(true);
+            try {
+              await deleteOwnAccount(userId);
+            } catch (e) {
+              setDeleting(false);
+              Alert.alert('Couldn’t delete your account', e instanceof Error ? e.message : 'Please try again.');
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -64,6 +93,13 @@ export default function SettingsScreen() {
       <Pressable style={styles.row} onPress={handleLogout}>
         <Text style={[styles.rowText, styles.logoutText]}>Log out</Text>
       </Pressable>
+
+      <View style={styles.divider} />
+
+      <Pressable style={styles.row} onPress={handleDeleteAccount} disabled={deleting}>
+        <Text style={[styles.rowText, styles.deleteText]}>Delete account</Text>
+        {deleting && <ActivityIndicator color={colors.coral} size="small" />}
+      </Pressable>
     </View>
   );
 }
@@ -94,5 +130,6 @@ function createStyles(colors: ColorTokens) {
     chevron: { fontSize: 18, color: colors.inkSoft },
     divider: { height: 1, backgroundColor: colors.line, marginHorizontal: spacing.lg, marginTop: 16 },
     logoutText: { color: colors.coral },
+    deleteText: { color: colors.coral },
   });
 }

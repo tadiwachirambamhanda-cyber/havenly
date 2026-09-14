@@ -48,6 +48,33 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+-- Lets a signed-in user permanently delete their own account from Settings.
+-- Runs as the table owner (security definer) because deleting from
+-- auth.users needs privileges the authenticated role doesn't have — same
+-- reason handle_new_user() needs it, just in reverse. Deleting the
+-- auth.users row cascades to profiles and, from there, to every table that
+-- references profiles(id) on delete cascade (posts, comments, likes, saved
+-- posts, follows, blocks, community memberships, messages, read state).
+-- Storage files (avatar, post images/videos) aren't touched by cascade —
+-- the client removes those first, while its session can still write to
+-- storage, before calling this.
+create or replace function public.delete_own_account()
+returns void
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+begin
+  if uid is null then
+    raise exception 'Not authenticated';
+  end if;
+  delete from auth.users where id = uid;
+end;
+$$;
+
+grant execute on function public.delete_own_account() to authenticated;
+
 -- ==================== SAFETY: BLOCKING ====================
 create table blocked_users (
   blocker_id uuid references profiles(id) on delete cascade,
@@ -343,7 +370,11 @@ create table conversations (
   last_message text,
   last_message_at timestamptz,
   status text not null default 'pending' check (status in ('pending', 'accepted', 'declined')),
-  initiator_id uuid references profiles(id),
+  -- on delete set null (not cascade): if the initiator later deletes their
+  -- account, the conversation and the other participant's messages should
+  -- survive — only this pointer needs to go null, same pattern as
+  -- posts.community_id when a community disappears.
+  initiator_id uuid references profiles(id) on delete set null,
   created_at timestamptz default now()
 );
 alter table conversations enable row level security;
