@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { colors, spacing } from '@/theme/tokens';
@@ -54,7 +55,7 @@ export default function CommunityDetailScreen() {
   if (!community) {
     return loaded ? (
       <View style={styles.notFound}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
+        <Pressable style={styles.back} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={17} color={colors.ink} /></Pressable>
         <Text style={styles.notFoundText}>This community isn't available.</Text>
       </View>
     ) : (
@@ -64,7 +65,7 @@ export default function CommunityDetailScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Pressable style={styles.back} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
+      <Pressable style={styles.back} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={17} color={colors.ink} /></Pressable>
       <View style={styles.body}>
         <Text style={styles.emoji}>{community.emoji}</Text>
         <Text style={styles.name}>{community.name}</Text>

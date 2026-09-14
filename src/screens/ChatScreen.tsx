@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, TextInput, Pressable, KeyboardAvoidin
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { markConversationRead } from '@/lib/conversations';
@@ -128,7 +129,7 @@ export default function ChatScreen() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Pressable style={styles.back} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
+          <Pressable style={styles.back} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={16} color={colors.ink} /></Pressable>
           {otherUser?.avatar_url ? (
             <Image source={{ uri: otherUser.avatar_url }} style={styles.headerAvatar} />
           ) : (
@@ -136,7 +137,7 @@ export default function ChatScreen() {
           )}
           <Text style={styles.headerName}>{otherUser?.display_name ?? '…'}</Text>
           <View style={{ flex: 1 }} />
-          <Pressable style={styles.overflow} onPress={openOptions}><Text>•••</Text></Pressable>
+          <Pressable style={styles.overflow} onPress={openOptions}><Feather name="more-horizontal" size={18} color={colors.ink} /></Pressable>
         </View>
 
         <FlatList
@@ -172,7 +173,7 @@ export default function ChatScreen() {
             {isPending && isInitiator && <Text style={styles.pendingHint}>Waiting for {otherUser?.display_name ?? 'them'} to accept your request</Text>}
             <View style={styles.inputInner}>
               <TextInput style={styles.input} placeholder="Message…" value={input} onChangeText={setInput} onSubmitEditing={send} />
-              <Pressable style={styles.sendBtn} onPress={send}><Text style={{ color: colors.sand }}>➤</Text></Pressable>
+              <Pressable style={styles.sendBtn} onPress={send}><Feather name="send" size={15} color={colors.sand} /></Pressable>
             </View>
           </View>
         )}

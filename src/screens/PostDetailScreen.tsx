@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useVideoPlayer, VideoView } from 'expo-video';
+import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { findOrCreateConversation } from '@/lib/conversations';
@@ -202,7 +203,7 @@ export default function PostDetailScreen() {
   if (!post) {
     return loaded ? (
       <View style={styles.notFound}>
-        <Pressable style={[styles.back, { top: insets.top + 12 }]} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
+        <Pressable style={[styles.back, { top: insets.top + 12 }]} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={16} color={colors.ink} /></Pressable>
         <Text style={styles.notFoundText}>This post isn't available.</Text>
       </View>
     ) : null;
@@ -219,9 +220,9 @@ export default function PostDetailScreen() {
         <LinearGradient colors={[heroFrom, heroTo]} style={StyleSheet.absoluteFill} />
         {post.image_url && <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" />}
         {post.video_url && <PostVideo uri={post.video_url} />}
-        <Pressable style={[styles.back, { top: insets.top + 12 }]} onPress={() => navigation.goBack()}><Text>←</Text></Pressable>
+        <Pressable style={[styles.back, { top: insets.top + 12 }]} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={16} color={colors.ink} /></Pressable>
         {!isOwnPost && (
-          <Pressable style={[styles.overflow, { top: insets.top + 12 }]} onPress={openOptions}><Text>•••</Text></Pressable>
+          <Pressable style={[styles.overflow, { top: insets.top + 12 }]} onPress={openOptions}><Feather name="more-horizontal" size={17} color={colors.ink} /></Pressable>
         )}
       </View>
       <View style={styles.body}>
@@ -241,7 +242,7 @@ export default function PostDetailScreen() {
           {!isOwnPost && (
             <View style={{ flexDirection: 'row', gap: 8 }}>
               <Pressable style={styles.messageBtn} onPress={onMessage}>
-                <Text style={styles.messageBtnText}>💬</Text>
+                <Feather name="message-circle" size={14} color={colors.ink} />
               </Pressable>
               <Pressable style={[styles.followBtn, following && styles.followBtnActive]} onPress={toggleFollow}>
                 <Text style={[styles.followBtnText, following && styles.followBtnTextActive]}>
@@ -256,16 +257,20 @@ export default function PostDetailScreen() {
 
         <View style={styles.actionBar}>
           <Pressable style={styles.actionItem} onPress={toggleLike}>
-            <Text style={styles.actionText}>{liked ? '❤️' : '🤍'} {post.like_count}</Text>
+            <Feather name="heart" size={15} color={liked ? colors.coral : colors.inkSoft} />
+            <Text style={[styles.actionText, liked && styles.actionTextActive]}>{post.like_count}</Text>
           </Pressable>
           <View style={styles.actionItem}>
-            <Text style={styles.actionText}>💬 {post.comment_count}</Text>
+            <Feather name="message-circle" size={15} color={colors.inkSoft} />
+            <Text style={styles.actionText}>{post.comment_count}</Text>
           </View>
           <Pressable style={styles.actionItem} onPress={onShare}>
-            <Text style={styles.actionText}>↗ Share</Text>
+            <Feather name="share-2" size={15} color={colors.inkSoft} />
+            <Text style={styles.actionText}>Share</Text>
           </Pressable>
           <Pressable style={styles.actionItem} onPress={toggleSave}>
-            <Text style={[styles.actionText, saved && styles.actionTextActive]}>🔖 {saved ? 'Saved' : 'Save'}</Text>
+            <Feather name="bookmark" size={15} color={saved ? colors.coral : colors.inkSoft} />
+            <Text style={[styles.actionText, saved && styles.actionTextActive]}>{saved ? 'Saved' : 'Save'}</Text>
           </Pressable>
         </View>
 
@@ -304,7 +309,7 @@ export default function PostDetailScreen() {
         onChangeText={setCommentInput}
         onSubmitEditing={addComment}
       />
-      <Pressable style={styles.commentSendBtn} onPress={addComment}><Text style={{ color: colors.sand }}>➤</Text></Pressable>
+      <Pressable style={styles.commentSendBtn} onPress={addComment}><Feather name="send" size={15} color={colors.sand} /></Pressable>
     </View>
     </View>
     </KeyboardAvoidingView>
@@ -332,7 +337,6 @@ const styles = StyleSheet.create({
   username: { fontSize: 13, fontWeight: '700', color: colors.ink },
   meta: { fontSize: 11, color: colors.inkSoft },
   messageBtn: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
-  messageBtnText: { fontSize: 13 },
   followBtn: { paddingHorizontal: 16, paddingVertical: 7, borderRadius: 100, backgroundColor: colors.ink },
   followBtnActive: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   followBtnText: { fontSize: 11.5, fontWeight: '700', color: colors.sand },

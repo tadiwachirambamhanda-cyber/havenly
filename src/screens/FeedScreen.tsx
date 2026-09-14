@@ -112,7 +112,10 @@ export default function FeedScreen() {
             <Text style={styles.cardUser} numberOfLines={1}>
               {item.is_editorial ? 'Havenly Editorial' : `@${item.author?.username ?? 'user'}`}
             </Text>
-            <Text style={styles.cardLikes}>♥ {item.like_count}</Text>
+            <View style={styles.cardLikesRow}>
+              <Feather name="heart" size={11} color={colors.inkSoft} />
+              <Text style={styles.cardLikes}>{item.like_count}</Text>
+            </View>
           </View>
         </View>
       </Pressable>
@@ -179,5 +182,6 @@ const styles = StyleSheet.create({
   cardTitle: { fontSize: 13.5, fontWeight: '700', marginTop: 5, color: colors.ink, lineHeight: 18 },
   cardMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 9 },
   cardUser: { fontSize: 11, color: colors.inkSoft, fontWeight: '600', flex: 1 },
+  cardLikesRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   cardLikes: { fontSize: 11, color: colors.inkSoft, fontWeight: '600' },
 });

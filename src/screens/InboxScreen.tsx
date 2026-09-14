@@ -4,6 +4,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { colors, radius, spacing } from '@/theme/tokens';
@@ -93,7 +94,7 @@ export default function InboxScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Messages</Text>
       <View style={styles.searchBar}>
-        <Text style={styles.searchIcon}>🔍</Text>
+        <Feather name="search" size={14} color={colors.inkSoft} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search messages…"
@@ -102,7 +103,7 @@ export default function InboxScreen() {
           onChangeText={setQuery}
         />
         {trimmed.length > 0 && (
-          <Pressable onPress={() => setQuery('')}><Text style={styles.clearBtn}>✕</Text></Pressable>
+          <Pressable style={styles.clearBtn} onPress={() => setQuery('')}><Feather name="x" size={14} color={colors.inkSoft} /></Pressable>
         )}
       </View>
       {requests.length === 0 && messages.length === 0 ? (
@@ -151,9 +152,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 11, backgroundColor: colors.white, borderWidth: 1.5,
     borderColor: colors.line, borderRadius: radius.pill,
   },
-  searchIcon: { fontSize: 13 },
   searchInput: { flex: 1, fontSize: 13, color: colors.ink },
-  clearBtn: { fontSize: 13, color: colors.inkSoft, paddingHorizontal: 4 },
+  clearBtn: { paddingHorizontal: 4 },
   sectionLabel: {
     fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
     fontWeight: '600', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 8,

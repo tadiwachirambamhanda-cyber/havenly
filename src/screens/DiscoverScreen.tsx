@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TextInput, Pressable } from 'react-
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { colors, radius, spacing, gradients } from '@/theme/tokens';
 import type { Community, Post } from '@/types';
@@ -64,7 +65,7 @@ export default function DiscoverScreen() {
       <Text style={styles.title}>Discover Dubai</Text>
 
       <View style={styles.searchBar}>
-        <Text style={styles.searchIcon}>🔍</Text>
+        <Feather name="search" size={14} color={colors.inkSoft} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search spots, events, posts, communities…"
@@ -73,7 +74,7 @@ export default function DiscoverScreen() {
           onChangeText={setQuery}
         />
         {isSearching && (
-          <Pressable onPress={() => setQuery('')}><Text style={styles.clearBtn}>✕</Text></Pressable>
+          <Pressable style={styles.clearBtn} onPress={() => setQuery('')}><Feather name="x" size={14} color={colors.inkSoft} /></Pressable>
         )}
       </View>
 
@@ -84,7 +85,7 @@ export default function DiscoverScreen() {
           <Text style={styles.sectionLabel}>Posts</Text>
           {posts.map((post) => (
             <Pressable key={post.id} style={styles.resultRow} onPress={() => navigation.navigate('PostDetail', { postId: post.id })}>
-              <View style={styles.resultIcon}><Text>📝</Text></View>
+              <View style={styles.resultIcon}><Feather name="file-text" size={15} color={colors.inkSoft} /></View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.resultTitle} numberOfLines={1}>{post.title}</Text>
                 <Text style={styles.resultSub}>{post.tag}</Text>
@@ -158,9 +159,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 4, backgroundColor: colors.white, borderWidth: 1.5,
     borderColor: colors.line, borderRadius: radius.pill,
   },
-  searchIcon: { fontSize: 13 },
   searchInput: { flex: 1, fontSize: 13, color: colors.ink, paddingVertical: 10 },
-  clearBtn: { fontSize: 13, color: colors.inkSoft, paddingHorizontal: 4 },
+  clearBtn: { paddingHorizontal: 4 },
   noResults: { color: colors.inkSoft, fontSize: 13, textAlign: 'center', marginTop: 24 },
   sectionLabel: {
     fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
