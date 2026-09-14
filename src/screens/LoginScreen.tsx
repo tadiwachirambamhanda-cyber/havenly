@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/lib/ThemeContext';
 import { spacing } from '@/theme/tokens';
@@ -12,10 +13,13 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function LoginScreen() {
   const navigation = useNavigation<Nav>();
+  const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,16 +41,24 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}>
-        <View style={styles.hero}>
-          <Text style={styles.eyebrow}>Welcome back</Text>
-          <Text style={styles.title}>Good to see you again.</Text>
-          <Text style={styles.sub}>Log in to pick up where you left off.</Text>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top + 28, paddingBottom: 40, paddingHorizontal: spacing.xl }}
+      >
+        <View style={styles.masthead}>
+          <View style={styles.brandDot} />
+          <Text style={styles.brandWordmark}>havenly.</Text>
         </View>
-        <View style={styles.panel}>
+
+        <Text style={styles.eyebrow}>Member sign-in</Text>
+        <Text style={styles.title}>Good to see{'\n'}you again.</Text>
+
+        <View style={styles.rule} />
+
+        <View style={styles.field}>
           <Text style={styles.label}>Email</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, emailFocused && styles.inputFocused]}
             placeholder="you@example.com"
             placeholderTextColor={colors.inkSoft}
             autoCapitalize="none"
@@ -55,25 +67,33 @@ export default function LoginScreen() {
             textContentType="emailAddress"
             value={email}
             onChangeText={setEmail}
+            onFocus={() => setEmailFocused(true)}
+            onBlur={() => setEmailFocused(false)}
           />
+        </View>
+        <View style={styles.field}>
           <Text style={styles.label}>Password</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, passwordFocused && styles.inputFocused]}
             placeholder="••••••••"
             placeholderTextColor={colors.inkSoft}
             secureTextEntry
             textContentType="password"
             value={password}
             onChangeText={setPassword}
+            onFocus={() => setPasswordFocused(true)}
+            onBlur={() => setPasswordFocused(false)}
           />
-          {error ? <Text style={styles.error}>{error}</Text> : null}
-          <Pressable style={styles.btnPrimary} onPress={handleLogin} disabled={loading}>
-            {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnPrimaryText}>Log in</Text>}
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate('SignUp')}>
-            <Text style={styles.switchLink}>New to Havenly? <Text style={styles.switchLinkBold}>Create an account</Text></Text>
-          </Pressable>
         </View>
+
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        <Pressable style={styles.btnPrimary} onPress={handleLogin} disabled={loading}>
+          {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnPrimaryText}>Log in</Text>}
+        </Pressable>
+        <Pressable onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.switchLink}>New to Havenly? <Text style={styles.switchLinkBold}>Create an account</Text></Text>
+        </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -81,20 +101,24 @@ export default function LoginScreen() {
 
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
-  // The hero block is a fixed dark brand moment regardless of app theme
-  // (same treatment as SignUp/Onboarding), so its own text stays literal
-  // cream/tan rather than colors.sand — which would flip to near-black
-  // text on this same dark background once dark mode is on.
-  container: { flex: 1, backgroundColor: '#2A2118' },
-  hero: { paddingHorizontal: spacing.xl, paddingTop: 90, paddingBottom: 20 },
-  eyebrow: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, color: '#F0C79A', textTransform: 'uppercase' },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 34, color: '#FBF5EA', marginTop: 14, lineHeight: 38 },
-  sub: { fontSize: 14.5, color: '#E7D9C8', marginTop: 14, lineHeight: 21, maxWidth: 280 },
-  panel: { backgroundColor: colors.sand, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, marginTop: 20, flexGrow: 1 },
-  label: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, color: colors.inkSoft, textTransform: 'uppercase', marginBottom: 6, marginTop: 14 },
-  input: { backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 13, fontSize: 15, color: colors.ink },
-  error: { color: colors.coral, fontSize: 13, marginTop: 14, lineHeight: 18 },
-  btnPrimary: { backgroundColor: colors.coral, paddingVertical: 16, borderRadius: 100, alignItems: 'center', marginTop: 24 },
+  container: { flex: 1, backgroundColor: colors.sand },
+  masthead: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  brandDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral },
+  brandWordmark: { fontFamily: 'Fraunces_700Bold_Italic', fontSize: 20, color: colors.ink },
+  eyebrow: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, color: colors.inkSoft, textTransform: 'uppercase', marginTop: 44 },
+  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 40, color: colors.ink, marginTop: 10, lineHeight: 44 },
+  rule: { height: 1, backgroundColor: colors.line, marginTop: 28, marginBottom: 26 },
+  field: { marginBottom: 22 },
+  label: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, color: colors.inkSoft, textTransform: 'uppercase', marginBottom: 8 },
+  input: {
+    borderBottomWidth: 1.5, borderBottomColor: colors.line, paddingVertical: 9, fontSize: 16.5, color: colors.ink,
+    // react-native-web-only: suppresses the browser's default focus ring so
+    // the underline-only look (via inputFocused below) reads cleanly on web.
+    ...(Platform.OS === 'web' ? { outlineStyle: 'none' as const } : null),
+  },
+  inputFocused: { borderBottomColor: colors.coral },
+  error: { color: colors.coral, fontSize: 13, marginBottom: 14, lineHeight: 18 },
+  btnPrimary: { backgroundColor: colors.coral, paddingVertical: 16, borderRadius: 100, alignItems: 'center', marginTop: 10 },
   btnPrimaryText: { color: 'white', fontWeight: '700', fontSize: 15 },
   switchLink: { textAlign: 'center', marginTop: 18, fontSize: 13.5, color: colors.inkSoft },
   switchLinkBold: { color: colors.teal, fontWeight: '700' },
