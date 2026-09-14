@@ -23,6 +23,7 @@ export default function CommunitiesScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [showAllCampuses, setShowAllCampuses] = useState(false);
+  const [showAllInterests, setShowAllInterests] = useState(false);
 
   const load = useCallback(async () => {
     const { data, error } = await supabase.from('communities').select('*').order('member_count', { ascending: false });
@@ -63,15 +64,22 @@ export default function CommunitiesScreen() {
   };
 
   const hasUniversity = !!profile?.university;
+  const hasInterests = userInterests.size > 0;
 
   // Once you've set a university, the Campus section defaults to just your
   // own — with 44 campus communities total, seeing every other school's is
   // pure clutter once you can only actually join one of them. "Show all"
-  // brings the rest back for anyone who wants to browse.
+  // brings the rest back for anyone who wants to browse. Interests get the
+  // same treatment: default to just what you picked, since that list can
+  // change any time in Edit Profile and shouldn't force a re-browse of
+  // every interest community to find what's still relevant.
   const sections = (['interest', 'campus'] as CommunityCategory[]).map((cat) => {
     let data = communities.filter((c) => c.category === cat);
     if (cat === 'campus' && hasUniversity && !showAllCampuses) {
       data = data.filter((c) => c.related_university === profile?.university);
+    }
+    if (cat === 'interest' && hasInterests && !showAllInterests) {
+      data = data.filter((c) => c.related_interest && userInterests.has(c.related_interest));
     }
     data.sort((a, b) => (matchesUser(b) ? 1 : 0) - (matchesUser(a) ? 1 : 0));
     return { title: SECTION_TITLES[cat], category: cat, data };
@@ -92,6 +100,11 @@ export default function CommunitiesScreen() {
             {section.category === 'campus' && hasUniversity && (
               <Pressable onPress={() => setShowAllCampuses((v) => !v)}>
                 <Text style={styles.sectionToggle}>{showAllCampuses ? 'Show only mine' : 'Show all'}</Text>
+              </Pressable>
+            )}
+            {section.category === 'interest' && hasInterests && (
+              <Pressable onPress={() => setShowAllInterests((v) => !v)}>
+                <Text style={styles.sectionToggle}>{showAllInterests ? 'Show only mine' : 'Show all'}</Text>
               </Pressable>
             )}
           </View>
