@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { colors, radius, spacing, gradients } from '@/theme/tokens';
+import { communityIcon } from '@/constants/communityIcons';
 import type { Community, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -100,7 +101,7 @@ export default function DiscoverScreen() {
           <Text style={styles.sectionLabel}>Communities</Text>
           {communities.map((c) => (
             <Pressable key={c.id} style={styles.resultRow} onPress={() => navigation.navigate('CommunityDetail', { communityId: c.id })}>
-              <View style={styles.resultIcon}><Text>{c.emoji}</Text></View>
+              <View style={styles.resultIcon}><Feather name={communityIcon(c)} size={15} color={colors.teal} /></View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.resultTitle}>{c.name}</Text>
                 <Text style={styles.resultSub}>{c.member_count} members</Text>

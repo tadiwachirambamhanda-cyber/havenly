@@ -2,9 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, SectionList, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { colors, radius, spacing } from '@/theme/tokens';
+import { communityIcon } from '@/constants/communityIcons';
 import type { Community, CommunityCategory } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -77,7 +79,9 @@ export default function CommunitiesScreen() {
         renderSectionHeader={({ section }) => <Text style={styles.sectionLabel}>{section.title}</Text>}
         renderItem={({ item }) => (
           <Pressable style={styles.card} onPress={() => navigation.navigate('CommunityDetail', { communityId: item.id })}>
-            <Text style={styles.emoji}>{item.emoji}</Text>
+            <View style={styles.iconChip}>
+              <Feather name={communityIcon(item)} size={16} color={colors.teal} />
+            </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.cardName}>{item.name}</Text>
               <Text style={styles.cardMeta}>{item.member_count} members</Text>
@@ -99,7 +103,7 @@ const styles = StyleSheet.create({
   sub: { color: colors.inkSoft, fontSize: 12.5, paddingHorizontal: spacing.lg, marginTop: 4, marginBottom: 8 },
   sectionLabel: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingVertical: 10 },
   card: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginHorizontal: spacing.lg, marginBottom: spacing.sm, backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, padding: spacing.md },
-  emoji: { fontSize: 22 },
+  iconChip: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
   cardName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   cardMeta: { fontSize: 11, color: colors.inkSoft, marginTop: 2 },
   matchBadge: { backgroundColor: colors.tealSoft, paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.pill },

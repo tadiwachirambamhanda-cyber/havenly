@@ -5,6 +5,7 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { colors, spacing } from '@/theme/tokens';
+import { communityIcon } from '@/constants/communityIcons';
 import type { Community } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -67,7 +68,9 @@ export default function CommunityDetailScreen() {
     <ScrollView style={styles.container}>
       <Pressable style={styles.back} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={17} color={colors.ink} /></Pressable>
       <View style={styles.body}>
-        <Text style={styles.emoji}>{community.emoji}</Text>
+        <View style={styles.iconChip}>
+          <Feather name={communityIcon(community)} size={28} color={colors.teal} />
+        </View>
         <Text style={styles.name}>{community.name}</Text>
         <Text style={styles.members}>{community.member_count} members</Text>
         <Text style={styles.desc}>{community.description}</Text>
@@ -86,7 +89,7 @@ const styles = StyleSheet.create({
   notFound: { flex: 1, backgroundColor: colors.sand, paddingTop: 60, paddingHorizontal: spacing.lg },
   notFoundText: { color: colors.inkSoft, textAlign: 'center', marginTop: 100 },
   body: { padding: spacing.lg },
-  emoji: { fontSize: 40 },
+  iconChip: { width: 68, height: 68, borderRadius: 34, backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
   name: { fontFamily: 'Fraunces_600SemiBold', fontSize: 21, color: colors.ink, marginTop: 8 },
   members: { fontSize: 12, color: colors.inkSoft, marginTop: 4 },
   desc: { fontSize: 13, color: '#3A4038', lineHeight: 20, marginTop: 12 },
