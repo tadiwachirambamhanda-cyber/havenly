@@ -62,7 +62,12 @@ export default function ChatScreen() {
     const { data: inserted, error } = await supabase.from('messages')
       .insert({ conversation_id: conversationId, sender_id: myId, body })
       .select().single();
-    if (error) { console.error('Failed to send message:', error.message); return; }
+    if (error) {
+      console.error('Failed to send message:', error.message);
+      setInput(body);
+      Alert.alert('Couldn\'t send message', 'This conversation may no longer be available.');
+      return;
+    }
     setMessages((prev) => (prev.some((m) => m.id === inserted.id) ? prev : [...prev, inserted as Message]));
     await supabase.from('conversations').update({ last_message: body, last_message_at: new Date().toISOString() }).eq('id', conversationId);
     await markConversationRead(conversationId, myId);
