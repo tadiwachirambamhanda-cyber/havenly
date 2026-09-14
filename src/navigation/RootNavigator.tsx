@@ -23,6 +23,7 @@ import CreatePostScreen from '@/screens/CreatePostScreen';
 import BlockedUsersScreen from '@/screens/BlockedUsersScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
 import EditProfileScreen from '@/screens/EditProfileScreen';
+import FollowListScreen from '@/screens/FollowListScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -37,6 +38,7 @@ export type RootStackParamList = {
   BlockedUsers: undefined;
   Settings: undefined;
   EditProfile: undefined;
+  FollowList: { userId: string; initialTab: 'followers' | 'following'; displayName: string };
 };
 
 export type MainTabParamList = {
@@ -103,6 +105,7 @@ export default function RootNavigator() {
             <Stack.Screen name="BlockedUsers" component={BlockedUsersScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ presentation: 'modal' }} />
+            <Stack.Screen name="FollowList" component={FollowListScreen} />
           </>
         )}
       </Stack.Navigator>

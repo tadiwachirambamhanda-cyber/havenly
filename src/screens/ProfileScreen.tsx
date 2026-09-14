@@ -125,8 +125,12 @@ export default function ProfileScreen() {
 
           <View style={styles.statsRow}>
             <View><Text style={styles.statNum}>{stats.posts}</Text><Text style={styles.statLabel}>Posts</Text></View>
-            <View><Text style={styles.statNum}>{stats.followers}</Text><Text style={styles.statLabel}>Followers</Text></View>
-            <View><Text style={styles.statNum}>{stats.following}</Text><Text style={styles.statLabel}>Following</Text></View>
+            <Pressable onPress={() => navigation.navigate('FollowList', { userId: profile.id, initialTab: 'followers', displayName: profile.display_name })}>
+              <Text style={styles.statNum}>{stats.followers}</Text><Text style={styles.statLabel}>Followers</Text>
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate('FollowList', { userId: profile.id, initialTab: 'following', displayName: profile.display_name })}>
+              <Text style={styles.statNum}>{stats.following}</Text><Text style={styles.statLabel}>Following</Text>
+            </Pressable>
           </View>
 
           {interestChips.length > 0 && (
