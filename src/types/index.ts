@@ -1,6 +1,7 @@
 export type Interest =
   | 'cafes' | 'fashion' | 'nightlife' | 'fitness' | 'beach'
-  | 'study' | 'travel' | 'events' | 'padel' | 'beauty';
+  | 'study' | 'travel' | 'events' | 'padel' | 'beauty'
+  | 'football' | 'running' | 'art' | 'gaming';
 
 export interface Profile {
   id: string; username: string; display_name: string; bio: string | null;

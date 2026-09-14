@@ -4,6 +4,10 @@ insert into communities (name, emoji, description, category, related_interest, r
   ('Café Hoppers', '☕', 'For people who plan their week around new café openings.', 'interest', 'cafes', null, 3210),
   ('Thrift & Style', '👗', 'Swap fits, find thrift spots, and share styling inspo.', 'interest', 'fashion', null, 2040),
   ('Study Grind', '📚', 'Silent co-study sessions, best study spots, and exam-season survival tips.', 'interest', 'study', null, 2780),
+  ('Dubai 5-a-Side', '⚽', 'Pickup games, weekly leagues, and finding a squad for Sports City or Times Square Center.', 'interest', 'football', null, 940),
+  ('Dubai Run Club', '🏃', 'Early runs on Kite Beach, marathon training, and pace groups for every level.', 'interest', 'running', null, 1280),
+  ('Alserkal Regulars', '🎨', 'Gallery openings, exhibitions, and the best of Dubai''s art scene.', 'interest', 'art', null, 670),
+  ('Dubai Gamers', '🎮', 'LAN meetups, tournament squads, and where to game after class.', 'interest', 'gaming', null, 1510),
   ('AUS Freshers', '🎓', 'American University of Sharjah — new student meetups & housing tips.', 'campus', null, 'American University of Sharjah', 1120),
   ('UOWD Connect', '🏫', 'University of Wollongong Dubai student community.', 'campus', null, 'University of Wollongong in Dubai', 890);
 

@@ -14,7 +14,10 @@ import type { Community } from '@/types';
 
 type Route = RouteProp<RootStackParamList, 'CreatePost'>;
 
-const TAG_OPTIONS = ['Cafés', 'Fashion', 'Nightlife', 'Fitness', 'Beach Days', 'Study Spots', 'Travel', 'Events', 'Padel', 'Beauty'];
+const TAG_OPTIONS = [
+  'Cafés', 'Fashion', 'Nightlife', 'Fitness', 'Beach Days', 'Study Spots', 'Travel', 'Events', 'Padel', 'Beauty',
+  'Football', 'Running', 'Art & Culture', 'Gaming',
+];
 const MAX_VIDEO_SECONDS = 60;
 
 async function uploadFile(bucket: string, uri: string, userId: string, fallbackExt: string, mimePrefix: string): Promise<string> {

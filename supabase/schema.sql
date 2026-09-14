@@ -231,7 +231,8 @@ create table communities (
   -- Only set for category='interest' communities — lets the Communities screen surface
   -- ones matching the interests a user picked in onboarding.
   related_interest text check (related_interest in (
-    'cafes','fashion','nightlife','fitness','beach','study','travel','events','padel','beauty'
+    'cafes','fashion','nightlife','fitness','beach','study','travel','events','padel','beauty',
+    'football','running','art','gaming'
   )),
   -- Only set for category='campus' communities — same personalization
   -- pattern as related_interest, matched against profiles.university.

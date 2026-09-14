@@ -6,4 +6,6 @@ export const INTEREST_OPTIONS: { key: Interest; label: string }[] = [
   { key: 'beach', label: 'Beach Days' }, { key: 'study', label: 'Study Spots' },
   { key: 'travel', label: 'Travel' }, { key: 'events', label: 'Events' },
   { key: 'padel', label: 'Padel' }, { key: 'beauty', label: 'Beauty' },
+  { key: 'football', label: 'Football' }, { key: 'running', label: 'Running' },
+  { key: 'art', label: 'Art & Culture' }, { key: 'gaming', label: 'Gaming' },
 ];
