@@ -6,8 +6,10 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/lib/AuthContext';
 import { colors, radius, spacing, gradients } from '@/theme/tokens';
-import type { Post } from '@/types';
+import { communityIcon } from '@/constants/topicIcons';
+import type { Community, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -33,7 +35,9 @@ function estimateCardHeight(post: Post, imageHeight: number): number {
 
 export default function FeedScreen() {
   const navigation = useNavigation<Nav>();
+  const { session } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [myCommunities, setMyCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
@@ -43,30 +47,38 @@ export default function FeedScreen() {
       .from('posts')
       // Explicit FK hint (posts_author_id_fkey) because post_likes creates a second,
       // indirect posts<->profiles path that makes the relationship ambiguous otherwise.
-      .select('*, author:profiles!posts_author_id_fkey(*)')
+      .select('*, author:profiles!posts_author_id_fkey(*), community:communities(name)')
       .order('created_at', { ascending: false })
       .limit(PAGE_SIZE);
     if (error) { console.error('Failed to fetch posts:', error.message); return; }
     setPosts((data as unknown as Post[]) ?? []);
   }, []);
 
+  const fetchMyCommunities = useCallback(async () => {
+    const userId = session?.user.id;
+    if (!userId) { setMyCommunities([]); return; }
+    const { data } = await supabase.from('community_members').select('community:communities(*)').eq('user_id', userId);
+    setMyCommunities(((data ?? []) as unknown as { community: Community }[]).map((r) => r.community));
+  }, [session]);
+
   // Refetches every time Feed regains focus (not just on mount) so a post
   // made in CreatePost, or a like toggled in PostDetail, shows up immediately
-  // without needing a manual pull-to-refresh.
+  // without needing a manual pull-to-refresh. Same for community membership —
+  // joining/leaving in Communities should update this row without a restart.
   useFocusEffect(
     useCallback(() => {
       (async () => {
         if (!hasLoadedOnce) setLoading(true);
-        await fetchPosts();
+        await Promise.all([fetchPosts(), fetchMyCommunities()]);
         setLoading(false);
         setHasLoadedOnce(true);
       })();
-    }, [fetchPosts, hasLoadedOnce])
+    }, [fetchPosts, fetchMyCommunities, hasLoadedOnce])
   );
 
   const onRefresh = useCallback(async () => {
-    setRefreshing(true); await fetchPosts(); setRefreshing(false);
-  }, [fetchPosts]);
+    setRefreshing(true); await Promise.all([fetchPosts(), fetchMyCommunities()]); setRefreshing(false);
+  }, [fetchPosts, fetchMyCommunities]);
 
   // True masonry: each post gets a deterministic (not fixed) image height,
   // then a greedy shortest-column-first pass balances posts across columns
@@ -107,6 +119,12 @@ export default function FeedScreen() {
         </View>
         <View style={styles.cardBody}>
           <Text style={styles.cardTag}>{item.tag}</Text>
+          {item.community?.name && (
+            <View style={styles.communityBadge}>
+              <Feather name="users" size={9} color={colors.teal} />
+              <Text style={styles.communityBadgeText} numberOfLines={1}>{item.community.name}</Text>
+            </View>
+          )}
           <Text style={styles.cardTitle} numberOfLines={3}>{item.title}</Text>
           <View style={styles.cardMeta}>
             <Text style={styles.cardUser} numberOfLines={1}>
@@ -141,6 +159,16 @@ export default function FeedScreen() {
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
       >
+        {myCommunities.length > 0 && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.myCommunitiesRow}>
+            {myCommunities.map((c) => (
+              <Pressable key={c.id} style={styles.myCommunityChip} onPress={() => navigation.navigate('CommunityDetail', { communityId: c.id })}>
+                <Feather name={communityIcon(c)} size={12} color={colors.teal} />
+                <Text style={styles.myCommunityChipText} numberOfLines={1}>{c.name}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        )}
         {posts.length === 0 ? (
           <View style={styles.centered}><Text style={{ color: colors.inkSoft }}>No posts yet — seed editorial content first.</Text></View>
         ) : (
@@ -166,6 +194,14 @@ const styles = StyleSheet.create({
   brand: { fontFamily: 'Fraunces_700Bold_Italic', fontSize: 24, color: colors.ink },
   topBarActions: { flexDirection: 'row', gap: spacing.sm },
   iconBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+  myCommunitiesRow: { flexDirection: 'row', gap: 8, paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
+  myCommunityChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.white, borderWidth: 1,
+    borderColor: colors.line, borderRadius: radius.pill, paddingVertical: 7, paddingHorizontal: 12, maxWidth: 160,
+  },
+  myCommunityChipText: { fontSize: 11.5, fontWeight: '700', color: colors.ink },
+  communityBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
+  communityBadgeText: { fontSize: 9.5, fontWeight: '700', color: colors.teal },
   masonryRow: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.lg },
   masonryColumn: { flex: 1, gap: spacing.sm },
   card: { borderRadius: radius.md, overflow: 'hidden', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },

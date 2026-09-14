@@ -32,7 +32,7 @@ export type RootStackParamList = {
   Chat: { conversationId: string; otherUserId: string };
   Communities: undefined;
   CommunityDetail: { communityId: string };
-  CreatePost: undefined;
+  CreatePost: { communityId?: string } | undefined;
   BlockedUsers: undefined;
   Settings: undefined;
   EditProfile: undefined;

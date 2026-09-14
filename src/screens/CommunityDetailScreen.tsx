@@ -1,39 +1,52 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
-import { colors, spacing } from '@/theme/tokens';
+import { colors, gradients, spacing } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
-import type { Community } from '@/types';
+import type { Community, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Route = RouteProp<RootStackParamList, 'CommunityDetail'>;
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function CommunityDetailScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const { communityId } = route.params;
   const { session } = useAuth();
   const [community, setCommunity] = useState<Community | null>(null);
   const [joined, setJoined] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]);
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     const userId = session?.user.id;
 
-    supabase.from('communities').select('*').eq('id', communityId).single().then(({ data }) => {
-      setCommunity(data as Community);
-      setLoaded(true);
-    });
+    const { data } = await supabase.from('communities').select('*').eq('id', communityId).single();
+    setCommunity(data as Community);
+    setLoaded(true);
+
+    const { data: postData } = await supabase.from('posts')
+      .select('*, author:profiles!posts_author_id_fkey(*)')
+      .eq('community_id', communityId).order('created_at', { ascending: false });
+    setPosts((postData as unknown as Post[]) ?? []);
 
     if (userId) {
-      supabase.from('community_members').select('*')
-        .eq('community_id', communityId).eq('user_id', userId).maybeSingle()
-        .then(({ data }) => setJoined(!!data));
+      const { data: memberRow } = await supabase.from('community_members').select('*')
+        .eq('community_id', communityId).eq('user_id', userId).maybeSingle();
+      setJoined(!!memberRow);
     }
   }, [communityId, session]);
+
+  // Refetches on focus so a post just made (via the "New post" button below,
+  // which navigates away to CreatePost) shows up on return without a manual pull.
+  useFocusEffect(useCallback(() => { load(); }, [load]));
 
   const toggleJoin = async () => {
     const userId = session?.user.id;
@@ -65,7 +78,7 @@ export default function CommunityDetailScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
       <Pressable style={styles.back} onPress={() => navigation.goBack()}><Feather name="arrow-left" size={17} color={colors.ink} /></Pressable>
       <View style={styles.body}>
         <View style={styles.iconChip}>
@@ -78,6 +91,50 @@ export default function CommunityDetailScreen() {
           <Text style={styles.joinBtnText}>{joined ? 'Joined ✓' : 'Join community'}</Text>
         </Pressable>
       </View>
+
+      <View style={styles.feedHeader}>
+        <Text style={styles.feedLabel}>Posts</Text>
+        {joined && (
+          <Pressable style={styles.newPostBtn} onPress={() => navigation.navigate('CreatePost', { communityId })}>
+            <Feather name="plus" size={13} color={colors.coral} />
+            <Text style={styles.newPostBtnText}>New post</Text>
+          </Pressable>
+        )}
+      </View>
+
+      {posts.length === 0 ? (
+        <Text style={styles.emptyText}>
+          {joined ? 'No posts yet — be the first to post here.' : 'No posts yet in this community.'}
+        </Text>
+      ) : (
+        posts.map((post) => {
+          const [from, to] = gradients[post.id.charCodeAt(0) % gradients.length];
+          return (
+            <Pressable key={post.id} style={styles.postCard} onPress={() => navigation.navigate('PostDetail', { postId: post.id })}>
+              <View style={styles.postImage}>
+                <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
+                {post.image_url && <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" />}
+                {post.video_url && (
+                  <View style={styles.playBadge}><Feather name="play" size={11} color="white" /></View>
+                )}
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.postTag}>{post.tag}</Text>
+                <Text style={styles.postTitle} numberOfLines={2}>{post.title}</Text>
+                <View style={styles.postMeta}>
+                  <Text style={styles.postUser} numberOfLines={1}>
+                    {post.is_editorial ? 'Havenly Editorial' : `@${post.author?.username ?? 'user'}`}
+                  </Text>
+                  <View style={styles.postLikes}>
+                    <Feather name="heart" size={10} color={colors.inkSoft} />
+                    <Text style={styles.postLikesText}>{post.like_count}</Text>
+                  </View>
+                </View>
+              </View>
+            </Pressable>
+          );
+        })
+      )}
     </ScrollView>
   );
 }
@@ -96,4 +153,29 @@ const styles = StyleSheet.create({
   joinBtn: { marginTop: 16, backgroundColor: colors.coral, paddingVertical: 13, borderRadius: 100, alignItems: 'center' },
   joinBtnJoined: { backgroundColor: colors.ink },
   joinBtnText: { color: 'white', fontWeight: '700', fontSize: 14 },
+  feedHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg, marginTop: 8, marginBottom: 10,
+  },
+  feedLabel: {
+    fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft, fontWeight: '600',
+  },
+  newPostBtn: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  newPostBtnText: { fontSize: 12.5, fontWeight: '700', color: colors.coral },
+  emptyText: { color: colors.inkSoft, textAlign: 'center', marginTop: 24, paddingHorizontal: spacing.lg, fontSize: 13 },
+  postCard: {
+    flexDirection: 'row', gap: 12, marginHorizontal: spacing.lg, marginBottom: 12,
+    backgroundColor: colors.white, borderRadius: 16, borderWidth: 1, borderColor: colors.line, padding: 10, overflow: 'hidden',
+  },
+  postImage: { width: 66, height: 66, borderRadius: 12, overflow: 'hidden' },
+  playBadge: {
+    position: 'absolute', top: 6, right: 6, width: 18, height: 18, borderRadius: 9,
+    backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center',
+  },
+  postTag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 9, color: colors.teal, textTransform: 'uppercase' },
+  postTitle: { fontSize: 13, fontWeight: '700', color: colors.ink, marginTop: 3, lineHeight: 17 },
+  postMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 },
+  postUser: { fontSize: 10.5, color: colors.inkSoft, fontWeight: '600', flex: 1 },
+  postLikes: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  postLikesText: { fontSize: 10.5, color: colors.inkSoft, fontWeight: '600' },
 });

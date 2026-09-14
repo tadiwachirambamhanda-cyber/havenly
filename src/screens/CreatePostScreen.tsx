@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { Image } from 'expo-image';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { colors, radius, spacing } from '@/theme/tokens';
+import { communityIcon } from '@/constants/topicIcons';
+import type { RootStackParamList } from '@/navigation/RootNavigator';
+import type { Community } from '@/types';
+
+type Route = RouteProp<RootStackParamList, 'CreatePost'>;
 
 const TAG_OPTIONS = ['Cafés', 'Fashion', 'Nightlife', 'Fitness', 'Beach Days', 'Study Spots', 'Travel', 'Events', 'Padel', 'Beauty'];
 const MAX_VIDEO_SECONDS = 60;
@@ -24,15 +29,27 @@ async function uploadFile(bucket: string, uri: string, userId: string, fallbackE
 
 export default function CreatePostScreen() {
   const navigation = useNavigation();
+  const route = useRoute<Route>();
   const { session } = useAuth();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [tag, setTag] = useState(TAG_OPTIONS[0]);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [videoUri, setVideoUri] = useState<string | null>(null);
+  const [myCommunities, setMyCommunities] = useState<Community[]>([]);
+  const [communityId, setCommunityId] = useState<string | null>(route.params?.communityId ?? null);
   const [publishing, setPublishing] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Only communities the user has joined can be posted into (enforced again,
+  // for real, by the insert RLS policy — this list is just what to offer).
+  useEffect(() => {
+    const userId = session?.user.id;
+    if (!userId) return;
+    supabase.from('community_members').select('community:communities(*)').eq('user_id', userId)
+      .then(({ data }) => setMyCommunities(((data ?? []) as unknown as { community: Community }[]).map((r) => r.community)));
+  }, [session]);
 
   const handlePickerResult = async (result: ImagePicker.ImagePickerResult) => {
     if (result.canceled) return;
@@ -117,6 +134,7 @@ export default function CreatePostScreen() {
         tag,
         image_url: imageUrl,
         video_url: videoUrl,
+        community_id: communityId,
       });
       if (insertError) throw insertError;
 
@@ -182,6 +200,26 @@ export default function CreatePostScreen() {
         })}
       </View>
 
+      {myCommunities.length > 0 && (
+        <>
+          <Text style={styles.sectionLabel}>Post to</Text>
+          <View style={styles.chipGrid}>
+            <Pressable style={[styles.chip, !communityId && styles.chipSelected]} onPress={() => setCommunityId(null)}>
+              <Text style={[styles.chipText, !communityId && styles.chipTextSelected]}>Just Feed</Text>
+            </Pressable>
+            {myCommunities.map((c) => {
+              const isSelected = communityId === c.id;
+              return (
+                <Pressable key={c.id} style={[styles.chip, styles.chipWithIcon, isSelected && styles.chipSelected]} onPress={() => setCommunityId(c.id)}>
+                  <Feather name={communityIcon(c)} size={12} color={isSelected ? colors.sand : colors.ink} />
+                  <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{c.name}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </>
+      )}
+
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </ScrollView>
   );
@@ -220,6 +258,7 @@ const styles = StyleSheet.create({
   },
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 9, paddingHorizontal: spacing.lg },
   chip: { paddingVertical: 9, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
+  chipWithIcon: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
   chipText: { fontSize: 12.5, fontWeight: '600', color: colors.ink },
   chipTextSelected: { color: colors.sand },
