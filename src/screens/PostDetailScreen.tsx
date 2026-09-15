@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Animated, Share, TextInput, KeyboardAvoidingView, Platform, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Animated, TextInput, KeyboardAvoidingView, Platform, Modal } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Clipboard from 'expo-clipboard';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -188,39 +189,25 @@ export default function PostDetailScreen() {
 
   const openShare = () => setShareSheetVisible(true);
 
-  // Native uses the OS share sheet, which always works. Most desktop
-  // browsers (this includes any web preview) have no navigator.share at
-  // all, so Share.share() there just rejects — previously swallowed
-  // silently, which read as the button doing nothing. Falling back to
-  // copying the text gives web a working action either way, and every path
-  // now ends in a toast so the user always sees *something* happened.
+  // react-native's own Share.share() turned out to hang indefinitely on a
+  // real device in this Expo SDK/New Architecture setup — confirmed via
+  // device logs that it's reliably invoked but its promise never resolves
+  // or rejects, so the OS sheet never appears and there's no error to
+  // catch. expo-clipboard doesn't have that problem, and on web prefer the
+  // real native share dialog (navigator.share) when the browser has one.
   const shareExternally = async () => {
     if (!post) return;
     const message = `${post.title} — via Havenly`;
-    if (Platform.OS === 'web') {
-      if (typeof navigator !== 'undefined' && navigator.share) {
-        try { await navigator.share({ title: post.title, text: message }); } catch { /* user cancelled — not an error */ }
-        return;
-      }
-      try {
-        await navigator.clipboard.writeText(message);
-        showToast('Copied to clipboard');
-      } catch {
-        showToast('Couldn’t copy — try again', 'error');
-      }
+    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.share) {
+      try { await navigator.share({ title: post.title, text: message }); } catch { /* user cancelled — not an error */ }
       return;
     }
-    // This fires right as the ActionSheet's own Modal is still animating
-    // closed — on iOS, presenting the real OS share sheet mid-dismiss gets
-    // silently dropped (no error, no rejection, the sheet just never
-    // appears). A plain setTimeout for the delay, not InteractionManager —
-    // in this app's New Architecture setup InteractionManager.
-    // runAfterInteractions's callback was confirmed (via device logs) to
-    // never actually fire, which is why the first attempt at this fix
-    // still did nothing.
-    setTimeout(() => {
-      Share.share({ message }).catch(() => showToast('Couldn’t share — try again', 'error'));
-    }, 350);
+    try {
+      await Clipboard.setStringAsync(message);
+      showToast('Copied to clipboard');
+    } catch {
+      showToast('Couldn’t copy — try again', 'error');
+    }
   };
 
   const onMessage = async () => {
