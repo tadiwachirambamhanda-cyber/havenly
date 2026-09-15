@@ -1,5 +1,5 @@
 import React, { useMemo, useRef } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 import { Feather } from '@expo/vector-icons';
@@ -11,7 +11,11 @@ import type { ColorTokens } from '@/theme/tokens';
 // scrolling past it): tap to play/pause, tap the corner icon to unmute, a
 // slim progress bar, seamless looping. Starts muted regardless, matching
 // the feed preview and avoiding an unexpected burst of audio.
-export default function PostVideoPlayer({ uri, onDoubleTap }: { uri: string; onDoubleTap?: () => void }) {
+export default function PostVideoPlayer({
+  uri, onDoubleTap, muteButtonStyle,
+}: {
+  uri: string; onDoubleTap?: () => void; muteButtonStyle?: StyleProp<ViewStyle>;
+}) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const lastTapRef = useRef(0);
@@ -50,7 +54,7 @@ export default function PostVideoPlayer({ uri, onDoubleTap }: { uri: string; onD
           <View style={styles.playCircle}><Feather name="play" size={24} color="white" /></View>
         </View>
       )}
-      <Pressable style={styles.muteBtn} onPress={() => { player.muted = !player.muted; }} hitSlop={10}>
+      <Pressable style={[styles.muteBtn, muteButtonStyle]} onPress={() => { player.muted = !player.muted; }} hitSlop={10}>
         <Feather name={muted ? 'volume-x' : 'volume-2'} size={14} color="white" />
       </Pressable>
       <View style={styles.progressTrack}>

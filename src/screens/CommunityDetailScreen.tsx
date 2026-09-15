@@ -163,9 +163,6 @@ export default function CommunityDetailScreen() {
                 ) : post.image_url ? (
                   <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
                 ) : null}
-                {post.video_url && (
-                  <View style={styles.playBadge}><Feather name="volume-x" size={9} color="white" /></View>
-                )}
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.postTag}>{post.tag}</Text>
@@ -227,10 +224,6 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: colors.white, borderRadius: 16, borderWidth: 1, borderColor: colors.line, padding: 10, overflow: 'hidden',
   },
   postImage: { width: 66, height: 66, borderRadius: 12, overflow: 'hidden' },
-  playBadge: {
-    position: 'absolute', top: 6, right: 6, width: 18, height: 18, borderRadius: 9,
-    backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center',
-  },
   postTag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 9, color: colors.teal, textTransform: 'uppercase' },
   postTitle: { fontSize: 13, fontWeight: '700', color: colors.ink, marginTop: 3, lineHeight: 17 },
   postMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 },

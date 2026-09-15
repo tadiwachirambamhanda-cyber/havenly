@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Animated, Share, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Animated, Share, TextInput, KeyboardAvoidingView, Platform, Modal } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -47,6 +47,7 @@ export default function PostDetailScreen() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentInput, setCommentInput] = useState('');
   const [postingComment, setPostingComment] = useState(false);
+  const [commentsVisible, setCommentsVisible] = useState(false);
 
   const loadComments = useCallback(async () => {
     const { data } = await supabase.from('comments').select('*, author:profiles(*)')
@@ -259,6 +260,147 @@ export default function PostDetailScreen() {
   const isOwnPost = post.author_id === session?.user.id;
   const [heroFrom, heroTo] = gradients[post.id.charCodeAt(0) % gradients.length];
 
+  const renderCommentRow = (comment: Comment) => (
+    <Pressable
+      key={comment.id}
+      style={styles.commentRow}
+      onLongPress={() => comment.author_id === session?.user.id && deleteComment(comment)}
+    >
+      {comment.author?.avatar_url ? (
+        <Image source={{ uri: comment.author.avatar_url }} style={styles.commentAvatar} transition={200} />
+      ) : (
+        <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.commentAvatar} />
+      )}
+      <View style={{ flex: 1 }}>
+        <Text style={styles.commentMeta}>
+          <Text style={styles.commentUser}>@{comment.author?.username ?? 'user'}</Text> · {timeAgo(comment.created_at)}
+        </Text>
+        <Text style={styles.commentBody}>{comment.body}</Text>
+      </View>
+    </Pressable>
+  );
+
+  // Video posts open full-screen, TikTok-style — the clip fills the whole
+  // screen with everything else (author, caption, actions) overlaid on top,
+  // instead of being a hero image at the top of a scrolling detail page.
+  // Comments move into a sheet since there's no scrolling body to hold them.
+  if (post.video_url) {
+    return (
+      <View style={styles.videoContainer}>
+        <PostVideoPlayer
+          uri={post.video_url}
+          onDoubleTap={() => { playHeartPop(); setLikedState(true); }}
+          muteButtonStyle={{ top: insets.top + 12, bottom: undefined, right: undefined, left: 62 }}
+        />
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.heartPop, { opacity: heartPopOpacity, transform: [{ scale: heartPopScale }] }]}
+        >
+          <Feather name="heart" size={84} color="white" />
+        </Animated.View>
+
+        <Pressable
+          style={[styles.videoBack, { top: insets.top + 12 }]}
+          onPress={() => navigation.goBack()}
+          accessibilityLabel="Go back"
+        >
+          <Feather name="arrow-left" size={18} color="white" />
+        </Pressable>
+        {!isOwnPost && (
+          <Pressable
+            style={[styles.videoOverflow, { top: insets.top + 12 }]}
+            onPress={openOptions}
+            accessibilityLabel="More options"
+          >
+            <Feather name="more-horizontal" size={20} color="white" />
+          </Pressable>
+        )}
+
+        <View style={[styles.videoBottomRow, { paddingBottom: insets.bottom + 20 }]}>
+          <View style={styles.videoInfo}>
+            <View style={styles.videoUserRow}>
+              {post.author?.avatar_url ? (
+                <Image source={{ uri: post.author.avatar_url }} style={styles.videoAvatar} transition={200} />
+              ) : (
+                <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.videoAvatar} />
+              )}
+              <Text style={styles.videoUsername} numberOfLines={1}>
+                {post.is_editorial ? 'Havenly Editorial' : `@${post.author?.username ?? 'user'}`}
+              </Text>
+              {!isOwnPost && (
+                <Pressable
+                  style={[styles.videoFollowBtn, following && styles.videoFollowBtnActive]}
+                  onPress={toggleFollow}
+                  accessibilityLabel={following ? 'Unfollow this user' : 'Follow this user'}
+                >
+                  <Text style={[styles.videoFollowBtnText, following && styles.videoFollowBtnTextActive]}>
+                    {following ? 'Following' : 'Follow'}
+                  </Text>
+                </Pressable>
+              )}
+            </View>
+            <Text style={styles.videoTag}>{post.tag}</Text>
+            <Text style={styles.videoTitle} numberOfLines={2}>{post.title}</Text>
+            {post.body ? <Text style={styles.videoBody} numberOfLines={2}>{post.body}</Text> : null}
+          </View>
+
+          <View style={styles.videoRail}>
+            <Pressable style={styles.railItem} onPress={toggleLike} accessibilityLabel={liked ? 'Unlike' : 'Like'}>
+              <Animated.View style={[styles.railIconCircle, { transform: [{ scale: likeIconScale }] }]}>
+                <Feather name="heart" size={22} color={liked ? colors.coral : 'white'} />
+              </Animated.View>
+              <Text style={styles.railText}>{formatCount(post.like_count)}</Text>
+            </Pressable>
+            <Pressable style={styles.railItem} onPress={() => setCommentsVisible(true)} accessibilityLabel="View comments">
+              <View style={styles.railIconCircle}><Feather name="message-circle" size={22} color="white" /></View>
+              <Text style={styles.railText}>{formatCount(post.comment_count)}</Text>
+            </Pressable>
+            {!isOwnPost && (
+              <Pressable style={styles.railItem} onPress={onMessage} accessibilityLabel="Message this user">
+                <View style={styles.railIconCircle}><Feather name="send" size={19} color="white" /></View>
+              </Pressable>
+            )}
+            <Pressable style={styles.railItem} onPress={onShare} accessibilityLabel="Share this post">
+              <View style={styles.railIconCircle}><Feather name="share-2" size={19} color="white" /></View>
+            </Pressable>
+            <Pressable style={styles.railItem} onPress={toggleSave} accessibilityLabel={saved ? 'Remove from saved' : 'Save this post'}>
+              <View style={styles.railIconCircle}><Feather name="bookmark" size={19} color={saved ? colors.coral : 'white'} /></View>
+            </Pressable>
+          </View>
+        </View>
+
+        <Modal visible={commentsVisible} transparent animationType="slide" onRequestClose={() => setCommentsVisible(false)}>
+          <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+            <Pressable style={styles.sheetBackdrop} onPress={() => setCommentsVisible(false)} />
+            <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.md }]}>
+              <View style={styles.sheetHandle} />
+              <Text style={[styles.commentsLabel, { paddingHorizontal: spacing.lg }]}>Comments</Text>
+              <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.lg }}>
+                {comments.map(renderCommentRow)}
+                {comments.length === 0 && <Text style={styles.noComments}>No comments yet — be the first.</Text>}
+              </ScrollView>
+              <View style={styles.commentInputRow}>
+                <TextInput
+                  style={styles.commentInput}
+                  placeholder="Add a comment…"
+                  placeholderTextColor={colors.inkSoft}
+                  value={commentInput}
+                  onChangeText={setCommentInput}
+                  onSubmitEditing={addComment}
+                />
+                <Pressable style={styles.commentSendBtn} onPress={addComment} accessibilityLabel="Post comment">
+                  <Feather name="send" size={15} color={colors.sand} />
+                </Pressable>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
+
+        <ReportModal visible={reportModalVisible} onClose={() => setReportModalVisible(false)} onSubmit={handleReportSubmit} />
+      </View>
+    );
+  }
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
     <View style={styles.container}>
@@ -352,25 +494,7 @@ export default function PostDetailScreen() {
 
         <View style={styles.commentsSection}>
           <Text style={styles.commentsLabel}>Comments</Text>
-          {comments.map((comment) => (
-            <Pressable
-              key={comment.id}
-              style={styles.commentRow}
-              onLongPress={() => comment.author_id === session?.user.id && deleteComment(comment)}
-            >
-              {comment.author?.avatar_url ? (
-                <Image source={{ uri: comment.author.avatar_url }} style={styles.commentAvatar} transition={200} />
-              ) : (
-                <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.commentAvatar} />
-              )}
-              <View style={{ flex: 1 }}>
-                <Text style={styles.commentMeta}>
-                  <Text style={styles.commentUser}>@{comment.author?.username ?? 'user'}</Text> · {timeAgo(comment.created_at)}
-                </Text>
-                <Text style={styles.commentBody}>{comment.body}</Text>
-              </View>
-            </Pressable>
-          ))}
+          {comments.map(renderCommentRow)}
           {comments.length === 0 && <Text style={styles.noComments}>No comments yet — be the first.</Text>}
         </View>
       </View>
@@ -440,5 +564,46 @@ function createStyles(colors: ColorTokens) {
   commentInputRow: { flexDirection: 'row', gap: 9, alignItems: 'center', padding: spacing.md, borderTopWidth: 1, borderColor: colors.line, backgroundColor: colors.sand },
   commentInput: { flex: 1, backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line, borderRadius: radius.pill, paddingHorizontal: 16, paddingVertical: 11, fontSize: 13, color: colors.ink },
   commentSendBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' },
+  // Fixed black background regardless of theme — a full-screen video player
+  // reads the same way (and the overlaid white text/icons stay legible)
+  // whether the app is in light or dark mode, same reasoning as the
+  // Login/SignUp hero always being a fixed dark panel.
+  videoContainer: { flex: 1, backgroundColor: '#000' },
+  videoBack: {
+    position: 'absolute', left: 16, width: 34, height: 34, borderRadius: 17,
+    backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center',
+  },
+  videoOverflow: {
+    position: 'absolute', right: 16, width: 34, height: 34, borderRadius: 17,
+    backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center',
+  },
+  videoBottomRow: {
+    position: 'absolute', left: 0, right: 0, bottom: 0, flexDirection: 'row', alignItems: 'flex-end',
+    paddingHorizontal: spacing.lg, paddingTop: 40, gap: spacing.md,
+  },
+  videoInfo: { flex: 1, gap: 2 },
+  videoUserRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
+  videoAvatar: { width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: 'white' },
+  videoUsername: { fontSize: 13.5, fontWeight: '700', color: 'white', flexShrink: 1 },
+  videoFollowBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.pill, borderWidth: 1.5, borderColor: 'white' },
+  videoFollowBtnActive: { backgroundColor: 'rgba(255,255,255,0.25)' },
+  videoFollowBtnText: { fontSize: 11, fontWeight: '700', color: 'white' },
+  videoFollowBtnTextActive: { color: 'white' },
+  videoTag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 10, color: colors.gold, textTransform: 'uppercase', marginBottom: 2 },
+  videoTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 17, color: 'white', lineHeight: 21 },
+  videoBody: { fontSize: 12.5, color: 'rgba(255,255,255,0.85)', marginTop: 4, lineHeight: 18 },
+  videoRail: { alignItems: 'center', gap: 18, paddingBottom: 4 },
+  railItem: { alignItems: 'center', gap: 4 },
+  railIconCircle: {
+    width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  railText: { fontSize: 11, fontWeight: '700', color: 'white' },
+  sheetBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' },
+  sheet: {
+    backgroundColor: colors.sand, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg,
+    maxHeight: '65%', paddingTop: 10,
+  },
+  sheetHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.line, alignSelf: 'center', marginBottom: 10 },
   });
 }

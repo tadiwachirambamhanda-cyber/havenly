@@ -123,9 +123,6 @@ export default function FeedScreen() {
           {item.is_editorial && (
             <View style={styles.editorialBadge}><Text style={styles.editorialBadgeText}>★ Havenly Picks</Text></View>
           )}
-          {item.video_url && (
-            <View style={styles.muteBadge}><Feather name="volume-x" size={11} color="white" /></View>
-          )}
         </View>
         <View style={styles.cardBody}>
           <Text style={styles.cardTag}>{item.tag}</Text>
@@ -248,10 +245,6 @@ function createStyles(colors: ColorTokens) {
   // dark mode and break the gold text's contrast, so this one stays literal.
   editorialBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: '#20261F', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 100 },
   editorialBadgeText: { color: colors.gold, fontSize: 9, fontWeight: '700' },
-  muteBadge: {
-    position: 'absolute', top: 8, right: 8, width: 22, height: 22, borderRadius: 11,
-    backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center',
-  },
   cardBody: { padding: 11 },
   cardTag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 9.5, color: colors.teal, textTransform: 'uppercase' },
   cardTitle: { fontSize: 13.5, fontWeight: '700', marginTop: 5, color: colors.ink, lineHeight: 18 },

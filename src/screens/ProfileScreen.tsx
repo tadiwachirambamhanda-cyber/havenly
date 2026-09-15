@@ -117,9 +117,6 @@ export default function ProfileScreen() {
             ) : item.image_url ? (
               <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
             ) : null}
-            {item.video_url && (
-              <View style={styles.gridPlayBadge}><Feather name="volume-x" size={10} color="white" /></View>
-            )}
           </Pressable>
         );
       }}
@@ -225,10 +222,6 @@ function createStyles(colors: ColorTokens) {
   tabTextActive: { color: colors.ink },
   tabUnderline: { position: 'absolute', bottom: -1, height: 2, width: '60%', backgroundColor: colors.coral, borderRadius: 1 },
   gridCell: { flex: 1, aspectRatio: 1 / 1.15, overflow: 'hidden', marginBottom: 2 },
-  gridPlayBadge: {
-    position: 'absolute', top: 6, right: 6, width: 20, height: 20, borderRadius: 10,
-    backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center',
-  },
   gridEmpty: { color: colors.inkSoft, textAlign: 'center', paddingVertical: 40, fontSize: 13 },
   });
 }
