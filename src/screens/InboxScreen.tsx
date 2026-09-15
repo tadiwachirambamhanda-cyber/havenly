@@ -16,7 +16,19 @@ import type { Conversation, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
-type Row = Conversation & { otherUser: Profile | undefined; unread: boolean };
+// otherUser stays around for 1:1 rows (existing rendering/openChat logic);
+// members holds every other participant, populated for both shapes so
+// group rows have something to build a display name and avatar from.
+type Row = Conversation & { otherUser: Profile | undefined; members: Profile[]; unread: boolean };
+
+// Falls back to a comma list of members' first names when a group has no
+// name set — trimmed so it doesn't run on forever for a big group.
+function groupDisplayName(row: Row): string {
+  if (row.name) return row.name;
+  const names = row.members.map((m) => m.display_name.split(' ')[0]);
+  if (names.length <= 3) return names.join(', ');
+  return `${names.slice(0, 3).join(', ')} & ${names.length - 3} more`;
+}
 
 export default function InboxScreen() {
   const navigation = useNavigation<Nav>();
@@ -41,7 +53,11 @@ export default function InboxScreen() {
     if (!conversations) return;
 
     const readAtByConversation = new Map((reads ?? []).map((r) => [r.conversation_id, r.last_read_at]));
-    const otherIds = conversations.map((c) => c.participant_ids.find((id: string) => id !== myId)).filter(Boolean) as string[];
+    // All other participants across every conversation, not just "the"
+    // other person — a group needs every member, not one.
+    const otherIds = Array.from(new Set(
+      conversations.flatMap((c) => c.participant_ids.filter((id: string) => id !== myId))
+    ));
     const { data: profiles } = otherIds.length
       ? await supabase.from('profiles').select('*').in('id', otherIds)
       : { data: [] as Profile[] };
@@ -50,7 +66,11 @@ export default function InboxScreen() {
     setRows(conversations.map((c) => {
       const readAt = readAtByConversation.get(c.id);
       const unread = !!c.last_message_at && (!readAt || new Date(readAt) < new Date(c.last_message_at));
-      return { ...(c as Conversation), otherUser: profileById.get(c.participant_ids.find((id: string) => id !== myId) ?? ''), unread };
+      const members = (c.participant_ids as string[])
+        .filter((id) => id !== myId)
+        .map((id) => profileById.get(id))
+        .filter((p): p is Profile => !!p);
+      return { ...(c as Conversation), otherUser: members[0], members, unread };
     }));
   }, [myId]);
 
@@ -78,8 +98,9 @@ export default function InboxScreen() {
   const trimmed = query.trim().toLowerCase();
   const filteredRows = trimmed
     ? rows.filter((r) =>
-        r.otherUser?.display_name.toLowerCase().includes(trimmed) ||
-        r.otherUser?.username.toLowerCase().includes(trimmed))
+        (r.is_group
+          ? groupDisplayName(r).toLowerCase().includes(trimmed)
+          : r.otherUser?.display_name.toLowerCase().includes(trimmed) || r.otherUser?.username.toLowerCase().includes(trimmed)))
     : rows;
 
   const requests = filteredRows.filter((r) => r.status === 'pending' && r.initiator_id !== myId);
@@ -91,13 +112,18 @@ export default function InboxScreen() {
   ];
 
   const openChat = (row: Row) => {
-    if (!row.otherUser) return;
-    navigation.navigate('Chat', { conversationId: row.id, otherUserId: row.otherUser.id });
+    if (!row.is_group && !row.otherUser) return;
+    navigation.navigate('Chat', { conversationId: row.id, otherUserId: row.otherUser?.id });
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Messages</Text>
+      <View style={styles.titleRow}>
+        <Text style={styles.title}>Messages</Text>
+        <Pressable style={styles.newGroupBtn} onPress={() => navigation.navigate('NewGroup')} accessibilityLabel="New group">
+          <Feather name="user-plus" size={16} color={colors.ink} />
+        </Pressable>
+      </View>
       <View style={styles.searchBar}>
         <Feather name="search" size={14} color={colors.inkSoft} />
         <TextInput
@@ -130,7 +156,11 @@ export default function InboxScreen() {
         renderItem={({ item }) => (
           <Pressable style={styles.row} onPress={() => openChat(item)}>
             <View>
-              {item.otherUser?.avatar_url ? (
+              {item.is_group ? (
+                <View style={[styles.avatar, styles.groupAvatar]}>
+                  <Feather name="users" size={20} color={colors.teal} />
+                </View>
+              ) : item.otherUser?.avatar_url ? (
                 <Image source={{ uri: item.otherUser.avatar_url }} style={styles.avatar} transition={200} />
               ) : (
                 <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
@@ -138,7 +168,7 @@ export default function InboxScreen() {
               {item.unread && <View style={styles.unreadDot} />}
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.name}>{item.otherUser?.display_name ?? 'Havenly user'}</Text>
+              <Text style={styles.name}>{item.is_group ? groupDisplayName(item) : item.otherUser?.display_name ?? 'Havenly user'}</Text>
               <Text style={[styles.preview, item.unread && styles.previewUnread]} numberOfLines={1}>
                 {item.status === 'pending' && item.initiator_id === myId ? 'Request sent' : item.last_message ?? 'Say hi 👋'}
               </Text>
@@ -155,7 +185,13 @@ export default function InboxScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 26, color: colors.ink, paddingHorizontal: spacing.lg, paddingTop: 60 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingTop: 60 },
+  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 26, color: colors.ink },
+  newGroupBtn: {
+    width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  groupAvatar: { backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
   searchBar: {
     flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: spacing.lg, marginTop: 12, marginBottom: 6,
     paddingHorizontal: 16, paddingVertical: 11, backgroundColor: colors.white, borderWidth: 1.5,

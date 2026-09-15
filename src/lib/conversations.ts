@@ -16,6 +16,19 @@ export async function findOrCreateConversation(myId: string, otherId: string): P
   return created.id;
 }
 
+// Creates a new group — always a fresh conversation, unlike
+// findOrCreateConversation, since there's no single "the" group between a
+// set of people the way there's exactly one 1:1 thread between two. Starts
+// 'accepted' immediately: a group has no request/accept step, you're just
+// added, matching most chat apps' group semantics.
+export async function createGroupConversation(myId: string, memberIds: string[], name: string | null): Promise<string> {
+  const { data: created, error } = await supabase.from('conversations')
+    .insert({ participant_ids: [myId, ...memberIds], initiator_id: myId, is_group: true, status: 'accepted', name })
+    .select('id').single();
+  if (error) throw error;
+  return created.id;
+}
+
 // Marks a conversation as read up to now for one user — call this whenever
 // they're actively looking at it (on open, and whenever a new message
 // arrives while they have it open) or just sent into it themselves.

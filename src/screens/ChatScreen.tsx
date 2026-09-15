@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Pressable, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
@@ -23,10 +24,21 @@ import type { RootStackParamList } from '@/navigation/RootNavigator';
 type Route = RouteProp<RootStackParamList, 'Chat'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
+// Falls back to a comma list of first names when a group has no name set —
+// same convention as Inbox's row label, trimmed so it doesn't run on
+// forever for a big group.
+function groupDisplayName(conversation: Conversation, members: Profile[]): string {
+  if (conversation.name) return conversation.name;
+  const names = members.map((m) => m.display_name.split(' ')[0]);
+  if (names.length <= 3) return names.join(', ');
+  return `${names.slice(0, 3).join(', ')} & ${names.length - 3} more`;
+}
+
 export default function ChatScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const { conversationId, otherUserId } = route.params;
+  const insets = useSafeAreaInsets();
   const { session } = useAuth();
   const { colors } = useTheme();
   const { showToast } = useToast();
@@ -34,19 +46,36 @@ export default function ChatScreen() {
   const myId = session?.user.id;
 
   const [otherUser, setOtherUser] = useState<Profile | null>(null);
+  const [members, setMembers] = useState<Profile[]>([]);
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [optionsVisible, setOptionsVisible] = useState(false);
   const [blockConfirmVisible, setBlockConfirmVisible] = useState(false);
+  const [membersModalVisible, setMembersModalVisible] = useState(false);
   const listRef = useRef<FlatList>(null);
+  const isGroup = conversation?.is_group ?? false;
+  const memberById = useMemo(() => new Map(members.map((m) => [m.id, m])), [members]);
 
   useEffect(() => {
-    supabase.from('profiles').select('*').eq('id', otherUserId).single()
-      .then(({ data }) => setOtherUser(data as Profile));
-    supabase.from('conversations').select('*').eq('id', conversationId).single()
-      .then(({ data }) => setConversation(data as Conversation));
+    (async () => {
+      const { data: conv } = await supabase.from('conversations').select('*').eq('id', conversationId).single();
+      setConversation(conv as Conversation | null);
+      if (!conv || !myId) return;
+
+      const otherIds = (conv.participant_ids as string[]).filter((id) => id !== myId);
+      if (conv.is_group) {
+        const { data: memberProfiles } = otherIds.length
+          ? await supabase.from('profiles').select('*').in('id', otherIds)
+          : { data: [] as Profile[] };
+        setMembers((memberProfiles as Profile[]) ?? []);
+      } else if (otherIds[0]) {
+        const { data } = await supabase.from('profiles').select('*').eq('id', otherIds[0]).single();
+        setOtherUser(data as Profile);
+      }
+    })();
+
     supabase.from('messages').select('*, shared_post:posts(id, title, tag, image_url, video_url)').eq('conversation_id', conversationId)
       .order('created_at', { ascending: true }).then(({ data }) => setMessages((data as unknown as Message[]) ?? []));
 
@@ -73,7 +102,7 @@ export default function ChatScreen() {
         (payload) => setConversation(payload.new as Conversation))
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [conversationId, otherUserId, myId]);
+  }, [conversationId, myId]);
 
   const send = async () => {
     if (!input.trim() || !myId) return;
@@ -104,7 +133,7 @@ export default function ChatScreen() {
   const handleBlock = () => setBlockConfirmVisible(true);
 
   const confirmBlock = async () => {
-    if (!myId) return;
+    if (!myId || !otherUserId) return;
     try {
       await blockUser(myId, otherUserId);
       haptics.success();
@@ -118,7 +147,7 @@ export default function ChatScreen() {
 
   const handleReportSubmit = async (reason: string) => {
     setReportModalVisible(false);
-    if (!myId) return;
+    if (!myId || !otherUserId) return;
     try {
       await submitReport(myId, 'user', otherUserId, reason);
       showToast('Thanks — we’ve got your report.');
@@ -141,20 +170,29 @@ export default function ChatScreen() {
           </Pressable>
           <Pressable
             style={styles.headerAuthorTap}
-            onPress={() => navigation.navigate('UserProfile', { userId: otherUserId })}
-            accessibilityLabel={`View ${otherUser?.display_name ?? 'their'} profile`}
+            onPress={() => (isGroup ? setMembersModalVisible(true) : otherUserId && navigation.navigate('UserProfile', { userId: otherUserId }))}
+            accessibilityLabel={isGroup ? 'View group members' : `View ${otherUser?.display_name ?? 'their'} profile`}
           >
-            {otherUser?.avatar_url ? (
+            {isGroup ? (
+              <View style={[styles.headerAvatar, styles.groupAvatar]}>
+                <Feather name="users" size={16} color={colors.teal} />
+              </View>
+            ) : otherUser?.avatar_url ? (
               <Image source={{ uri: otherUser.avatar_url }} style={styles.headerAvatar} transition={200} />
             ) : (
               <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.headerAvatar} />
             )}
-            <Text style={styles.headerName}>{otherUser?.display_name ?? '…'}</Text>
+            <View>
+              <Text style={styles.headerName}>{isGroup ? groupDisplayName(conversation!, members) : otherUser?.display_name ?? '…'}</Text>
+              {isGroup && <Text style={styles.headerSub}>{members.length + 1} members</Text>}
+            </View>
           </Pressable>
           <View style={{ flex: 1 }} />
-          <Pressable style={styles.overflow} onPress={openOptions} accessibilityLabel="More options">
-            <Feather name="more-horizontal" size={18} color={colors.ink} />
-          </Pressable>
+          {!isGroup && (
+            <Pressable style={styles.overflow} onPress={openOptions} accessibilityLabel="More options">
+              <Feather name="more-horizontal" size={18} color={colors.ink} />
+            </Pressable>
+          )}
         </View>
 
         <FlatList
@@ -165,29 +203,33 @@ export default function ChatScreen() {
           renderItem={({ item }) => {
             const mine = item.sender_id === myId;
             const textStyle = mine ? styles.bubbleTextMe : styles.bubbleTextThem;
+            const senderName = isGroup && !mine ? memberById.get(item.sender_id)?.display_name : null;
             return (
-              <View style={[styles.bubble, mine ? styles.bubbleMe : styles.bubbleThem, item.shared_post && styles.bubbleShared]}>
-                {item.shared_post ? (
-                  <Pressable
-                    style={styles.sharedPostRow}
-                    onPress={() => navigation.navigate('PostDetail', { postId: item.shared_post!.id })}
-                    accessibilityLabel={`Open post: ${item.shared_post.title}`}
-                  >
-                    {item.shared_post.image_url ? (
-                      <Image source={{ uri: item.shared_post.image_url }} style={styles.sharedPostThumb} contentFit="cover" transition={200} />
-                    ) : (
-                      <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.sharedPostThumb} />
-                    )}
-                    <View style={{ flex: 1 }}>
-                      <Text style={[styles.sharedPostTag, textStyle]}>{item.shared_post.tag}</Text>
-                      <Text style={[styles.sharedPostTitle, textStyle]} numberOfLines={2}>{item.shared_post.title}</Text>
-                    </View>
-                    <Feather name="chevron-right" size={14} color={mine ? 'rgba(255,255,255,0.8)' : colors.inkSoft} />
-                  </Pressable>
-                ) : (
-                  <Text style={textStyle}>{item.body}</Text>
-                )}
-                <Text style={mine ? styles.bubbleTimeMe : styles.bubbleTimeThem}>{timeAgo(item.created_at)}</Text>
+              <View>
+                {senderName && <Text style={styles.senderName}>{senderName}</Text>}
+                <View style={[styles.bubble, mine ? styles.bubbleMe : styles.bubbleThem, item.shared_post && styles.bubbleShared]}>
+                  {item.shared_post ? (
+                    <Pressable
+                      style={styles.sharedPostRow}
+                      onPress={() => navigation.navigate('PostDetail', { postId: item.shared_post!.id })}
+                      accessibilityLabel={`Open post: ${item.shared_post.title}`}
+                    >
+                      {item.shared_post.image_url ? (
+                        <Image source={{ uri: item.shared_post.image_url }} style={styles.sharedPostThumb} contentFit="cover" transition={200} />
+                      ) : (
+                        <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.sharedPostThumb} />
+                      )}
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.sharedPostTag, textStyle]}>{item.shared_post.tag}</Text>
+                        <Text style={[styles.sharedPostTitle, textStyle]} numberOfLines={2}>{item.shared_post.title}</Text>
+                      </View>
+                      <Feather name="chevron-right" size={14} color={mine ? 'rgba(255,255,255,0.8)' : colors.inkSoft} />
+                    </Pressable>
+                  ) : (
+                    <Text style={textStyle}>{item.body}</Text>
+                  )}
+                  <Text style={mine ? styles.bubbleTimeMe : styles.bubbleTimeThem}>{timeAgo(item.created_at)}</Text>
+                </View>
               </View>
             );
           }}
@@ -243,6 +285,37 @@ export default function ChatScreen() {
         message="They won't be able to message you or see each other's posts anymore."
         actions={[{ label: 'Block', destructive: true, onPress: confirmBlock }]}
       />
+      <Modal visible={membersModalVisible} transparent animationType="fade" onRequestClose={() => setMembersModalVisible(false)}>
+        <Pressable style={styles.membersBackdrop} onPress={() => setMembersModalVisible(false)}>
+          <Pressable style={[styles.membersCard, { paddingBottom: insets.bottom + spacing.md }]} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.membersHandle} />
+            <Text style={styles.membersTitle}>{conversation && groupDisplayName(conversation, members)}</Text>
+            <Text style={styles.membersSubtitle}>{members.length + 1} members</Text>
+            <FlatList
+              data={members}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={{ paddingTop: spacing.md }}
+              renderItem={({ item }) => (
+                <Pressable
+                  style={styles.memberRow}
+                  onPress={() => { setMembersModalVisible(false); navigation.navigate('UserProfile', { userId: item.id }); }}
+                  accessibilityLabel={`View ${item.display_name}'s profile`}
+                >
+                  {item.avatar_url ? (
+                    <Image source={{ uri: item.avatar_url }} style={styles.memberAvatar} transition={200} />
+                  ) : (
+                    <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.memberAvatar} />
+                  )}
+                  <View>
+                    <Text style={styles.memberName}>{item.display_name}</Text>
+                    <Text style={styles.memberHandle}>@{item.username}</Text>
+                  </View>
+                </Pressable>
+              )}
+            />
+          </Pressable>
+        </Pressable>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -258,7 +331,10 @@ function createStyles(colors: ColorTokens) {
   overflow: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   headerAuthorTap: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   headerAvatar: { width: 34, height: 34, borderRadius: 17 },
+  groupAvatar: { backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
   headerName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
+  headerSub: { fontSize: 10.5, color: colors.inkSoft, marginTop: 1 },
+  senderName: { fontSize: 10.5, fontWeight: '700', color: colors.inkSoft, marginBottom: 3, marginLeft: 4 },
   bubble: { maxWidth: '75%', padding: 12, borderRadius: 18 },
   bubbleThem: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignSelf: 'flex-start' },
   bubbleMe: { backgroundColor: colors.coral, alignSelf: 'flex-end' },
@@ -283,5 +359,17 @@ function createStyles(colors: ColorTokens) {
   declineBtnText: { fontSize: 13, fontWeight: '700', color: colors.ink },
   acceptBtn: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: radius.pill, backgroundColor: colors.coral },
   acceptBtnText: { fontSize: 13, fontWeight: '700', color: 'white' },
+  membersBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  membersCard: {
+    backgroundColor: colors.sand, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg,
+    padding: spacing.lg, maxHeight: '70%',
+  },
+  membersHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.line, alignSelf: 'center', marginBottom: 14 },
+  membersTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 17, color: colors.ink },
+  membersSubtitle: { fontSize: 12, color: colors.inkSoft, marginTop: 2 },
+  memberRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 9 },
+  memberAvatar: { width: 42, height: 42, borderRadius: 21 },
+  memberName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
+  memberHandle: { fontSize: 11, color: colors.inkSoft, fontFamily: 'JetBrainsMono_500Medium', marginTop: 1 },
   });
 }

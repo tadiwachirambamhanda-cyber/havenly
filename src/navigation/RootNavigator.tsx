@@ -29,6 +29,7 @@ import BlockedUsersScreen from '@/screens/BlockedUsersScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
 import EditProfileScreen from '@/screens/EditProfileScreen';
 import FollowListScreen from '@/screens/FollowListScreen';
+import NewGroupScreen from '@/screens/NewGroupScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -39,7 +40,8 @@ export type RootStackParamList = {
   UserProfile: { userId: string };
   Notifications: undefined;
   SharePost: { postId: string };
-  Chat: { conversationId: string; otherUserId: string };
+  Chat: { conversationId: string; otherUserId?: string };
+  NewGroup: undefined;
   Communities: undefined;
   CommunityDetail: { communityId: string };
   CreatePost: { communityId?: string } | undefined;
@@ -118,6 +120,7 @@ export default function RootNavigator() {
             <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="SharePost" component={SharePostScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Chat" component={ChatScreen} />
+            <Stack.Screen name="NewGroup" component={NewGroupScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Communities" component={CommunitiesScreen} />
             <Stack.Screen name="CommunityDetail" component={CommunityDetailScreen} />
             <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ presentation: 'modal' }} />
