@@ -17,6 +17,7 @@ import InboxScreen from '@/screens/InboxScreen';
 import ChatScreen from '@/screens/ChatScreen';
 import ProfileScreen from '@/screens/ProfileScreen';
 import UserProfileScreen from '@/screens/UserProfileScreen';
+import NotificationsScreen from '@/screens/NotificationsScreen';
 import PostDetailScreen from '@/screens/PostDetailScreen';
 import CommunitiesScreen from '@/screens/CommunitiesScreen';
 import CommunityDetailScreen from '@/screens/CommunityDetailScreen';
@@ -34,6 +35,7 @@ export type RootStackParamList = {
   MainTabs: undefined;
   PostDetail: { postId: string };
   UserProfile: { userId: string };
+  Notifications: undefined;
   Chat: { conversationId: string; otherUserId: string };
   Communities: undefined;
   CommunityDetail: { communityId: string };
@@ -109,6 +111,7 @@ export default function RootNavigator() {
             <Stack.Screen name="MainTabs" component={MainTabs} />
             <Stack.Screen name="PostDetail" component={PostDetailScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="UserProfile" component={UserProfileScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="Chat" component={ChatScreen} />
             <Stack.Screen name="Communities" component={CommunitiesScreen} />
             <Stack.Screen name="CommunityDetail" component={CommunityDetailScreen} />

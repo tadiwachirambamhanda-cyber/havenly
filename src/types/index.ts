@@ -42,3 +42,11 @@ export interface HavenlyEvent {
   id: string; title: string; description: string | null; location: string; tag: string;
   event_date: string; interested_count: number; created_at: string;
 }
+
+export type NotificationType = 'follow' | 'like' | 'comment';
+
+export interface Notification {
+  id: string; recipient_id: string; actor_id: string; actor?: Profile; type: NotificationType;
+  post_id: string | null; post?: Pick<Post, 'id' | 'title' | 'image_url'> | null;
+  comment_id: string | null; is_read: boolean; created_at: string;
+}

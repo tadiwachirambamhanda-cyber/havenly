@@ -9,6 +9,7 @@ import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { useUnreadNotifications } from '@/lib/useUnreadNotifications';
 import { haptics } from '@/lib/haptics';
 import { radius, spacing, gradients } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
@@ -108,6 +109,7 @@ export default function FeedScreen() {
   const { session, profile } = useAuth();
   const { colors } = useTheme();
   const isFocused = useIsFocused();
+  const hasUnreadNotifications = useUnreadNotifications();
   const { height: windowHeight } = useWindowDimensions();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -406,6 +408,10 @@ export default function FeedScreen() {
           <Text style={styles.brand}>havenly.</Text>
         </Pressable>
         <View style={styles.topBarActions}>
+          <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Notifications')} accessibilityLabel="Notifications">
+            <Feather name="bell" size={17} color={colors.ink} />
+            {hasUnreadNotifications && <View style={styles.iconBtnDot} />}
+          </Pressable>
           <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Communities')} accessibilityLabel="Communities">
             <Feather name="users" size={17} color={colors.ink} />
           </Pressable>
@@ -519,6 +525,7 @@ function createStyles(colors: ColorTokens) {
   brand: { fontFamily: 'Fraunces_700Bold_Italic', fontSize: 24, color: colors.ink },
   topBarActions: { flexDirection: 'row', gap: spacing.sm },
   iconBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+  iconBtnDot: { position: 'absolute', top: 6, right: 7, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral, borderWidth: 1.5, borderColor: colors.white },
   interestRow: { flexDirection: 'row', gap: 8, paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
   interestChip: {
     backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line,
