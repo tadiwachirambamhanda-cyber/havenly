@@ -12,6 +12,7 @@ import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
 import { timeAgo } from '@/utils/timeAgo';
+import { groupDisplayName } from '@/utils/groupDisplayName';
 import type { Conversation, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -20,15 +21,6 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 // members holds every other participant, populated for both shapes so
 // group rows have something to build a display name and avatar from.
 type Row = Conversation & { otherUser: Profile | undefined; members: Profile[]; unread: boolean };
-
-// Falls back to a comma list of members' first names when a group has no
-// name set — trimmed so it doesn't run on forever for a big group.
-function groupDisplayName(row: Row): string {
-  if (row.name) return row.name;
-  const names = row.members.map((m) => m.display_name.split(' ')[0]);
-  if (names.length <= 3) return names.join(', ');
-  return `${names.slice(0, 3).join(', ')} & ${names.length - 3} more`;
-}
 
 export default function InboxScreen() {
   const navigation = useNavigation<Nav>();
@@ -99,7 +91,7 @@ export default function InboxScreen() {
   const filteredRows = trimmed
     ? rows.filter((r) =>
         (r.is_group
-          ? groupDisplayName(r).toLowerCase().includes(trimmed)
+          ? groupDisplayName(r, r.members).toLowerCase().includes(trimmed)
           : r.otherUser?.display_name.toLowerCase().includes(trimmed) || r.otherUser?.username.toLowerCase().includes(trimmed)))
     : rows;
 
@@ -157,9 +149,13 @@ export default function InboxScreen() {
           <Pressable style={styles.row} onPress={() => openChat(item)}>
             <View>
               {item.is_group ? (
-                <View style={[styles.avatar, styles.groupAvatar]}>
-                  <Feather name="users" size={20} color={colors.teal} />
-                </View>
+                item.icon_url ? (
+                  <Image source={{ uri: item.icon_url }} style={styles.avatar} transition={200} />
+                ) : (
+                  <View style={[styles.avatar, styles.groupAvatar]}>
+                    <Feather name="users" size={20} color={colors.teal} />
+                  </View>
+                )
               ) : item.otherUser?.avatar_url ? (
                 <Image source={{ uri: item.otherUser.avatar_url }} style={styles.avatar} transition={200} />
               ) : (
@@ -168,7 +164,7 @@ export default function InboxScreen() {
               {item.unread && <View style={styles.unreadDot} />}
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.name}>{item.is_group ? groupDisplayName(item) : item.otherUser?.display_name ?? 'Havenly user'}</Text>
+              <Text style={styles.name}>{item.is_group ? groupDisplayName(item, item.members) : item.otherUser?.display_name ?? 'Havenly user'}</Text>
               <Text style={[styles.preview, item.unread && styles.previewUnread]} numberOfLines={1}>
                 {item.status === 'pending' && item.initiator_id === myId ? 'Request sent' : item.last_message ?? 'Say hi 👋'}
               </Text>

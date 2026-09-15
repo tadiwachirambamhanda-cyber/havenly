@@ -29,6 +29,23 @@ export async function createGroupConversation(myId: string, memberIds: string[],
   return created.id;
 }
 
+// Uploads a picked image as a group's icon and points icon_url at it —
+// path is "<conversationId>/<timestamp>.<ext>", not a user id, since a
+// group icon has no single owner (see the group-icons bucket policies).
+export async function uploadGroupIcon(conversationId: string, localUri: string): Promise<string> {
+  const ext = localUri.split('.').pop()?.toLowerCase() ?? 'jpg';
+  const path = `${conversationId}/${Date.now()}.${ext}`;
+  const arrayBuffer = await fetch(localUri).then((r) => r.arrayBuffer());
+  const { error: uploadError } = await supabase.storage.from('group-icons').upload(path, arrayBuffer, {
+    contentType: `image/${ext === 'jpg' ? 'jpeg' : ext}`,
+  });
+  if (uploadError) throw uploadError;
+  const iconUrl = supabase.storage.from('group-icons').getPublicUrl(path).data.publicUrl;
+  const { error: updateError } = await supabase.from('conversations').update({ icon_url: iconUrl }).eq('id', conversationId);
+  if (updateError) throw updateError;
+  return iconUrl;
+}
+
 // Marks a conversation as read up to now for one user — call this whenever
 // they're actively looking at it (on open, and whenever a new message
 // arrives while they have it open) or just sent into it themselves.

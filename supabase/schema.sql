@@ -561,10 +561,12 @@ create table conversations (
   -- A group has no request/accept step the way an unsolicited 1:1 DM does
   -- (you're just added), so it's created directly at status='accepted' and
   -- stays there for its whole lifetime in this first version — no
-  -- leave/kick/rename yet. name is only ever set for groups; a 1:1's
-  -- display name is always just the other participant's.
+  -- leave/kick yet, though any member can rename it or change its icon.
+  -- name/icon_url are only ever set for groups; a 1:1's display name and
+  -- photo are always just the other participant's.
   is_group boolean not null default false,
   name text,
+  icon_url text,
   check (not is_group or status = 'accepted'),
   created_at timestamptz default now()
 );
@@ -610,6 +612,12 @@ create policy "Participants can update conversation status" on conversations for
 create policy "Group participants can update conversation" on conversations for update
   using (is_group and auth.uid() = any(participant_ids))
   with check (is_group and auth.uid() = any(participant_ids) and status = 'accepted');
+-- icon_url/name weren't in the column-scoped grant above — needed so a
+-- group member can actually rename a group or set its icon from the
+-- client. The policy above already allows any current member to write
+-- these once granted; it doesn't restrict which columns, only the GRANT
+-- does that.
+grant update (icon_url, name) on conversations to authenticated;
 
 create table messages (
   id uuid primary key default gen_random_uuid(),
@@ -821,4 +829,36 @@ create policy "Users can update their own cover" on storage.objects for update u
 );
 create policy "Users can delete their own cover" on storage.objects for delete using (
   bucket_id = 'covers' and auth.uid()::text = (storage.foldername(name))[1]
+);
+
+-- Different shape from avatars/covers: those are folder-scoped by the
+-- owning user's own uid, but a group icon has no single owner — any
+-- current member should be able to set it. Objects are stored at
+-- "<conversation_id>/<file>", so the check is membership in that specific
+-- group rather than auth.uid() matching the folder name.
+--
+-- storage.objects.name is schema-qualified below rather than bare `name` —
+-- conversations also has its own `name` column (the group's display name),
+-- and inside this subquery a bare `name` resolves to the nearer c.name
+-- instead of the file path, silently rejecting every upload.
+insert into storage.buckets (id, name, public) values ('group-icons', 'group-icons', true)
+on conflict (id) do nothing;
+create policy "Group icons are publicly viewable" on storage.objects for select using (bucket_id = 'group-icons');
+create policy "Group members can upload a group icon" on storage.objects for insert with check (
+  bucket_id = 'group-icons' and exists (
+    select 1 from conversations c where c.id::text = (storage.foldername(storage.objects.name))[1]
+      and c.is_group and auth.uid() = any(c.participant_ids)
+  )
+);
+create policy "Group members can update a group icon" on storage.objects for update using (
+  bucket_id = 'group-icons' and exists (
+    select 1 from conversations c where c.id::text = (storage.foldername(storage.objects.name))[1]
+      and c.is_group and auth.uid() = any(c.participant_ids)
+  )
+);
+create policy "Group members can delete a group icon" on storage.objects for delete using (
+  bucket_id = 'group-icons' and exists (
+    select 1 from conversations c where c.id::text = (storage.foldername(storage.objects.name))[1]
+      and c.is_group and auth.uid() = any(c.participant_ids)
+  )
 );

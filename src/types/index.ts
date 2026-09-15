@@ -31,7 +31,7 @@ export type ConversationStatus = 'pending' | 'accepted' | 'declined';
 
 export interface Conversation {
   id: string; participant_ids: string[]; last_message: string | null; last_message_at: string | null;
-  status: ConversationStatus; initiator_id: string; is_group: boolean; name: string | null;
+  status: ConversationStatus; initiator_id: string; is_group: boolean; name: string | null; icon_url: string | null;
 }
 
 export interface Message {

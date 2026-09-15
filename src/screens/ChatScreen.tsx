@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, TextInput, Pressable, Modal, Keyboard
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
@@ -11,28 +12,19 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
-import { markConversationRead } from '@/lib/conversations';
+import { markConversationRead, uploadGroupIcon } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
 import ActionSheet from '@/components/ActionSheet';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
+import { groupDisplayName } from '@/utils/groupDisplayName';
 import type { Conversation, Message, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Route = RouteProp<RootStackParamList, 'Chat'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
-
-// Falls back to a comma list of first names when a group has no name set —
-// same convention as Inbox's row label, trimmed so it doesn't run on
-// forever for a big group.
-function groupDisplayName(conversation: Conversation, members: Profile[]): string {
-  if (conversation.name) return conversation.name;
-  const names = members.map((m) => m.display_name.split(' ')[0]);
-  if (names.length <= 3) return names.join(', ');
-  return `${names.slice(0, 3).join(', ')} & ${names.length - 3} more`;
-}
 
 export default function ChatScreen() {
   const navigation = useNavigation<Nav>();
@@ -54,9 +46,38 @@ export default function ChatScreen() {
   const [optionsVisible, setOptionsVisible] = useState(false);
   const [blockConfirmVisible, setBlockConfirmVisible] = useState(false);
   const [membersModalVisible, setMembersModalVisible] = useState(false);
+  const [groupNameDraft, setGroupNameDraft] = useState('');
+  const [savingIcon, setSavingIcon] = useState(false);
   const listRef = useRef<FlatList>(null);
   const isGroup = conversation?.is_group ?? false;
   const memberById = useMemo(() => new Map(members.map((m) => [m.id, m])), [members]);
+
+  const openMembersModal = () => {
+    setGroupNameDraft(conversation?.name ?? '');
+    setMembersModalVisible(true);
+  };
+
+  const saveGroupName = async () => {
+    const trimmed = groupNameDraft.trim();
+    if (!conversation || trimmed === (conversation.name ?? '')) return;
+    const { error } = await supabase.from('conversations').update({ name: trimmed || null }).eq('id', conversationId);
+    if (error) { showToast('Couldn’t rename group — try again.', 'error'); return; }
+    setConversation((prev) => prev && { ...prev, name: trimmed || null });
+  };
+
+  const pickGroupIcon = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8, allowsEditing: true, aspect: [1, 1] });
+    if (result.canceled) return;
+    setSavingIcon(true);
+    try {
+      const iconUrl = await uploadGroupIcon(conversationId, result.assets[0].uri);
+      setConversation((prev) => prev && { ...prev, icon_url: iconUrl });
+    } catch {
+      showToast('Couldn’t update group photo — try again.', 'error');
+    } finally {
+      setSavingIcon(false);
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -170,13 +191,17 @@ export default function ChatScreen() {
           </Pressable>
           <Pressable
             style={styles.headerAuthorTap}
-            onPress={() => (isGroup ? setMembersModalVisible(true) : otherUserId && navigation.navigate('UserProfile', { userId: otherUserId }))}
-            accessibilityLabel={isGroup ? 'View group members' : `View ${otherUser?.display_name ?? 'their'} profile`}
+            onPress={() => (isGroup ? openMembersModal() : otherUserId && navigation.navigate('UserProfile', { userId: otherUserId }))}
+            accessibilityLabel={isGroup ? 'View group info' : `View ${otherUser?.display_name ?? 'their'} profile`}
           >
             {isGroup ? (
-              <View style={[styles.headerAvatar, styles.groupAvatar]}>
-                <Feather name="users" size={16} color={colors.teal} />
-              </View>
+              conversation?.icon_url ? (
+                <Image source={{ uri: conversation.icon_url }} style={styles.headerAvatar} transition={200} />
+              ) : (
+                <View style={[styles.headerAvatar, styles.groupAvatar]}>
+                  <Feather name="users" size={16} color={colors.teal} />
+                </View>
+              )
             ) : otherUser?.avatar_url ? (
               <Image source={{ uri: otherUser.avatar_url }} style={styles.headerAvatar} transition={200} />
             ) : (
@@ -289,7 +314,29 @@ export default function ChatScreen() {
         <Pressable style={styles.membersBackdrop} onPress={() => setMembersModalVisible(false)}>
           <Pressable style={[styles.membersCard, { paddingBottom: insets.bottom + spacing.md }]} onPress={(e) => e.stopPropagation()}>
             <View style={styles.membersHandle} />
-            <Text style={styles.membersTitle}>{conversation && groupDisplayName(conversation, members)}</Text>
+            <Pressable style={styles.groupIconEdit} onPress={pickGroupIcon} accessibilityLabel="Change group photo">
+              {conversation?.icon_url ? (
+                <Image source={{ uri: conversation.icon_url }} style={styles.groupIconEditImg} transition={200} />
+              ) : (
+                <View style={[styles.groupIconEditImg, styles.groupAvatar]}>
+                  <Feather name="users" size={22} color={colors.teal} />
+                </View>
+              )}
+              <View style={styles.groupIconEditBadge}>
+                {savingIcon ? <Feather name="loader" size={11} color="white" /> : <Feather name="camera" size={11} color="white" />}
+              </View>
+            </Pressable>
+            <View style={styles.groupNameRow}>
+              <TextInput
+                style={styles.groupNameInput}
+                placeholder="Name this group…"
+                placeholderTextColor={colors.inkSoft}
+                value={groupNameDraft}
+                onChangeText={setGroupNameDraft}
+                onBlur={saveGroupName}
+                onSubmitEditing={saveGroupName}
+              />
+            </View>
             <Text style={styles.membersSubtitle}>{members.length + 1} members</Text>
             <FlatList
               data={members}
@@ -365,8 +412,15 @@ function createStyles(colors: ColorTokens) {
     padding: spacing.lg, maxHeight: '70%',
   },
   membersHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.line, alignSelf: 'center', marginBottom: 14 },
-  membersTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 17, color: colors.ink },
-  membersSubtitle: { fontSize: 12, color: colors.inkSoft, marginTop: 2 },
+  groupIconEdit: { alignSelf: 'center' },
+  groupIconEditImg: { width: 64, height: 64, borderRadius: 32 },
+  groupIconEditBadge: {
+    position: 'absolute', bottom: -2, right: -2, width: 22, height: 22, borderRadius: 11,
+    backgroundColor: colors.ink, borderWidth: 2, borderColor: colors.sand, alignItems: 'center', justifyContent: 'center',
+  },
+  groupNameRow: { marginTop: 10 },
+  groupNameInput: { fontFamily: 'Fraunces_600SemiBold', fontSize: 17, color: colors.ink, textAlign: 'center', padding: 0 },
+  membersSubtitle: { fontSize: 12, color: colors.inkSoft, marginTop: 2, textAlign: 'center' },
   memberRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 9 },
   memberAvatar: { width: 42, height: 42, borderRadius: 21 },
   memberName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },

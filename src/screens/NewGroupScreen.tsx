@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, TextInput, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
@@ -9,7 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
-import { createGroupConversation } from '@/lib/conversations';
+import { createGroupConversation, uploadGroupIcon } from '@/lib/conversations';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
@@ -34,8 +35,14 @@ export default function NewGroupScreen() {
   const [loaded, setLoaded] = useState(false);
   const [query, setQuery] = useState('');
   const [groupName, setGroupName] = useState('');
+  const [iconUri, setIconUri] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [creating, setCreating] = useState(false);
+
+  const pickIcon = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8, allowsEditing: true, aspect: [1, 1] });
+    if (!result.canceled) setIconUri(result.assets[0].uri);
+  };
 
   useEffect(() => {
     if (!myId) return;
@@ -73,6 +80,12 @@ export default function NewGroupScreen() {
     setCreating(true);
     try {
       const conversationId = await createGroupConversation(myId, Array.from(selectedIds), groupName.trim() || null);
+      // The icon needs a conversation id for its storage path, so it can
+      // only upload after the group itself exists — a failure here shouldn't
+      // block the group from opening, just leave it iconless for now.
+      if (iconUri) {
+        try { await uploadGroupIcon(conversationId, iconUri); } catch { /* non-fatal */ }
+      }
       navigation.replace('Chat', { conversationId });
     } catch {
       showToast('Couldn’t create group — try again.', 'error');
@@ -88,6 +101,17 @@ export default function NewGroupScreen() {
         </Pressable>
         <Text style={styles.title}>New group</Text>
       </View>
+
+      <Pressable style={styles.iconPicker} onPress={pickIcon} accessibilityLabel="Set group photo">
+        {iconUri ? (
+          <Image source={{ uri: iconUri }} style={styles.iconPreview} transition={200} />
+        ) : (
+          <View style={[styles.iconPreview, styles.iconPlaceholder]}>
+            <Feather name="camera" size={20} color={colors.teal} />
+          </View>
+        )}
+        <Text style={styles.iconPickerText}>{iconUri ? 'Change group photo' : 'Add group photo'}</Text>
+      </Pressable>
 
       <TextInput
         style={styles.nameInput}
@@ -166,6 +190,10 @@ function createStyles(colors: ColorTokens) {
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 16, paddingHorizontal: spacing.lg },
   back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
+  iconPicker: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: spacing.lg, marginBottom: 14 },
+  iconPreview: { width: 56, height: 56, borderRadius: 28 },
+  iconPlaceholder: { backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  iconPickerText: { fontSize: 13, fontWeight: '700', color: colors.teal },
   nameInput: {
     marginHorizontal: spacing.lg, marginBottom: 10, backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line,
     borderRadius: radius.sm, paddingHorizontal: 16, paddingVertical: 12, fontSize: 14, color: colors.ink,
