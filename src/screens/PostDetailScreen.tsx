@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Animated, Share, TextInput, KeyboardAvoidingView, Platform, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Animated, Share, TextInput, KeyboardAvoidingView, Platform, Modal, InteractionManager } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -210,11 +210,18 @@ export default function PostDetailScreen() {
       }
       return;
     }
-    try {
-      await Share.share({ message });
-    } catch {
-      showToast('Couldn’t share — try again', 'error');
-    }
+    // This fires right as the ActionSheet's own Modal is still animating
+    // closed — on iOS, presenting the real OS share sheet mid-dismiss gets
+    // silently dropped (no error, no rejection, the sheet just never
+    // appears). InteractionManager alone isn't reliable here since that
+    // dismiss is a native transition, not a tracked JS interaction — so a
+    // short explicit delay (matching the Modal's own ~300ms fade-out) is
+    // what actually lets the share sheet open.
+    InteractionManager.runAfterInteractions(() => {
+      setTimeout(() => {
+        Share.share({ message }).catch(() => showToast('Couldn’t share — try again', 'error'));
+      }, 350);
+    });
   };
 
   const onMessage = async () => {
