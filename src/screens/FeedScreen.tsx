@@ -23,6 +23,33 @@ import type { RootStackParamList } from '@/navigation/RootNavigator';
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 const PAGE_SIZE = 20;
 const NUM_COLUMNS = 2;
+// How many recent posts to pull before ranking and trimming down to
+// PAGE_SIZE — has to be wider than the display count so a post that's a
+// couple of days old but well-matched/well-liked still has a chance to
+// outrank something brand new but low-engagement. Small enough not to
+// worry about at this app's current post volume.
+const RANKING_POOL_SIZE = 100;
+
+// Hand-tuned weights, not learned from any real usage data — there's no
+// event-tracking pipeline to learn from yet, so this is a heuristic scorer
+// that feels personal, not an actual recommender system. Recency and
+// popularity are continuous (recency in (0,1], popularity log-dampened so
+// one viral post can't bury everything else); interest/university match are
+// flat bonuses since "is this relevant to you" is more a yes/no than a
+// gradient.
+const RECENCY_WEIGHT = 3;
+const POPULARITY_WEIGHT = 1.5;
+const INTEREST_BONUS = 2.5;
+const UNIVERSITY_BONUS = 1;
+
+function scorePost(post: Post, viewerInterestLabels: Set<string>, viewerUniversity: string | null | undefined): number {
+  const ageHours = (Date.now() - new Date(post.created_at).getTime()) / (1000 * 60 * 60);
+  const recencyScore = 1 / (1 + ageHours / 24);
+  const popularityScore = Math.log10(post.like_count + 1);
+  const interestBonus = viewerInterestLabels.has(post.tag) ? INTEREST_BONUS : 0;
+  const universityBonus = viewerUniversity && post.author?.university === viewerUniversity ? UNIVERSITY_BONUS : 0;
+  return recencyScore * RECENCY_WEIGHT + popularityScore * POPULARITY_WEIGHT + interestBonus + universityBonus;
+}
 
 // Deterministic per-post hash (not random per render) so a card's image
 // height and gradient stay stable across refreshes/refetches instead of
@@ -74,12 +101,22 @@ export default function FeedScreen() {
       // indirect posts<->profiles path that makes the relationship ambiguous otherwise.
       .select('*, author:profiles!posts_author_id_fkey(*), community:communities(name)')
       .order('created_at', { ascending: false })
-      .limit(PAGE_SIZE);
+      .limit(RANKING_POOL_SIZE);
     if (tag) query = query.eq('tag', tag);
     const { data, error } = await query;
     if (error) { console.error('Failed to fetch posts:', error.message); return; }
-    setPosts((data as unknown as Post[]) ?? []);
-  }, []);
+    const pool = (data as unknown as Post[]) ?? [];
+
+    const viewerInterestLabels = new Set(
+      (profile?.interests ?? [])
+        .map((key) => INTEREST_OPTIONS.find((opt) => opt.key === key)?.label)
+        .filter((label): label is string => !!label)
+    );
+    const ranked = [...pool].sort(
+      (a, b) => scorePost(b, viewerInterestLabels, profile?.university) - scorePost(a, viewerInterestLabels, profile?.university)
+    );
+    setPosts(ranked.slice(0, PAGE_SIZE));
+  }, [profile]);
 
   const fetchMyCommunities = useCallback(async () => {
     const userId = session?.user.id;
