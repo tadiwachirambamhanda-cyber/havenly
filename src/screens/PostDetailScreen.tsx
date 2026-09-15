@@ -5,7 +5,6 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useVideoPlayer, VideoView } from 'expo-video';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -16,6 +15,7 @@ import { formatCount } from '@/utils/formatCount';
 import { findOrCreateConversation } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
+import PostVideoPlayer from '@/components/PostVideoPlayer';
 import { gradients, radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
@@ -24,16 +24,6 @@ import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Route = RouteProp<RootStackParamList, 'PostDetail'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
-
-// Paused until the viewer taps play (native controls) — no autoplay, so
-// opening a post never burns data on its own. This version of expo-video
-// has no poster-image prop, so the generated thumbnail is rendered as a
-// backdrop behind it (see the hero markup below) for the moment before the
-// player has a frame to show.
-function PostVideo({ uri }: { uri: string }) {
-  const player = useVideoPlayer(uri);
-  return <VideoView player={player} style={StyleSheet.absoluteFill} contentFit="cover" nativeControls />;
-}
 
 export default function PostDetailScreen() {
   const navigation = useNavigation<Nav>();
@@ -275,12 +265,13 @@ export default function PostDetailScreen() {
     <ScrollView>
       <View style={styles.hero}>
         <LinearGradient colors={[heroFrom, heroTo]} style={StyleSheet.absoluteFill} />
-        {post.image_url && (
+        {post.video_url ? (
+          <PostVideoPlayer uri={post.video_url} onDoubleTap={() => { playHeartPop(); setLikedState(true); }} />
+        ) : post.image_url ? (
           <Pressable style={StyleSheet.absoluteFill} onPress={handleImageTap}>
             <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
           </Pressable>
-        )}
-        {post.video_url && <PostVideo uri={post.video_url} />}
+        ) : null}
         <Animated.View
           pointerEvents="none"
           style={[styles.heartPop, { opacity: heartPopOpacity, transform: [{ scale: heartPopScale }] }]}

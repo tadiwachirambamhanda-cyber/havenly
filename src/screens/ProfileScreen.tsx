@@ -14,6 +14,7 @@ import { formatCount } from '@/utils/formatCount';
 import { radius, spacing, gradients } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
+import VideoThumb from '@/components/VideoThumb';
 import type { ColorTokens } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
 import { interestIcon } from '@/constants/topicIcons';
@@ -111,9 +112,13 @@ export default function ProfileScreen() {
         return (
           <Pressable style={styles.gridCell} onPress={() => navigation.navigate('PostDetail', { postId: item.id })}>
             <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
-            {item.image_url && <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />}
+            {item.video_url ? (
+              <VideoThumb uri={item.video_url} />
+            ) : item.image_url ? (
+              <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+            ) : null}
             {item.video_url && (
-              <View style={styles.gridPlayBadge}><Feather name="play" size={12} color="white" /></View>
+              <View style={styles.gridPlayBadge}><Feather name="volume-x" size={10} color="white" /></View>
             )}
           </Pressable>
         );

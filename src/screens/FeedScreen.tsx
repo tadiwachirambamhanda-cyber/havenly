@@ -14,6 +14,7 @@ import { communityIcon } from '@/constants/topicIcons';
 import { formatCount } from '@/utils/formatCount';
 import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
+import VideoThumb from '@/components/VideoThumb';
 import type { Community, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -114,14 +115,16 @@ export default function FeedScreen() {
       >
         <View style={[styles.cardImage, { height: imageHeight }]}>
           <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
-          {item.image_url ? (
+          {item.video_url ? (
+            <VideoThumb uri={item.video_url} />
+          ) : item.image_url ? (
             <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
           ) : null}
           {item.is_editorial && (
             <View style={styles.editorialBadge}><Text style={styles.editorialBadgeText}>★ Havenly Picks</Text></View>
           )}
           {item.video_url && (
-            <View style={styles.playBadge}><Feather name="play" size={14} color="white" /></View>
+            <View style={styles.muteBadge}><Feather name="volume-x" size={11} color="white" /></View>
           )}
         </View>
         <View style={styles.cardBody}>
@@ -245,8 +248,8 @@ function createStyles(colors: ColorTokens) {
   // dark mode and break the gold text's contrast, so this one stays literal.
   editorialBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: '#20261F', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 100 },
   editorialBadgeText: { color: colors.gold, fontSize: 9, fontWeight: '700' },
-  playBadge: {
-    position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: 13,
+  muteBadge: {
+    position: 'absolute', top: 8, right: 8, width: 22, height: 22, borderRadius: 11,
     backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center',
   },
   cardBody: { padding: 11 },

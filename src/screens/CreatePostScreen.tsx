@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, ActivityIndicator, Alert, PanResponder } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { Image } from 'expo-image';
@@ -11,6 +11,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { useConfirmDiscard } from '@/lib/useConfirmDiscard';
+import { uploadWithProgress } from '@/lib/uploadWithProgress';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
@@ -25,14 +26,69 @@ const TAG_OPTIONS = [
 ];
 const MAX_VIDEO_SECONDS = 60;
 
-async function uploadFile(bucket: string, uri: string, userId: string, fallbackExt: string, mimePrefix: string): Promise<string> {
+async function uploadFile(
+  bucket: string, uri: string, userId: string, fallbackExt: string, mimePrefix: string,
+  onProgress: (fraction: number) => void
+): Promise<string> {
   const ext = uri.split('.').pop()?.toLowerCase() || fallbackExt;
   const path = `${userId}/${Date.now()}.${ext}`;
   const arrayBuffer = await fetch(uri).then((r) => r.arrayBuffer());
   const contentType = ext === 'jpg' ? `${mimePrefix}/jpeg` : ext === 'mov' ? `${mimePrefix}/quicktime` : `${mimePrefix}/${ext}`;
-  const { error: uploadError } = await supabase.storage.from(bucket).upload(path, arrayBuffer, { contentType });
-  if (uploadError) throw uploadError;
+  await uploadWithProgress(bucket, path, arrayBuffer, contentType, onProgress);
   return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+}
+
+// Drag to scrub through the clip and pick which frame becomes the post's
+// cover — dx-based (not locationX-based) so a drag stays correct even once
+// the finger moves outside the track's own bounds, same pattern as
+// SwipeToAction's offset tracking.
+function CoverScrubber({
+  colors, durationMs, initialFraction, onSeek,
+}: {
+  colors: ColorTokens; durationMs: number; initialFraction: number; onSeek: (ms: number) => void;
+}) {
+  const styles = useMemo(() => createScrubberStyles(colors), [colors]);
+  const [trackWidth, setTrackWidth] = useState(1);
+  const [fraction, setFraction] = useState(initialFraction);
+  const fractionRef = useRef(initialFraction);
+  const startFractionRef = useRef(initialFraction);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => { startFractionRef.current = fractionRef.current; },
+      onPanResponderMove: (_, gesture) => {
+        const next = Math.min(1, Math.max(0, startFractionRef.current + gesture.dx / trackWidth));
+        fractionRef.current = next;
+        setFraction(next);
+      },
+      onPanResponderRelease: () => onSeek(Math.round(fractionRef.current * durationMs)),
+    })
+  ).current;
+
+  return (
+    <View
+      style={styles.track}
+      onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
+      {...panResponder.panHandlers}
+    >
+      <View style={styles.trackBg} />
+      <View style={[styles.trackFill, { width: `${fraction * 100}%` }]} />
+      <View style={[styles.thumb, { left: `${fraction * 100}%` }]} />
+    </View>
+  );
+}
+
+function createScrubberStyles(colors: ColorTokens) {
+  return StyleSheet.create({
+    track: { height: 28, justifyContent: 'center' },
+    trackBg: { height: 4, borderRadius: 2, backgroundColor: colors.sandDeep },
+    trackFill: { position: 'absolute', left: 0, height: 4, borderRadius: 2, backgroundColor: colors.coral },
+    thumb: {
+      position: 'absolute', width: 16, height: 16, borderRadius: 8, marginLeft: -8,
+      backgroundColor: colors.coral, borderWidth: 2, borderColor: colors.white,
+    },
+  });
 }
 
 export default function CreatePostScreen() {
@@ -47,10 +103,14 @@ export default function CreatePostScreen() {
   const [tag, setTag] = useState(TAG_OPTIONS[0]);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [videoUri, setVideoUri] = useState<string | null>(null);
+  const [videoDurationMs, setVideoDurationMs] = useState<number | null>(null);
+  const [coverTimeMs, setCoverTimeMs] = useState(100);
+  const [regeneratingCover, setRegeneratingCover] = useState(false);
   const [myCommunities, setMyCommunities] = useState<Community[]>([]);
   const [communityId, setCommunityId] = useState<string | null>(route.params?.communityId ?? null);
   const [publishing, setPublishing] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [posted, setPosted] = useState(false);
 
@@ -81,13 +141,31 @@ export default function CreatePostScreen() {
         const thumbnail = await VideoThumbnails.getThumbnailAsync(asset.uri, { time: 100 });
         setVideoUri(asset.uri);
         setImageUri(thumbnail.uri);
+        setVideoDurationMs(asset.duration ?? null);
+        setCoverTimeMs(100);
       } catch {
         setError('Couldn\'t process that video — try a different one.');
       }
     } else {
       setError(null);
       setVideoUri(null);
+      setVideoDurationMs(null);
       setImageUri(asset.uri);
+    }
+  };
+
+  const handleCoverSeek = async (ms: number) => {
+    if (!videoUri) return;
+    setCoverTimeMs(ms);
+    setRegeneratingCover(true);
+    try {
+      const thumbnail = await VideoThumbnails.getThumbnailAsync(videoUri, { time: Math.max(0, ms) });
+      setImageUri(thumbnail.uri);
+    } catch {
+      // Some frames (e.g. right at the very end) can fail to decode — just
+      // keep whatever cover was already showing rather than erroring out.
+    } finally {
+      setRegeneratingCover(false);
     }
   };
 
@@ -134,11 +212,13 @@ export default function CreatePostScreen() {
 
       if (imageUri) {
         setUploadStatus(videoUri ? 'Uploading thumbnail…' : 'Uploading photo…');
-        imageUrl = await uploadFile('post-images', imageUri, session.user.id, 'jpg', 'image');
+        setUploadProgress(0);
+        imageUrl = await uploadFile('post-images', imageUri, session.user.id, 'jpg', 'image', setUploadProgress);
       }
       if (videoUri) {
         setUploadStatus('Uploading video…');
-        videoUrl = await uploadFile('post-videos', videoUri, session.user.id, 'mp4', 'video');
+        setUploadProgress(0);
+        videoUrl = await uploadFile('post-videos', videoUri, session.user.id, 'mp4', 'video', setUploadProgress);
       }
 
       const { error: insertError } = await supabase.from('posts').insert({
@@ -161,6 +241,7 @@ export default function CreatePostScreen() {
     } finally {
       setPublishing(false);
       setUploadStatus(null);
+      setUploadProgress(0);
     }
   };
 
@@ -173,7 +254,14 @@ export default function CreatePostScreen() {
           {publishing ? <ActivityIndicator color={colors.coral} /> : <Text style={[styles.headerBtn, styles.postBtn]}>Post</Text>}
         </Pressable>
       </View>
-      {uploadStatus && <Text style={styles.uploadStatus}>{uploadStatus}</Text>}
+      {uploadStatus && (
+        <View style={styles.progressWrap}>
+          <Text style={styles.uploadStatus}>{uploadStatus} {Math.round(uploadProgress * 100)}%</Text>
+          <View style={styles.progressTrack}>
+            <View style={[styles.progressFill, { width: `${Math.max(4, uploadProgress * 100)}%` }]} />
+          </View>
+        </View>
+      )}
 
       <Pressable onPress={pickMedia} style={styles.imagePicker} accessibilityLabel="Add a photo or video">
         {imageUri ? (
@@ -182,11 +270,26 @@ export default function CreatePostScreen() {
             {videoUri && (
               <View style={styles.playBadge}><Feather name="play" size={16} color="white" /></View>
             )}
+            {regeneratingCover && (
+              <View style={styles.coverLoading}><ActivityIndicator color="white" /></View>
+            )}
           </>
         ) : (
           <Text style={styles.imagePickerText}>+ Add a photo or video</Text>
         )}
       </Pressable>
+
+      {videoUri && videoDurationMs != null && videoDurationMs > 0 && (
+        <View style={styles.scrubberSection}>
+          <Text style={styles.sectionLabel}>Cover</Text>
+          <CoverScrubber
+            colors={colors}
+            durationMs={videoDurationMs}
+            initialFraction={coverTimeMs / videoDurationMs}
+            onSeek={handleCoverSeek}
+          />
+        </View>
+      )}
 
       <TextInput
         style={styles.titleInput}
@@ -252,7 +355,10 @@ function createStyles(colors: ColorTokens) {
   headerTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 17, color: colors.ink },
   headerBtn: { fontSize: 14, fontWeight: '600', color: colors.inkSoft },
   postBtn: { color: colors.coral, fontWeight: '700' },
-  uploadStatus: { fontSize: 12, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginBottom: 8, textAlign: 'center' },
+  progressWrap: { paddingHorizontal: spacing.lg, marginBottom: 12, gap: 6 },
+  uploadStatus: { fontSize: 12, color: colors.inkSoft, textAlign: 'center' },
+  progressTrack: { height: 4, borderRadius: 2, backgroundColor: colors.sandDeep, overflow: 'hidden' },
+  progressFill: { height: '100%', borderRadius: 2, backgroundColor: colors.coral },
   imagePicker: {
     height: 200, marginHorizontal: spacing.lg, borderRadius: radius.md, backgroundColor: colors.sandDeep,
     alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.line, overflow: 'hidden',
@@ -262,6 +368,11 @@ function createStyles(colors: ColorTokens) {
     position: 'absolute', width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(0,0,0,0.55)',
     alignItems: 'center', justifyContent: 'center',
   },
+  coverLoading: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  scrubberSection: { marginTop: spacing.sm },
   titleInput: {
     marginHorizontal: spacing.lg, marginTop: spacing.md, backgroundColor: colors.white, borderWidth: 1,
     borderColor: colors.line, borderRadius: radius.sm, padding: 14, fontSize: 15, fontWeight: '600', color: colors.ink,

@@ -14,6 +14,7 @@ import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
 import { formatCount } from '@/utils/formatCount';
 import EmptyState from '@/components/EmptyState';
+import VideoThumb from '@/components/VideoThumb';
 import type { Community, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -157,9 +158,13 @@ export default function CommunityDetailScreen() {
             <Pressable key={post.id} style={styles.postCard} onPress={() => navigation.navigate('PostDetail', { postId: post.id })}>
               <View style={styles.postImage}>
                 <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
-                {post.image_url && <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />}
+                {post.video_url ? (
+                  <VideoThumb uri={post.video_url} />
+                ) : post.image_url ? (
+                  <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+                ) : null}
                 {post.video_url && (
-                  <View style={styles.playBadge}><Feather name="play" size={11} color="white" /></View>
+                  <View style={styles.playBadge}><Feather name="volume-x" size={9} color="white" /></View>
                 )}
               </View>
               <View style={{ flex: 1 }}>
