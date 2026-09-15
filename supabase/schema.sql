@@ -11,6 +11,10 @@ create table profiles (
   university text,
   interests text[] default '{}',
   has_completed_onboarding boolean not null default false,
+  -- Lets a small set of trusted accounts manage events (create/delete) from
+  -- inside the app. Defaults false; nobody has it except an explicit grant
+  -- (see README.md's "Getting started" for how to set the first one).
+  is_admin boolean not null default false,
   created_at timestamptz default now()
 );
 alter table profiles enable row level security;
@@ -456,6 +460,12 @@ create table events (
 );
 alter table events enable row level security;
 create policy "Events are viewable by everyone" on events for select using (true);
+create policy "Admins can create events" on events for insert with check (
+  exists (select 1 from profiles where id = auth.uid() and is_admin = true)
+);
+create policy "Admins can delete events" on events for delete using (
+  exists (select 1 from profiles where id = auth.uid() and is_admin = true)
+);
 
 -- Who's marked themselves interested in an event — lets Discover show a
 -- real count and cross-reference against `follows` to surface "people you

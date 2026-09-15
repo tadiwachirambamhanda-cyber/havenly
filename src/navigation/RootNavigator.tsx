@@ -20,6 +20,7 @@ import PostDetailScreen from '@/screens/PostDetailScreen';
 import CommunitiesScreen from '@/screens/CommunitiesScreen';
 import CommunityDetailScreen from '@/screens/CommunityDetailScreen';
 import CreatePostScreen from '@/screens/CreatePostScreen';
+import CreateEventScreen from '@/screens/CreateEventScreen';
 import BlockedUsersScreen from '@/screens/BlockedUsersScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
 import EditProfileScreen from '@/screens/EditProfileScreen';
@@ -35,6 +36,7 @@ export type RootStackParamList = {
   Communities: undefined;
   CommunityDetail: { communityId: string };
   CreatePost: { communityId?: string } | undefined;
+  CreateEvent: undefined;
   BlockedUsers: undefined;
   Settings: undefined;
   EditProfile: undefined;
@@ -102,6 +104,7 @@ export default function RootNavigator() {
             <Stack.Screen name="Communities" component={CommunitiesScreen} />
             <Stack.Screen name="CommunityDetail" component={CommunityDetailScreen} />
             <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ presentation: 'modal' }} />
+            <Stack.Screen name="CreateEvent" component={CreateEventScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="BlockedUsers" component={BlockedUsersScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ presentation: 'modal' }} />

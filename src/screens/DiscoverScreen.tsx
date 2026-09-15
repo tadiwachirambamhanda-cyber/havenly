@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, RefreshControl, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -22,8 +22,9 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 // Spots are still static mock content — PROJECT_BRIEF.md section 2 designs
 // this to eventually pull from Google Places API for live data. Search
 // still filters them for real, since that's real (if mock) data actually
-// on screen, not faked. Events are real now (see `events` table) — editorial
-// only, same as posts.is_editorial, so there's no in-app way to create one.
+// on screen, not faked. Events are real now (see `events` table) — only
+// profiles.is_admin accounts can create/delete them (Settings → Create
+// event), everyone else just views and marks interest.
 interface Spot { name: string; sub: string; }
 
 const SPOTS: Spot[] = [
@@ -44,7 +45,7 @@ function friendsGoingLabel(friends: Profile[]): string {
 
 export default function DiscoverScreen() {
   const navigation = useNavigation<Nav>();
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [query, setQuery] = useState('');
@@ -115,6 +116,19 @@ export default function DiscoverScreen() {
       });
     }
   }, [session, myInterestIds]);
+
+  const deleteEvent = useCallback((event: HavenlyEvent) => {
+    Alert.alert('Delete event?', `"${event.title}" will be removed for everyone.`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete', style: 'destructive',
+        onPress: async () => {
+          const { error } = await supabase.from('events').delete().eq('id', event.id);
+          if (!error) setEvents((prev) => prev?.filter((e) => e.id !== event.id) ?? prev);
+        },
+      },
+    ]);
+  }, []);
 
   const runSearch = useCallback(async (trimmed: string) => {
     const [{ data: postData }, { data: communityData }] = await Promise.all([
@@ -242,17 +256,29 @@ export default function DiscoverScreen() {
                     <Text style={styles.eventName}>{event.title}</Text>
                     <Text style={styles.eventLoc}>{event.location}</Text>
                   </View>
-                  <Pressable
-                    style={styles.interestBtn}
-                    onPress={() => toggleInterest(event.id)}
-                    hitSlop={8}
-                    accessibilityLabel={interested ? "Remove interest in this event" : "I'm interested in this event"}
-                  >
-                    <Feather name="heart" size={15} color={interested ? colors.coral : colors.inkSoft} />
-                    <Text style={[styles.interestCount, interested && styles.interestCountActive]}>
-                      {formatCount(event.interested_count)}
-                    </Text>
-                  </Pressable>
+                  <View style={styles.eventActions}>
+                    <Pressable
+                      style={styles.interestBtn}
+                      onPress={() => toggleInterest(event.id)}
+                      hitSlop={8}
+                      accessibilityLabel={interested ? "Remove interest in this event" : "I'm interested in this event"}
+                    >
+                      <Feather name="heart" size={15} color={interested ? colors.coral : colors.inkSoft} />
+                      <Text style={[styles.interestCount, interested && styles.interestCountActive]}>
+                        {formatCount(event.interested_count)}
+                      </Text>
+                    </Pressable>
+                    {profile?.is_admin && (
+                      <Pressable
+                        style={styles.deleteBtn}
+                        onPress={() => deleteEvent(event)}
+                        hitSlop={8}
+                        accessibilityLabel="Delete event"
+                      >
+                        <Feather name="trash-2" size={13} color={colors.inkSoft} />
+                      </Pressable>
+                    )}
+                  </View>
                 </View>
                 {friends.length > 0 && (
                   <View style={styles.friendsRow}>
@@ -324,9 +350,11 @@ function createStyles(colors: ColorTokens) {
   eventMonth: { fontSize: 8.5, textTransform: 'uppercase', fontWeight: '800', color: colors.teal },
   eventName: { fontSize: 12.5, fontWeight: '700', color: colors.ink },
   eventLoc: { fontSize: 10.5, color: colors.inkSoft, marginTop: 2 },
+  eventActions: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   interestBtn: { alignItems: 'center', gap: 2, paddingLeft: 4 },
   interestCount: { fontSize: 10, fontWeight: '700', color: colors.inkSoft },
   interestCountActive: { color: colors.coral },
+  deleteBtn: { padding: 4 },
   friendsRow: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.line,

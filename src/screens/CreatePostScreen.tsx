@@ -15,15 +15,12 @@ import { uploadWithProgress } from '@/lib/uploadWithProgress';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
+import { TAG_OPTIONS } from '@/constants/tags';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import type { Community } from '@/types';
 
 type Route = RouteProp<RootStackParamList, 'CreatePost'>;
 
-const TAG_OPTIONS = [
-  'Cafés', 'Fashion', 'Nightlife', 'Fitness', 'Beach Days', 'Study Spots', 'Travel', 'Events', 'Padel', 'Beauty',
-  'Football', 'Running', 'Art & Culture', 'Gaming',
-];
 const MAX_VIDEO_SECONDS = 60;
 
 async function uploadFile(

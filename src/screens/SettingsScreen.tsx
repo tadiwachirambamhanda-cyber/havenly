@@ -26,7 +26,7 @@ const MODE_OPTIONS: { key: ThemeMode; label: string; icon: keyof typeof Feather.
 export default function SettingsScreen() {
   const navigation = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
   const { colors, mode, setMode } = useTheme();
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -97,6 +97,16 @@ export default function SettingsScreen() {
         <Text style={styles.rowText}>Blocked accounts</Text>
         <Text style={styles.chevron}>›</Text>
       </Pressable>
+
+      {profile?.is_admin && (
+        <>
+          <View style={styles.divider} />
+          <Pressable style={styles.row} onPress={() => navigation.navigate('CreateEvent')}>
+            <Text style={styles.rowText}>Create event</Text>
+            <Text style={styles.chevron}>›</Text>
+          </Pressable>
+        </>
+      )}
 
       <View style={styles.divider} />
 

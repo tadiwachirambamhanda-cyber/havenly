@@ -30,7 +30,12 @@ npm install
    Nobody ever logs in as this account — the password just needs to exist.
    `supabase/migrations/20260912160509_seed_editorial_posts.sql` finds it by
    email, sets its display name/bio, and attaches the editorial posts to it.
-6. `npx expo start`
+6. Grant yourself (or whoever should manage events) admin access, so
+   Settings → Create event shows up:
+   ```sql
+   update profiles set is_admin = true where id = (select id from auth.users where email = '<your-email>');
+   ```
+7. `npx expo start`
 
 ## Priority order
 1. ~~Authentication (sign up/login/session)~~ — done: `src/lib/AuthContext.tsx`,
