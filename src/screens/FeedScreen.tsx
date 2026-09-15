@@ -338,9 +338,16 @@ export default function FeedScreen() {
           )}
           <Text style={styles.cardTitle} numberOfLines={3}>{item.title}</Text>
           <View style={styles.cardMeta}>
-            <Text style={styles.cardUser} numberOfLines={1}>
-              {item.is_editorial ? 'Havenly Editorial' : `@${item.author?.username ?? 'user'}`}
-            </Text>
+            <Pressable
+              style={styles.cardUserTap}
+              disabled={item.is_editorial}
+              onPress={() => navigation.navigate('UserProfile', { userId: item.author_id })}
+              hitSlop={4}
+            >
+              <Text style={styles.cardUser} numberOfLines={1}>
+                {item.is_editorial ? 'Havenly Editorial' : `@${item.author?.username ?? 'user'}`}
+              </Text>
+            </Pressable>
             <View style={styles.cardLikesRow}>
               <Feather name="heart" size={11} color={colors.inkSoft} />
               <Text style={styles.cardLikes}>{formatCount(item.like_count)}</Text>
@@ -556,7 +563,8 @@ function createStyles(colors: ColorTokens) {
   cardTag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 9.5, color: colors.teal, textTransform: 'uppercase' },
   cardTitle: { fontSize: 13.5, fontWeight: '700', marginTop: 5, color: colors.ink, lineHeight: 18 },
   cardMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 9 },
-  cardUser: { fontSize: 11, color: colors.inkSoft, fontWeight: '600', flex: 1 },
+  cardUserTap: { flex: 1 },
+  cardUser: { fontSize: 11, color: colors.inkSoft, fontWeight: '600' },
   cardLikesRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   cardLikes: { fontSize: 11, color: colors.inkSoft, fontWeight: '600' },
   });

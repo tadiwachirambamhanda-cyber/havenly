@@ -168,9 +168,16 @@ export default function CommunityDetailScreen() {
                 <Text style={styles.postTag}>{post.tag}</Text>
                 <Text style={styles.postTitle} numberOfLines={2}>{post.title}</Text>
                 <View style={styles.postMeta}>
-                  <Text style={styles.postUser} numberOfLines={1}>
-                    {post.is_editorial ? 'Havenly Editorial' : `@${post.author?.username ?? 'user'}`}
-                  </Text>
+                  <Pressable
+                    style={styles.postUserTap}
+                    disabled={post.is_editorial}
+                    onPress={() => navigation.navigate('UserProfile', { userId: post.author_id })}
+                    hitSlop={4}
+                  >
+                    <Text style={styles.postUser} numberOfLines={1}>
+                      {post.is_editorial ? 'Havenly Editorial' : `@${post.author?.username ?? 'user'}`}
+                    </Text>
+                  </Pressable>
                   <View style={styles.postLikes}>
                     <Feather name="heart" size={10} color={colors.inkSoft} />
                     <Text style={styles.postLikesText}>{formatCount(post.like_count)}</Text>
@@ -227,7 +234,8 @@ function createStyles(colors: ColorTokens) {
   postTag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 9, color: colors.teal, textTransform: 'uppercase' },
   postTitle: { fontSize: 13, fontWeight: '700', color: colors.ink, marginTop: 3, lineHeight: 17 },
   postMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 },
-  postUser: { fontSize: 10.5, color: colors.inkSoft, fontWeight: '600', flex: 1 },
+  postUserTap: { flex: 1 },
+  postUser: { fontSize: 10.5, color: colors.inkSoft, fontWeight: '600' },
   postLikes: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   postLikesText: { fontSize: 10.5, color: colors.inkSoft, fontWeight: '600' },
   });

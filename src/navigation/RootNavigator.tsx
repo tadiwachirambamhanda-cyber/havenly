@@ -16,6 +16,7 @@ import DiscoverScreen from '@/screens/DiscoverScreen';
 import InboxScreen from '@/screens/InboxScreen';
 import ChatScreen from '@/screens/ChatScreen';
 import ProfileScreen from '@/screens/ProfileScreen';
+import UserProfileScreen from '@/screens/UserProfileScreen';
 import PostDetailScreen from '@/screens/PostDetailScreen';
 import CommunitiesScreen from '@/screens/CommunitiesScreen';
 import CommunityDetailScreen from '@/screens/CommunityDetailScreen';
@@ -32,6 +33,7 @@ export type RootStackParamList = {
   Onboarding: undefined;
   MainTabs: undefined;
   PostDetail: { postId: string };
+  UserProfile: { userId: string };
   Chat: { conversationId: string; otherUserId: string };
   Communities: undefined;
   CommunityDetail: { communityId: string };
@@ -106,6 +108,7 @@ export default function RootNavigator() {
           <>
             <Stack.Screen name="MainTabs" component={MainTabs} />
             <Stack.Screen name="PostDetail" component={PostDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="UserProfile" component={UserProfileScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="Chat" component={ChatScreen} />
             <Stack.Screen name="Communities" component={CommunitiesScreen} />
             <Stack.Screen name="CommunityDetail" component={CommunityDetailScreen} />

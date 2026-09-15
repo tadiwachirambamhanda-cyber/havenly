@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
@@ -20,9 +21,10 @@ import type { Conversation, Message, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Route = RouteProp<RootStackParamList, 'Chat'>;
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function ChatScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const { conversationId, otherUserId } = route.params;
   const { session } = useAuth();
@@ -130,12 +132,18 @@ export default function ChatScreen() {
           <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
             <Feather name="arrow-left" size={16} color={colors.ink} />
           </Pressable>
-          {otherUser?.avatar_url ? (
-            <Image source={{ uri: otherUser.avatar_url }} style={styles.headerAvatar} transition={200} />
-          ) : (
-            <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.headerAvatar} />
-          )}
-          <Text style={styles.headerName}>{otherUser?.display_name ?? '…'}</Text>
+          <Pressable
+            style={styles.headerAuthorTap}
+            onPress={() => navigation.navigate('UserProfile', { userId: otherUserId })}
+            accessibilityLabel={`View ${otherUser?.display_name ?? 'their'} profile`}
+          >
+            {otherUser?.avatar_url ? (
+              <Image source={{ uri: otherUser.avatar_url }} style={styles.headerAvatar} transition={200} />
+            ) : (
+              <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.headerAvatar} />
+            )}
+            <Text style={styles.headerName}>{otherUser?.display_name ?? '…'}</Text>
+          </Pressable>
           <View style={{ flex: 1 }} />
           <Pressable style={styles.overflow} onPress={openOptions} accessibilityLabel="More options">
             <Feather name="more-horizontal" size={18} color={colors.ink} />
@@ -218,6 +226,7 @@ function createStyles(colors: ColorTokens) {
   },
   back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
   overflow: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  headerAuthorTap: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   headerAvatar: { width: 34, height: 34, borderRadius: 17 },
   headerName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   bubble: { maxWidth: '75%', padding: 12, borderRadius: 18 },

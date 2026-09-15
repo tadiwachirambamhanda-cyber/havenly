@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, ActivityIndicator, RefreshControl } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
@@ -16,6 +17,7 @@ import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type FollowTab = 'followers' | 'following';
 type Rt = RouteProp<RootStackParamList, 'FollowList'>;
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 const TABS: { key: FollowTab; label: string }[] = [
   { key: 'followers', label: 'Followers' },
@@ -23,7 +25,7 @@ const TABS: { key: FollowTab; label: string }[] = [
 ];
 
 export default function FollowListScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<Nav>();
   const route = useRoute<Rt>();
   const { userId, initialTab, displayName } = route.params;
   const { session } = useAuth();
@@ -106,15 +108,21 @@ export default function FollowListScreen() {
             const isFollowing = myFollowingIds.has(item.id);
             return (
               <View style={styles.row}>
-                {item.avatar_url ? (
-                  <Image source={{ uri: item.avatar_url }} style={styles.avatar} transition={200} />
-                ) : (
-                  <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
-                )}
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.name}>{item.display_name}</Text>
-                  <Text style={styles.handle}>@{item.username}{item.university ? ` · ${item.university}` : ''}</Text>
-                </View>
+                <Pressable
+                  style={styles.rowAuthorTap}
+                  onPress={() => navigation.navigate('UserProfile', { userId: item.id })}
+                  accessibilityLabel={`View ${item.display_name}'s profile`}
+                >
+                  {item.avatar_url ? (
+                    <Image source={{ uri: item.avatar_url }} style={styles.avatar} transition={200} />
+                  ) : (
+                    <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+                  )}
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.name}>{item.display_name}</Text>
+                    <Text style={styles.handle}>@{item.username}{item.university ? ` · ${item.university}` : ''}</Text>
+                  </View>
+                </Pressable>
                 {!isMe && (
                   <Pressable
                     style={[styles.followBtn, isFollowing && styles.followBtnActive]}
@@ -150,6 +158,7 @@ function createStyles(colors: ColorTokens) {
   tabTextActive: { color: colors.ink },
   tabUnderline: { position: 'absolute', bottom: -1, height: 2, width: '40%', backgroundColor: colors.ink, borderRadius: 1 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  rowAuthorTap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },
   avatar: { width: 44, height: 44, borderRadius: 22 },
   name: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   handle: { fontSize: 11.5, color: colors.inkSoft, fontFamily: 'JetBrainsMono_500Medium', marginTop: 2 },

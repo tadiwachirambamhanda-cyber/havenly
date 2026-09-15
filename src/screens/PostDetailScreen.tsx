@@ -252,6 +252,7 @@ export default function PostDetailScreen() {
     <Pressable
       key={comment.id}
       style={styles.commentRow}
+      onPress={() => navigation.navigate('UserProfile', { userId: comment.author_id })}
       onLongPress={() => comment.author_id === session?.user.id && deleteComment(comment)}
     >
       {comment.author?.avatar_url ? (
@@ -307,14 +308,21 @@ export default function PostDetailScreen() {
         <View style={[styles.videoBottomRow, { paddingBottom: insets.bottom + 20 }]}>
           <View style={styles.videoInfo}>
             <View style={styles.videoUserRow}>
-              {post.author?.avatar_url ? (
-                <Image source={{ uri: post.author.avatar_url }} style={styles.videoAvatar} transition={200} />
-              ) : (
-                <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.videoAvatar} />
-              )}
-              <Text style={styles.videoUsername} numberOfLines={1}>
-                {post.is_editorial ? 'Havenly Editorial' : `@${post.author?.username ?? 'user'}`}
-              </Text>
+              <Pressable
+                style={styles.videoAuthorTap}
+                disabled={post.is_editorial}
+                onPress={() => navigation.navigate('UserProfile', { userId: post.author_id })}
+                accessibilityLabel={`View @${post.author?.username ?? 'user'}'s profile`}
+              >
+                {post.author?.avatar_url ? (
+                  <Image source={{ uri: post.author.avatar_url }} style={styles.videoAvatar} transition={200} />
+                ) : (
+                  <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.videoAvatar} />
+                )}
+                <Text style={styles.videoUsername} numberOfLines={1}>
+                  {post.is_editorial ? 'Havenly Editorial' : `@${post.author?.username ?? 'user'}`}
+                </Text>
+              </Pressable>
               {!isOwnPost && (
                 <Pressable
                   style={[styles.videoFollowBtn, following && styles.videoFollowBtnActive]}
@@ -451,15 +459,22 @@ export default function PostDetailScreen() {
         <Text style={styles.title}>{post.title}</Text>
 
         <View style={styles.userRow}>
-          {post.author?.avatar_url ? (
-            <Image source={{ uri: post.author.avatar_url }} style={styles.avatar} transition={200} />
-          ) : (
-            <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
-          )}
-          <View style={{ flex: 1 }}>
-            <Text style={styles.username}>{post.is_editorial ? 'Havenly Editorial' : `@${post.author?.username ?? 'user'}`}</Text>
-            <Text style={styles.meta}>{timeAgo(post.created_at)}</Text>
-          </View>
+          <Pressable
+            style={styles.authorTap}
+            disabled={post.is_editorial}
+            onPress={() => navigation.navigate('UserProfile', { userId: post.author_id })}
+            accessibilityLabel={`View @${post.author?.username ?? 'user'}'s profile`}
+          >
+            {post.author?.avatar_url ? (
+              <Image source={{ uri: post.author.avatar_url }} style={styles.avatar} transition={200} />
+            ) : (
+              <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+            )}
+            <View style={{ flex: 1 }}>
+              <Text style={styles.username}>{post.is_editorial ? 'Havenly Editorial' : `@${post.author?.username ?? 'user'}`}</Text>
+              <Text style={styles.meta}>{timeAgo(post.created_at)}</Text>
+            </View>
+          </Pressable>
           {!isOwnPost && (
             <View style={{ flexDirection: 'row', gap: 8 }}>
               <Pressable style={styles.messageBtn} onPress={onMessage} accessibilityLabel="Message this user">
@@ -570,6 +585,7 @@ function createStyles(colors: ColorTokens) {
   tag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 10.5, color: colors.teal, textTransform: 'uppercase' },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 22, color: colors.ink, marginTop: 8, lineHeight: 28 },
   userRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginVertical: 14 },
+  authorTap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
   avatar: { width: 32, height: 32, borderRadius: 16 },
   username: { fontSize: 13, fontWeight: '700', color: colors.ink },
   meta: { fontSize: 11, color: colors.inkSoft },
@@ -613,6 +629,7 @@ function createStyles(colors: ColorTokens) {
   },
   videoInfo: { flex: 1, gap: 2 },
   videoUserRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
+  videoAuthorTap: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
   videoAvatar: { width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: 'white' },
   videoUsername: { fontSize: 13.5, fontWeight: '700', color: 'white', flexShrink: 1 },
   videoFollowBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.pill, borderWidth: 1.5, borderColor: 'white' },
