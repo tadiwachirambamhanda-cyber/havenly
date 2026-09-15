@@ -68,6 +68,17 @@ function estimateCardHeight(post: Post, imageHeight: number): number {
   return imageHeight + 64 + titleLines * 18;
 }
 
+// Deterministically picks one post out of a candidate pool from a seed —
+// stable for as long as the seed is (a day + this viewer's id), so the same
+// person sees the same pick all day and it changes at midnight, but two
+// different viewers most likely land on two different posts instead of
+// everyone piling onto the single highest-ranked one. Not randomness at
+// render time, which would reshuffle on every refresh.
+function pickDailyPost(candidates: Post[], seed: string): Post | null {
+  if (candidates.length === 0) return null;
+  return candidates[hashString(seed) % candidates.length];
+}
+
 // True masonry: each post gets a deterministic (not fixed) image height,
 // then a greedy shortest-column-first pass balances posts across columns by
 // estimated total height — plain FlatList numColumns forces equal-height
@@ -251,6 +262,16 @@ export default function FeedScreen() {
   const trendingColumns = useMemo(() => balanceColumns(trendingPosts), [trendingPosts]);
   const communityColumns = useMemo(() => balanceColumns(communityPosts), [communityPosts]);
 
+  // Prefers the trending pool (already popularity-sorted within the
+  // viewer's top interest) over the blended "Picked for you" ranking, so
+  // the daily pick skews toward what they actually care about rather than
+  // whatever the recency/popularity blend happens to surface.
+  const dailyPick = useMemo(() => {
+    const candidates = trendingPosts.length > 0 ? trendingPosts : posts;
+    const daySeed = new Date().toISOString().slice(0, 10);
+    return pickDailyPost(candidates, `${daySeed}:${session?.user.id ?? 'anon'}`);
+  }, [trendingPosts, posts, session]);
+
   // sectionKey distinguishes the same post rendered in more than one
   // section at once (see checkVideoVisibility) — doesn't need to be
   // anything but stable and unique per section.
@@ -425,6 +446,26 @@ export default function FeedScreen() {
           <EmptyState icon="image" text="Nothing here yet — be the first to post." />
         ) : (
           <>
+            {dailyPick && (
+              <Pressable
+                style={styles.dailyPickCard}
+                onPress={() => navigation.navigate('PostDetail', { postId: dailyPick.id })}
+              >
+                {dailyPick.image_url ? (
+                  <Image source={{ uri: dailyPick.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+                ) : (
+                  <LinearGradient colors={gradients[hashString(dailyPick.id) % gradients.length]} style={StyleSheet.absoluteFill} />
+                )}
+                <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={StyleSheet.absoluteFill} />
+                <View style={styles.dailyPickBody}>
+                  <Text style={styles.dailyPickEyebrow}>★ Today's pick</Text>
+                  <Text style={styles.dailyPickTitle} numberOfLines={2}>{dailyPick.title}</Text>
+                  <Text style={styles.dailyPickMeta}>
+                    {dailyPick.tag} · {dailyPick.is_editorial ? 'Havenly Editorial' : `@${dailyPick.author?.username ?? 'user'}`}
+                  </Text>
+                </View>
+              </Pressable>
+            )}
             {posts.length > 0 && renderSection('Picked for you', pickedColumns, 'picked')}
             {topInterestLabel && trendingPosts.length > 0 && renderSection(`Trending in ${topInterestLabel}`, trendingColumns, 'trending')}
             {communityPosts.length > 0 && renderSection('New in your communities', communityColumns, 'community')}
@@ -464,6 +505,17 @@ function createStyles(colors: ColorTokens) {
     fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
     fontWeight: '600', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
   },
+  dailyPickCard: {
+    marginHorizontal: spacing.lg, marginTop: spacing.sm, marginBottom: spacing.md,
+    height: 190, borderRadius: radius.lg, overflow: 'hidden', justifyContent: 'flex-end',
+  },
+  dailyPickBody: { padding: spacing.lg },
+  // Literal white/gold regardless of theme — this card is always a photo or
+  // gradient with a dark overlay gradient under it, same reasoning as the
+  // full-screen video layout's own white text.
+  dailyPickEyebrow: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 10.5, color: colors.gold, textTransform: 'uppercase', fontWeight: '700', marginBottom: 6 },
+  dailyPickTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: 'white', lineHeight: 24 },
+  dailyPickMeta: { fontSize: 11.5, color: 'rgba(255,255,255,0.8)', fontWeight: '600', marginTop: 6 },
   masonryRow: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.lg },
   masonryColumn: { flex: 1, gap: spacing.sm },
   card: { borderRadius: radius.md, overflow: 'hidden', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },

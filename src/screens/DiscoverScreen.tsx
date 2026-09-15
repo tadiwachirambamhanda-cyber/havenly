@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -12,10 +12,11 @@ import { haptics } from '@/lib/haptics';
 import { formatCount } from '@/utils/formatCount';
 import { radius, spacing, gradients } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
-import { communityIcon } from '@/constants/topicIcons';
+import { communityIcon, interestIcon } from '@/constants/topicIcons';
+import { INTEREST_OPTIONS } from '@/constants/interests';
 import EmptyState from '@/components/EmptyState';
 import ActionSheet from '@/components/ActionSheet';
-import type { Community, HavenlyEvent, Post, Profile } from '@/types';
+import type { Community, HavenlyEvent, Interest, Post, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -46,7 +47,7 @@ function friendsGoingLabel(friends: Profile[]): string {
 
 export default function DiscoverScreen() {
   const navigation = useNavigation<Nav>();
-  const { session, profile } = useAuth();
+  const { session, profile, refreshProfile } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [query, setQuery] = useState('');
@@ -56,6 +57,24 @@ export default function DiscoverScreen() {
   const [myInterestIds, setMyInterestIds] = useState<Set<string>>(new Set());
   const [friendsGoing, setFriendsGoing] = useState<Map<string, Profile[]>>(new Map());
   const [refreshing, setRefreshing] = useState(false);
+  const [addingInterest, setAddingInterest] = useState<Interest | null>(null);
+
+  // Lets Discover double as a lightweight way to grow your interests beyond
+  // what you picked at onboarding — searching a topic or browsing "More
+  // interests to explore" both write straight to profiles.interests, same
+  // column Edit Profile's full picker edits. The Feed (filter chips, the
+  // ranking bonus, "Trending in X") all read that same column, so this
+  // takes effect there immediately without any extra wiring.
+  const toggleProfileInterest = useCallback(async (key: Interest) => {
+    if (!session?.user.id || !profile) return;
+    haptics.tap();
+    setAddingInterest(key);
+    const has = profile.interests.includes(key);
+    const nextInterests = has ? profile.interests.filter((k) => k !== key) : [...profile.interests, key];
+    const { error } = await supabase.from('profiles').update({ interests: nextInterests }).eq('id', session.user.id);
+    if (!error) await refreshProfile();
+    setAddingInterest(null);
+  }, [session, profile, refreshProfile]);
 
   const loadEvents = useCallback(async () => {
     const { data: eventData } = await supabase.from('events').select('*')
@@ -157,8 +176,13 @@ export default function DiscoverScreen() {
   const filteredSpots = isSearching ? SPOTS.filter((s) => s.name.toLowerCase().includes(trimmed)) : SPOTS;
   const eventList = events ?? [];
   const filteredEvents = isSearching ? eventList.filter((e) => e.title.toLowerCase().includes(trimmed)) : eventList;
+  const matchedInterests = isSearching ? INTEREST_OPTIONS.filter((opt) => opt.label.toLowerCase().includes(trimmed)) : [];
+  // Only what's not already picked — once added, an interest naturally
+  // drops off this row on its own (profile.interests now includes it).
+  const exploreInterests = INTEREST_OPTIONS.filter((opt) => !profile?.interests.includes(opt.key));
   const noResults = isSearching && posts !== null && communities !== null
-    && posts.length === 0 && communities.length === 0 && filteredSpots.length === 0 && filteredEvents.length === 0;
+    && posts.length === 0 && communities.length === 0 && filteredSpots.length === 0 && filteredEvents.length === 0
+    && matchedInterests.length === 0;
 
   return (
     <>
@@ -187,6 +211,62 @@ export default function DiscoverScreen() {
       </View>
 
       {noResults && <EmptyState icon="search" text={`No results for "${query.trim()}"`} />}
+
+      {isSearching && matchedInterests.length > 0 && (
+        <>
+          <Text style={styles.sectionLabel}>Interests</Text>
+          {matchedInterests.map((opt) => {
+            const added = profile?.interests.includes(opt.key) ?? false;
+            return (
+              <View key={opt.key} style={styles.resultRow}>
+                <View style={styles.resultIcon}><Feather name={interestIcon(opt.key)} size={15} color={colors.coral} /></View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.resultTitle}>{opt.label}</Text>
+                  <Text style={styles.resultSub}>Interest</Text>
+                </View>
+                <Pressable
+                  style={[styles.addInterestBtn, added && styles.addInterestBtnAdded]}
+                  onPress={() => toggleProfileInterest(opt.key)}
+                  disabled={addingInterest === opt.key}
+                  accessibilityLabel={added ? `Remove ${opt.label} from your interests` : `Add ${opt.label} to your interests`}
+                >
+                  {addingInterest === opt.key ? (
+                    <ActivityIndicator size="small" color={added ? colors.inkSoft : colors.coral} />
+                  ) : (
+                    <Text style={[styles.addInterestBtnText, added && styles.addInterestBtnTextAdded]}>{added ? 'Added ✓' : '+ Add'}</Text>
+                  )}
+                </Pressable>
+              </View>
+            );
+          })}
+        </>
+      )}
+
+      {!isSearching && exploreInterests.length > 0 && (
+        <>
+          <Text style={styles.sectionLabel}>More interests to explore</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.exploreInterestsRow}>
+            {exploreInterests.map((opt) => (
+              <Pressable
+                key={opt.key}
+                style={styles.exploreInterestChip}
+                onPress={() => toggleProfileInterest(opt.key)}
+                disabled={addingInterest === opt.key}
+                accessibilityLabel={`Add ${opt.label} to your interests`}
+              >
+                {addingInterest === opt.key ? (
+                  <ActivityIndicator size="small" color={colors.ink} />
+                ) : (
+                  <>
+                    <Feather name={interestIcon(opt.key)} size={13} color={colors.ink} />
+                    <Text style={styles.exploreInterestChipText}>{opt.label}</Text>
+                  </>
+                )}
+              </Pressable>
+            ))}
+          </ScrollView>
+        </>
+      )}
 
       {isSearching && posts !== null && posts.length > 0 && (
         <>
@@ -342,6 +422,19 @@ function createStyles(colors: ColorTokens) {
   resultIcon: { width: 32, alignItems: 'center' },
   resultTitle: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   resultSub: { fontSize: 11, color: colors.inkSoft, marginTop: 2 },
+  addInterestBtn: {
+    paddingVertical: 7, paddingHorizontal: 12, borderRadius: radius.pill,
+    borderWidth: 1.5, borderColor: colors.coral, minWidth: 66, alignItems: 'center',
+  },
+  addInterestBtnAdded: { borderColor: colors.line, backgroundColor: colors.sandDeep },
+  addInterestBtnText: { fontSize: 11.5, fontWeight: '700', color: colors.coral },
+  addInterestBtnTextAdded: { color: colors.inkSoft },
+  exploreInterestsRow: { gap: 8, paddingHorizontal: spacing.lg, paddingBottom: 4 },
+  exploreInterestChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.white, borderWidth: 1.5,
+    borderColor: colors.line, borderRadius: radius.pill, paddingVertical: 9, paddingHorizontal: 14,
+  },
+  exploreInterestChipText: { fontSize: 12.5, fontWeight: '600', color: colors.ink },
   spotScroll: { gap: spacing.md, paddingHorizontal: spacing.lg, paddingBottom: 4 },
   spotCard: { width: 150, borderRadius: radius.md, overflow: 'hidden', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   spotImage: { height: 100, width: '100%' },
