@@ -11,7 +11,14 @@
       "bundleIdentifier": "com.havenly.app"
     },
     "android": {
-      "package": "com.havenly.app"
+      "package": "com.havenly.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FF5A3C"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
     },
     "extra": {
       "supabaseUrl": "https://xygkeodsjpaobnpjtkiz.supabase.co",
