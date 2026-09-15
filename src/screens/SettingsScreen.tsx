@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,6 +14,7 @@ import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import { deleteOwnAccount } from '@/lib/account';
+import ActionSheet from '@/components/ActionSheet';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -31,37 +32,23 @@ export default function SettingsScreen() {
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [deleting, setDeleting] = useState(false);
+  const [logoutConfirmVisible, setLogoutConfirmVisible] = useState(false);
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
 
-  const handleLogout = () => {
-    Alert.alert('Log out?', undefined, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Log out', style: 'destructive', onPress: () => supabase.auth.signOut() },
-    ]);
-  };
+  const handleLogout = () => setLogoutConfirmVisible(true);
+  const confirmLogout = () => supabase.auth.signOut();
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = () => setDeleteConfirmVisible(true);
+  const confirmDeleteAccount = async () => {
     const userId = session?.user.id;
     if (!userId) return;
-    Alert.alert(
-      'Delete your account?',
-      'This permanently deletes your profile, posts, comments, and messages. This can’t be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete account',
-          style: 'destructive',
-          onPress: async () => {
-            setDeleting(true);
-            try {
-              await deleteOwnAccount(userId);
-            } catch (e) {
-              setDeleting(false);
-              showToast(e instanceof Error ? e.message : 'Couldn’t delete your account. Please try again.', 'error');
-            }
-          },
-        },
-      ]
-    );
+    setDeleting(true);
+    try {
+      await deleteOwnAccount(userId);
+    } catch (e) {
+      setDeleting(false);
+      showToast(e instanceof Error ? e.message : 'Couldn’t delete your account. Please try again.', 'error');
+    }
   };
 
   return (
@@ -120,6 +107,20 @@ export default function SettingsScreen() {
         <Text style={[styles.rowText, styles.deleteText]}>Delete account</Text>
         {deleting && <ActivityIndicator color={colors.coral} size="small" />}
       </Pressable>
+
+      <ActionSheet
+        visible={logoutConfirmVisible}
+        onClose={() => setLogoutConfirmVisible(false)}
+        title="Log out?"
+        actions={[{ label: 'Log out', destructive: true, onPress: confirmLogout }]}
+      />
+      <ActionSheet
+        visible={deleteConfirmVisible}
+        onClose={() => setDeleteConfirmVisible(false)}
+        title="Delete your account?"
+        message="This permanently deletes your profile, posts, comments, and messages. This can’t be undone."
+        actions={[{ label: 'Delete account', destructive: true, onPress: confirmDeleteAccount }]}
+      />
     </View>
   );
 }

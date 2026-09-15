@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,6 +12,7 @@ import { haptics } from '@/lib/haptics';
 import { markConversationRead } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
+import ActionSheet from '@/components/ActionSheet';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
@@ -35,6 +36,8 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [optionsVisible, setOptionsVisible] = useState(false);
+  const [blockConfirmVisible, setBlockConfirmVisible] = useState(false);
   const listRef = useRef<FlatList>(null);
 
   useEffect(() => {
@@ -89,35 +92,20 @@ export default function ChatScreen() {
     if (status === 'declined') navigation.goBack();
   };
 
-  const handleBlock = () => {
+  const handleBlock = () => setBlockConfirmVisible(true);
+
+  const confirmBlock = async () => {
     if (!myId) return;
-    Alert.alert(
-      `Block @${otherUser?.username ?? 'this user'}?`,
-      'They won\'t be able to message you or see each other\'s posts anymore.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Block', style: 'destructive', onPress: async () => {
-            try {
-              await blockUser(myId, otherUserId);
-              haptics.success();
-              navigation.goBack();
-            } catch (e) {
-              showToast(e instanceof Error ? e.message : 'Couldn’t block. Try again.', 'error');
-            }
-          },
-        },
-      ]
-    );
+    try {
+      await blockUser(myId, otherUserId);
+      haptics.success();
+      navigation.goBack();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Couldn’t block. Try again.', 'error');
+    }
   };
 
-  const openOptions = () => {
-    Alert.alert('', undefined, [
-      { text: 'Report user', onPress: () => setReportModalVisible(true) },
-      { text: `Block @${otherUser?.username ?? 'user'}`, style: 'destructive', onPress: handleBlock },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
-  };
+  const openOptions = () => setOptionsVisible(true);
 
   const handleReportSubmit = async (reason: string) => {
     setReportModalVisible(false);
@@ -202,6 +190,21 @@ export default function ChatScreen() {
         )}
       </View>
       <ReportModal visible={reportModalVisible} onClose={() => setReportModalVisible(false)} onSubmit={handleReportSubmit} />
+      <ActionSheet
+        visible={optionsVisible}
+        onClose={() => setOptionsVisible(false)}
+        actions={[
+          { label: 'Report user', onPress: () => setReportModalVisible(true) },
+          { label: `Block @${otherUser?.username ?? 'user'}`, destructive: true, onPress: handleBlock },
+        ]}
+      />
+      <ActionSheet
+        visible={blockConfirmVisible}
+        onClose={() => setBlockConfirmVisible(false)}
+        title={`Block @${otherUser?.username ?? 'this user'}?`}
+        message="They won't be able to message you or see each other's posts anymore."
+        actions={[{ label: 'Block', destructive: true, onPress: confirmBlock }]}
+      />
     </KeyboardAvoidingView>
   );
 }

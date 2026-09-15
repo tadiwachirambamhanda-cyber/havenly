@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, ActivityIndicator, Alert, PanResponder } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, ActivityIndicator, PanResponder } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { Image } from 'expo-image';
@@ -16,6 +16,7 @@ import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
 import { TAG_OPTIONS } from '@/constants/tags';
+import ActionSheet from '@/components/ActionSheet';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import type { Community } from '@/types';
 
@@ -110,6 +111,7 @@ export default function CreatePostScreen() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [posted, setPosted] = useState(false);
+  const [mediaPickerVisible, setMediaPickerVisible] = useState(false);
 
   useConfirmDiscard(!posted && (title.trim() !== '' || body.trim() !== '' || imageUri !== null || videoUri !== null));
 
@@ -189,13 +191,7 @@ export default function CreatePostScreen() {
     await handlePickerResult(result);
   };
 
-  const pickMedia = () => {
-    Alert.alert('Add to your post', undefined, [
-      { text: 'Take Photo or Video', onPress: captureFromCamera },
-      { text: 'Choose from Library', onPress: pickFromLibrary },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
-  };
+  const pickMedia = () => setMediaPickerVisible(true);
 
   const publish = async () => {
     setError(null);
@@ -243,6 +239,7 @@ export default function CreatePostScreen() {
   };
 
   return (
+    <>
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
       <View style={styles.header}>
         <Pressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></Pressable>
@@ -339,6 +336,16 @@ export default function CreatePostScreen() {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </ScrollView>
+    <ActionSheet
+      visible={mediaPickerVisible}
+      onClose={() => setMediaPickerVisible(false)}
+      title="Add to your post"
+      actions={[
+        { label: 'Take Photo or Video', onPress: captureFromCamera },
+        { label: 'Choose from Library', onPress: pickFromLibrary },
+      ]}
+    />
+    </>
   );
 }
 

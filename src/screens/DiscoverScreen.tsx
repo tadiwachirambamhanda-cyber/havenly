@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, RefreshControl, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -14,6 +14,7 @@ import { radius, spacing, gradients } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
 import EmptyState from '@/components/EmptyState';
+import ActionSheet from '@/components/ActionSheet';
 import type { Community, HavenlyEvent, Post, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -117,18 +118,16 @@ export default function DiscoverScreen() {
     }
   }, [session, myInterestIds]);
 
-  const deleteEvent = useCallback((event: HavenlyEvent) => {
-    Alert.alert('Delete event?', `"${event.title}" will be removed for everyone.`, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete', style: 'destructive',
-        onPress: async () => {
-          const { error } = await supabase.from('events').delete().eq('id', event.id);
-          if (!error) setEvents((prev) => prev?.filter((e) => e.id !== event.id) ?? prev);
-        },
-      },
-    ]);
-  }, []);
+  const [deleteEventTarget, setDeleteEventTarget] = useState<HavenlyEvent | null>(null);
+
+  const deleteEvent = useCallback((event: HavenlyEvent) => setDeleteEventTarget(event), []);
+
+  const confirmDeleteEvent = useCallback(async () => {
+    const event = deleteEventTarget;
+    if (!event) return;
+    const { error } = await supabase.from('events').delete().eq('id', event.id);
+    if (!error) setEvents((prev) => prev?.filter((e) => e.id !== event.id) ?? prev);
+  }, [deleteEventTarget]);
 
   const runSearch = useCallback(async (trimmed: string) => {
     const [{ data: postData }, { data: communityData }] = await Promise.all([
@@ -162,6 +161,7 @@ export default function DiscoverScreen() {
     && posts.length === 0 && communities.length === 0 && filteredSpots.length === 0 && filteredEvents.length === 0;
 
   return (
+    <>
     <ScrollView
       style={styles.container}
       contentContainerStyle={{ paddingBottom: 100 }}
@@ -308,6 +308,14 @@ export default function DiscoverScreen() {
         </>
       )}
     </ScrollView>
+    <ActionSheet
+      visible={!!deleteEventTarget}
+      onClose={() => setDeleteEventTarget(null)}
+      title="Delete event?"
+      message={deleteEventTarget ? `"${deleteEventTarget.title}" will be removed for everyone.` : undefined}
+      actions={[{ label: 'Delete', destructive: true, onPress: confirmDeleteEvent }]}
+    />
+    </>
   );
 }
 

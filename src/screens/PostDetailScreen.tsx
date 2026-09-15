@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Animated, Share, TextInput, KeyboardAvoidingView, Platform, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Animated, Share, TextInput, KeyboardAvoidingView, Platform, Modal } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,6 +15,7 @@ import { formatCount } from '@/utils/formatCount';
 import { findOrCreateConversation } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
+import ActionSheet from '@/components/ActionSheet';
 import PostVideoPlayer from '@/components/PostVideoPlayer';
 import { gradients, radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
@@ -48,6 +49,9 @@ export default function PostDetailScreen() {
   const [commentInput, setCommentInput] = useState('');
   const [postingComment, setPostingComment] = useState(false);
   const [commentsVisible, setCommentsVisible] = useState(false);
+  const [optionsVisible, setOptionsVisible] = useState(false);
+  const [blockConfirmVisible, setBlockConfirmVisible] = useState(false);
+  const [deleteCommentTarget, setDeleteCommentTarget] = useState<Comment | null>(null);
 
   const loadComments = useCallback(async () => {
     const { data } = await supabase.from('comments').select('*, author:profiles(*)')
@@ -157,18 +161,15 @@ export default function PostDetailScreen() {
     setPost((prev) => prev && { ...prev, comment_count: prev.comment_count + 1 });
   };
 
-  const deleteComment = (comment: Comment) => {
-    Alert.alert('Delete comment?', undefined, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete', style: 'destructive', onPress: async () => {
-          await supabase.from('comments').delete().eq('id', comment.id);
-          haptics.tap();
-          setComments((prev) => prev.filter((c) => c.id !== comment.id));
-          setPost((prev) => prev && { ...prev, comment_count: Math.max(prev.comment_count - 1, 0) });
-        },
-      },
-    ]);
+  const deleteComment = (comment: Comment) => setDeleteCommentTarget(comment);
+
+  const confirmDeleteComment = async () => {
+    const comment = deleteCommentTarget;
+    if (!comment) return;
+    await supabase.from('comments').delete().eq('id', comment.id);
+    haptics.tap();
+    setComments((prev) => prev.filter((c) => c.id !== comment.id));
+    setPost((prev) => prev && { ...prev, comment_count: Math.max(prev.comment_count - 1, 0) });
   };
 
   const toggleFollow = async () => {
@@ -200,35 +201,22 @@ export default function PostDetailScreen() {
     }
   };
 
-  const handleBlock = () => {
+  const handleBlock = () => setBlockConfirmVisible(true);
+
+  const confirmBlock = async () => {
     if (!post || !session?.user) return;
-    Alert.alert(
-      `Block @${post.author?.username ?? 'this user'}?`,
-      'They won\'t be able to message you or see each other\'s posts anymore.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Block', style: 'destructive', onPress: async () => {
-            try {
-              await blockUser(session.user.id, post.author_id);
-              haptics.success();
-              navigation.goBack();
-            } catch (e) {
-              showToast(e instanceof Error ? e.message : 'Couldn’t block. Try again.', 'error');
-            }
-          },
-        },
-      ]
-    );
+    try {
+      await blockUser(session.user.id, post.author_id);
+      haptics.success();
+      navigation.goBack();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Couldn’t block. Try again.', 'error');
+    }
   };
 
   const openOptions = () => {
     if (!post) return;
-    Alert.alert('', undefined, [
-      { text: 'Report post', onPress: () => setReportModalVisible(true) },
-      { text: `Block @${post.author?.username ?? 'user'}`, style: 'destructive', onPress: handleBlock },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
+    setOptionsVisible(true);
   };
 
   const handleReportSubmit = async (reason: string) => {
@@ -397,6 +385,27 @@ export default function PostDetailScreen() {
         </Modal>
 
         <ReportModal visible={reportModalVisible} onClose={() => setReportModalVisible(false)} onSubmit={handleReportSubmit} />
+        <ActionSheet
+          visible={optionsVisible}
+          onClose={() => setOptionsVisible(false)}
+          actions={[
+            { label: 'Report post', onPress: () => setReportModalVisible(true) },
+            { label: `Block @${post.author?.username ?? 'user'}`, destructive: true, onPress: handleBlock },
+          ]}
+        />
+        <ActionSheet
+          visible={blockConfirmVisible}
+          onClose={() => setBlockConfirmVisible(false)}
+          title={`Block @${post.author?.username ?? 'this user'}?`}
+          message="They won't be able to message you or see each other's posts anymore."
+          actions={[{ label: 'Block', destructive: true, onPress: confirmBlock }]}
+        />
+        <ActionSheet
+          visible={!!deleteCommentTarget}
+          onClose={() => setDeleteCommentTarget(null)}
+          title="Delete comment?"
+          actions={[{ label: 'Delete', destructive: true, onPress: confirmDeleteComment }]}
+        />
       </View>
     );
   }
@@ -499,6 +508,27 @@ export default function PostDetailScreen() {
         </View>
       </View>
       <ReportModal visible={reportModalVisible} onClose={() => setReportModalVisible(false)} onSubmit={handleReportSubmit} />
+      <ActionSheet
+        visible={optionsVisible}
+        onClose={() => setOptionsVisible(false)}
+        actions={[
+          { label: 'Report post', onPress: () => setReportModalVisible(true) },
+          { label: `Block @${post.author?.username ?? 'user'}`, destructive: true, onPress: handleBlock },
+        ]}
+      />
+      <ActionSheet
+        visible={blockConfirmVisible}
+        onClose={() => setBlockConfirmVisible(false)}
+        title={`Block @${post.author?.username ?? 'this user'}?`}
+        message="They won't be able to message you or see each other's posts anymore."
+        actions={[{ label: 'Block', destructive: true, onPress: confirmBlock }]}
+      />
+      <ActionSheet
+        visible={!!deleteCommentTarget}
+        onClose={() => setDeleteCommentTarget(null)}
+        title="Delete comment?"
+        actions={[{ label: 'Delete', destructive: true, onPress: confirmDeleteComment }]}
+      />
     </ScrollView>
     <View style={styles.commentInputRow}>
       <TextInput
