@@ -6,6 +6,7 @@ export type Interest =
 export interface Profile {
   id: string; username: string; display_name: string; bio: string | null;
   avatar_url: string | null; cover_url: string | null; university: string | null; interests: Interest[];
+  current_streak: number; longest_streak: number; last_active_date: string | null;
   has_completed_onboarding: boolean; is_admin: boolean; created_at: string;
 }
 

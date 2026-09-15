@@ -180,6 +180,10 @@ export default function ProfileScreen() {
             >
               <Text style={styles.statNum}>{formatCount(stats.following)}</Text><Text style={styles.statLabel}>Following</Text>
             </Pressable>
+            <View>
+              <Text style={styles.statNum}>🔥 {profile.current_streak}</Text>
+              <Text style={styles.statLabel}>Streak</Text>
+            </View>
           </View>
 
           {interestChips.length > 0 && (

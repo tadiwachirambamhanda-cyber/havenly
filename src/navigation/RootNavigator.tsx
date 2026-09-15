@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { ColorTokens } from '@/theme/tokens';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { useStreakBump } from '@/lib/useStreakBump';
 import TabBar from '@/navigation/TabBar';
 
 import LoginScreen from '@/screens/LoginScreen';
@@ -81,6 +82,7 @@ function SplashLoading({ colors }: { colors: ColorTokens }) {
 export default function RootNavigator() {
   const { session, profile, loading } = useAuth();
   const { colors, scheme } = useTheme();
+  useStreakBump();
 
   const navTheme = useMemo(() => {
     const base = scheme === 'dark' ? DarkTheme : DefaultTheme;

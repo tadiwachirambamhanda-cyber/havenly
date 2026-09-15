@@ -408,6 +408,15 @@ export default function FeedScreen() {
           <Text style={styles.brand}>havenly.</Text>
         </Pressable>
         <View style={styles.topBarActions}>
+          {!!profile?.current_streak && (
+            <Pressable
+              style={styles.streakBadge}
+              onPress={() => navigation.navigate('Profile')}
+              accessibilityLabel={`${profile.current_streak} day streak`}
+            >
+              <Text style={styles.streakBadgeText}>🔥 {profile.current_streak}</Text>
+            </Pressable>
+          )}
           <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Notifications')} accessibilityLabel="Notifications">
             <Feather name="bell" size={17} color={colors.ink} />
             {hasUnreadNotifications && <View style={styles.iconBtnDot} />}
@@ -526,6 +535,8 @@ function createStyles(colors: ColorTokens) {
   topBarActions: { flexDirection: 'row', gap: spacing.sm },
   iconBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
   iconBtnDot: { position: 'absolute', top: 6, right: 7, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral, borderWidth: 1.5, borderColor: colors.white },
+  streakBadge: { height: 36, paddingHorizontal: 12, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+  streakBadgeText: { fontSize: 13, fontWeight: '700', color: colors.ink },
   interestRow: { flexDirection: 'row', gap: 8, paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
   interestChip: {
     backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line,
