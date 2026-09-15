@@ -198,7 +198,7 @@ export default function DiscoverScreen() {
         <Feather name="search" size={14} color={colors.inkSoft} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search spots, events, posts, communities…"
+          placeholder="Search interests, posts, communities, events…"
           placeholderTextColor={colors.inkSoft}
           value={query}
           onChangeText={setQuery}
