@@ -188,9 +188,33 @@ export default function PostDetailScreen() {
 
   const openShare = () => setShareSheetVisible(true);
 
-  const shareExternally = () => {
+  // Native uses the OS share sheet, which always works. Most desktop
+  // browsers (this includes any web preview) have no navigator.share at
+  // all, so Share.share() there just rejects — previously swallowed
+  // silently, which read as the button doing nothing. Falling back to
+  // copying the text gives web a working action either way, and every path
+  // now ends in a toast so the user always sees *something* happened.
+  const shareExternally = async () => {
     if (!post) return;
-    Share.share({ message: `${post.title} — via Havenly` }).catch(() => {});
+    const message = `${post.title} — via Havenly`;
+    if (Platform.OS === 'web') {
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        try { await navigator.share({ title: post.title, text: message }); } catch { /* user cancelled — not an error */ }
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(message);
+        showToast('Copied to clipboard');
+      } catch {
+        showToast('Couldn’t copy — try again', 'error');
+      }
+      return;
+    }
+    try {
+      await Share.share({ message });
+    } catch {
+      showToast('Couldn’t share — try again', 'error');
+    }
   };
 
   const onMessage = async () => {
