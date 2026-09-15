@@ -16,7 +16,7 @@ import { findOrCreateConversation } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
 import ActionSheet from '@/components/ActionSheet';
-import PostVideoPlayer from '@/components/PostVideoPlayer';
+import PostVideoPlayer, { type PostVideoPlayerHandle } from '@/components/PostVideoPlayer';
 import { gradients, radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
@@ -38,6 +38,8 @@ export default function PostDetailScreen() {
   const heartPopScale = useRef(new Animated.Value(0.5)).current;
   const heartPopOpacity = useRef(new Animated.Value(0)).current;
   const likeIconScale = useRef(new Animated.Value(1)).current;
+  const videoPlayerRef = useRef<PostVideoPlayerHandle>(null);
+  const [videoMuted, setVideoMuted] = useState(true);
   const [post, setPost] = useState<Post | null>(null);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -277,9 +279,10 @@ export default function PostDetailScreen() {
     return (
       <View style={styles.videoContainer}>
         <PostVideoPlayer
+          ref={videoPlayerRef}
           uri={post.video_url}
           onDoubleTap={() => { playHeartPop(); setLikedState(true); }}
-          muteButtonStyle={{ top: insets.top + 12, bottom: undefined, right: undefined, left: 62 }}
+          onMutedChange={setVideoMuted}
         />
         <Animated.View
           pointerEvents="none"
@@ -341,6 +344,15 @@ export default function PostDetailScreen() {
           </View>
 
           <View style={styles.videoRail}>
+            <Pressable
+              style={styles.railItem}
+              onPress={() => videoPlayerRef.current?.toggleMute()}
+              accessibilityLabel={videoMuted ? 'Unmute' : 'Mute'}
+            >
+              <View style={styles.railIconCircle}>
+                <Feather name={videoMuted ? 'volume-x' : 'volume-2'} size={20} color="white" />
+              </View>
+            </Pressable>
             <Pressable style={styles.railItem} onPress={toggleLike} accessibilityLabel={liked ? 'Unlike' : 'Like'}>
               <Animated.View style={[styles.railIconCircle, { transform: [{ scale: likeIconScale }] }]}>
                 <Feather name="heart" size={22} color={liked ? colors.coral : 'white'} />

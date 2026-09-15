@@ -1,23 +1,23 @@
-import React, { useMemo, useRef } from 'react';
-import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 import { Feather } from '@expo/vector-icons';
-import { useTheme } from '@/lib/ThemeContext';
-import type { ColorTokens } from '@/theme/tokens';
+
+export interface PostVideoPlayerHandle {
+  toggleMute: () => void;
+}
 
 // The full player used on Post Detail — branded controls instead of the
 // OS's own, since a viewer here has deliberately opened the post (not just
-// scrolling past it): tap to play/pause, tap the corner icon to unmute, a
-// slim progress bar, seamless looping. Starts muted regardless, matching
-// the feed preview and avoiding an unexpected burst of audio.
-export default function PostVideoPlayer({
-  uri, onDoubleTap, muteButtonStyle,
-}: {
-  uri: string; onDoubleTap?: () => void; muteButtonStyle?: StyleProp<ViewStyle>;
-}) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+// scrolling past it): tap to play/pause, a slim progress bar, seamless
+// looping. Starts muted regardless, matching the feed preview and avoiding
+// an unexpected burst of audio — the mute toggle itself lives in the
+// caller's action rail (passed a ref here) rather than floating on the
+// video, so it sits in the same reachable spot as like/comment/share.
+const PostVideoPlayer = forwardRef<PostVideoPlayerHandle, {
+  uri: string; onDoubleTap?: () => void; onMutedChange?: (muted: boolean) => void;
+}>(function PostVideoPlayer({ uri, onDoubleTap, onMutedChange }, ref) {
   const lastTapRef = useRef(0);
 
   const player = useVideoPlayer(uri, (p) => {
@@ -34,6 +34,10 @@ export default function PostVideoPlayer({
   });
   const duration = player.duration || 0;
   const progress = duration > 0 ? Math.min(1, currentTime / duration) : 0;
+
+  useEffect(() => { onMutedChange?.(muted); }, [muted, onMutedChange]);
+
+  useImperativeHandle(ref, () => ({ toggleMute: () => { player.muted = !player.muted; } }), [player]);
 
   // Every tap toggles play/pause immediately (no delay, so the primary
   // action stays responsive) — a tap that turns out to be the second half
@@ -54,28 +58,21 @@ export default function PostVideoPlayer({
           <View style={styles.playCircle}><Feather name="play" size={24} color="white" /></View>
         </View>
       )}
-      <Pressable style={[styles.muteBtn, muteButtonStyle]} onPress={() => { player.muted = !player.muted; }} hitSlop={10}>
-        <Feather name={muted ? 'volume-x' : 'volume-2'} size={14} color="white" />
-      </Pressable>
       <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${progress * 100}%`, backgroundColor: colors.coral }]} />
+        <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
       </View>
     </Pressable>
   );
-}
+});
 
-function createStyles(colors: ColorTokens) {
-  return StyleSheet.create({
-    playOverlay: { alignItems: 'center', justifyContent: 'center' },
-    playCircle: {
-      width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(0,0,0,0.45)',
-      alignItems: 'center', justifyContent: 'center',
-    },
-    muteBtn: {
-      position: 'absolute', bottom: 14, right: 12, width: 30, height: 30, borderRadius: 15,
-      backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center',
-    },
-    progressTrack: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, backgroundColor: 'rgba(255,255,255,0.3)' },
-    progressFill: { height: '100%' },
-  });
-}
+export default PostVideoPlayer;
+
+const styles = StyleSheet.create({
+  playOverlay: { alignItems: 'center', justifyContent: 'center' },
+  playCircle: {
+    width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(0,0,0,0.45)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  progressTrack: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, backgroundColor: 'rgba(255,255,255,0.3)' },
+  progressFill: { height: '100%', backgroundColor: '#FF5A3C' },
+});
