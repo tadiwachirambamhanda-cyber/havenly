@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Pressable, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
@@ -11,13 +11,26 @@ import { Feather } from '@expo/vector-icons';
 // inside it works the same way SwipeToAction's action button does — the
 // innermost Pressable claims the touch, so tapping the icon doesn't also
 // trigger the card's navigation.
-export default function VideoThumb({ uri, style }: { uri: string; style?: StyleProp<ViewStyle> }) {
+//
+// isVisible is driven by the parent screen's own scroll/viewport tracking —
+// this component just plays or pauses in response rather than deciding for
+// itself, since it has no way to know where it sits on screen. Defaults to
+// true for screens that don't track visibility, so it just autoplays as
+// before there.
+export default function VideoThumb({
+  uri, style, isVisible = true,
+}: {
+  uri: string; style?: StyleProp<ViewStyle>; isVisible?: boolean;
+}) {
   const player = useVideoPlayer(uri, (p) => {
     p.loop = true;
     p.muted = true;
-    p.play();
   });
   const { muted } = useEvent(player, 'mutedChange', { muted: player.muted });
+
+  useEffect(() => {
+    if (isVisible) player.play(); else player.pause();
+  }, [isVisible, player]);
 
   return (
     <>

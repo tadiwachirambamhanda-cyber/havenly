@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl, useWindowDimensions, type NativeSyntheticEvent, type NativeScrollEvent } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useFocusEffect, useIsFocused } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -43,12 +43,17 @@ export default function FeedScreen() {
   const navigation = useNavigation<Nav>();
   const { session } = useAuth();
   const { colors } = useTheme();
+  const isFocused = useIsFocused();
+  const { height: windowHeight } = useWindowDimensions();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [myCommunities, setMyCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const [visibleVideoIds, setVisibleVideoIds] = useState<Set<string>>(new Set());
+  const videoCardRefs = useRef<Map<string, View>>(new Map());
+  const lastVisibilityCheckRef = useRef(0);
 
   const fetchPosts = useCallback(async () => {
     const { data, error } = await supabase
@@ -88,6 +93,40 @@ export default function FeedScreen() {
     setRefreshing(true); await Promise.all([fetchPosts(), fetchMyCommunities()]); setRefreshing(false);
   }, [fetchPosts, fetchMyCommunities]);
 
+  // The masonry layout is a plain ScrollView (FlatList's numColumns forces
+  // equal-height rows, which is exactly what breaks true masonry — see the
+  // comment below), so there's no built-in onViewableItemsChanged to lean
+  // on the way ProfileScreen's grid does. Measuring each video card's own
+  // on-screen position directly gets the same result without needing one.
+  const checkVideoVisibility = useCallback(async () => {
+    const videoPosts = posts.filter((p) => p.video_url);
+    if (videoPosts.length === 0) return;
+    const results = await Promise.all(videoPosts.map((post) => new Promise<[string, boolean]>((resolve) => {
+      const ref = videoCardRefs.current.get(post.id);
+      if (!ref) { resolve([post.id, false]); return; }
+      ref.measureInWindow((_x, y, _width, height) => {
+        resolve([post.id, y + height > 0 && y < windowHeight]);
+      });
+    })));
+    const next = new Set(results.filter(([, visible]) => visible).map(([id]) => id));
+    setVisibleVideoIds((prev) => {
+      if (prev.size === next.size && [...prev].every((id) => next.has(id))) return prev;
+      return next;
+    });
+  }, [posts, windowHeight]);
+
+  const onScroll = useCallback((_e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const now = Date.now();
+    if (now - lastVisibilityCheckRef.current < 200) return;
+    lastVisibilityCheckRef.current = now;
+    checkVideoVisibility();
+  }, [checkVideoVisibility]);
+
+  // Posts (and therefore which cards exist at all) only change on load or
+  // refresh, not on every scroll — run one check whenever that happens so
+  // videos already on screen start playing without needing a scroll first.
+  useEffect(() => { checkVideoVisibility(); }, [checkVideoVisibility]);
+
   // True masonry: each post gets a deterministic (not fixed) image height,
   // then a greedy shortest-column-first pass balances posts across columns
   // by estimated total height — plain FlatList numColumns forces equal-height
@@ -116,7 +155,12 @@ export default function FeedScreen() {
         <View style={[styles.cardImage, { height: imageHeight }]}>
           <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
           {item.video_url ? (
-            <VideoThumb uri={item.video_url} />
+            <View
+              style={StyleSheet.absoluteFill}
+              ref={(el) => { if (el) videoCardRefs.current.set(item.id, el); else videoCardRefs.current.delete(item.id); }}
+            >
+              <VideoThumb uri={item.video_url} isVisible={isFocused && visibleVideoIds.has(item.id)} />
+            </View>
           ) : item.image_url ? (
             <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
           ) : null}
@@ -192,6 +236,8 @@ export default function FeedScreen() {
       <ScrollView
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
+        onScroll={onScroll}
+        scrollEventThrottle={200}
       >
         {myCommunities.length > 0 && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.myCommunitiesRow}>

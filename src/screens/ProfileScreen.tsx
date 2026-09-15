@@ -1,6 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, RefreshControl } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Pressable, RefreshControl, type ViewToken } from 'react-native';
+import { useNavigation, useFocusEffect, useIsFocused } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -31,6 +31,7 @@ const GRID_TABS: { key: GridTab; label: string }[] = [
 
 export default function ProfileScreen() {
   const navigation = useNavigation<Nav>();
+  const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
   const { session } = useAuth();
   const { colors } = useTheme();
@@ -42,6 +43,14 @@ export default function ProfileScreen() {
   const [activeTab, setActiveTab] = useState<GridTab>('posts');
   const [refreshing, setRefreshing] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const [visibleVideoIds, setVisibleVideoIds] = useState<Set<string>>(new Set());
+  // FlatList (unlike FeedScreen's manual masonry ScrollView) has built-in
+  // viewability tracking — no need to measure card positions by hand here.
+  // Both refs must stay stable across renders or FlatList warns/ignores them.
+  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+    setVisibleVideoIds(new Set(viewableItems.map((vi) => vi.item.id)));
+  }).current;
+  const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 }).current;
 
   const load = useCallback(async () => {
     const userId = session?.user.id;
@@ -107,13 +116,15 @@ export default function ProfileScreen() {
       columnWrapperStyle={{ gap: 2 }}
       contentContainerStyle={{ paddingBottom: 40 }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
+      onViewableItemsChanged={onViewableItemsChanged}
+      viewabilityConfig={viewabilityConfig}
       renderItem={({ item, index }) => {
         const [from, to] = gradients[index % gradients.length];
         return (
           <Pressable style={styles.gridCell} onPress={() => navigation.navigate('PostDetail', { postId: item.id })}>
             <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
             {item.video_url ? (
-              <VideoThumb uri={item.video_url} />
+              <VideoThumb uri={item.video_url} isVisible={isFocused && visibleVideoIds.has(item.id)} />
             ) : item.image_url ? (
               <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
             ) : null}
