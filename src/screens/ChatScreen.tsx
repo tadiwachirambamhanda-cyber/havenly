@@ -47,8 +47,8 @@ export default function ChatScreen() {
       .then(({ data }) => setOtherUser(data as Profile));
     supabase.from('conversations').select('*').eq('id', conversationId).single()
       .then(({ data }) => setConversation(data as Conversation));
-    supabase.from('messages').select('*').eq('conversation_id', conversationId)
-      .order('created_at', { ascending: true }).then(({ data }) => setMessages((data as Message[]) ?? []));
+    supabase.from('messages').select('*, shared_post:posts(id, title, tag, image_url, video_url)').eq('conversation_id', conversationId)
+      .order('created_at', { ascending: true }).then(({ data }) => setMessages((data as unknown as Message[]) ?? []));
 
     if (myId) markConversationRead(conversationId, myId);
 
@@ -57,8 +57,15 @@ export default function ChatScreen() {
     // via realtime — without the check it would render twice.
     const channel = supabase.channel(`chat-${conversationId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` },
-        (payload) => {
+        async (payload) => {
           const incoming = payload.new as Message;
+          // Realtime payloads carry only the raw row — no joins — so a
+          // shared post needs its own fetch to render as a preview card.
+          if (incoming.shared_post_id) {
+            const { data: sharedPost } = await supabase.from('posts')
+              .select('id, title, tag, image_url, video_url').eq('id', incoming.shared_post_id).maybeSingle();
+            incoming.shared_post = sharedPost as Message['shared_post'];
+          }
           setMessages((prev) => (prev.some((m) => m.id === incoming.id) ? prev : [...prev, incoming]));
           if (myId) markConversationRead(conversationId, myId);
         })
@@ -155,12 +162,35 @@ export default function ChatScreen() {
           data={messages}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: spacing.lg, gap: 8 }}
-          renderItem={({ item }) => (
-            <View style={[styles.bubble, item.sender_id === myId ? styles.bubbleMe : styles.bubbleThem]}>
-              <Text style={item.sender_id === myId ? styles.bubbleTextMe : styles.bubbleTextThem}>{item.body}</Text>
-              <Text style={item.sender_id === myId ? styles.bubbleTimeMe : styles.bubbleTimeThem}>{timeAgo(item.created_at)}</Text>
-            </View>
-          )}
+          renderItem={({ item }) => {
+            const mine = item.sender_id === myId;
+            const textStyle = mine ? styles.bubbleTextMe : styles.bubbleTextThem;
+            return (
+              <View style={[styles.bubble, mine ? styles.bubbleMe : styles.bubbleThem, item.shared_post && styles.bubbleShared]}>
+                {item.shared_post ? (
+                  <Pressable
+                    style={styles.sharedPostRow}
+                    onPress={() => navigation.navigate('PostDetail', { postId: item.shared_post!.id })}
+                    accessibilityLabel={`Open post: ${item.shared_post.title}`}
+                  >
+                    {item.shared_post.image_url ? (
+                      <Image source={{ uri: item.shared_post.image_url }} style={styles.sharedPostThumb} contentFit="cover" transition={200} />
+                    ) : (
+                      <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.sharedPostThumb} />
+                    )}
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.sharedPostTag, textStyle]}>{item.shared_post.tag}</Text>
+                      <Text style={[styles.sharedPostTitle, textStyle]} numberOfLines={2}>{item.shared_post.title}</Text>
+                    </View>
+                    <Feather name="chevron-right" size={14} color={mine ? 'rgba(255,255,255,0.8)' : colors.inkSoft} />
+                  </Pressable>
+                ) : (
+                  <Text style={textStyle}>{item.body}</Text>
+                )}
+                <Text style={mine ? styles.bubbleTimeMe : styles.bubbleTimeThem}>{timeAgo(item.created_at)}</Text>
+              </View>
+            );
+          }}
           onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
         />
 
@@ -236,6 +266,11 @@ function createStyles(colors: ColorTokens) {
   bubbleTextMe: { color: 'white', fontSize: 13 },
   bubbleTimeThem: { color: colors.inkSoft, fontSize: 9.5, marginTop: 3 },
   bubbleTimeMe: { color: 'rgba(255,255,255,0.75)', fontSize: 9.5, marginTop: 3 },
+  bubbleShared: { padding: 8 },
+  sharedPostRow: { flexDirection: 'row', alignItems: 'center', gap: 10, minWidth: 190 },
+  sharedPostThumb: { width: 46, height: 46, borderRadius: 10 },
+  sharedPostTag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 9, textTransform: 'uppercase', opacity: 0.7 },
+  sharedPostTitle: { fontSize: 12.5, fontWeight: '700', marginTop: 2, lineHeight: 16 },
   inputRow: { padding: spacing.md, borderTopWidth: 1, borderColor: colors.line },
   inputInner: { flexDirection: 'row', gap: 9, alignItems: 'center' },
   pendingHint: { fontSize: 11, color: colors.inkSoft, marginBottom: 8, textAlign: 'center' },

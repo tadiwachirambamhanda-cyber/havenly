@@ -52,6 +52,7 @@ export default function PostDetailScreen() {
   const [postingComment, setPostingComment] = useState(false);
   const [commentsVisible, setCommentsVisible] = useState(false);
   const [optionsVisible, setOptionsVisible] = useState(false);
+  const [shareSheetVisible, setShareSheetVisible] = useState(false);
   const [blockConfirmVisible, setBlockConfirmVisible] = useState(false);
   const [deleteCommentTarget, setDeleteCommentTarget] = useState<Comment | null>(null);
 
@@ -185,7 +186,9 @@ export default function PostDetailScreen() {
     setFollowing(!following);
   };
 
-  const onShare = () => {
+  const openShare = () => setShareSheetVisible(true);
+
+  const shareExternally = () => {
     if (!post) return;
     Share.share({ message: `${post.title} — via Havenly` }).catch(() => {});
   };
@@ -368,7 +371,7 @@ export default function PostDetailScreen() {
                 <View style={styles.railIconCircle}><Feather name="send" size={19} color="white" /></View>
               </Pressable>
             )}
-            <Pressable style={styles.railItem} onPress={onShare} accessibilityLabel="Share this post">
+            <Pressable style={styles.railItem} onPress={openShare} accessibilityLabel="Share this post">
               <View style={styles.railIconCircle}><Feather name="share-2" size={19} color="white" /></View>
             </Pressable>
             <Pressable style={styles.railItem} onPress={toggleSave} accessibilityLabel={saved ? 'Remove from saved' : 'Save this post'}>
@@ -425,6 +428,14 @@ export default function PostDetailScreen() {
           onClose={() => setDeleteCommentTarget(null)}
           title="Delete comment?"
           actions={[{ label: 'Delete', destructive: true, onPress: confirmDeleteComment }]}
+        />
+        <ActionSheet
+          visible={shareSheetVisible}
+          onClose={() => setShareSheetVisible(false)}
+          actions={[
+            { label: 'Send to a follower', onPress: () => navigation.navigate('SharePost', { postId: post.id }) },
+            { label: 'Share externally', onPress: shareExternally },
+          ]}
         />
       </View>
     );
@@ -518,7 +529,7 @@ export default function PostDetailScreen() {
             <Feather name="message-circle" size={15} color={colors.inkSoft} />
             <Text style={styles.actionText}>{post.comment_count}</Text>
           </View>
-          <Pressable style={styles.actionItem} onPress={onShare} accessibilityLabel="Share this post">
+          <Pressable style={styles.actionItem} onPress={openShare} accessibilityLabel="Share this post">
             <Feather name="share-2" size={15} color={colors.inkSoft} />
             <Text style={styles.actionText}>Share</Text>
           </Pressable>
@@ -555,6 +566,14 @@ export default function PostDetailScreen() {
         onClose={() => setDeleteCommentTarget(null)}
         title="Delete comment?"
         actions={[{ label: 'Delete', destructive: true, onPress: confirmDeleteComment }]}
+      />
+      <ActionSheet
+        visible={shareSheetVisible}
+        onClose={() => setShareSheetVisible(false)}
+        actions={[
+          { label: 'Send to a follower', onPress: () => navigation.navigate('SharePost', { postId: post.id }) },
+          { label: 'Share externally', onPress: shareExternally },
+        ]}
       />
     </ScrollView>
     <View style={styles.commentInputRow}>

@@ -18,6 +18,7 @@ import ChatScreen from '@/screens/ChatScreen';
 import ProfileScreen from '@/screens/ProfileScreen';
 import UserProfileScreen from '@/screens/UserProfileScreen';
 import NotificationsScreen from '@/screens/NotificationsScreen';
+import SharePostScreen from '@/screens/SharePostScreen';
 import PostDetailScreen from '@/screens/PostDetailScreen';
 import CommunitiesScreen from '@/screens/CommunitiesScreen';
 import CommunityDetailScreen from '@/screens/CommunityDetailScreen';
@@ -36,6 +37,7 @@ export type RootStackParamList = {
   PostDetail: { postId: string };
   UserProfile: { userId: string };
   Notifications: undefined;
+  SharePost: { postId: string };
   Chat: { conversationId: string; otherUserId: string };
   Communities: undefined;
   CommunityDetail: { communityId: string };
@@ -112,6 +114,7 @@ export default function RootNavigator() {
             <Stack.Screen name="PostDetail" component={PostDetailScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="UserProfile" component={UserProfileScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="SharePost" component={SharePostScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Chat" component={ChatScreen} />
             <Stack.Screen name="Communities" component={CommunitiesScreen} />
             <Stack.Screen name="CommunityDetail" component={CommunityDetailScreen} />

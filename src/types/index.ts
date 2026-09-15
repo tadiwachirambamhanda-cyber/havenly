@@ -35,6 +35,7 @@ export interface Conversation {
 
 export interface Message {
   id: string; conversation_id: string; sender_id: string; body: string; created_at: string;
+  shared_post_id: string | null; shared_post?: Pick<Post, 'id' | 'title' | 'tag' | 'image_url' | 'video_url'> | null;
 }
 
 // Named HavenlyEvent, not Event, to avoid shadowing the DOM's global Event type.
