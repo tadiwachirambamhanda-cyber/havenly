@@ -180,11 +180,16 @@ export default function ProfileScreen() {
             >
               <Text style={styles.statNum}>{formatCount(stats.following)}</Text><Text style={styles.statLabel}>Following</Text>
             </Pressable>
-            <View>
+            <Pressable onPress={() => navigation.navigate('Offers')} accessibilityLabel="View your perks">
               <Text style={styles.statNum}>🔥 {profile.current_streak}</Text>
               <Text style={styles.statLabel}>Streak</Text>
-            </View>
+            </Pressable>
           </View>
+          <Pressable style={styles.perksRow} onPress={() => navigation.navigate('Offers')} accessibilityLabel="View your perks">
+            <Feather name="gift" size={13} color={colors.coral} />
+            <Text style={styles.perksRowText}>View your perks</Text>
+            <Feather name="chevron-right" size={13} color={colors.inkSoft} />
+          </Pressable>
 
           {interestChips.length > 0 && (
             <View style={styles.chipRow}>
@@ -232,6 +237,8 @@ function createStyles(colors: ColorTokens) {
   statsRow: { flexDirection: 'row', gap: 22, paddingHorizontal: spacing.lg, paddingTop: 16, paddingBottom: 6 },
   statNum: { fontSize: 16, fontWeight: '800', color: colors.ink },
   statLabel: { fontSize: 10.5, color: colors.inkSoft, fontWeight: '600', marginTop: 2 },
+  perksRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: spacing.lg, paddingTop: 10 },
+  perksRowText: { flex: 1, fontSize: 12, fontWeight: '700', color: colors.ink },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, paddingHorizontal: spacing.lg, paddingVertical: 14 },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill, backgroundColor: colors.coralSoft },
   chipText: { fontSize: 11, fontWeight: '700', color: colors.coral },

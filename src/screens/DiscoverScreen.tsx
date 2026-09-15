@@ -210,6 +210,17 @@ export default function DiscoverScreen() {
         )}
       </View>
 
+      {!isSearching && (
+        <Pressable style={styles.perksPromo} onPress={() => navigation.navigate('Offers')} accessibilityLabel="View perks">
+          <View style={styles.perksPromoIcon}><Feather name="gift" size={18} color={colors.coral} /></View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.perksPromoTitle}>Perks</Text>
+            <Text style={styles.perksPromoSub}>Unlock brand discounts with your streak</Text>
+          </View>
+          <Feather name="chevron-right" size={16} color={colors.inkSoft} />
+        </Pressable>
+      )}
+
       {noResults && <EmptyState icon="search" text={`No results for "${query.trim()}"`} />}
 
       {isSearching && matchedInterests.length > 0 && (
@@ -410,6 +421,13 @@ function createStyles(colors: ColorTokens) {
   },
   searchInput: { flex: 1, fontSize: 13, color: colors.ink, paddingVertical: 10 },
   clearBtn: { paddingHorizontal: 4 },
+  perksPromo: {
+    flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: spacing.lg, marginTop: 14,
+    backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: radius.md, padding: 14,
+  },
+  perksPromoIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.coralSoft, alignItems: 'center', justifyContent: 'center' },
+  perksPromoTitle: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
+  perksPromoSub: { fontSize: 11.5, color: colors.inkSoft, marginTop: 2 },
   noResults: { color: colors.inkSoft, fontSize: 13, textAlign: 'center', marginTop: 24 },
   sectionLabel: {
     fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,

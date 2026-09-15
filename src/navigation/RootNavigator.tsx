@@ -30,6 +30,10 @@ import SettingsScreen from '@/screens/SettingsScreen';
 import EditProfileScreen from '@/screens/EditProfileScreen';
 import FollowListScreen from '@/screens/FollowListScreen';
 import NewGroupScreen from '@/screens/NewGroupScreen';
+import OffersScreen from '@/screens/OffersScreen';
+import OfferDetailScreen from '@/screens/OfferDetailScreen';
+import ManageBrandsScreen from '@/screens/ManageBrandsScreen';
+import CreateOfferScreen from '@/screens/CreateOfferScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -50,6 +54,10 @@ export type RootStackParamList = {
   Settings: undefined;
   EditProfile: undefined;
   FollowList: { userId: string; initialTab: 'followers' | 'following'; displayName: string };
+  Offers: undefined;
+  OfferDetail: { offerId: string };
+  ManageBrands: undefined;
+  CreateOffer: undefined;
 };
 
 export type MainTabParamList = {
@@ -129,6 +137,10 @@ export default function RootNavigator() {
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="FollowList" component={FollowListScreen} />
+            <Stack.Screen name="Offers" component={OffersScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="OfferDetail" component={OfferDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="ManageBrands" component={ManageBrandsScreen} options={{ presentation: 'modal' }} />
+            <Stack.Screen name="CreateOffer" component={CreateOfferScreen} options={{ presentation: 'modal' }} />
           </>
         )}
       </Stack.Navigator>

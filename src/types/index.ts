@@ -52,3 +52,17 @@ export interface Notification {
   post_id: string | null; post?: Pick<Post, 'id' | 'title' | 'image_url'> | null;
   comment_id: string | null; is_read: boolean; created_at: string;
 }
+
+export interface Brand {
+  id: string; name: string; logo_url: string | null; category: string; description: string | null;
+  contact_email: string | null; is_active: boolean; created_at: string;
+}
+
+export interface Offer {
+  id: string; brand_id: string; brand?: Brand; title: string; description: string | null; image_url: string | null;
+  discount_label: string; min_streak: number; starts_at: string; ends_at: string | null; is_active: boolean; created_at: string;
+}
+
+export interface OfferClaim {
+  id: string; offer_id: string; user_id: string; code: string; claimed_at: string; redeemed_at: string | null;
+}
