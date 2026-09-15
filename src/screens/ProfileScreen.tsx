@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, RefreshControl } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,7 +10,10 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { haptics } from '@/lib/haptics';
+import { formatCount } from '@/utils/formatCount';
 import { radius, spacing, gradients } from '@/theme/tokens';
+import EmptyState from '@/components/EmptyState';
+import Skeleton from '@/components/Skeleton';
 import type { ColorTokens } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
 import { interestIcon } from '@/constants/topicIcons';
@@ -72,7 +75,24 @@ export default function ProfileScreen() {
   }, [load]);
 
   if (!profile) {
-    return hasLoadedOnce ? null : <View style={styles.centered}><ActivityIndicator color={colors.coral} /></View>;
+    if (hasLoadedOnce) return null;
+    return (
+      <View style={styles.container}>
+        <Skeleton style={{ height: 110, borderRadius: 0 }} />
+        <View style={styles.avatarRow}>
+          <Skeleton style={{ width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand }} />
+          <Skeleton style={{ width: 96, height: 32, borderRadius: radius.pill, marginBottom: 6 }} />
+        </View>
+        <Skeleton style={{ height: 20, width: '50%', marginTop: 12, marginHorizontal: spacing.lg }} />
+        <Skeleton style={{ height: 13, width: '35%', marginTop: 8, marginHorizontal: spacing.lg }} />
+        <View style={[styles.statsRow, { gap: 22 }]}>
+          {[0, 1, 2].map((i) => <Skeleton key={i} style={{ width: 40, height: 30 }} />)}
+        </View>
+        <View style={styles.skeletonGrid}>
+          {[0, 1, 2, 3, 4, 5].map((i) => <Skeleton key={i} style={styles.skeletonGridCell} />)}
+        </View>
+      </View>
+    );
   }
 
   const interestChips = INTEREST_OPTIONS.filter((opt) => profile.interests.includes(opt.key));
@@ -99,9 +119,10 @@ export default function ProfileScreen() {
         );
       }}
       ListEmptyComponent={
-        <Text style={styles.gridEmpty}>
-          {activeTab === 'posts' ? 'No posts yet.' : activeTab === 'saved' ? 'Nothing saved yet.' : 'No tagged posts yet.'}
-        </Text>
+        <EmptyState
+          icon={activeTab === 'posts' ? 'grid' : activeTab === 'saved' ? 'bookmark' : 'tag'}
+          text={activeTab === 'posts' ? 'No posts yet.' : activeTab === 'saved' ? 'Nothing saved yet.' : 'No tagged posts yet.'}
+        />
       }
       ListHeaderComponent={
         <View>
@@ -129,18 +150,18 @@ export default function ProfileScreen() {
           {profile.bio ? <Text style={styles.bio}>{profile.bio}</Text> : null}
 
           <View style={styles.statsRow}>
-            <View><Text style={styles.statNum}>{stats.posts}</Text><Text style={styles.statLabel}>Posts</Text></View>
+            <View><Text style={styles.statNum}>{formatCount(stats.posts)}</Text><Text style={styles.statLabel}>Posts</Text></View>
             <Pressable
               onPress={() => navigation.navigate('FollowList', { userId: profile.id, initialTab: 'followers', displayName: profile.display_name })}
               accessibilityLabel="View followers"
             >
-              <Text style={styles.statNum}>{stats.followers}</Text><Text style={styles.statLabel}>Followers</Text>
+              <Text style={styles.statNum}>{formatCount(stats.followers)}</Text><Text style={styles.statLabel}>Followers</Text>
             </Pressable>
             <Pressable
               onPress={() => navigation.navigate('FollowList', { userId: profile.id, initialTab: 'following', displayName: profile.display_name })}
               accessibilityLabel="View following"
             >
-              <Text style={styles.statNum}>{stats.following}</Text><Text style={styles.statLabel}>Following</Text>
+              <Text style={styles.statNum}>{formatCount(stats.following)}</Text><Text style={styles.statLabel}>Following</Text>
             </Pressable>
           </View>
 
@@ -173,7 +194,8 @@ export default function ProfileScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
-  centered: { flex: 1, backgroundColor: colors.sand, alignItems: 'center', justifyContent: 'center' },
+  skeletonGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 2, paddingHorizontal: 0, marginTop: 20 },
+  skeletonGridCell: { width: '33%', aspectRatio: 1 / 1.15, borderRadius: 0 },
   cover: { height: 110 },
   settingsBtn: {
     position: 'absolute', right: 16, width: 34, height: 34, borderRadius: 17,

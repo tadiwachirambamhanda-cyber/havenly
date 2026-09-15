@@ -12,6 +12,8 @@ import { haptics } from '@/lib/haptics';
 import { gradients, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
+import { formatCount } from '@/utils/formatCount';
+import EmptyState from '@/components/EmptyState';
 import type { Community, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -113,7 +115,7 @@ export default function CommunityDetailScreen() {
           <Feather name={communityIcon(community)} size={28} color={colors.teal} />
         </View>
         <Text style={styles.name}>{community.name}</Text>
-        <Text style={styles.members}>{community.member_count} members</Text>
+        <Text style={styles.members}>{formatCount(community.member_count)} members</Text>
         <Text style={styles.desc}>{community.description}</Text>
         {canJoin ? (
           <Pressable
@@ -147,9 +149,7 @@ export default function CommunityDetailScreen() {
       </View>
 
       {posts.length === 0 ? (
-        <Text style={styles.emptyText}>
-          {joined ? 'No posts yet — be the first to post here.' : 'No posts yet in this community.'}
-        </Text>
+        <EmptyState icon="image" text={joined ? 'No posts yet — be the first to post here.' : 'No posts yet in this community.'} />
       ) : (
         posts.map((post) => {
           const [from, to] = gradients[post.id.charCodeAt(0) % gradients.length];
@@ -171,7 +171,7 @@ export default function CommunityDetailScreen() {
                   </Text>
                   <View style={styles.postLikes}>
                     <Feather name="heart" size={10} color={colors.inkSoft} />
-                    <Text style={styles.postLikesText}>{post.like_count}</Text>
+                    <Text style={styles.postLikesText}>{formatCount(post.like_count)}</Text>
                   </View>
                 </View>
               </View>

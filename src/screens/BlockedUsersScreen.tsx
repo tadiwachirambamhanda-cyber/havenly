@@ -10,6 +10,8 @@ import { useTheme } from '@/lib/ThemeContext';
 import { haptics } from '@/lib/haptics';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
+import EmptyState from '@/components/EmptyState';
+import SwipeToAction from '@/components/SwipeToAction';
 import type { Profile } from '@/types';
 
 export default function BlockedUsersScreen() {
@@ -52,22 +54,24 @@ export default function BlockedUsersScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: spacing.lg }}
         renderItem={({ item }) => (
-          <View style={styles.row}>
-            {item.avatar_url ? (
-              <Image source={{ uri: item.avatar_url }} style={styles.avatar} transition={200} />
-            ) : (
-              <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
-            )}
-            <View style={{ flex: 1 }}>
-              <Text style={styles.name}>{item.display_name}</Text>
-              <Text style={styles.handle}>@{item.username}</Text>
+          <SwipeToAction actionLabel="Unblock" onAction={() => unblock(item.id)}>
+            <View style={styles.row}>
+              {item.avatar_url ? (
+                <Image source={{ uri: item.avatar_url }} style={styles.avatar} transition={200} />
+              ) : (
+                <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+              )}
+              <View style={{ flex: 1 }}>
+                <Text style={styles.name}>{item.display_name}</Text>
+                <Text style={styles.handle}>@{item.username}</Text>
+              </View>
+              <Pressable style={styles.unblockBtn} onPress={() => unblock(item.id)} accessibilityLabel={`Unblock ${item.display_name}`}>
+                <Text style={styles.unblockText}>Unblock</Text>
+              </Pressable>
             </View>
-            <Pressable style={styles.unblockBtn} onPress={() => unblock(item.id)} accessibilityLabel={`Unblock ${item.display_name}`}>
-              <Text style={styles.unblockText}>Unblock</Text>
-            </Pressable>
-          </View>
+          </SwipeToAction>
         )}
-        ListEmptyComponent={<Text style={styles.placeholder}>You haven't blocked anyone.</Text>}
+        ListEmptyComponent={<EmptyState icon="shield" text="You haven't blocked anyone." />}
       />
     </View>
   );

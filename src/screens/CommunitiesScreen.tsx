@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, SectionList, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, SectionList, Pressable, RefreshControl } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Feather } from '@expo/vector-icons';
@@ -10,6 +10,8 @@ import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
 import { haptics } from '@/lib/haptics';
+import { formatCount } from '@/utils/formatCount';
+import Skeleton from '@/components/Skeleton';
 import type { Community, CommunityCategory } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -90,7 +92,24 @@ export default function CommunitiesScreen() {
     return { title: SECTION_TITLES[cat], category: cat, data };
   });
 
-  if (loading) return <View style={styles.centered}><ActivityIndicator color={colors.coral} /></View>;
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Communities</Text>
+        <Text style={styles.sub}>Join groups around your interests or campus.</Text>
+        <Skeleton style={{ height: 11, width: 140, marginHorizontal: spacing.lg, marginTop: spacing.lg, marginBottom: 10 }} />
+        {[0, 1, 2, 3].map((i) => (
+          <View key={i} style={styles.card}>
+            <Skeleton style={{ width: 40, height: 40, borderRadius: 20 }} />
+            <View style={{ flex: 1, gap: 6 }}>
+              <Skeleton style={{ height: 13, width: '55%' }} />
+              <Skeleton style={{ height: 11, width: '35%' }} />
+            </View>
+          </View>
+        ))}
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -121,7 +140,7 @@ export default function CommunitiesScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.cardName}>{item.name}</Text>
-              <Text style={styles.cardMeta}>{item.member_count} members</Text>
+              <Text style={styles.cardMeta}>{formatCount(item.member_count)} members</Text>
             </View>
             {matchesUser(item) && (
               <View style={styles.matchBadge}><Text style={styles.matchBadgeText}>For you</Text></View>
@@ -136,7 +155,6 @@ export default function CommunitiesScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand, paddingTop: 60 },
-  centered: { flex: 1, backgroundColor: colors.sand, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 26, color: colors.ink, paddingHorizontal: spacing.lg },
   sub: { color: colors.inkSoft, fontSize: 12.5, paddingHorizontal: spacing.lg, marginTop: 4, marginBottom: 8 },
   sectionHeaderRow: {

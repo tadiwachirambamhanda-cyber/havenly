@@ -10,6 +10,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { haptics } from '@/lib/haptics';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
+import EmptyState from '@/components/EmptyState';
 import type { Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -129,9 +130,7 @@ export default function FollowListScreen() {
             );
           }}
           ListEmptyComponent={
-            <Text style={styles.placeholder}>
-              {tab === 'followers' ? 'No followers yet.' : 'Not following anyone yet.'}
-            </Text>
+            <EmptyState icon="users" text={tab === 'followers' ? 'No followers yet.' : 'Not following anyone yet.'} />
           }
         />
       )}

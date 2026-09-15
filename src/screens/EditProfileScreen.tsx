@@ -11,6 +11,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
+import { useConfirmDiscard } from '@/lib/useConfirmDiscard';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
@@ -34,8 +35,20 @@ export default function EditProfileScreen() {
   const [avatarUri, setAvatarUri] = useState<string | null>(profile?.avatar_url ?? null);
   const [newAvatarPicked, setNewAvatarPicked] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [universityPickerVisible, setUniversityPickerVisible] = useState(false);
+
+  const interestsChanged = interests.size !== (profile?.interests ?? []).length
+    || Array.from(interests).some((k) => !profile?.interests.includes(k));
+  useConfirmDiscard(!saved && (
+    displayName !== (profile?.display_name ?? '')
+    || username !== (profile?.username ?? '')
+    || bio !== (profile?.bio ?? '')
+    || university !== (profile?.university ?? '')
+    || newAvatarPicked
+    || interestsChanged
+  ));
 
   const toggleInterest = (key: Interest) => {
     setInterests((prev) => {
@@ -89,6 +102,7 @@ export default function EditProfileScreen() {
 
       await refreshProfile();
       haptics.success();
+      setSaved(true);
       navigation.goBack();
       showToast('Profile updated');
     } catch (e) {

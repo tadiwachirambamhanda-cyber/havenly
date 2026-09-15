@@ -9,6 +9,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { radius, spacing, gradients } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
+import EmptyState from '@/components/EmptyState';
 import type { Community, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -99,7 +100,7 @@ export default function DiscoverScreen() {
         )}
       </View>
 
-      {noResults && <Text style={styles.noResults}>No results for "{query.trim()}"</Text>}
+      {noResults && <EmptyState icon="search" text={`No results for "${query.trim()}"`} />}
 
       {isSearching && posts !== null && posts.length > 0 && (
         <>

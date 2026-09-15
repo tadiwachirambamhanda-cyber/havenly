@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
+import { useConfirmDiscard } from '@/lib/useConfirmDiscard';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
@@ -51,6 +52,9 @@ export default function CreatePostScreen() {
   const [publishing, setPublishing] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [posted, setPosted] = useState(false);
+
+  useConfirmDiscard(!posted && (title.trim() !== '' || body.trim() !== '' || imageUri !== null || videoUri !== null));
 
   // Only communities the user has joined can be posted into (enforced again,
   // for real, by the insert RLS policy — this list is just what to offer).
@@ -149,6 +153,7 @@ export default function CreatePostScreen() {
       if (insertError) throw insertError;
 
       haptics.success();
+      setPosted(true);
       navigation.goBack();
       showToast('Posted!');
     } catch (e) {

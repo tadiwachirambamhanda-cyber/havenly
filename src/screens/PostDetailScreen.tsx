@@ -12,6 +12,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
+import { formatCount } from '@/utils/formatCount';
 import { findOrCreateConversation } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
@@ -342,7 +343,7 @@ export default function PostDetailScreen() {
             <Animated.View style={{ transform: [{ scale: likeIconScale }] }}>
               <Feather name="heart" size={15} color={liked ? colors.coral : colors.inkSoft} />
             </Animated.View>
-            <Text style={[styles.actionText, liked && styles.actionTextActive]}>{post.like_count}</Text>
+            <Text style={[styles.actionText, liked && styles.actionTextActive]}>{formatCount(post.like_count)}</Text>
           </Pressable>
           <View style={styles.actionItem}>
             <Feather name="message-circle" size={15} color={colors.inkSoft} />

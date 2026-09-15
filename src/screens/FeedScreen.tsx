@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
@@ -11,6 +11,9 @@ import { useTheme } from '@/lib/ThemeContext';
 import { radius, spacing, gradients } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
+import { formatCount } from '@/utils/formatCount';
+import EmptyState from '@/components/EmptyState';
+import Skeleton from '@/components/Skeleton';
 import type { Community, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -136,7 +139,7 @@ export default function FeedScreen() {
             </Text>
             <View style={styles.cardLikesRow}>
               <Feather name="heart" size={11} color={colors.inkSoft} />
-              <Text style={styles.cardLikes}>{item.like_count}</Text>
+              <Text style={styles.cardLikes}>{formatCount(item.like_count)}</Text>
             </View>
           </View>
         </View>
@@ -144,7 +147,34 @@ export default function FeedScreen() {
     );
   };
 
-  if (loading) return <View style={styles.centered}><ActivityIndicator color={colors.coral} /></View>;
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.topBar}>
+          <View style={styles.brandRow}>
+            <View style={styles.brandDot} />
+            <Text style={styles.brand}>havenly.</Text>
+          </View>
+        </View>
+        <View style={styles.masonryRow}>
+          {[0, 1].map((col) => (
+            <View key={col} style={styles.masonryColumn}>
+              {[0, 1, 2].map((i) => (
+                <View key={i} style={styles.card}>
+                  <Skeleton style={{ height: 110 + ((col + i) % 3) * 30, borderRadius: 0 }} />
+                  <View style={styles.cardBody}>
+                    <Skeleton style={{ height: 9, width: '40%', marginBottom: 8 }} />
+                    <Skeleton style={{ height: 13, width: '85%', marginBottom: 6 }} />
+                    <Skeleton style={{ height: 13, width: '60%' }} />
+                  </View>
+                </View>
+              ))}
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -174,7 +204,7 @@ export default function FeedScreen() {
           </ScrollView>
         )}
         {posts.length === 0 ? (
-          <View style={styles.centered}><Text style={{ color: colors.inkSoft }}>No posts yet — seed editorial content first.</Text></View>
+          <EmptyState icon="image" text="No posts yet — seed editorial content first." />
         ) : (
           <View style={styles.masonryRow}>
             {columns.map((col, i) => (
@@ -192,7 +222,6 @@ export default function FeedScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 60 },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingTop: 60, paddingBottom: spacing.md },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   brandDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral },

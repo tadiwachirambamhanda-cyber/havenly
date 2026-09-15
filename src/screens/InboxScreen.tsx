@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
+import EmptyState from '@/components/EmptyState';
 import { timeAgo } from '@/utils/timeAgo';
 import type { Conversation, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -113,9 +114,10 @@ export default function InboxScreen() {
         )}
       </View>
       {requests.length === 0 && messages.length === 0 ? (
-        <Text style={styles.placeholder}>
-          {trimmed ? `No conversations matching "${query.trim()}"` : 'No conversations yet.'}
-        </Text>
+        <EmptyState
+          icon={trimmed ? 'search' : 'mail'}
+          text={trimmed ? `No conversations matching "${query.trim()}"` : 'No conversations yet.'}
+        />
       ) : (
       <SectionList
         sections={sections}
