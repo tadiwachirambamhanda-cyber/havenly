@@ -2,25 +2,29 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { haptics } from '@/lib/haptics';
+import { formatCount } from '@/utils/formatCount';
 import { radius, spacing, gradients } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
 import EmptyState from '@/components/EmptyState';
-import type { Community, Post } from '@/types';
+import type { Community, HavenlyEvent, Post, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-// Spots/events are static mock content — PROJECT_BRIEF.md section 2 designs
-// this to eventually pull from Google Places API + Eventbrite API for live
-// data. Search still filters them for real, since that's real (if mock)
-// data actually on screen, not faked.
+// Spots are still static mock content — PROJECT_BRIEF.md section 2 designs
+// this to eventually pull from Google Places API for live data. Search
+// still filters them for real, since that's real (if mock) data actually
+// on screen, not faked. Events are real now (see `events` table) — editorial
+// only, same as posts.is_editorial, so there's no in-app way to create one.
 interface Spot { name: string; sub: string; }
-interface DiscoverEvent { day: string; month: string; name: string; location: string; }
 
 const SPOTS: Spot[] = [
   { name: 'Nightjar Coffee', sub: 'Al Quoz · Café' },
@@ -29,20 +33,88 @@ const SPOTS: Spot[] = [
   { name: 'Alserkal Studios', sub: 'Al Quoz · Art' },
 ];
 
-const EVENTS: DiscoverEvent[] = [
-  { day: '24', month: 'Aug', name: 'AUS Rooftop Movie Night', location: 'American University · Free entry' },
-  { day: '27', month: 'Aug', name: 'Alserkal Night Market', location: 'Al Quoz · 6–11pm' },
-  { day: '02', month: 'Sep', name: 'UOWD Freshers Mixer', location: 'DIAC · RSVP required' },
-];
+// "Sara is going" / "Sara and Amir are going" / "Sara, Amir and 3 others are going".
+function friendsGoingLabel(friends: Profile[]): string {
+  const names = friends.map((f) => f.display_name);
+  if (names.length === 1) return `${names[0]} is going`;
+  if (names.length === 2) return `${names[0]} and ${names[1]} are going`;
+  if (names.length === 3) return `${names[0]}, ${names[1]} and ${names[2]} are going`;
+  return `${names[0]}, ${names[1]} and ${names.length - 2} others are going`;
+}
 
 export default function DiscoverScreen() {
   const navigation = useNavigation<Nav>();
+  const { session } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [query, setQuery] = useState('');
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [communities, setCommunities] = useState<Community[] | null>(null);
+  const [events, setEvents] = useState<HavenlyEvent[] | null>(null);
+  const [myInterestIds, setMyInterestIds] = useState<Set<string>>(new Set());
+  const [friendsGoing, setFriendsGoing] = useState<Map<string, Profile[]>>(new Map());
   const [refreshing, setRefreshing] = useState(false);
+
+  const loadEvents = useCallback(async () => {
+    const { data: eventData } = await supabase.from('events').select('*')
+      .gte('event_date', new Date().toISOString()).order('event_date', { ascending: true }).limit(10);
+    const eventList = (eventData as HavenlyEvent[]) ?? [];
+    setEvents(eventList);
+
+    const userId = session?.user.id;
+    if (!userId || eventList.length === 0) { setMyInterestIds(new Set()); setFriendsGoing(new Map()); return; }
+
+    const eventIds = eventList.map((e) => e.id);
+    const [{ data: mineData }, { data: followData }] = await Promise.all([
+      supabase.from('event_interests').select('event_id').eq('user_id', userId).in('event_id', eventIds),
+      supabase.from('follows').select('following_id').eq('follower_id', userId),
+    ]);
+    setMyInterestIds(new Set(((mineData ?? []) as { event_id: string }[]).map((row) => row.event_id)));
+
+    const followingIds = ((followData ?? []) as { following_id: string }[]).map((row) => row.following_id);
+    if (followingIds.length === 0) { setFriendsGoing(new Map()); return; }
+
+    const { data: interestData } = await supabase.from('event_interests')
+      .select('event_id, user:profiles(*)')
+      .in('event_id', eventIds).in('user_id', followingIds);
+
+    const grouped = new Map<string, Profile[]>();
+    for (const row of (interestData as unknown as { event_id: string; user: Profile | null }[]) ?? []) {
+      if (!row.user) continue;
+      const list = grouped.get(row.event_id) ?? [];
+      list.push(row.user);
+      grouped.set(row.event_id, list);
+    }
+    setFriendsGoing(grouped);
+  }, [session]);
+
+  useEffect(() => { loadEvents(); }, [loadEvents]);
+
+  const toggleInterest = useCallback(async (eventId: string) => {
+    if (!session?.user.id) return;
+    haptics.tap();
+    const wasInterested = myInterestIds.has(eventId);
+    const bump = (n: number) => Math.max(n + (wasInterested ? -1 : 1), 0);
+    const unbump = (n: number) => Math.max(n + (wasInterested ? 1 : -1), 0);
+
+    setEvents((prev) => prev?.map((e) => (e.id === eventId ? { ...e, interested_count: bump(e.interested_count) } : e)) ?? prev);
+    setMyInterestIds((prev) => {
+      const next = new Set(prev);
+      if (wasInterested) next.delete(eventId); else next.add(eventId);
+      return next;
+    });
+
+    const { error } = await supabase.rpc('toggle_event_interest', { event_id_input: eventId });
+    if (error) {
+      // Revert the optimistic update if the write actually failed.
+      setEvents((prev) => prev?.map((e) => (e.id === eventId ? { ...e, interested_count: unbump(e.interested_count) } : e)) ?? prev);
+      setMyInterestIds((prev) => {
+        const next = new Set(prev);
+        if (wasInterested) next.add(eventId); else next.delete(eventId);
+        return next;
+      });
+    }
+  }, [session, myInterestIds]);
 
   const runSearch = useCallback(async (trimmed: string) => {
     const [{ data: postData }, { data: communityData }] = await Promise.all([
@@ -62,16 +134,16 @@ export default function DiscoverScreen() {
 
   const onRefresh = useCallback(async () => {
     const trimmed = query.trim();
-    if (!trimmed) return;
     setRefreshing(true);
-    await runSearch(trimmed);
+    await Promise.all([trimmed ? runSearch(trimmed) : Promise.resolve(), loadEvents()]);
     setRefreshing(false);
-  }, [query, runSearch]);
+  }, [query, runSearch, loadEvents]);
 
   const trimmed = query.trim().toLowerCase();
   const isSearching = trimmed.length > 0;
   const filteredSpots = isSearching ? SPOTS.filter((s) => s.name.toLowerCase().includes(trimmed)) : SPOTS;
-  const filteredEvents = isSearching ? EVENTS.filter((e) => e.name.toLowerCase().includes(trimmed)) : EVENTS;
+  const eventList = events ?? [];
+  const filteredEvents = isSearching ? eventList.filter((e) => e.title.toLowerCase().includes(trimmed)) : eventList;
   const noResults = isSearching && posts !== null && communities !== null
     && posts.length === 0 && communities.length === 0 && filteredSpots.length === 0 && filteredEvents.length === 0;
 
@@ -155,18 +227,58 @@ export default function DiscoverScreen() {
       {filteredEvents.length > 0 && (
         <>
           <Text style={styles.sectionLabel}>{isSearching ? 'Events' : 'This week on campus'}</Text>
-          {filteredEvents.map((event) => (
-            <View key={event.name} style={styles.eventRow}>
-              <View style={styles.eventDate}>
-                <Text style={styles.eventDay}>{event.day}</Text>
-                <Text style={styles.eventMonth}>{event.month}</Text>
+          {filteredEvents.map((event) => {
+            const date = new Date(event.event_date);
+            const interested = myInterestIds.has(event.id);
+            const friends = friendsGoing.get(event.id) ?? [];
+            return (
+              <View key={event.id} style={styles.eventCard}>
+                <View style={styles.eventRow}>
+                  <View style={styles.eventDate}>
+                    <Text style={styles.eventDay}>{date.getDate()}</Text>
+                    <Text style={styles.eventMonth}>{date.toLocaleDateString('en-US', { month: 'short' })}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.eventName}>{event.title}</Text>
+                    <Text style={styles.eventLoc}>{event.location}</Text>
+                  </View>
+                  <Pressable
+                    style={styles.interestBtn}
+                    onPress={() => toggleInterest(event.id)}
+                    hitSlop={8}
+                    accessibilityLabel={interested ? "Remove interest in this event" : "I'm interested in this event"}
+                  >
+                    <Feather name="heart" size={15} color={interested ? colors.coral : colors.inkSoft} />
+                    <Text style={[styles.interestCount, interested && styles.interestCountActive]}>
+                      {formatCount(event.interested_count)}
+                    </Text>
+                  </Pressable>
+                </View>
+                {friends.length > 0 && (
+                  <View style={styles.friendsRow}>
+                    <View style={styles.friendsAvatars}>
+                      {friends.slice(0, 3).map((friend, i) =>
+                        friend.avatar_url ? (
+                          <Image
+                            key={friend.id}
+                            source={{ uri: friend.avatar_url }}
+                            style={[styles.friendAvatar, i > 0 && { marginLeft: -8 }]}
+                          />
+                        ) : (
+                          <LinearGradient
+                            key={friend.id}
+                            colors={['#0F8B82', '#FF5A3C']}
+                            style={[styles.friendAvatar, i > 0 && { marginLeft: -8 }]}
+                          />
+                        )
+                      )}
+                    </View>
+                    <Text style={styles.friendsText} numberOfLines={1}>{friendsGoingLabel(friends)}</Text>
+                  </View>
+                )}
               </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.eventName}>{event.name}</Text>
-                <Text style={styles.eventLoc}>{event.location}</Text>
-              </View>
-            </View>
-          ))}
+            );
+          })}
         </>
       )}
     </ScrollView>
@@ -202,14 +314,25 @@ function createStyles(colors: ColorTokens) {
   spotInfo: { paddingHorizontal: 11, paddingTop: 9, paddingBottom: 11 },
   spotName: { fontSize: 12.5, fontWeight: '700', color: colors.ink },
   spotSub: { fontSize: 10.5, color: colors.inkSoft, marginTop: 2 },
-  eventRow: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginHorizontal: spacing.lg, marginBottom: 10,
+  eventCard: {
+    marginHorizontal: spacing.lg, marginBottom: 10,
     backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: radius.md, padding: spacing.md,
   },
+  eventRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   eventDate: { width: 46, height: 46, borderRadius: 10, backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
   eventDay: { fontSize: 15, lineHeight: 17, fontWeight: '800', color: colors.teal },
   eventMonth: { fontSize: 8.5, textTransform: 'uppercase', fontWeight: '800', color: colors.teal },
   eventName: { fontSize: 12.5, fontWeight: '700', color: colors.ink },
   eventLoc: { fontSize: 10.5, color: colors.inkSoft, marginTop: 2 },
+  interestBtn: { alignItems: 'center', gap: 2, paddingLeft: 4 },
+  interestCount: { fontSize: 10, fontWeight: '700', color: colors.inkSoft },
+  interestCountActive: { color: colors.coral },
+  friendsRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.line,
+  },
+  friendsAvatars: { flexDirection: 'row' },
+  friendAvatar: { width: 20, height: 20, borderRadius: 10, borderWidth: 1.5, borderColor: colors.white },
+  friendsText: { flex: 1, fontSize: 10.5, color: colors.inkSoft, fontWeight: '600' },
   });
 }

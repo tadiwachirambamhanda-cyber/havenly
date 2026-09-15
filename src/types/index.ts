@@ -36,3 +36,9 @@ export interface Conversation {
 export interface Message {
   id: string; conversation_id: string; sender_id: string; body: string; created_at: string;
 }
+
+// Named HavenlyEvent, not Event, to avoid shadowing the DOM's global Event type.
+export interface HavenlyEvent {
+  id: string; title: string; description: string | null; location: string; tag: string;
+  event_date: string; interested_count: number; created_at: string;
+}
