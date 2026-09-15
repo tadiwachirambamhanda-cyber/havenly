@@ -34,6 +34,8 @@ export default function EditProfileScreen() {
   const [interests, setInterests] = useState<Set<Interest>>(new Set(profile?.interests ?? []));
   const [avatarUri, setAvatarUri] = useState<string | null>(profile?.avatar_url ?? null);
   const [newAvatarPicked, setNewAvatarPicked] = useState(false);
+  const [coverUri, setCoverUri] = useState<string | null>(profile?.cover_url ?? null);
+  const [newCoverPicked, setNewCoverPicked] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +49,7 @@ export default function EditProfileScreen() {
     || bio !== (profile?.bio ?? '')
     || university !== (profile?.university ?? '')
     || newAvatarPicked
+    || newCoverPicked
     || interestsChanged
   ));
 
@@ -63,6 +66,14 @@ export default function EditProfileScreen() {
     if (!result.canceled) {
       setAvatarUri(result.assets[0].uri);
       setNewAvatarPicked(true);
+    }
+  };
+
+  const pickCover = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8, allowsEditing: true, aspect: [3, 1] });
+    if (!result.canceled) {
+      setCoverUri(result.assets[0].uri);
+      setNewCoverPicked(true);
     }
   };
 
@@ -86,6 +97,18 @@ export default function EditProfileScreen() {
         avatarUrl = supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl;
       }
 
+      let coverUrl = profile?.cover_url ?? null;
+      if (newCoverPicked && coverUri) {
+        const ext = coverUri.split('.').pop()?.toLowerCase() ?? 'jpg';
+        const path = `${session.user.id}/${Date.now()}.${ext}`;
+        const arrayBuffer = await fetch(coverUri).then((r) => r.arrayBuffer());
+        const { error: uploadError } = await supabase.storage.from('covers').upload(path, arrayBuffer, {
+          contentType: `image/${ext === 'jpg' ? 'jpeg' : ext}`,
+        });
+        if (uploadError) throw uploadError;
+        coverUrl = supabase.storage.from('covers').getPublicUrl(path).data.publicUrl;
+      }
+
       const { error: updateError } = await supabase.from('profiles').update({
         display_name: displayName.trim(),
         username: username.trim(),
@@ -93,6 +116,7 @@ export default function EditProfileScreen() {
         university: university.trim() || null,
         interests: Array.from(interests),
         avatar_url: avatarUrl,
+        cover_url: coverUrl,
       }).eq('id', session.user.id);
 
       if (updateError) {
@@ -129,14 +153,28 @@ export default function EditProfileScreen() {
         </Pressable>
       </View>
 
-      <Pressable style={styles.avatarWrap} onPress={pickAvatar} accessibilityLabel="Change profile photo">
-        {avatarUri ? (
-          <Image source={{ uri: avatarUri }} style={styles.avatar} transition={200} />
+      <Pressable onPress={pickCover} accessibilityLabel="Change cover photo">
+        {coverUri ? (
+          <Image source={{ uri: coverUri }} style={styles.cover} transition={200} />
         ) : (
-          <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+          <LinearGradient colors={['#FF7A5C', '#E3A23A', '#0F8B82']} locations={[0, 0.6, 1]} style={styles.cover} />
         )}
-        <Text style={styles.changePhoto}>Change photo</Text>
+        <View style={styles.coverEditBadge}>
+          <Feather name="camera" size={12} color="white" />
+          <Text style={styles.coverEditBadgeText}>Change cover</Text>
+        </View>
       </Pressable>
+
+      <View style={styles.avatarRow}>
+        <Pressable onPress={pickAvatar} accessibilityLabel="Change profile photo">
+          {avatarUri ? (
+            <Image source={{ uri: avatarUri }} style={styles.avatar} transition={200} />
+          ) : (
+            <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+          )}
+        </Pressable>
+        <Text style={styles.changePhoto}>Tap either photo to change it</Text>
+      </View>
 
       <Text style={styles.label}>Display name</Text>
       <TextInput style={styles.input} value={displayName} onChangeText={setDisplayName} placeholder="Your name" placeholderTextColor={colors.inkSoft} />
@@ -186,9 +224,15 @@ function createStyles(colors: ColorTokens) {
   headerTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 17, color: colors.ink },
   headerBtn: { fontSize: 14, fontWeight: '600', color: colors.inkSoft },
   saveBtn: { color: colors.coral, fontWeight: '700' },
-  avatarWrap: { alignItems: 'center', marginBottom: 20 },
-  avatar: { width: 88, height: 88, borderRadius: 44 },
-  changePhoto: { marginTop: 8, fontSize: 12.5, fontWeight: '700', color: colors.teal },
+  cover: { height: 110 },
+  coverEditBadge: {
+    position: 'absolute', bottom: 10, right: 16, flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: radius.pill,
+  },
+  coverEditBadgeText: { color: 'white', fontSize: 11, fontWeight: '700' },
+  avatarRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: -38, paddingHorizontal: spacing.lg, marginBottom: 20 },
+  avatar: { width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand },
+  changePhoto: { flex: 1, fontSize: 12, color: colors.inkSoft },
   label: {
     fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
     fontWeight: '600', paddingHorizontal: spacing.lg, marginTop: spacing.md, marginBottom: 6,

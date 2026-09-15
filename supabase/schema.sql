@@ -8,6 +8,9 @@ create table profiles (
   display_name text not null,
   bio text,
   avatar_url text,
+  -- Shown behind the avatar on the profile header; falls back to a fixed
+  -- gradient when null, same fallback pattern as a missing avatar_url.
+  cover_url text,
   university text,
   interests text[] default '{}',
   has_completed_onboarding boolean not null default false,
@@ -712,4 +715,19 @@ create policy "Users can update their own avatar" on storage.objects for update 
 );
 create policy "Users can delete their own avatar" on storage.objects for delete using (
   bucket_id = 'avatars' and auth.uid()::text = (storage.foldername(name))[1]
+);
+
+-- Same bucket/RLS shape as avatars — one cover photo per user, folder-scoped
+-- to their own uid so the insert/update/delete policies can check it.
+insert into storage.buckets (id, name, public) values ('covers', 'covers', true)
+on conflict (id) do nothing;
+create policy "Covers are publicly viewable" on storage.objects for select using (bucket_id = 'covers');
+create policy "Users can upload their own cover" on storage.objects for insert with check (
+  bucket_id = 'covers' and auth.uid()::text = (storage.foldername(name))[1]
+);
+create policy "Users can update their own cover" on storage.objects for update using (
+  bucket_id = 'covers' and auth.uid()::text = (storage.foldername(name))[1]
+);
+create policy "Users can delete their own cover" on storage.objects for delete using (
+  bucket_id = 'covers' and auth.uid()::text = (storage.foldername(name))[1]
 );

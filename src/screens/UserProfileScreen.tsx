@@ -199,7 +199,11 @@ export default function UserProfileScreen() {
         ListEmptyComponent={hasLoadedOnce ? <EmptyState icon="grid" text="No posts yet." /> : null}
         ListHeaderComponent={
           <View>
-            <LinearGradient colors={['#FF7A5C', '#E3A23A', '#0F8B82']} locations={[0, 0.6, 1]} style={styles.cover} />
+            {profile.cover_url ? (
+              <Image source={{ uri: profile.cover_url }} style={styles.cover} contentFit="cover" transition={200} />
+            ) : (
+              <LinearGradient colors={['#FF7A5C', '#E3A23A', '#0F8B82']} locations={[0, 0.6, 1]} style={styles.cover} />
+            )}
             <Pressable style={[styles.back, styles.backOverlay, { top: insets.top + 12 }]} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
               <Feather name="arrow-left" size={17} color="#20261F" />
             </Pressable>

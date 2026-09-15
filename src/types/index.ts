@@ -5,7 +5,7 @@ export type Interest =
 
 export interface Profile {
   id: string; username: string; display_name: string; bio: string | null;
-  avatar_url: string | null; university: string | null; interests: Interest[];
+  avatar_url: string | null; cover_url: string | null; university: string | null; interests: Interest[];
   has_completed_onboarding: boolean; is_admin: boolean; created_at: string;
 }
 
