@@ -221,6 +221,17 @@ export default function DiscoverScreen() {
         </Pressable>
       )}
 
+      {!isSearching && (
+        <Pressable style={[styles.perksPromo, { marginTop: 10 }]} onPress={() => navigation.navigate('Map')} accessibilityLabel="Open map">
+          <View style={[styles.perksPromoIcon, { backgroundColor: colors.tealSoft }]}><Feather name="map-pin" size={18} color={colors.teal} /></View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.perksPromoTitle}>Map</Text>
+            <Text style={styles.perksPromoSub}>See offers, events, and who's checked in nearby</Text>
+          </View>
+          <Feather name="chevron-right" size={16} color={colors.inkSoft} />
+        </Pressable>
+      )}
+
       {noResults && <EmptyState icon="search" text={`No results for "${query.trim()}"`} />}
 
       {isSearching && matchedInterests.length > 0 && (

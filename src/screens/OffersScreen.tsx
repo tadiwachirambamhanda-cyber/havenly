@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, RefreshControl } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -8,6 +8,7 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { getCurrentLocation, distanceKm, formatDistance, type Coords } from '@/lib/location';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
@@ -24,7 +25,12 @@ export default function OffersScreen() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [myLocation, setMyLocation] = useState<Coords | null>(null);
   const myStreak = profile?.current_streak ?? 0;
+
+  // Once per visit, not on every focus — no need to re-prompt/re-fetch GPS
+  // each time this screen comes back into view.
+  useEffect(() => { getCurrentLocation().then(setMyLocation); }, []);
 
   const load = useCallback(async () => {
     const now = new Date().toISOString();
@@ -46,6 +52,21 @@ export default function OffersScreen() {
     setRefreshing(false);
   }, [load]);
 
+  // Nearest-first when we actually have a location to sort by; offers with
+  // no coordinates (or no location permission) fall back to the original
+  // min_streak order, and always sort after ones we could place on a map.
+  const sortedOffers = useMemo(() => {
+    if (!myLocation) return offers;
+    return [...offers].sort((a, b) => {
+      const da = a.latitude != null && a.longitude != null ? distanceKm(myLocation, { latitude: a.latitude, longitude: a.longitude }) : null;
+      const db = b.latitude != null && b.longitude != null ? distanceKm(myLocation, { latitude: b.latitude, longitude: b.longitude }) : null;
+      if (da == null && db == null) return a.min_streak - b.min_streak;
+      if (da == null) return 1;
+      if (db == null) return -1;
+      return da - db;
+    });
+  }, [offers, myLocation]);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -58,13 +79,16 @@ export default function OffersScreen() {
         <Text style={styles.streakBannerText}>🔥 Your streak: {myStreak} day{myStreak === 1 ? '' : 's'}</Text>
       </View>
       <FlatList
-        data={offers}
+        data={sortedOffers}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.md, flexGrow: 1 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
         ListEmptyComponent={loaded ? <EmptyState icon="gift" text="No perks available right now — check back soon." /> : null}
         renderItem={({ item }) => {
           const unlocked = myStreak >= item.min_streak;
+          const distance = myLocation && item.latitude != null && item.longitude != null
+            ? distanceKm(myLocation, { latitude: item.latitude, longitude: item.longitude })
+            : null;
           return (
             <Pressable style={styles.card} onPress={() => navigation.navigate('OfferDetail', { offerId: item.id })}>
               {item.image_url ? (
@@ -75,7 +99,15 @@ export default function OffersScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={styles.cardBrand}>{item.brand?.name ?? 'Havenly Partner'}</Text>
                 <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
-                <Text style={styles.cardDiscount}>{item.discount_label}</Text>
+                <View style={styles.cardMetaRow}>
+                  <Text style={styles.cardDiscount}>{item.discount_label}</Text>
+                  {distance != null && (
+                    <View style={styles.distancePill}>
+                      <Feather name="map-pin" size={9} color={colors.teal} />
+                      <Text style={styles.distancePillText}>{formatDistance(distance)}</Text>
+                    </View>
+                  )}
+                </View>
               </View>
               {unlocked ? (
                 <Feather name="chevron-right" size={18} color={colors.inkSoft} />
@@ -105,7 +137,10 @@ function createStyles(colors: ColorTokens) {
   cardImage: { width: 56, height: 56, borderRadius: 12 },
   cardBrand: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 10, textTransform: 'uppercase', color: colors.teal },
   cardTitle: { fontSize: 13.5, fontWeight: '700', color: colors.ink, marginTop: 2, lineHeight: 17 },
-  cardDiscount: { fontSize: 12, color: colors.coral, fontWeight: '700', marginTop: 3 },
+  cardMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 3 },
+  cardDiscount: { fontSize: 12, color: colors.coral, fontWeight: '700' },
+  distancePill: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: colors.tealSoft, paddingHorizontal: 7, paddingVertical: 2, borderRadius: radius.pill },
+  distancePillText: { fontSize: 10, fontWeight: '700', color: colors.teal },
   lockBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: colors.sandDeep, paddingHorizontal: 8, paddingVertical: 5, borderRadius: radius.pill },
   lockBadgeText: { fontSize: 10.5, fontWeight: '700', color: colors.inkSoft },
   });

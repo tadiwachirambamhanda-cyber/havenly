@@ -8,6 +8,7 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { useToast } from '@/lib/ToastContext';
 import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
@@ -16,45 +17,64 @@ import type { Notification } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
+// place_title is resolved client-side after the initial fetch (ping-only —
+// see load()), since check_ins.place_id can point at either offers or
+// events and there's no single join that covers both.
+type Row = Notification & { place_title?: string };
 
 const ICON_BY_TYPE: Record<Notification['type'], keyof typeof Feather.glyphMap> = {
   follow: 'user-plus',
   like: 'heart',
   comment: 'message-circle',
+  ping: 'navigation',
 };
 
-function messageFor(n: Notification): string {
+function messageFor(n: Row): string {
   const name = n.actor?.display_name ?? 'Someone';
   if (n.type === 'follow') return `${name} started following you`;
   if (n.type === 'like') return `${name} liked your post`;
-  return `${name} commented on your post`;
+  if (n.type === 'comment') return `${name} commented on your post`;
+  return `${name} pinged you${n.place_title ? ` from ${n.place_title}` : ''}`;
 }
 
 export default function NotificationsScreen() {
   const navigation = useNavigation<Nav>();
   const { session } = useAuth();
   const { colors } = useTheme();
+  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
 
-  const [rows, setRows] = useState<Notification[]>([]);
+  const [rows, setRows] = useState<Row[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     if (!myId) return;
     const { data } = await supabase.from('notifications')
-      .select('*, actor:profiles!notifications_actor_id_fkey(*), post:posts(id, title, image_url)')
+      .select('*, actor:profiles!notifications_actor_id_fkey(*), post:posts(id, title, image_url), check_in:check_ins(id, place_type, place_id)')
       .eq('recipient_id', myId)
       .order('created_at', { ascending: false })
       .limit(100);
-    setRows((data as unknown as Notification[]) ?? []);
+    const notifs = (data as unknown as Notification[]) ?? [];
+
+    // Ping notifications only — resolve the place name from whichever
+    // table the check-in actually points at.
+    const offerIds = notifs.filter((n) => n.check_in?.place_type === 'offer').map((n) => n.check_in!.place_id);
+    const eventIds = notifs.filter((n) => n.check_in?.place_type === 'event').map((n) => n.check_in!.place_id);
+    const [{ data: offerRows }, { data: eventRows }] = await Promise.all([
+      offerIds.length ? supabase.from('offers').select('id, title').in('id', offerIds) : Promise.resolve({ data: [] as { id: string; title: string }[] }),
+      eventIds.length ? supabase.from('events').select('id, title').in('id', eventIds) : Promise.resolve({ data: [] as { id: string; title: string }[] }),
+    ]);
+    const titleById = new Map([...(offerRows ?? []), ...(eventRows ?? [])].map((r) => [r.id, r.title]));
+
+    setRows(notifs.map((n) => ({ ...n, place_title: n.check_in ? titleById.get(n.check_in.place_id) : undefined })));
     setLoaded(true);
 
     // Snapshot each row's real is_read state into local state above before
     // this, so unread rows still render highlighted for this viewing —
     // marking them read here only affects the badge and the *next* visit.
-    const unreadIds = (data ?? []).filter((n) => !n.is_read).map((n) => n.id);
+    const unreadIds = notifs.filter((n) => !n.is_read).map((n) => n.id);
     if (unreadIds.length) {
       await supabase.from('notifications').update({ is_read: true }).in('id', unreadIds);
     }
@@ -68,9 +88,12 @@ export default function NotificationsScreen() {
     setRefreshing(false);
   }, [load]);
 
-  const openNotification = (n: Notification) => {
+  const openNotification = (n: Row) => {
     if (n.type === 'follow') {
       navigation.navigate('UserProfile', { userId: n.actor_id });
+    } else if (n.type === 'ping' && n.check_in) {
+      if (n.check_in.place_type === 'offer') navigation.navigate('OfferDetail', { offerId: n.check_in.place_id });
+      else showToast('Open Discover to see this event.');
     } else if (n.post_id) {
       navigation.navigate('PostDetail', { postId: n.post_id });
     }

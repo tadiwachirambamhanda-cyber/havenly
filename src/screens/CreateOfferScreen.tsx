@@ -32,6 +32,9 @@ export default function CreateOfferScreen() {
   const [imageUrl, setImageUrl] = useState('');
   const [minStreak, setMinStreak] = useState(0);
   const [endsAt, setEndsAt] = useState('');
+  const [address, setAddress] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
@@ -47,6 +50,7 @@ export default function CreateOfferScreen() {
 
   const allowLeave = useConfirmDiscard(!created && (
     title.trim() !== '' || description.trim() !== '' || discountLabel.trim() !== '' || imageUrl.trim() !== '' || endsAt !== ''
+    || address.trim() !== '' || latitude !== '' || longitude !== ''
   ));
 
   const create = async () => {
@@ -63,6 +67,14 @@ export default function CreateOfferScreen() {
       endsAtIso = parsed.toISOString();
     }
 
+    let lat: number | null = null;
+    let lng: number | null = null;
+    if (latitude.trim() || longitude.trim()) {
+      lat = Number(latitude.trim());
+      lng = Number(longitude.trim());
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return setError('Latitude/longitude must both be numbers, e.g. 25.2048, 55.2708.');
+    }
+
     setCreating(true);
     const { error: insertError } = await supabase.from('offers').insert({
       brand_id: brandId,
@@ -72,6 +84,9 @@ export default function CreateOfferScreen() {
       discount_label: discountLabel.trim(),
       min_streak: minStreak,
       ends_at: endsAtIso,
+      address: address.trim() || null,
+      latitude: lat,
+      longitude: lng,
     });
     setCreating(false);
 
@@ -139,6 +154,22 @@ export default function CreateOfferScreen() {
         keyboardType="numbers-and-punctuation"
       />
 
+      <Text style={styles.sectionLabel}>Location (optional — lets it show on the map)</Text>
+      <Text style={styles.hint}>Right-click the spot on Google Maps and tap the coordinates to copy them.</Text>
+      <TextInput style={[styles.fieldInput, { marginTop: spacing.sm }]} placeholder="Address (optional)…" placeholderTextColor={colors.inkSoft} value={address} onChangeText={setAddress} />
+      <View style={styles.dateRow}>
+        <TextInput
+          style={[styles.fieldInput, styles.dateInput, { marginTop: 0 }]}
+          placeholder="Latitude, e.g. 25.2048" placeholderTextColor={colors.inkSoft}
+          value={latitude} onChangeText={setLatitude} keyboardType="numbers-and-punctuation"
+        />
+        <TextInput
+          style={[styles.fieldInput, styles.dateInput, { marginTop: 0 }]}
+          placeholder="Longitude, e.g. 55.2708" placeholderTextColor={colors.inkSoft}
+          value={longitude} onChangeText={setLongitude} keyboardType="numbers-and-punctuation"
+        />
+      </View>
+
       {error && <Text style={styles.error}>{error}</Text>}
     </ScrollView>
   );
@@ -171,6 +202,9 @@ function createStyles(colors: ColorTokens) {
     marginHorizontal: spacing.lg, marginTop: spacing.sm, minHeight: 80, backgroundColor: colors.white, borderWidth: 1,
     borderColor: colors.line, borderRadius: radius.sm, padding: 14, fontSize: 14, color: colors.ink, textAlignVertical: 'top',
   },
+  hint: { fontSize: 11.5, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: -4 },
+  dateRow: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.lg, marginTop: spacing.sm },
+  dateInput: { flex: 1, marginHorizontal: 0 },
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 9, paddingHorizontal: spacing.lg },
   chip: { paddingVertical: 9, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
   chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },

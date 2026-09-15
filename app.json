@@ -43,7 +43,13 @@
           "microphonePermission": "Havenly needs access to your microphone to record video for a post."
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Havenly uses your location to show offers, events, and check-ins near you."
+        }
+      ]
     ]
   }
 }

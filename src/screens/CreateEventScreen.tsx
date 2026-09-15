@@ -29,11 +29,16 @@ export default function CreateEventScreen() {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [tag, setTag] = useState(TAG_OPTIONS[0]);
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
 
-  const allowLeave = useConfirmDiscard(!created && (title.trim() !== '' || location.trim() !== '' || description.trim() !== '' || date !== '' || time !== ''));
+  const allowLeave = useConfirmDiscard(!created && (
+    title.trim() !== '' || location.trim() !== '' || description.trim() !== '' || date !== '' || time !== ''
+    || latitude !== '' || longitude !== ''
+  ));
 
   const create = async () => {
     setError(null);
@@ -46,6 +51,14 @@ export default function CreateEventScreen() {
     if (Number.isNaN(eventDate.getTime())) return setError('That date and time isn’t valid.');
     if (eventDate.getTime() <= Date.now()) return setError('Event date must be in the future — Discover only shows upcoming events.');
 
+    let lat: number | null = null;
+    let lng: number | null = null;
+    if (latitude.trim() || longitude.trim()) {
+      lat = Number(latitude.trim());
+      lng = Number(longitude.trim());
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return setError('Latitude/longitude must both be numbers, e.g. 25.2048, 55.2708.');
+    }
+
     setCreating(true);
     const { error: insertError } = await supabase.from('events').insert({
       title: title.trim(),
@@ -53,6 +66,8 @@ export default function CreateEventScreen() {
       description: description.trim() || null,
       tag,
       event_date: eventDate.toISOString(),
+      latitude: lat,
+      longitude: lng,
     });
     setCreating(false);
 
@@ -123,6 +138,21 @@ export default function CreateEventScreen() {
         />
       </View>
 
+      <Text style={styles.sectionLabel}>Location on map (optional)</Text>
+      <Text style={styles.hint}>Right-click the spot on Google Maps and tap the coordinates to copy them.</Text>
+      <View style={[styles.dateRow, { marginTop: spacing.sm }]}>
+        <TextInput
+          style={[styles.fieldInput, styles.dateInput, { marginTop: 0 }]}
+          placeholder="Latitude, e.g. 25.2048" placeholderTextColor={colors.inkSoft}
+          value={latitude} onChangeText={setLatitude} keyboardType="numbers-and-punctuation"
+        />
+        <TextInput
+          style={[styles.fieldInput, styles.dateInput, { marginTop: 0 }]}
+          placeholder="Longitude, e.g. 55.2708" placeholderTextColor={colors.inkSoft}
+          value={longitude} onChangeText={setLongitude} keyboardType="numbers-and-punctuation"
+        />
+      </View>
+
       <Text style={styles.sectionLabel}>Tag</Text>
       <View style={styles.chipGrid}>
         {TAG_OPTIONS.map((opt) => {
@@ -166,6 +196,7 @@ function createStyles(colors: ColorTokens) {
     fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
     fontWeight: '600', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
   },
+  hint: { fontSize: 11.5, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: -4 },
   dateRow: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.lg },
   dateInput: { flex: 1.3, marginHorizontal: 0 },
   timeInput: { flex: 1, marginHorizontal: 0 },

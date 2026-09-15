@@ -10,10 +10,13 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
+import { createCheckIn, deleteCheckIn, sendPing } from '@/lib/checkIns';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
-import type { Offer } from '@/types';
+import type { CheckIn, Offer, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
+
+type VisibleCheckIn = CheckIn & { user: Profile };
 
 type Route = RouteProp<RootStackParamList, 'OfferDetail'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -31,20 +34,56 @@ export default function OfferDetailScreen() {
   const [loaded, setLoaded] = useState(false);
   const [claiming, setClaiming] = useState(false);
   const [claimCode, setClaimCode] = useState<string | null>(null);
+  const [checkIns, setCheckIns] = useState<VisibleCheckIn[]>([]);
+  const [checkingIn, setCheckingIn] = useState(false);
+  const [pingingId, setPingingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const [{ data: offerData }, { data: claimData }] = await Promise.all([
+    const now = new Date().toISOString();
+    const [{ data: offerData }, { data: claimData }, { data: checkInData }] = await Promise.all([
       supabase.from('offers').select('*, brand:brands(*)').eq('id', offerId).maybeSingle(),
       profile
         ? supabase.from('offer_claims').select('code').eq('offer_id', offerId).eq('user_id', profile.id).maybeSingle()
         : Promise.resolve({ data: null as { code: string } | null }),
+      supabase.from('check_ins').select('*, user:profiles(*)').eq('place_type', 'offer').eq('place_id', offerId).gt('expires_at', now),
     ]);
     setOffer(offerData as unknown as Offer);
     setClaimCode(claimData?.code ?? null);
+    setCheckIns((checkInData as unknown as VisibleCheckIn[]) ?? []);
     setLoaded(true);
   }, [offerId, profile]);
 
   useEffect(() => { load(); }, [load]);
+
+  const myCheckIn = checkIns.find((c) => c.user_id === profile?.id) ?? null;
+
+  const toggleCheckIn = async () => {
+    if (!profile || checkingIn) return;
+    setCheckingIn(true);
+    haptics.tap();
+    try {
+      if (myCheckIn) await deleteCheckIn(myCheckIn.id);
+      else await createCheckIn(profile.id, 'offer', offerId);
+      await load();
+    } catch {
+      showToast('Couldn’t update your check-in — try again.', 'error');
+    } finally {
+      setCheckingIn(false);
+    }
+  };
+
+  const ping = async (checkIn: VisibleCheckIn) => {
+    setPingingId(checkIn.id);
+    try {
+      await sendPing(checkIn.id);
+      haptics.success();
+      showToast(`Pinged ${checkIn.user.display_name} 👋`);
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Couldn’t send ping.', 'error');
+    } finally {
+      setPingingId(null);
+    }
+  };
 
   const myStreak = profile?.current_streak ?? 0;
   const unlocked = offer ? myStreak >= offer.min_streak : false;
@@ -115,6 +154,58 @@ export default function OfferDetailScreen() {
             <Text style={styles.lockedText}>Keep your streak going to unlock this.</Text>
           </View>
         )}
+
+        {offer.latitude != null && offer.longitude != null && (
+          <View style={styles.checkInSection}>
+            <Pressable
+              style={[styles.checkInBtn, myCheckIn && styles.checkInBtnActive]}
+              onPress={toggleCheckIn}
+              disabled={checkingIn}
+              accessibilityLabel={myCheckIn ? 'Check out' : 'Check in here'}
+            >
+              {checkingIn ? (
+                <ActivityIndicator size="small" color={myCheckIn ? colors.coral : 'white'} />
+              ) : (
+                <>
+                  <Feather name="map-pin" size={14} color={myCheckIn ? colors.coral : 'white'} />
+                  <Text style={[styles.checkInBtnText, myCheckIn && styles.checkInBtnTextActive]}>
+                    {myCheckIn ? 'You’re checked in' : 'Check in here'}
+                  </Text>
+                </>
+              )}
+            </Pressable>
+
+            {checkIns.length > 0 && (
+              <View style={styles.checkInList}>
+                <Text style={styles.checkInListLabel}>{checkIns.length} checked in nearby</Text>
+                {checkIns.map((c) => (
+                  <View key={c.id} style={styles.checkInRow}>
+                    {c.user.avatar_url ? (
+                      <Image source={{ uri: c.user.avatar_url }} style={styles.checkInAvatar} transition={200} />
+                    ) : (
+                      <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.checkInAvatar} />
+                    )}
+                    <Text style={styles.checkInName}>{c.user.display_name}{c.user_id === profile?.id ? ' (you)' : ''}</Text>
+                    {c.user_id !== profile?.id && (
+                      <Pressable
+                        style={styles.pingBtn}
+                        onPress={() => ping(c)}
+                        disabled={pingingId === c.id}
+                        accessibilityLabel={`Ping ${c.user.display_name}`}
+                      >
+                        {pingingId === c.id ? (
+                          <ActivityIndicator size="small" color={colors.ink} />
+                        ) : (
+                          <Text style={styles.pingBtnText}>Ping 👋</Text>
+                        )}
+                      </Pressable>
+                    )}
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        )}
       </View>
     </ScrollView>
   );
@@ -150,5 +241,23 @@ function createStyles(colors: ColorTokens) {
   },
   codeLabel: { fontSize: 11.5, color: colors.sand, opacity: 0.7, textTransform: 'uppercase', fontFamily: 'JetBrainsMono_500Medium' },
   code: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 30, fontWeight: '700', color: colors.sand, letterSpacing: 6, marginTop: 8 },
+  checkInSection: { marginTop: 24, paddingTop: 20, borderTopWidth: 1, borderColor: colors.line },
+  checkInBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.teal,
+    paddingVertical: 13, borderRadius: radius.pill,
+  },
+  checkInBtnActive: { backgroundColor: colors.tealSoft, borderWidth: 1.5, borderColor: colors.teal },
+  checkInBtnText: { color: 'white', fontWeight: '700', fontSize: 13.5 },
+  checkInBtnTextActive: { color: colors.teal },
+  checkInList: { marginTop: 18 },
+  checkInListLabel: {
+    fontFamily: 'JetBrainsMono_500Medium', fontSize: 10.5, textTransform: 'uppercase', color: colors.inkSoft,
+    fontWeight: '600', marginBottom: 10,
+  },
+  checkInRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
+  checkInAvatar: { width: 32, height: 32, borderRadius: 16 },
+  checkInName: { flex: 1, fontSize: 12.5, fontWeight: '600', color: colors.ink },
+  pingBtn: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: radius.pill, backgroundColor: colors.sandDeep, borderWidth: 1, borderColor: colors.line },
+  pingBtnText: { fontSize: 11.5, fontWeight: '700', color: colors.ink },
   });
 }
