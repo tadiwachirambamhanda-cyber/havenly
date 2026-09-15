@@ -61,7 +61,7 @@ export default function CreateEventScreen() {
       return;
     }
     setCreated(true);
-    showToast('Event created', 'success');
+    showToast('Event created!', 'success');
     navigation.goBack();
   };
 

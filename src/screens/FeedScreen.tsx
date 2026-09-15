@@ -250,7 +250,7 @@ export default function FeedScreen() {
           </ScrollView>
         )}
         {posts.length === 0 ? (
-          <EmptyState icon="image" text="No posts yet — seed editorial content first." />
+          <EmptyState icon="image" text="Nothing here yet — be the first to post." />
         ) : (
           <View style={styles.masonryRow}>
             {columns.map((col, i) => (
