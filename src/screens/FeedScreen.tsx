@@ -68,6 +68,23 @@ function estimateCardHeight(post: Post, imageHeight: number): number {
   return imageHeight + 64 + titleLines * 18;
 }
 
+// True masonry: each post gets a deterministic (not fixed) image height,
+// then a greedy shortest-column-first pass balances posts across columns by
+// estimated total height — plain FlatList numColumns forces equal-height
+// rows, which is what made this not-actually-masonry before. Pulled out to
+// a plain function (not a hook) so each feed section can balance its own
+// posts independently instead of one global column pair.
+function balanceColumns(items: Post[]): Post[][] {
+  const cols: Post[][] = Array.from({ length: NUM_COLUMNS }, () => []);
+  const colHeights = new Array(NUM_COLUMNS).fill(0);
+  for (const post of items) {
+    const shortest = colHeights.indexOf(Math.min(...colHeights));
+    cols[shortest].push(post);
+    colHeights[shortest] += estimateCardHeight(post, 110 + (hashString(post.id) % 60));
+  }
+  return cols;
+}
+
 export default function FeedScreen() {
   const navigation = useNavigation<Nav>();
   const { session, profile } = useAuth();
@@ -76,6 +93,8 @@ export default function FeedScreen() {
   const { height: windowHeight } = useWindowDimensions();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [trendingPosts, setTrendingPosts] = useState<Post[]>([]);
+  const [communityPosts, setCommunityPosts] = useState<Post[]>([]);
   const [myCommunities, setMyCommunities] = useState<Community[]>([]);
   const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -93,8 +112,12 @@ export default function FeedScreen() {
     () => INTEREST_OPTIONS.filter((opt) => profile?.interests.includes(opt.key)),
     [profile]
   );
+  // The first picked interest doubles as the one the "Trending in X" section
+  // features — same order the filter chips render in, so it's the same one
+  // that sits leftmost right above it.
+  const topInterestLabel = interestChips[0]?.label ?? null;
 
-  const fetchPosts = useCallback(async (tag: string | null) => {
+  const fetchPosts = useCallback(async (tag: string | null, communityIds: string[]) => {
     let query = supabase
       .from('posts')
       // Explicit FK hint (posts_author_id_fkey) because post_likes creates a second,
@@ -116,13 +139,34 @@ export default function FeedScreen() {
       (a, b) => scorePost(b, viewerInterestLabels, profile?.university) - scorePost(a, viewerInterestLabels, profile?.university)
     );
     setPosts(ranked.slice(0, PAGE_SIZE));
-  }, [profile]);
 
-  const fetchMyCommunities = useCallback(async () => {
+    // A specific tag filter is already the flat, single-topic view a chip
+    // switches you into — the section rows below (a mix across topics) don't
+    // add anything there, so skip fetching them entirely rather than just
+    // hiding them.
+    if (tag) { setTrendingPosts([]); setCommunityPosts([]); return; }
+
+    const [trendingResult, communityResult] = await Promise.all([
+      topInterestLabel
+        ? supabase.from('posts').select('*, author:profiles!posts_author_id_fkey(*), community:communities(name)')
+            .eq('tag', topInterestLabel).order('like_count', { ascending: false }).limit(10)
+        : Promise.resolve(null),
+      communityIds.length > 0
+        ? supabase.from('posts').select('*, author:profiles!posts_author_id_fkey(*), community:communities(name)')
+            .in('community_id', communityIds).order('created_at', { ascending: false }).limit(10)
+        : Promise.resolve(null),
+    ]);
+    setTrendingPosts((trendingResult?.data as unknown as Post[]) ?? []);
+    setCommunityPosts((communityResult?.data as unknown as Post[]) ?? []);
+  }, [profile, topInterestLabel]);
+
+  const fetchMyCommunities = useCallback(async (): Promise<Community[]> => {
     const userId = session?.user.id;
-    if (!userId) { setMyCommunities([]); return; }
+    if (!userId) { setMyCommunities([]); return []; }
     const { data } = await supabase.from('community_members').select('community:communities(*)').eq('user_id', userId);
-    setMyCommunities(((data ?? []) as unknown as { community: Community }[]).map((r) => r.community));
+    const list = ((data ?? []) as unknown as { community: Community }[]).map((r) => r.community);
+    setMyCommunities(list);
+    return list;
   }, [session]);
 
   // Refetches every time Feed regains focus (not just on mount) so a post
@@ -132,11 +176,16 @@ export default function FeedScreen() {
   // selectedInterest is a dependency too, not just read from state, so
   // tapping a filter chip while already focused re-runs this immediately —
   // that's the only signal this effect gets that the filter changed.
+  // Communities are fetched first (not in parallel with posts) because the
+  // "New in your communities" section needs their ids — fetchPosts can't
+  // read them off state since fetchMyCommunities' own setState wouldn't have
+  // landed yet if both ran at once.
   useFocusEffect(
     useCallback(() => {
       (async () => {
         if (!hasLoadedOnce) setLoading(true);
-        await Promise.all([fetchPosts(selectedInterest), fetchMyCommunities()]);
+        const communities = await fetchMyCommunities();
+        await fetchPosts(selectedInterest, communities.map((c) => c.id));
         setLoading(false);
         setHasLoadedOnce(true);
       })();
@@ -144,7 +193,10 @@ export default function FeedScreen() {
   );
 
   const onRefresh = useCallback(async () => {
-    setRefreshing(true); await Promise.all([fetchPosts(selectedInterest), fetchMyCommunities()]); setRefreshing(false);
+    setRefreshing(true);
+    const communities = await fetchMyCommunities();
+    await fetchPosts(selectedInterest, communities.map((c) => c.id));
+    setRefreshing(false);
   }, [fetchPosts, fetchMyCommunities, selectedInterest]);
 
   const toggleInterestFilter = useCallback((label: string) => {
@@ -158,21 +210,30 @@ export default function FeedScreen() {
   // on the way ProfileScreen's grid does. Measuring each video card's own
   // on-screen position directly gets the same result without needing one.
   const checkVideoVisibility = useCallback(async () => {
-    const videoPosts = posts.filter((p) => p.video_url);
-    if (videoPosts.length === 0) return;
-    const results = await Promise.all(videoPosts.map((post) => new Promise<[string, boolean]>((resolve) => {
-      const ref = videoCardRefs.current.get(post.id);
-      if (!ref) { resolve([post.id, false]); return; }
+    // Keyed by "<section>:<post id>", not just post id — the same post can
+    // now render in more than one section at once (e.g. also trending in
+    // its own tag), and each on-screen instance needs its own measured
+    // position. Keying by post id alone meant two instances shared one
+    // tracked ref, so whichever wasn't on screen paused BOTH copies.
+    const videoEntries: [string, Post][] = [
+      ...posts.map((p): [string, Post] => [`picked:${p.id}`, p]),
+      ...trendingPosts.map((p): [string, Post] => [`trending:${p.id}`, p]),
+      ...communityPosts.map((p): [string, Post] => [`community:${p.id}`, p]),
+    ].filter(([, p]) => p.video_url);
+    if (videoEntries.length === 0) return;
+    const results = await Promise.all(videoEntries.map(([cardKey]) => new Promise<[string, boolean]>((resolve) => {
+      const ref = videoCardRefs.current.get(cardKey);
+      if (!ref) { resolve([cardKey, false]); return; }
       ref.measureInWindow((_x, y, _width, height) => {
-        resolve([post.id, y + height > 0 && y < windowHeight]);
+        resolve([cardKey, y + height > 0 && y < windowHeight]);
       });
     })));
-    const next = new Set(results.filter(([, visible]) => visible).map(([id]) => id));
+    const next = new Set(results.filter(([, visible]) => visible).map(([key]) => key));
     setVisibleVideoIds((prev) => {
       if (prev.size === next.size && [...prev].every((id) => next.has(id))) return prev;
       return next;
     });
-  }, [posts, windowHeight]);
+  }, [posts, trendingPosts, communityPosts, windowHeight]);
 
   const onScroll = useCallback((_e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const now = Date.now();
@@ -186,28 +247,21 @@ export default function FeedScreen() {
   // videos already on screen start playing without needing a scroll first.
   useEffect(() => { checkVideoVisibility(); }, [checkVideoVisibility]);
 
-  // True masonry: each post gets a deterministic (not fixed) image height,
-  // then a greedy shortest-column-first pass balances posts across columns
-  // by estimated total height — plain FlatList numColumns forces equal-height
-  // rows, which is what made this not-actually-masonry before.
-  const columns = useMemo(() => {
-    const cols: Post[][] = Array.from({ length: NUM_COLUMNS }, () => []);
-    const colHeights = new Array(NUM_COLUMNS).fill(0);
-    for (const post of posts) {
-      const shortest = colHeights.indexOf(Math.min(...colHeights));
-      cols[shortest].push(post);
-      colHeights[shortest] += estimateCardHeight(post, 110 + (hashString(post.id) % 60));
-    }
-    return cols;
-  }, [posts]);
+  const pickedColumns = useMemo(() => balanceColumns(posts), [posts]);
+  const trendingColumns = useMemo(() => balanceColumns(trendingPosts), [trendingPosts]);
+  const communityColumns = useMemo(() => balanceColumns(communityPosts), [communityPosts]);
 
-  const renderCard = (item: Post) => {
+  // sectionKey distinguishes the same post rendered in more than one
+  // section at once (see checkVideoVisibility) — doesn't need to be
+  // anything but stable and unique per section.
+  const renderCard = (item: Post, sectionKey: string) => {
     const hash = hashString(item.id);
     const [from, to] = gradients[hash % gradients.length];
     const imageHeight = 110 + (hash % 60);
+    const cardKey = `${sectionKey}:${item.id}`;
     return (
       <Pressable
-        key={item.id}
+        key={cardKey}
         style={[styles.card, item.is_editorial && styles.cardEditorial]}
         onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
       >
@@ -216,9 +270,9 @@ export default function FeedScreen() {
           {item.video_url ? (
             <View
               style={StyleSheet.absoluteFill}
-              ref={(el) => { if (el) videoCardRefs.current.set(item.id, el); else videoCardRefs.current.delete(item.id); }}
+              ref={(el) => { if (el) videoCardRefs.current.set(cardKey, el); else videoCardRefs.current.delete(cardKey); }}
             >
-              <VideoThumb uri={item.video_url} isVisible={isFocused && visibleVideoIds.has(item.id)} />
+              <VideoThumb uri={item.video_url} isVisible={isFocused && visibleVideoIds.has(cardKey)} />
             </View>
           ) : item.image_url ? (
             <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
@@ -249,6 +303,17 @@ export default function FeedScreen() {
       </Pressable>
     );
   };
+
+  const renderSection = (title: string, columns: Post[][], sectionKey: string) => (
+    <View key={title}>
+      <Text style={styles.sectionLabel}>{title}</Text>
+      <View style={styles.masonryRow}>
+        {columns.map((col, i) => (
+          <View key={i} style={styles.masonryColumn}>{col.map((post) => renderCard(post, sectionKey))}</View>
+        ))}
+      </View>
+    </View>
+  );
 
   if (loading) {
     return (
@@ -343,19 +408,27 @@ export default function FeedScreen() {
             ))}
           </ScrollView>
         )}
-        {posts.length === 0 ? (
-          <EmptyState
-            icon="image"
-            text={selectedInterest ? `No ${selectedInterest} posts yet.` : 'Nothing here yet — be the first to post.'}
-          />
+        {selectedInterest ? (
+          // A chip is active — one flat, single-topic grid, same as before
+          // sections existed. "Trending in X" / "New in your communities"
+          // don't add anything once you've already filtered to one topic.
+          posts.length === 0 ? (
+            <EmptyState icon="image" text={`No ${selectedInterest} posts yet.`} />
+          ) : (
+            <View style={styles.masonryRow}>
+              {pickedColumns.map((col, i) => (
+                <View key={i} style={styles.masonryColumn}>{col.map((post) => renderCard(post, 'flat'))}</View>
+              ))}
+            </View>
+          )
+        ) : posts.length === 0 && trendingPosts.length === 0 && communityPosts.length === 0 ? (
+          <EmptyState icon="image" text="Nothing here yet — be the first to post." />
         ) : (
-          <View style={styles.masonryRow}>
-            {columns.map((col, i) => (
-              <View key={i} style={styles.masonryColumn}>
-                {col.map(renderCard)}
-              </View>
-            ))}
-          </View>
+          <>
+            {posts.length > 0 && renderSection('Picked for you', pickedColumns, 'picked')}
+            {topInterestLabel && trendingPosts.length > 0 && renderSection(`Trending in ${topInterestLabel}`, trendingColumns, 'trending')}
+            {communityPosts.length > 0 && renderSection('New in your communities', communityColumns, 'community')}
+          </>
         )}
       </ScrollView>
     </View>
@@ -387,6 +460,10 @@ function createStyles(colors: ColorTokens) {
   myCommunityChipText: { fontSize: 11.5, fontWeight: '700', color: colors.ink },
   communityBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
   communityBadgeText: { fontSize: 9.5, fontWeight: '700', color: colors.teal },
+  sectionLabel: {
+    fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
+    fontWeight: '600', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
+  },
   masonryRow: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.lg },
   masonryColumn: { flex: 1, gap: spacing.sm },
   card: { borderRadius: radius.md, overflow: 'hidden', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
