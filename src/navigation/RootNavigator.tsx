@@ -82,6 +82,12 @@ export default function RootNavigator() {
   }, [scheme, colors]);
 
   if (loading) return <SplashLoading colors={colors} />;
+  // Right after signing in, `session` updates a render before `profile` does
+  // (AuthContext fetches it separately, after the fact) — without this,
+  // that gap reads as "signed in, no completed-onboarding profile yet" and
+  // flashes the Onboarding screen for a moment before the real profile
+  // loads in, even for a returning user.
+  if (session && !profile) return <SplashLoading colors={colors} />;
 
   return (
     <NavigationContainer theme={navTheme}>
