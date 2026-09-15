@@ -165,16 +165,16 @@ export default function EditProfileScreen() {
         </View>
       </Pressable>
 
-      <View style={styles.avatarRow}>
-        <Pressable onPress={pickAvatar} accessibilityLabel="Change profile photo">
-          {avatarUri ? (
-            <Image source={{ uri: avatarUri }} style={styles.avatar} transition={200} />
-          ) : (
-            <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
-          )}
-        </Pressable>
-        <Text style={styles.changePhoto}>Tap either photo to change it</Text>
-      </View>
+      <Pressable style={styles.avatarWrap} onPress={pickAvatar} accessibilityLabel="Change profile photo">
+        {avatarUri ? (
+          <Image source={{ uri: avatarUri }} style={styles.avatar} transition={200} />
+        ) : (
+          <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+        )}
+        <View style={styles.avatarEditBadge}>
+          <Feather name="camera" size={11} color="white" />
+        </View>
+      </Pressable>
 
       <Text style={styles.label}>Display name</Text>
       <TextInput style={styles.input} value={displayName} onChangeText={setDisplayName} placeholder="Your name" placeholderTextColor={colors.inkSoft} />
@@ -230,9 +230,12 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: radius.pill,
   },
   coverEditBadgeText: { color: 'white', fontSize: 11, fontWeight: '700' },
-  avatarRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: -38, paddingHorizontal: spacing.lg, marginBottom: 20 },
+  avatarWrap: { alignSelf: 'flex-start', marginTop: -38, marginLeft: spacing.lg, marginBottom: 20 },
   avatar: { width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand },
-  changePhoto: { flex: 1, fontSize: 12, color: colors.inkSoft },
+  avatarEditBadge: {
+    position: 'absolute', bottom: 0, right: 0, width: 24, height: 24, borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.55)', borderWidth: 2, borderColor: colors.sand, alignItems: 'center', justifyContent: 'center',
+  },
   label: {
     fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
     fontWeight: '600', paddingHorizontal: spacing.lg, marginTop: spacing.md, marginBottom: 6,
