@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl, useWindo
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation, useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { useNavigation, useFocusEffect, useIsFocused, type CompositeNavigationProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -18,9 +19,15 @@ import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
 import VideoThumb from '@/components/VideoThumb';
 import type { Community, Post } from '@/types';
-import type { RootStackParamList } from '@/navigation/RootNavigator';
+import type { RootStackParamList, MainTabParamList } from '@/navigation/RootNavigator';
 
-type Nav = NativeStackNavigationProp<RootStackParamList>;
+// FeedScreen is actually a Tab.Screen nested inside the root stack, so its
+// real navigation prop is both — the tab type for tabPress (only fired on
+// the tab navigator, not the stack), the stack type for navigate('PostDetail', ...).
+type Nav = CompositeNavigationProp<
+  BottomTabNavigationProp<MainTabParamList, 'Feed'>,
+  NativeStackNavigationProp<RootStackParamList>
+>;
 const PAGE_SIZE = 20;
 const NUM_COLUMNS = 2;
 // How many recent posts to pull before ranking and trimming down to
@@ -114,6 +121,7 @@ export default function FeedScreen() {
   const [visibleVideoIds, setVisibleVideoIds] = useState<Set<string>>(new Set());
   const videoCardRefs = useRef<Map<string, View>>(new Map());
   const lastVisibilityCheckRef = useRef(0);
+  const scrollRef = useRef<ScrollView>(null);
 
   // Only the interests picked in onboarding/Edit Profile show up as filter
   // chips — same source ProfileScreen's own interest chips use. post.tag
@@ -209,6 +217,24 @@ export default function FeedScreen() {
     await fetchPosts(selectedInterest, communities.map((c) => c.id));
     setRefreshing(false);
   }, [fetchPosts, fetchMyCommunities, selectedInterest]);
+
+  // Shared by the "havenly." wordmark and re-tapping the already-active Feed
+  // tab — both the scroll-to-top and the refresh, same as tapping the active
+  // tab does in most feed apps.
+  const refreshFeed = useCallback(() => {
+    haptics.tap();
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+    onRefresh();
+  }, [onRefresh]);
+
+  // Fires whenever the Feed tab button is pressed, whether or not it's
+  // already the active tab — react-navigation's own tabPress event, not
+  // anything TabBar has to cooperate with.
+  useEffect(() => {
+    return navigation.addListener('tabPress', () => {
+      if (navigation.isFocused()) refreshFeed();
+    });
+  }, [navigation, refreshFeed]);
 
   const toggleInterestFilter = useCallback((label: string) => {
     haptics.tap();
@@ -368,10 +394,10 @@ export default function FeedScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <View style={styles.brandRow}>
+        <Pressable style={styles.brandRow} onPress={refreshFeed} accessibilityLabel="Refresh feed">
           <View style={styles.brandDot} />
           <Text style={styles.brand}>havenly.</Text>
-        </View>
+        </Pressable>
         <View style={styles.topBarActions}>
           <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Communities')} accessibilityLabel="Communities">
             <Feather name="users" size={17} color={colors.ink} />
@@ -414,6 +440,7 @@ export default function FeedScreen() {
         </ScrollView>
       )}
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
         onScroll={onScroll}
