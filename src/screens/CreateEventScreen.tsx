@@ -33,7 +33,7 @@ export default function CreateEventScreen() {
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
 
-  useConfirmDiscard(!created && (title.trim() !== '' || location.trim() !== '' || description.trim() !== '' || date !== '' || time !== ''));
+  const allowLeave = useConfirmDiscard(!created && (title.trim() !== '' || location.trim() !== '' || description.trim() !== '' || date !== '' || time !== ''));
 
   const create = async () => {
     setError(null);
@@ -61,6 +61,7 @@ export default function CreateEventScreen() {
       return;
     }
     setCreated(true);
+    allowLeave();
     showToast('Event created!', 'success');
     navigation.goBack();
   };

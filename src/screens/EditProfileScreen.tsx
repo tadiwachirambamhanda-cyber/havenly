@@ -41,7 +41,7 @@ export default function EditProfileScreen() {
 
   const interestsChanged = interests.size !== (profile?.interests ?? []).length
     || Array.from(interests).some((k) => !profile?.interests.includes(k));
-  useConfirmDiscard(!saved && (
+  const allowLeave = useConfirmDiscard(!saved && (
     displayName !== (profile?.display_name ?? '')
     || username !== (profile?.username ?? '')
     || bio !== (profile?.bio ?? '')
@@ -103,6 +103,7 @@ export default function EditProfileScreen() {
       await refreshProfile();
       haptics.success();
       setSaved(true);
+      allowLeave();
       navigation.goBack();
       showToast('Profile updated');
     } catch (e) {

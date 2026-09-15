@@ -113,7 +113,7 @@ export default function CreatePostScreen() {
   const [posted, setPosted] = useState(false);
   const [mediaPickerVisible, setMediaPickerVisible] = useState(false);
 
-  useConfirmDiscard(!posted && (title.trim() !== '' || body.trim() !== '' || imageUri !== null || videoUri !== null));
+  const allowLeave = useConfirmDiscard(!posted && (title.trim() !== '' || body.trim() !== '' || imageUri !== null || videoUri !== null));
 
   // Only communities the user has joined can be posted into (enforced again,
   // for real, by the insert RLS policy — this list is just what to offer).
@@ -227,6 +227,7 @@ export default function CreatePostScreen() {
 
       haptics.success();
       setPosted(true);
+      allowLeave();
       navigation.goBack();
       showToast('Posted!');
     } catch (e) {
