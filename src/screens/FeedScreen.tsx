@@ -8,9 +8,11 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { haptics } from '@/lib/haptics';
 import { radius, spacing, gradients } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
+import { INTEREST_OPTIONS } from '@/constants/interests';
 import { formatCount } from '@/utils/formatCount';
 import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
@@ -41,13 +43,14 @@ function estimateCardHeight(post: Post, imageHeight: number): number {
 
 export default function FeedScreen() {
   const navigation = useNavigation<Nav>();
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
   const { colors } = useTheme();
   const isFocused = useIsFocused();
   const { height: windowHeight } = useWindowDimensions();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [myCommunities, setMyCommunities] = useState<Community[]>([]);
+  const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
@@ -55,14 +58,25 @@ export default function FeedScreen() {
   const videoCardRefs = useRef<Map<string, View>>(new Map());
   const lastVisibilityCheckRef = useRef(0);
 
-  const fetchPosts = useCallback(async () => {
-    const { data, error } = await supabase
+  // Only the interests picked in onboarding/Edit Profile show up as filter
+  // chips — same source ProfileScreen's own interest chips use. post.tag
+  // values are chosen from the same label set at posting time (TAG_OPTIONS),
+  // so matching on the label directly (not the Interest key) works.
+  const interestChips = useMemo(
+    () => INTEREST_OPTIONS.filter((opt) => profile?.interests.includes(opt.key)),
+    [profile]
+  );
+
+  const fetchPosts = useCallback(async (tag: string | null) => {
+    let query = supabase
       .from('posts')
       // Explicit FK hint (posts_author_id_fkey) because post_likes creates a second,
       // indirect posts<->profiles path that makes the relationship ambiguous otherwise.
       .select('*, author:profiles!posts_author_id_fkey(*), community:communities(name)')
       .order('created_at', { ascending: false })
       .limit(PAGE_SIZE);
+    if (tag) query = query.eq('tag', tag);
+    const { data, error } = await query;
     if (error) { console.error('Failed to fetch posts:', error.message); return; }
     setPosts((data as unknown as Post[]) ?? []);
   }, []);
@@ -78,20 +92,28 @@ export default function FeedScreen() {
   // made in CreatePost, or a like toggled in PostDetail, shows up immediately
   // without needing a manual pull-to-refresh. Same for community membership —
   // joining/leaving in Communities should update this row without a restart.
+  // selectedInterest is a dependency too, not just read from state, so
+  // tapping a filter chip while already focused re-runs this immediately —
+  // that's the only signal this effect gets that the filter changed.
   useFocusEffect(
     useCallback(() => {
       (async () => {
         if (!hasLoadedOnce) setLoading(true);
-        await Promise.all([fetchPosts(), fetchMyCommunities()]);
+        await Promise.all([fetchPosts(selectedInterest), fetchMyCommunities()]);
         setLoading(false);
         setHasLoadedOnce(true);
       })();
-    }, [fetchPosts, fetchMyCommunities, hasLoadedOnce])
+    }, [fetchPosts, fetchMyCommunities, hasLoadedOnce, selectedInterest])
   );
 
   const onRefresh = useCallback(async () => {
-    setRefreshing(true); await Promise.all([fetchPosts(), fetchMyCommunities()]); setRefreshing(false);
-  }, [fetchPosts, fetchMyCommunities]);
+    setRefreshing(true); await Promise.all([fetchPosts(selectedInterest), fetchMyCommunities()]); setRefreshing(false);
+  }, [fetchPosts, fetchMyCommunities, selectedInterest]);
+
+  const toggleInterestFilter = useCallback((label: string) => {
+    haptics.tap();
+    setSelectedInterest((prev) => (prev === label ? null : label));
+  }, []);
 
   // The masonry layout is a plain ScrollView (FlatList's numColumns forces
   // equal-height rows, which is exactly what breaks true masonry — see the
@@ -233,6 +255,41 @@ export default function FeedScreen() {
           </Pressable>
         </View>
       </View>
+      {interestChips.length > 0 && (
+        // Pinned above the scrolling feed (unlike myCommunitiesRow below,
+        // which scrolls away with the rest) since it's an active filter
+        // control — you're more likely to want to keep switching it while
+        // scrolling through results than a static row of shortcuts. Needs
+        // its own flexGrow/flexShrink: 0 here — placed directly in the
+        // column flex layout (not nested inside the main ScrollView the way
+        // myCommunitiesRow is), react-native-web otherwise squeezes this
+        // row below its content's natural height, clipping the chips.
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ flexGrow: 0, flexShrink: 0 }}
+          contentContainerStyle={styles.interestRow}
+        >
+          <Pressable
+            style={[styles.interestChip, !selectedInterest && styles.interestChipSelected]}
+            onPress={() => { haptics.tap(); setSelectedInterest(null); }}
+          >
+            <Text style={[styles.interestChipText, !selectedInterest && styles.interestChipTextSelected]}>All</Text>
+          </Pressable>
+          {interestChips.map((opt) => {
+            const isSelected = selectedInterest === opt.label;
+            return (
+              <Pressable
+                key={opt.key}
+                style={[styles.interestChip, isSelected && styles.interestChipSelected]}
+                onPress={() => toggleInterestFilter(opt.label)}
+              >
+                <Text style={[styles.interestChipText, isSelected && styles.interestChipTextSelected]}>{opt.label}</Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      )}
       <ScrollView
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
@@ -250,7 +307,10 @@ export default function FeedScreen() {
           </ScrollView>
         )}
         {posts.length === 0 ? (
-          <EmptyState icon="image" text="Nothing here yet — be the first to post." />
+          <EmptyState
+            icon="image"
+            text={selectedInterest ? `No ${selectedInterest} posts yet.` : 'Nothing here yet — be the first to post.'}
+          />
         ) : (
           <View style={styles.masonryRow}>
             {columns.map((col, i) => (
@@ -274,6 +334,14 @@ function createStyles(colors: ColorTokens) {
   brand: { fontFamily: 'Fraunces_700Bold_Italic', fontSize: 24, color: colors.ink },
   topBarActions: { flexDirection: 'row', gap: spacing.sm },
   iconBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+  interestRow: { flexDirection: 'row', gap: 8, paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
+  interestChip: {
+    backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line,
+    borderRadius: radius.pill, paddingVertical: 7, paddingHorizontal: 14,
+  },
+  interestChipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
+  interestChipText: { fontSize: 11.5, fontWeight: '700', color: colors.ink },
+  interestChipTextSelected: { color: colors.sand },
   myCommunitiesRow: { flexDirection: 'row', gap: 8, paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
   myCommunityChip: {
     flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.white, borderWidth: 1,
