@@ -692,7 +692,6 @@ create table events (
   location text not null,
   tag text not null,
   event_date timestamptz not null,
-  interested_count int not null default 0,
   -- Nullable — lets an event be pinned on the map, but doesn't require it
   -- (older/editorial rows just don't appear there).
   latitude double precision,
@@ -707,55 +706,6 @@ create policy "Admins can create events" on events for insert with check (
 create policy "Admins can delete events" on events for delete using (
   exists (select 1 from profiles where id = auth.uid() and is_admin = true)
 );
-
--- Who's marked themselves interested in an event — lets Discover show a
--- real count and cross-reference against `follows` to surface "people you
--- follow who are going". Viewable by everyone (same as post_likes/
--- community_members) so that friends-going lookup can run as a normal
--- client query instead of a security-definer function.
-create table event_interests (
-  event_id uuid references events(id) on delete cascade,
-  user_id uuid references profiles(id) on delete cascade,
-  created_at timestamptz default now(),
-  primary key (event_id, user_id)
-);
-alter table event_interests enable row level security;
-create policy "Event interest is viewable by everyone" on event_interests for select using (true);
-create policy "Users can mark interest in events" on event_interests for insert with check (auth.uid() = user_id);
-create policy "Users can remove their interest" on event_interests for delete using (auth.uid() = user_id);
-
--- Atomically toggles interest and keeps events.interested_count in sync,
--- same shape as toggle_post_like. security definer because there's no
--- update policy on events at all (nothing else should ever touch this
--- table's columns from the client).
-create or replace function public.toggle_event_interest(event_id_input uuid)
-returns table (interested boolean, interested_count int)
-language plpgsql
-security definer set search_path = public
-as $$
-declare
-  uid uuid := auth.uid();
-  already_interested boolean;
-begin
-  if uid is null then
-    raise exception 'Not authenticated';
-  end if;
-
-  select exists(select 1 from event_interests where event_id = event_id_input and user_id = uid) into already_interested;
-
-  if already_interested then
-    delete from event_interests where event_id = event_id_input and user_id = uid;
-    update events set interested_count = greatest(events.interested_count - 1, 0) where id = event_id_input;
-  else
-    insert into event_interests (event_id, user_id) values (event_id_input, uid);
-    update events set interested_count = events.interested_count + 1 where id = event_id_input;
-  end if;
-
-  return query select not already_interested, events.interested_count from events where events.id = event_id_input;
-end;
-$$;
-
-grant execute on function public.toggle_event_interest(uuid) to authenticated;
 
 -- ==================== BRAND OFFERS ====================
 -- Phase one of monetization: brands are invoiced manually outside the app
@@ -1007,12 +957,49 @@ create table interests (
 );
 
 alter table interests enable row level security;
-create policy "Users can view interests they're allowed to see" on interests for select using (
-  public.can_see_checkin(auth.uid(), user_id)
-);
+-- Public, not can_see_checkin()-restricted: events' pre-existing "interested"
+-- count (Discover's heart button, e.g. "42 interested") shares this table
+-- and has always been visible to everyone, not just the viewer's own
+-- network. "I'm down to go" is a forward-looking intent, not a real-time
+-- location, so treating it like a check-in's tighter visibility isn't
+-- warranted here.
+create policy "Interest is viewable by everyone" on interests for select using (true);
 create policy "Users can mark their own interest" on interests for insert with check (auth.uid() = user_id);
 create policy "Users can remove their own interest" on interests for delete using (auth.uid() = user_id);
 create index interests_place_idx on interests (place_type, place_id);
+
+-- Atomically toggles a user's interest in an offer or event — replaces the
+-- old event-only toggle_event_interest() now that offers and events share
+-- one interests table. security definer since a plain client-side
+-- delete-then-insert (the original client-side toggleInterest()) has a
+-- real, if small, race window between two rapid taps.
+create or replace function public.toggle_interest(place_type_input text, place_id_input uuid)
+returns table (interested boolean)
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  already_interested boolean;
+begin
+  if uid is null then
+    raise exception 'Not authenticated';
+  end if;
+
+  select exists(
+    select 1 from interests where place_type = place_type_input and place_id = place_id_input and user_id = uid
+  ) into already_interested;
+
+  if already_interested then
+    delete from interests where place_type = place_type_input and place_id = place_id_input and user_id = uid;
+  else
+    insert into interests (user_id, place_type, place_id) values (uid, place_type_input, place_id_input);
+  end if;
+
+  return query select not already_interested;
+end;
+$$;
+grant execute on function public.toggle_interest(text, uuid) to authenticated;
 
 -- ==================== SAFETY: REPORTING ====================
 create table reports (

@@ -1,24 +1,13 @@
 import { supabase } from '@/lib/supabase';
 import type { CheckInPlaceType } from '@/types';
 
-// Toggles "I'm down to go" for one place — a plain flip since, unlike a
-// check-in, there's nothing on the row itself that ever needs refreshing.
-// Returns the new state so callers can update local UI without a refetch.
-export async function toggleInterest(userId: string, placeType: CheckInPlaceType, placeId: string): Promise<boolean> {
-  const { data: existing } = await supabase
-    .from('interests')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('place_type', placeType)
-    .eq('place_id', placeId)
-    .maybeSingle();
-
-  if (existing) {
-    const { error } = await supabase.from('interests').delete().eq('id', existing.id);
-    if (error) throw error;
-    return false;
-  }
-  const { error } = await supabase.from('interests').insert({ user_id: userId, place_type: placeType, place_id: placeId });
+// Wraps toggle_interest() — a security-definer RPC that flips the row
+// atomically server-side (auth.uid() identifies the user, not a passed-in
+// id), rather than a client-side check-then-insert/delete with a race
+// window between two rapid taps. Returns the new state so callers can
+// update local UI without a refetch.
+export async function toggleInterest(placeType: CheckInPlaceType, placeId: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc('toggle_interest', { place_type_input: placeType, place_id_input: placeId });
   if (error) throw error;
-  return true;
+  return !!data?.[0]?.interested;
 }

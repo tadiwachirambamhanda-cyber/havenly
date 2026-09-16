@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { haptics } from '@/lib/haptics';
+import { toggleInterest as togglePlaceInterest } from '@/lib/interests';
 import { formatCount } from '@/utils/formatCount';
 import { radius, spacing, gradients } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
@@ -57,6 +58,7 @@ export default function DiscoverScreen() {
   const [communities, setCommunities] = useState<Community[] | null>(null);
   const [events, setEvents] = useState<HavenlyEvent[] | null>(null);
   const [myInterestIds, setMyInterestIds] = useState<Set<string>>(new Set());
+  const [interestCounts, setInterestCounts] = useState<Map<string, number>>(new Map());
   const [friendsGoing, setFriendsGoing] = useState<Map<string, Profile[]>>(new Map());
   const [refreshing, setRefreshing] = useState(false);
   const [addingInterest, setAddingInterest] = useState<Interest | null>(null);
@@ -85,28 +87,32 @@ export default function DiscoverScreen() {
     setEvents(eventList);
 
     const userId = session?.user.id;
-    if (!userId || eventList.length === 0) { setMyInterestIds(new Set()); setFriendsGoing(new Map()); return; }
+    if (eventList.length === 0) { setMyInterestIds(new Set()); setInterestCounts(new Map()); setFriendsGoing(new Map()); return; }
 
     const eventIds = eventList.map((e) => e.id);
-    const [{ data: mineData }, { data: followData }] = await Promise.all([
-      supabase.from('event_interests').select('event_id').eq('user_id', userId).in('event_id', eventIds),
-      supabase.from('follows').select('following_id').eq('follower_id', userId),
+    // One query covers all three: the total count (public — this is the
+    // same "42 interested" number event_interests used to show), which of
+    // those are mine, and which are people I follow, all derived from the
+    // same result instead of three separate round trips.
+    const [{ data: interestData }, { data: followData }] = await Promise.all([
+      supabase.from('interests').select('place_id, user_id, user:profiles(*)').eq('place_type', 'event').in('place_id', eventIds),
+      userId ? supabase.from('follows').select('following_id').eq('follower_id', userId) : Promise.resolve({ data: [] }),
     ]);
-    setMyInterestIds(new Set(((mineData ?? []) as { event_id: string }[]).map((row) => row.event_id)));
 
-    const followingIds = ((followData ?? []) as { following_id: string }[]).map((row) => row.following_id);
-    if (followingIds.length === 0) { setFriendsGoing(new Map()); return; }
+    const rows = (interestData as unknown as { place_id: string; user_id: string; user: Profile | null }[]) ?? [];
+    setMyInterestIds(new Set(userId ? rows.filter((r) => r.user_id === userId).map((r) => r.place_id) : []));
 
-    const { data: interestData } = await supabase.from('event_interests')
-      .select('event_id, user:profiles(*)')
-      .in('event_id', eventIds).in('user_id', followingIds);
+    const counts = new Map<string, number>();
+    rows.forEach((r) => counts.set(r.place_id, (counts.get(r.place_id) ?? 0) + 1));
+    setInterestCounts(counts);
 
+    const followingIds = new Set(((followData ?? []) as { following_id: string }[]).map((row) => row.following_id));
     const grouped = new Map<string, Profile[]>();
-    for (const row of (interestData as unknown as { event_id: string; user: Profile | null }[]) ?? []) {
-      if (!row.user) continue;
-      const list = grouped.get(row.event_id) ?? [];
+    for (const row of rows) {
+      if (!row.user || !followingIds.has(row.user_id)) continue;
+      const list = grouped.get(row.place_id) ?? [];
       list.push(row.user);
-      grouped.set(row.event_id, list);
+      grouped.set(row.place_id, list);
     }
     setFriendsGoing(grouped);
   }, [session]);
@@ -120,17 +126,18 @@ export default function DiscoverScreen() {
     const bump = (n: number) => Math.max(n + (wasInterested ? -1 : 1), 0);
     const unbump = (n: number) => Math.max(n + (wasInterested ? 1 : -1), 0);
 
-    setEvents((prev) => prev?.map((e) => (e.id === eventId ? { ...e, interested_count: bump(e.interested_count) } : e)) ?? prev);
+    setInterestCounts((prev) => { const next = new Map(prev); next.set(eventId, bump(next.get(eventId) ?? 0)); return next; });
     setMyInterestIds((prev) => {
       const next = new Set(prev);
       if (wasInterested) next.delete(eventId); else next.add(eventId);
       return next;
     });
 
-    const { error } = await supabase.rpc('toggle_event_interest', { event_id_input: eventId });
-    if (error) {
+    try {
+      await togglePlaceInterest('event', eventId);
+    } catch {
       // Revert the optimistic update if the write actually failed.
-      setEvents((prev) => prev?.map((e) => (e.id === eventId ? { ...e, interested_count: unbump(e.interested_count) } : e)) ?? prev);
+      setInterestCounts((prev) => { const next = new Map(prev); next.set(eventId, unbump(next.get(eventId) ?? 0)); return next; });
       setMyInterestIds((prev) => {
         const next = new Set(prev);
         if (wasInterested) next.add(eventId); else next.delete(eventId);
@@ -355,6 +362,10 @@ export default function DiscoverScreen() {
                 entering={FadeInDown.delay(Math.min(eventIndex, 6) * 60).springify().damping(16)}
                 style={styles.eventCard}
               >
+                <AnimatedPressable
+                  onPress={() => navigation.navigate('EventDetail', { eventId: event.id })}
+                  accessibilityLabel={`View ${event.title}`}
+                >
                 <View style={styles.eventRow}>
                   <View style={styles.eventDate}>
                     <Text style={styles.eventDay}>{date.getDate()}</Text>
@@ -374,7 +385,7 @@ export default function DiscoverScreen() {
                     >
                       <Feather name="heart" size={15} color={interested ? colors.coral : colors.inkSoft} />
                       <Text style={[styles.interestCount, interested && styles.interestCountActive]}>
-                        {formatCount(event.interested_count)}
+                        {formatCount(interestCounts.get(event.id) ?? 0)}
                       </Text>
                     </AnimatedPressable>
                     {profile?.is_admin && (
@@ -411,6 +422,7 @@ export default function DiscoverScreen() {
                     <Text style={styles.friendsText} numberOfLines={1}>{friendsGoingLabel(friends)}</Text>
                   </View>
                 )}
+                </AnimatedPressable>
               </Animated.View>
             );
           })}

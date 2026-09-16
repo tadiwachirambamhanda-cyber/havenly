@@ -539,7 +539,7 @@ export default function MapScreen() {
     if (!myId) return;
     haptics.tap();
     try {
-      const nowMine = await toggleInterest(myId, placeType, placeId);
+      const nowMine = await toggleInterest(placeType, placeId);
       const filtered = interests.filter((i) => !(i.user_id === myId && i.place_type === placeType && i.place_id === placeId));
       const nextInterests = nowMine
         ? [...filtered, { id: `local-${placeType}-${placeId}`, user_id: myId, place_type: placeType, place_id: placeId, created_at: new Date().toISOString() }]
@@ -620,7 +620,7 @@ export default function MapScreen() {
     try {
       const msg = JSON.parse(event.nativeEvent.data);
       if (msg.type === 'openOffer') navigation.navigate('OfferDetail', { offerId: msg.id });
-      else if (msg.type === 'openEvent') showToast('Open Discover to see this event.');
+      else if (msg.type === 'openEvent') navigation.navigate('EventDetail', { eventId: msg.id });
       else if (msg.type === 'ping') handlePing(msg.id);
       else if (msg.type === 'toggleInterest') handleToggleInterest(msg.placeType, msg.id);
     } catch {

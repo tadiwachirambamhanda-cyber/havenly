@@ -70,7 +70,7 @@ export default function OfferDetailScreen() {
     setTogglingInterest(true);
     haptics.tap();
     try {
-      await toggleInterest(profile.id, 'offer', offerId);
+      await toggleInterest('offer', offerId);
       await load();
     } catch {
       showToast('Couldn’t update — try again.', 'error');

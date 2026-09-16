@@ -35,6 +35,7 @@ import OfferDetailScreen from '@/screens/OfferDetailScreen';
 import ManageBrandsScreen from '@/screens/ManageBrandsScreen';
 import CreateOfferScreen from '@/screens/CreateOfferScreen';
 import MapScreen from '@/screens/MapScreen';
+import EventDetailScreen from '@/screens/EventDetailScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -60,6 +61,7 @@ export type RootStackParamList = {
   ManageBrands: undefined;
   CreateOffer: undefined;
   Map: undefined;
+  EventDetail: { eventId: string };
 };
 
 export type MainTabParamList = {
@@ -144,6 +146,7 @@ export default function RootNavigator() {
             <Stack.Screen name="ManageBrands" component={ManageBrandsScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="CreateOffer" component={CreateOfferScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Map" component={MapScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="EventDetail" component={EventDetailScreen} options={{ presentation: 'card' }} />
           </>
         )}
       </Stack.Navigator>

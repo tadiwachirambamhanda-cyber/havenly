@@ -42,7 +42,7 @@ export interface Message {
 // Named HavenlyEvent, not Event, to avoid shadowing the DOM's global Event type.
 export interface HavenlyEvent {
   id: string; title: string; description: string | null; location: string; tag: string;
-  event_date: string; interested_count: number; created_at: string;
+  event_date: string; created_at: string;
   latitude: number | null; longitude: number | null;
 }
 
