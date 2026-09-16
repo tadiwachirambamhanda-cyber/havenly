@@ -968,6 +968,19 @@ create policy "Users can mark their own interest" on interests for insert with c
 create policy "Users can remove their own interest" on interests for delete using (auth.uid() = user_id);
 create index interests_place_idx on interests (place_type, place_id);
 
+-- Lets the Map screen react to new/removed check-ins and interest toggles
+-- live instead of only on reopen — same reasoning as the messages/
+-- conversations/notifications publication statements above (search doesn't
+-- find them grouped there since check_ins/interests aren't defined until
+-- here).
+alter publication supabase_realtime add table check_ins;
+alter publication supabase_realtime add table interests;
+-- A DELETE's "old record" only carries primary-key columns by default —
+-- check_ins.id is the primary key, so its deletes are fine as-is, but
+-- interests.place_type/place_id aren't part of its primary key (just id
+-- is), and the map needs both to know which pin's count to recompute.
+alter table interests replica identity full;
+
 -- Atomically toggles a user's interest in an offer or event — replaces the
 -- old event-only toggle_event_interest() now that offers and events share
 -- one interests table. security definer since a plain client-side

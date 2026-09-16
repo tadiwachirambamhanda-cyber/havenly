@@ -393,22 +393,43 @@ function buildMapHtml(params: {
       renderTypeMarkers(renderedEvent, { type: 'event', data: eventData, color: '${palette.teal}', icon: '${ICON_CALENDAR}', popupHtml: eventPopupHtml });
     }
 
-    function addCheckinMarkers() {
-      checkInData.forEach(function (p) {
-        var el = document.createElement('div');
-        el.className = 'checkin-wrap';
-        el.innerHTML = '<div class="checkin-pulse"></div><div class="checkin-pin"' +
-          (p.avatar ? ' style="background-image:url(' + escapeHtml(p.avatar) + ')"' : '') + '></div>';
-        checkinEls[p.id] = el;
-        var popup = new mapboxgl.Popup({ offset: 22, closeButton: false }).setHTML(
-          '<div class="popup-title">' + escapeHtml(p.name) + (p.mine ? ' (you)' : '') + '</div>' +
-          '<div class="popup-sub">Checked in at ' + escapeHtml(p.placeTitle) + '</div>' +
-          (p.mine ? '' : '<button class="popup-btn" onclick=\\'pingClick("' + p.id + '")\\'>${ICON_RADIO} Ping</button>')
-        );
-        var marker = new mapboxgl.Marker({ element: el, anchor: 'center' }).setLngLat([p.lng, p.lat]).setPopup(popup).addTo(map);
-        markersById['checkin:' + p.id] = marker;
-      });
+    function addOneCheckin(p) {
+      var el = document.createElement('div');
+      el.className = 'checkin-wrap';
+      el.innerHTML = '<div class="checkin-pulse"></div><div class="checkin-pin"' +
+        (p.avatar ? ' style="background-image:url(' + escapeHtml(p.avatar) + ')"' : '') + '></div>';
+      checkinEls[p.id] = el;
+      var popup = new mapboxgl.Popup({ offset: 22, closeButton: false }).setHTML(
+        '<div class="popup-title">' + escapeHtml(p.name) + (p.mine ? ' (you)' : '') + '</div>' +
+        '<div class="popup-sub">Checked in at ' + escapeHtml(p.placeTitle) + '</div>' +
+        (p.mine ? '' : '<button class="popup-btn" onclick=\\'pingClick("' + p.id + '")\\'>${ICON_RADIO} Ping</button>')
+      );
+      var marker = new mapboxgl.Marker({ element: el, anchor: 'center' }).setLngLat([p.lng, p.lat]).setPopup(popup).addTo(map);
+      markersById['checkin:' + p.id] = marker;
     }
+    function addCheckinMarkers() {
+      checkInData.forEach(addOneCheckin);
+    }
+
+    // Live patch points — called from RN via injectJavaScript when a
+    // Realtime subscription sees someone else's check-in appear/disappear
+    // while this screen is open, so the map updates without a full reload
+    // (which would also reset pan/zoom, same reasoning as setInterest).
+    window.addCheckin = function (p) {
+      var key = 'checkin:' + p.id;
+      if (pointDataById[key]) return; // already present — avoid a duplicate marker
+      checkInData.push(p);
+      pointDataById[key] = p;
+      if (typeVisible.checkin) addOneCheckin(p);
+    };
+    window.removeCheckin = function (id) {
+      var key = 'checkin:' + id;
+      var m = markersById[key];
+      if (m) { m.remove(); delete markersById[key]; }
+      delete checkinEls[id];
+      delete pointDataById[key];
+      checkInData = checkInData.filter(function (p) { return p.id !== id; });
+    };
 
     function addMarkers() {
       var userEl = document.createElement('div');
@@ -478,6 +499,13 @@ export default function MapScreen() {
   const [hiddenTypes, setHiddenTypes] = useState<{ offer: boolean; event: boolean; checkin: boolean }>({
     offer: false, event: false, checkin: false,
   });
+  // Realtime handlers below need the latest offers/events to resolve a new
+  // check-in's place, but re-subscribing the channel every time offers/
+  // events change (a normal useCallback dependency would do that) would
+  // drop and reopen the connection far more than needed — a ref sidesteps
+  // that without going stale.
+  const offersRef = useRef<Offer[]>([]);
+  const eventsRef = useRef<HavenlyEvent[]>([]);
 
   const load = useCallback(async () => {
     const loc = await getCurrentLocation();
@@ -506,9 +534,68 @@ export default function MapScreen() {
     setCheckIns(checkInList);
     setInterests((interestData as unknown as PlaceInterest[]) ?? []);
     setLoaded(true);
+    offersRef.current = offerList;
+    eventsRef.current = eventList;
   }, []);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
+
+  // Patches the WebView directly (addCheckin/removeCheckin/setInterest)
+  // rather than calling load() + rebuilding the page on every event — same
+  // "don't reset the user's pan/zoom for one small change" reasoning as
+  // handleToggleInterest. Someone else's check-in appearing, disappearing,
+  // or a "down to go" count changing shows up live while this screen is
+  // open, instead of only on the next reopen.
+  const handleCheckInInsert = useCallback(async (row: CheckIn) => {
+    const place = row.place_type === 'offer'
+      ? offersRef.current.find((o) => o.id === row.place_id)
+      : eventsRef.current.find((e) => e.id === row.place_id);
+    if (!place || place.latitude == null || place.longitude == null) return;
+
+    const { data: userData } = await supabase.from('profiles').select('*').eq('id', row.user_id).maybeSingle();
+    if (!userData) return;
+    const user = userData as Profile;
+
+    setCheckIns((prev) => (prev.some((c) => c.id === row.id) ? prev : [...prev, { ...row, user, place }]));
+
+    const patch = {
+      id: row.id, lat: place.latitude, lng: place.longitude,
+      name: user.display_name, avatar: user.avatar_url, mine: row.user_id === myId,
+      placeTitle: place.title,
+    };
+    if (typeof webviewRef.current?.injectJavaScript === 'function') {
+      webviewRef.current.injectJavaScript(`window.addCheckin && window.addCheckin(${JSON.stringify(patch)}); true;`);
+    }
+  }, [myId]);
+
+  const handleCheckInDelete = useCallback((id: string) => {
+    setCheckIns((prev) => prev.filter((c) => c.id !== id));
+    if (typeof webviewRef.current?.injectJavaScript === 'function') {
+      webviewRef.current.injectJavaScript(`window.removeCheckin && window.removeCheckin(${JSON.stringify(id)}); true;`);
+    }
+  }, []);
+
+  const handleInterestChange = useCallback(async (row: { place_type: string; place_id: string } | undefined) => {
+    if (!row || (row.place_type !== 'offer' && row.place_type !== 'event')) return;
+    const { data } = await supabase.from('interests').select('user_id').eq('place_type', row.place_type).eq('place_id', row.place_id);
+    const rows = (data as { user_id: string }[]) ?? [];
+    const count = rows.length;
+    const mine = !!myId && rows.some((r) => r.user_id === myId);
+    const key = `${row.place_type}:${row.place_id}`;
+    if (typeof webviewRef.current?.injectJavaScript === 'function') {
+      webviewRef.current.injectJavaScript(`window.setInterest && window.setInterest(${JSON.stringify(key)}, ${count}, ${mine}); true;`);
+    }
+  }, [myId]);
+
+  useFocusEffect(useCallback(() => {
+    const channel = supabase.channel('map-live')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'check_ins' }, (payload) => handleCheckInInsert(payload.new as CheckIn))
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'check_ins' }, (payload) => handleCheckInDelete((payload.old as { id: string }).id))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'interests' },
+        (payload) => handleInterestChange((payload.new ?? payload.old) as { place_type: string; place_id: string } | undefined))
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [handleCheckInInsert, handleCheckInDelete, handleInterestChange]));
 
   const handleEnableLocation = async () => {
     haptics.tap();
