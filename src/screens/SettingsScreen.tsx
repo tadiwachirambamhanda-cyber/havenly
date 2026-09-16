@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -54,9 +55,9 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </AnimatedPressable>
         <Text style={styles.title}>Settings</Text>
       </View>
 
@@ -65,7 +66,7 @@ export default function SettingsScreen() {
         {MODE_OPTIONS.map((opt) => {
           const isSelected = mode === opt.key;
           return (
-            <Pressable
+            <AnimatedPressable
               key={opt.key}
               style={[styles.segment, isSelected && styles.segmentActive]}
               onPress={() => { haptics.tap(); setMode(opt.key); }}
@@ -73,50 +74,50 @@ export default function SettingsScreen() {
             >
               <Feather name={opt.icon} size={14} color={isSelected ? colors.sand : colors.inkSoft} />
               <Text style={[styles.segmentText, isSelected && styles.segmentTextActive]}>{opt.label}</Text>
-            </Pressable>
+            </AnimatedPressable>
           );
         })}
       </View>
 
       <View style={styles.divider} />
 
-      <Pressable style={styles.row} onPress={() => navigation.navigate('BlockedUsers')}>
+      <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('BlockedUsers')}>
         <Text style={styles.rowText}>Blocked accounts</Text>
         <Text style={styles.chevron}>›</Text>
-      </Pressable>
+      </AnimatedPressable>
 
       {profile?.is_admin && (
         <>
           <View style={styles.divider} />
-          <Pressable style={styles.row} onPress={() => navigation.navigate('CreateEvent')}>
+          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('CreateEvent')}>
             <Text style={styles.rowText}>Create event</Text>
             <Text style={styles.chevron}>›</Text>
-          </Pressable>
+          </AnimatedPressable>
           <View style={styles.divider} />
-          <Pressable style={styles.row} onPress={() => navigation.navigate('ManageBrands')}>
+          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('ManageBrands')}>
             <Text style={styles.rowText}>Manage brands</Text>
             <Text style={styles.chevron}>›</Text>
-          </Pressable>
+          </AnimatedPressable>
           <View style={styles.divider} />
-          <Pressable style={styles.row} onPress={() => navigation.navigate('CreateOffer')}>
+          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('CreateOffer')}>
             <Text style={styles.rowText}>Create offer</Text>
             <Text style={styles.chevron}>›</Text>
-          </Pressable>
+          </AnimatedPressable>
         </>
       )}
 
       <View style={styles.divider} />
 
-      <Pressable style={styles.row} onPress={handleLogout}>
+      <AnimatedPressable style={styles.row} onPress={handleLogout}>
         <Text style={[styles.rowText, styles.logoutText]}>Log out</Text>
-      </Pressable>
+      </AnimatedPressable>
 
       <View style={styles.divider} />
 
-      <Pressable style={styles.row} onPress={handleDeleteAccount} disabled={deleting}>
+      <AnimatedPressable style={styles.row} onPress={handleDeleteAccount} disabled={deleting}>
         <Text style={[styles.rowText, styles.deleteText]}>Delete account</Text>
         {deleting && <ActivityIndicator color={colors.coral} size="small" />}
-      </Pressable>
+      </AnimatedPressable>
 
       <ActionSheet
         visible={logoutConfirmVisible}

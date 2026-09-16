@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, SectionList, Pressable, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, SectionList, TextInput, ActivityIndicator } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -117,9 +118,9 @@ export default function SharePostScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </AnimatedPressable>
         <Text style={styles.title}>Send to</Text>
       </View>
       <View style={styles.searchBar}>
@@ -165,7 +166,7 @@ export default function SharePostScreen() {
                   <Text style={styles.name}>{item.name}</Text>
                   <Text style={styles.handle}>{item.subtitle}</Text>
                 </View>
-                <Pressable
+                <AnimatedPressable
                   style={[styles.sendBtn, sent && styles.sendBtnSent]}
                   onPress={() => sendTo(item)}
                   disabled={sent || sendingId === item.id}
@@ -176,7 +177,7 @@ export default function SharePostScreen() {
                   ) : (
                     <Text style={[styles.sendBtnText, sent && styles.sendBtnTextSent]}>{sent ? 'Sent ✓' : 'Send'}</Text>
                   )}
-                </Pressable>
+                </AnimatedPressable>
               </View>
             );
           }}

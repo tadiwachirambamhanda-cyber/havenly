@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -53,15 +54,15 @@ export default function OnboardingScreen() {
           {INTEREST_OPTIONS.map((opt) => {
             const isSelected = selected.has(opt.key);
             return (
-              <Pressable key={opt.key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => toggle(opt.key)}>
+              <AnimatedPressable key={opt.key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => toggle(opt.key)}>
                 <Feather name={interestIcon(opt.key)} size={13} color={isSelected ? colors.sand : colors.ink} />
                 <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt.label}</Text>
-              </Pressable>
+              </AnimatedPressable>
             );
           })}
         </View>
-        <Pressable style={styles.btnPrimary} onPress={handleContinue} disabled={saving}><Text style={styles.btnPrimaryText}>{saving ? 'Saving…' : 'Continue'}</Text></Pressable>
-        <Pressable onPress={handleSkip} disabled={saving}><Text style={styles.skip}>Skip for now</Text></Pressable>
+        <AnimatedPressable style={styles.btnPrimary} onPress={handleContinue} disabled={saving}><Text style={styles.btnPrimaryText}>{saving ? 'Saving…' : 'Continue'}</Text></AnimatedPressable>
+        <AnimatedPressable onPress={handleSkip} disabled={saving}><Text style={styles.skip}>Skip for now</Text></AnimatedPressable>
       </View>
     </ScrollView>
   );

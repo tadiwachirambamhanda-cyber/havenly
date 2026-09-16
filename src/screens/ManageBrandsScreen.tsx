@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, ActivityIndicator } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/lib/ThemeContext';
@@ -58,7 +59,7 @@ export default function ManageBrandsScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} accessibilityLabel="Close"><Text style={styles.headerBtn}>Close</Text></Pressable>
+        <AnimatedPressable onPress={() => navigation.goBack()} accessibilityLabel="Close"><Text style={styles.headerBtn}>Close</Text></AnimatedPressable>
         <Text style={styles.headerTitle}>Manage brands</Text>
         <View style={{ width: 44 }} />
       </View>
@@ -69,9 +70,9 @@ export default function ManageBrandsScreen() {
         {BRAND_CATEGORIES.map((opt) => {
           const isSelected = category === opt;
           return (
-            <Pressable key={opt} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); setCategory(opt); }}>
+            <AnimatedPressable key={opt} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); setCategory(opt); }}>
               <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt}</Text>
-            </Pressable>
+            </AnimatedPressable>
           );
         })}
       </View>
@@ -87,9 +88,9 @@ export default function ManageBrandsScreen() {
         style={styles.input} placeholder="Contact email (optional)…" placeholderTextColor={colors.inkSoft}
         value={contactEmail} onChangeText={setContactEmail} autoCapitalize="none" keyboardType="email-address"
       />
-      <Pressable style={styles.createBtn} onPress={create} disabled={creating} accessibilityLabel="Add brand">
+      <AnimatedPressable style={styles.createBtn} onPress={create} disabled={creating} accessibilityLabel="Add brand">
         {creating ? <ActivityIndicator color="white" /> : <Text style={styles.createBtnText}>Add brand</Text>}
-      </Pressable>
+      </AnimatedPressable>
 
       <Text style={styles.sectionLabel}>Existing brands</Text>
       {brands.length === 0 && <Text style={styles.emptyText}>No brands yet.</Text>}
@@ -99,13 +100,13 @@ export default function ManageBrandsScreen() {
             <Text style={styles.brandName}>{brand.name}</Text>
             <Text style={styles.brandMeta}>{brand.category}{!brand.is_active ? ' · inactive' : ''}</Text>
           </View>
-          <Pressable
+          <AnimatedPressable
             style={styles.toggleBtn}
             onPress={() => toggleActive(brand)}
             accessibilityLabel={brand.is_active ? `Deactivate ${brand.name}` : `Activate ${brand.name}`}
           >
             <Text style={styles.toggleBtnText}>{brand.is_active ? 'Deactivate' : 'Activate'}</Text>
-          </Pressable>
+          </AnimatedPressable>
         </View>
       ))}
     </ScrollView>

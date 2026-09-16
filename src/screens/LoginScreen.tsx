@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -88,12 +89,12 @@ export default function LoginScreen() {
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <Pressable style={styles.btnPrimary} onPress={handleLogin} disabled={loading}>
+        <AnimatedPressable style={styles.btnPrimary} onPress={handleLogin} disabled={loading}>
           {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnPrimaryText}>Log in</Text>}
-        </Pressable>
-        <Pressable onPress={() => navigation.navigate('SignUp')}>
+        </AnimatedPressable>
+        <AnimatedPressable onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.switchLink}>New to Havenly? <Text style={styles.switchLinkBold}>Create an account</Text></Text>
-        </Pressable>
+        </AnimatedPressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );

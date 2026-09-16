@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, ActivityIndicator } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as ImagePicker from 'expo-image-picker';
@@ -96,13 +97,13 @@ export default function NewGroupScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </AnimatedPressable>
         <Text style={styles.title}>New group</Text>
       </View>
 
-      <Pressable style={styles.iconPicker} onPress={pickIcon} accessibilityLabel="Set group photo">
+      <AnimatedPressable style={styles.iconPicker} onPress={pickIcon} accessibilityLabel="Set group photo">
         {iconUri ? (
           <Image source={{ uri: iconUri }} style={styles.iconPreview} transition={200} />
         ) : (
@@ -111,7 +112,7 @@ export default function NewGroupScreen() {
           </View>
         )}
         <Text style={styles.iconPickerText}>{iconUri ? 'Change group photo' : 'Add group photo'}</Text>
-      </Pressable>
+      </AnimatedPressable>
 
       <TextInput
         style={styles.nameInput}
@@ -148,7 +149,7 @@ export default function NewGroupScreen() {
           renderItem={({ item }) => {
             const selected = selectedIds.has(item.id);
             return (
-              <Pressable style={styles.row} onPress={() => toggleSelected(item.id)} accessibilityLabel={`${selected ? 'Remove' : 'Add'} ${item.display_name}`}>
+              <AnimatedPressable style={styles.row} onPress={() => toggleSelected(item.id)} accessibilityLabel={`${selected ? 'Remove' : 'Add'} ${item.display_name}`}>
                 {item.avatar_url ? (
                   <Image source={{ uri: item.avatar_url }} style={styles.avatar} transition={200} />
                 ) : (
@@ -161,14 +162,14 @@ export default function NewGroupScreen() {
                 <View style={[styles.checkbox, selected && styles.checkboxSelected]}>
                   {selected && <Feather name="check" size={13} color="white" />}
                 </View>
-              </Pressable>
+              </AnimatedPressable>
             );
           }}
         />
       )}
 
       <View style={styles.footer}>
-        <Pressable style={[styles.createBtn, !canCreate && styles.createBtnDisabled]} onPress={create} disabled={!canCreate} accessibilityLabel="Create group">
+        <AnimatedPressable style={[styles.createBtn, !canCreate && styles.createBtnDisabled]} onPress={create} disabled={!canCreate} accessibilityLabel="Create group">
           {creating ? (
             <ActivityIndicator size="small" color={colors.sand} />
           ) : (
@@ -178,7 +179,7 @@ export default function NewGroupScreen() {
                 : `Create group (${selectedIds.size})`}
             </Text>
           )}
-        </Pressable>
+        </AnimatedPressable>
       </View>
     </View>
   );

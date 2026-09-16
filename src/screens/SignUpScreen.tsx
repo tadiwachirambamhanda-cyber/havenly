@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -104,12 +105,12 @@ export default function SignUpScreen() {
         {error ? <Text style={styles.error}>{error}</Text> : null}
         {info ? <Text style={styles.info}>{info}</Text> : null}
 
-        <Pressable style={styles.btnPrimary} onPress={handleSignUp} disabled={loading}>
+        <AnimatedPressable style={styles.btnPrimary} onPress={handleSignUp} disabled={loading}>
           {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnPrimaryText}>Create account</Text>}
-        </Pressable>
-        <Pressable onPress={() => navigation.navigate('Login')}>
+        </AnimatedPressable>
+        <AnimatedPressable onPress={() => navigation.navigate('Login')}>
           <Text style={styles.switchLink}>Already have an account? <Text style={styles.switchLinkBold}>Log in</Text></Text>
-        </Pressable>
+        </AnimatedPressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );

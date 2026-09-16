@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/lib/ThemeContext';
@@ -84,11 +85,11 @@ export default function CreateEventScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></Pressable>
+        <AnimatedPressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></AnimatedPressable>
         <Text style={styles.headerTitle}>New event</Text>
-        <Pressable onPress={create} disabled={creating} accessibilityLabel="Create event">
+        <AnimatedPressable onPress={create} disabled={creating} accessibilityLabel="Create event">
           {creating ? <ActivityIndicator color={colors.coral} /> : <Text style={[styles.headerBtn, styles.createBtn]}>Create</Text>}
-        </Pressable>
+        </AnimatedPressable>
       </View>
 
       <TextInput
@@ -158,9 +159,9 @@ export default function CreateEventScreen() {
         {TAG_OPTIONS.map((opt) => {
           const isSelected = tag === opt;
           return (
-            <Pressable key={opt} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); setTag(opt); }}>
+            <AnimatedPressable key={opt} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); setTag(opt); }}>
               <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt}</Text>
-            </Pressable>
+            </AnimatedPressable>
           );
         })}
       </View>

@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, RefreshControl, ActivityIndicator, type ViewToken } from 'react-native';
+import { View, Text, StyleSheet, FlatList, RefreshControl, ActivityIndicator, type ViewToken } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useNavigation, useRoute, useFocusEffect, useIsFocused, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -153,9 +155,9 @@ export default function UserProfileScreen() {
   if (notFound) {
     return (
       <View style={styles.notFound}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </AnimatedPressable>
         <Text style={styles.notFoundText}>This account isn’t available.</Text>
       </View>
     );
@@ -186,14 +188,16 @@ export default function UserProfileScreen() {
         renderItem={({ item, index }) => {
           const [from, to] = gradients[index % gradients.length];
           return (
-            <Pressable style={styles.gridCell} onPress={() => navigation.navigate('PostDetail', { postId: item.id })}>
+            <Animated.View entering={FadeIn.delay(Math.min(index, 11) * 30)} style={styles.gridCell}>
+            <AnimatedPressable style={{ flex: 1 }} onPress={() => navigation.navigate('PostDetail', { postId: item.id })}>
               <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
               {item.video_url ? (
                 <VideoThumb uri={item.video_url} isVisible={isFocused && visibleVideoIds.has(item.id)} />
               ) : item.image_url ? (
                 <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
               ) : null}
-            </Pressable>
+            </AnimatedPressable>
+            </Animated.View>
           );
         }}
         ListEmptyComponent={hasLoadedOnce ? <EmptyState icon="grid" text="No posts yet." /> : null}
@@ -204,17 +208,17 @@ export default function UserProfileScreen() {
             ) : (
               <LinearGradient colors={['#FF7A5C', '#E3A23A', '#0F8B82']} locations={[0, 0.6, 1]} style={styles.cover} />
             )}
-            <Pressable style={[styles.back, styles.backOverlay, { top: insets.top + 12 }]} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+            <AnimatedPressable style={[styles.back, styles.backOverlay, { top: insets.top + 12 }]} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
               <Feather name="arrow-left" size={17} color="#20261F" />
-            </Pressable>
+            </AnimatedPressable>
             {!isMe && (
-              <Pressable
+              <AnimatedPressable
                 style={[styles.overflowBtn, { top: insets.top + 12 }]}
                 onPress={() => setOptionsVisible(true)}
                 accessibilityLabel="More options"
               >
                 <Feather name="more-horizontal" size={17} color="#20261F" />
-              </Pressable>
+              </AnimatedPressable>
             )}
             <View style={styles.avatarRow}>
               {profile.avatar_url ? (
@@ -224,10 +228,10 @@ export default function UserProfileScreen() {
               )}
               {!isMe && (
                 <View style={styles.actionRow}>
-                  <Pressable style={styles.messageBtn} onPress={onMessage} disabled={messaging} accessibilityLabel="Message">
+                  <AnimatedPressable style={styles.messageBtn} onPress={onMessage} disabled={messaging} accessibilityLabel="Message">
                     <Feather name="message-circle" size={15} color={colors.ink} />
-                  </Pressable>
-                  <Pressable
+                  </AnimatedPressable>
+                  <AnimatedPressable
                     style={[styles.followBtn, following && styles.followBtnActive]}
                     onPress={toggleFollow}
                     accessibilityLabel={following ? `Unfollow ${profile.display_name}` : `Follow ${profile.display_name}`}
@@ -235,7 +239,7 @@ export default function UserProfileScreen() {
                     <Text style={[styles.followBtnText, following && styles.followBtnTextActive]}>
                       {following ? 'Following' : 'Follow'}
                     </Text>
-                  </Pressable>
+                  </AnimatedPressable>
                 </View>
               )}
             </View>
@@ -246,18 +250,18 @@ export default function UserProfileScreen() {
 
             <View style={styles.statsRow}>
               <View><Text style={styles.statNum}>{formatCount(stats.posts)}</Text><Text style={styles.statLabel}>Posts</Text></View>
-              <Pressable
+              <AnimatedPressable
                 onPress={() => navigation.navigate('FollowList', { userId: profile.id, initialTab: 'followers', displayName: profile.display_name })}
                 accessibilityLabel="View followers"
               >
                 <Text style={styles.statNum}>{formatCount(stats.followers)}</Text><Text style={styles.statLabel}>Followers</Text>
-              </Pressable>
-              <Pressable
+              </AnimatedPressable>
+              <AnimatedPressable
                 onPress={() => navigation.navigate('FollowList', { userId: profile.id, initialTab: 'following', displayName: profile.display_name })}
                 accessibilityLabel="View following"
               >
                 <Text style={styles.statNum}>{formatCount(stats.following)}</Text><Text style={styles.statLabel}>Following</Text>
-              </Pressable>
+              </AnimatedPressable>
               <View>
                 <Text style={styles.statNum}>🔥 {profile.current_streak}</Text>
                 <Text style={styles.statLabel}>Streak</Text>

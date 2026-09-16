@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/lib/ThemeContext';
@@ -103,11 +104,11 @@ export default function CreateOfferScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></Pressable>
+        <AnimatedPressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></AnimatedPressable>
         <Text style={styles.headerTitle}>New offer</Text>
-        <Pressable onPress={create} disabled={creating} accessibilityLabel="Create offer">
+        <AnimatedPressable onPress={create} disabled={creating} accessibilityLabel="Create offer">
           {creating ? <ActivityIndicator color={colors.coral} /> : <Text style={[styles.headerBtn, styles.createBtn]}>Create</Text>}
-        </Pressable>
+        </AnimatedPressable>
       </View>
 
       <Text style={styles.sectionLabel}>Brand</Text>
@@ -118,9 +119,9 @@ export default function CreateOfferScreen() {
           {brands.map((brand) => {
             const isSelected = brandId === brand.id;
             return (
-              <Pressable key={brand.id} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); setBrandId(brand.id); }}>
+              <AnimatedPressable key={brand.id} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); setBrandId(brand.id); }}>
                 <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{brand.name}</Text>
-              </Pressable>
+              </AnimatedPressable>
             );
           })}
         </View>
@@ -136,9 +137,9 @@ export default function CreateOfferScreen() {
         {STREAK_OPTIONS.map((opt) => {
           const isSelected = minStreak === opt;
           return (
-            <Pressable key={opt} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); setMinStreak(opt); }}>
+            <AnimatedPressable key={opt} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); setMinStreak(opt); }}>
               <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt === 0 ? 'Everyone' : `${opt}-day`}</Text>
-            </Pressable>
+            </AnimatedPressable>
           );
         })}
       </View>

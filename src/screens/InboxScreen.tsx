@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, SectionList, Pressable, RefreshControl, TextInput } from 'react-native';
+import { View, Text, StyleSheet, SectionList, RefreshControl, TextInput } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -112,9 +114,9 @@ export default function InboxScreen() {
     <View style={styles.container}>
       <View style={styles.titleRow}>
         <Text style={styles.title}>Messages</Text>
-        <Pressable style={styles.newGroupBtn} onPress={() => navigation.navigate('NewGroup')} accessibilityLabel="New group">
+        <AnimatedPressable style={styles.newGroupBtn} onPress={() => navigation.navigate('NewGroup')} accessibilityLabel="New group">
           <Feather name="user-plus" size={16} color={colors.ink} />
-        </Pressable>
+        </AnimatedPressable>
       </View>
       <View style={styles.searchBar}>
         <Feather name="search" size={14} color={colors.inkSoft} />
@@ -126,9 +128,9 @@ export default function InboxScreen() {
           onChangeText={setQuery}
         />
         {trimmed.length > 0 && (
-          <Pressable style={styles.clearBtn} onPress={() => setQuery('')} accessibilityLabel="Clear search">
+          <AnimatedPressable style={styles.clearBtn} onPress={() => setQuery('')} accessibilityLabel="Clear search">
             <Feather name="x" size={14} color={colors.inkSoft} />
-          </Pressable>
+          </AnimatedPressable>
         )}
       </View>
       {requests.length === 0 && messages.length === 0 ? (
@@ -145,8 +147,9 @@ export default function InboxScreen() {
         renderSectionHeader={({ section }) => (
           sections.length > 1 ? <Text style={styles.sectionLabel}>{section.title}</Text> : null
         )}
-        renderItem={({ item }) => (
-          <Pressable style={styles.row} onPress={() => openChat(item)}>
+        renderItem={({ item, index }) => (
+          <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).springify().damping(16)}>
+          <AnimatedPressable style={styles.row} onPress={() => openChat(item)}>
             <View>
               {item.is_group ? (
                 item.icon_url ? (
@@ -170,7 +173,8 @@ export default function InboxScreen() {
               </Text>
             </View>
             {item.last_message_at && <Text style={styles.time}>{timeAgo(item.last_message_at)}</Text>}
-          </Pressable>
+          </AnimatedPressable>
+          </Animated.View>
         )}
       />
       )}

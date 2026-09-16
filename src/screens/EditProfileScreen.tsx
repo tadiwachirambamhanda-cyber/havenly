@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -146,14 +147,14 @@ export default function EditProfileScreen() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <Pressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></Pressable>
+        <AnimatedPressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></AnimatedPressable>
         <Text style={styles.headerTitle}>Edit profile</Text>
-        <Pressable onPress={save} disabled={saving} accessibilityLabel="Save profile">
+        <AnimatedPressable onPress={save} disabled={saving} accessibilityLabel="Save profile">
           {saving ? <ActivityIndicator color={colors.coral} /> : <Text style={[styles.headerBtn, styles.saveBtn]}>Save</Text>}
-        </Pressable>
+        </AnimatedPressable>
       </View>
 
-      <Pressable onPress={pickCover} accessibilityLabel="Change cover photo">
+      <AnimatedPressable onPress={pickCover} accessibilityLabel="Change cover photo">
         {coverUri ? (
           <Image source={{ uri: coverUri }} style={styles.cover} transition={200} />
         ) : (
@@ -163,9 +164,9 @@ export default function EditProfileScreen() {
           <Feather name="camera" size={12} color="white" />
           <Text style={styles.coverEditBadgeText}>Change cover</Text>
         </View>
-      </Pressable>
+      </AnimatedPressable>
 
-      <Pressable style={styles.avatarWrap} onPress={pickAvatar} accessibilityLabel="Change profile photo">
+      <AnimatedPressable style={styles.avatarWrap} onPress={pickAvatar} accessibilityLabel="Change profile photo">
         {avatarUri ? (
           <Image source={{ uri: avatarUri }} style={styles.avatar} transition={200} />
         ) : (
@@ -174,7 +175,7 @@ export default function EditProfileScreen() {
         <View style={styles.avatarEditBadge}>
           <Feather name="camera" size={11} color="white" />
         </View>
-      </Pressable>
+      </AnimatedPressable>
 
       <Text style={styles.label}>Display name</Text>
       <TextInput style={styles.input} value={displayName} onChangeText={setDisplayName} placeholder="Your name" placeholderTextColor={colors.inkSoft} />
@@ -186,11 +187,11 @@ export default function EditProfileScreen() {
       <TextInput style={[styles.input, styles.bioInput]} value={bio} onChangeText={setBio} multiline placeholder="Tell people a bit about you" placeholderTextColor={colors.inkSoft} />
 
       <Text style={styles.label}>University</Text>
-      <Pressable style={styles.input} onPress={() => setUniversityPickerVisible(true)}>
+      <AnimatedPressable style={styles.input} onPress={() => setUniversityPickerVisible(true)}>
         <Text style={university ? styles.universityValue : styles.universityPlaceholder}>
           {university || 'Select your university'}
         </Text>
-      </Pressable>
+      </AnimatedPressable>
       <UniversityPickerModal
         visible={universityPickerVisible}
         selected={university || null}
@@ -203,10 +204,10 @@ export default function EditProfileScreen() {
         {INTEREST_OPTIONS.map((opt) => {
           const isSelected = interests.has(opt.key);
           return (
-            <Pressable key={opt.key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); toggleInterest(opt.key); }}>
+            <AnimatedPressable key={opt.key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); toggleInterest(opt.key); }}>
               <Feather name={interestIcon(opt.key)} size={13} color={isSelected ? colors.sand : colors.ink} />
               <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt.label}</Text>
-            </Pressable>
+            </AnimatedPressable>
           );
         })}
       </View>

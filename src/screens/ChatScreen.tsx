@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Pressable, Modal, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Modal, KeyboardAvoidingView, Platform } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -186,10 +187,10 @@ export default function ChatScreen() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+          <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
             <Feather name="arrow-left" size={16} color={colors.ink} />
-          </Pressable>
-          <Pressable
+          </AnimatedPressable>
+          <AnimatedPressable
             style={styles.headerAuthorTap}
             onPress={() => (isGroup ? openMembersModal() : otherUserId && navigation.navigate('UserProfile', { userId: otherUserId }))}
             accessibilityLabel={isGroup ? 'View group info' : `View ${otherUser?.display_name ?? 'their'} profile`}
@@ -211,12 +212,12 @@ export default function ChatScreen() {
               <Text style={styles.headerName}>{isGroup ? groupDisplayName(conversation!, members) : otherUser?.display_name ?? '…'}</Text>
               {isGroup && <Text style={styles.headerSub}>{members.length + 1} members</Text>}
             </View>
-          </Pressable>
+          </AnimatedPressable>
           <View style={{ flex: 1 }} />
           {!isGroup && (
-            <Pressable style={styles.overflow} onPress={openOptions} accessibilityLabel="More options">
+            <AnimatedPressable style={styles.overflow} onPress={openOptions} accessibilityLabel="More options">
               <Feather name="more-horizontal" size={18} color={colors.ink} />
-            </Pressable>
+            </AnimatedPressable>
           )}
         </View>
 
@@ -234,7 +235,7 @@ export default function ChatScreen() {
                 {senderName && <Text style={styles.senderName}>{senderName}</Text>}
                 <View style={[styles.bubble, mine ? styles.bubbleMe : styles.bubbleThem, item.shared_post && styles.bubbleShared]}>
                   {item.shared_post ? (
-                    <Pressable
+                    <AnimatedPressable
                       style={styles.sharedPostRow}
                       onPress={() => navigation.navigate('PostDetail', { postId: item.shared_post!.id })}
                       accessibilityLabel={`Open post: ${item.shared_post.title}`}
@@ -249,7 +250,7 @@ export default function ChatScreen() {
                         <Text style={[styles.sharedPostTitle, textStyle]} numberOfLines={2}>{item.shared_post.title}</Text>
                       </View>
                       <Feather name="chevron-right" size={14} color={mine ? 'rgba(255,255,255,0.8)' : colors.inkSoft} />
-                    </Pressable>
+                    </AnimatedPressable>
                   ) : (
                     <Text style={textStyle}>{item.body}</Text>
                   )}
@@ -265,12 +266,12 @@ export default function ChatScreen() {
           <View style={styles.requestBar}>
             <Text style={styles.requestText}>{otherUser?.display_name ?? 'This person'} wants to message you.</Text>
             <View style={styles.requestActions}>
-              <Pressable style={styles.declineBtn} onPress={() => respondToRequest('declined')} accessibilityLabel="Decline conversation">
+              <AnimatedPressable style={styles.declineBtn} onPress={() => respondToRequest('declined')} accessibilityLabel="Decline conversation">
                 <Text style={styles.declineBtnText}>Decline</Text>
-              </Pressable>
-              <Pressable style={styles.acceptBtn} onPress={() => respondToRequest('accepted')} accessibilityLabel="Accept conversation">
+              </AnimatedPressable>
+              <AnimatedPressable style={styles.acceptBtn} onPress={() => respondToRequest('accepted')} accessibilityLabel="Accept conversation">
                 <Text style={styles.acceptBtnText}>Accept</Text>
-              </Pressable>
+              </AnimatedPressable>
             </View>
           </View>
         ) : isDeclined ? (
@@ -287,9 +288,9 @@ export default function ChatScreen() {
                 onChangeText={setInput}
                 onSubmitEditing={send}
               />
-              <Pressable style={styles.sendBtn} onPress={send} accessibilityLabel="Send message">
+              <AnimatedPressable style={styles.sendBtn} onPress={send} accessibilityLabel="Send message">
                 <Feather name="send" size={15} color={colors.sand} />
-              </Pressable>
+              </AnimatedPressable>
             </View>
           </View>
         )}
@@ -311,10 +312,10 @@ export default function ChatScreen() {
         actions={[{ label: 'Block', destructive: true, onPress: confirmBlock }]}
       />
       <Modal visible={membersModalVisible} transparent animationType="fade" onRequestClose={() => setMembersModalVisible(false)}>
-        <Pressable style={styles.membersBackdrop} onPress={() => setMembersModalVisible(false)}>
-          <Pressable style={[styles.membersCard, { paddingBottom: insets.bottom + spacing.md }]} onPress={(e) => e.stopPropagation()}>
+        <AnimatedPressable style={styles.membersBackdrop} onPress={() => setMembersModalVisible(false)}>
+          <AnimatedPressable style={[styles.membersCard, { paddingBottom: insets.bottom + spacing.md }]} onPress={(e) => e.stopPropagation()}>
             <View style={styles.membersHandle} />
-            <Pressable style={styles.groupIconEdit} onPress={pickGroupIcon} accessibilityLabel="Change group photo">
+            <AnimatedPressable style={styles.groupIconEdit} onPress={pickGroupIcon} accessibilityLabel="Change group photo">
               {conversation?.icon_url ? (
                 <Image source={{ uri: conversation.icon_url }} style={styles.groupIconEditImg} transition={200} />
               ) : (
@@ -325,7 +326,7 @@ export default function ChatScreen() {
               <View style={styles.groupIconEditBadge}>
                 {savingIcon ? <Feather name="loader" size={11} color="white" /> : <Feather name="camera" size={11} color="white" />}
               </View>
-            </Pressable>
+            </AnimatedPressable>
             <View style={styles.groupNameRow}>
               <TextInput
                 style={styles.groupNameInput}
@@ -343,7 +344,7 @@ export default function ChatScreen() {
               keyExtractor={(item) => item.id}
               contentContainerStyle={{ paddingTop: spacing.md }}
               renderItem={({ item }) => (
-                <Pressable
+                <AnimatedPressable
                   style={styles.memberRow}
                   onPress={() => { setMembersModalVisible(false); navigation.navigate('UserProfile', { userId: item.id }); }}
                   accessibilityLabel={`View ${item.display_name}'s profile`}
@@ -357,11 +358,11 @@ export default function ChatScreen() {
                     <Text style={styles.memberName}>{item.display_name}</Text>
                     <Text style={styles.memberHandle}>@{item.username}</Text>
                   </View>
-                </Pressable>
+                </AnimatedPressable>
               )}
             />
-          </Pressable>
-        </Pressable>
+          </AnimatedPressable>
+        </AnimatedPressable>
       </Modal>
     </KeyboardAvoidingView>
   );

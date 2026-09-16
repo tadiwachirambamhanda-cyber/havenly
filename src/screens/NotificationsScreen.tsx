@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -102,9 +104,9 @@ export default function NotificationsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </AnimatedPressable>
         <Text style={styles.title}>Notifications</Text>
       </View>
 
@@ -114,8 +116,9 @@ export default function NotificationsScreen() {
         contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
         ListEmptyComponent={loaded ? <EmptyState icon="bell" text="No notifications yet." /> : null}
-        renderItem={({ item }) => (
-          <Pressable
+        renderItem={({ item, index }) => (
+          <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).springify().damping(16)}>
+          <AnimatedPressable
             style={[styles.row, !item.is_read && styles.rowUnread]}
             onPress={() => openNotification(item)}
           >
@@ -134,7 +137,8 @@ export default function NotificationsScreen() {
             {item.post?.image_url && (
               <Image source={{ uri: item.post.image_url }} style={styles.postThumb} contentFit="cover" transition={200} />
             )}
-          </Pressable>
+          </AnimatedPressable>
+          </Animated.View>
         )}
       />
     </View>

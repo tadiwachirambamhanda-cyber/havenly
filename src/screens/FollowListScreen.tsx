@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -80,18 +82,18 @@ export default function FollowListScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </AnimatedPressable>
         <Text style={styles.title}>{displayName}</Text>
       </View>
 
       <View style={styles.tabRow}>
         {TABS.map((t) => (
-          <Pressable key={t.key} style={styles.tab} onPress={() => setTab(t.key)}>
+          <AnimatedPressable key={t.key} style={styles.tab} onPress={() => setTab(t.key)}>
             <Text style={[styles.tabText, tab === t.key && styles.tabTextActive]}>{t.label}</Text>
             {tab === t.key && <View style={styles.tabUnderline} />}
-          </Pressable>
+          </AnimatedPressable>
         ))}
       </View>
 
@@ -103,12 +105,12 @@ export default function FollowListScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: spacing.lg }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.coral} />}
-          renderItem={({ item }) => {
+          renderItem={({ item, index }) => {
             const isMe = item.id === session?.user.id;
             const isFollowing = myFollowingIds.has(item.id);
             return (
-              <View style={styles.row}>
-                <Pressable
+              <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).springify().damping(16)} style={styles.row}>
+                <AnimatedPressable
                   style={styles.rowAuthorTap}
                   onPress={() => navigation.navigate('UserProfile', { userId: item.id })}
                   accessibilityLabel={`View ${item.display_name}'s profile`}
@@ -122,9 +124,9 @@ export default function FollowListScreen() {
                     <Text style={styles.name}>{item.display_name}</Text>
                     <Text style={styles.handle}>@{item.username}{item.university ? ` · ${item.university}` : ''}</Text>
                   </View>
-                </Pressable>
+                </AnimatedPressable>
                 {!isMe && (
-                  <Pressable
+                  <AnimatedPressable
                     style={[styles.followBtn, isFollowing && styles.followBtnActive]}
                     onPress={() => toggleFollow(item.id)}
                     accessibilityLabel={isFollowing ? `Unfollow ${item.display_name}` : `Follow ${item.display_name}`}
@@ -132,9 +134,9 @@ export default function FollowListScreen() {
                     <Text style={[styles.followBtnText, isFollowing && styles.followBtnTextActive]}>
                       {isFollowing ? 'Following' : 'Follow'}
                     </Text>
-                  </Pressable>
+                  </AnimatedPressable>
                 )}
-              </View>
+              </Animated.View>
             );
           }}
           ListEmptyComponent={

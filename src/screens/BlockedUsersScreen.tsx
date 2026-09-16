@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -44,9 +45,9 @@ export default function BlockedUsersScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </AnimatedPressable>
         <Text style={styles.title}>Blocked accounts</Text>
       </View>
       <FlatList
@@ -65,9 +66,9 @@ export default function BlockedUsersScreen() {
                 <Text style={styles.name}>{item.display_name}</Text>
                 <Text style={styles.handle}>@{item.username}</Text>
               </View>
-              <Pressable style={styles.unblockBtn} onPress={() => unblock(item.id)} accessibilityLabel={`Unblock ${item.display_name}`}>
+              <AnimatedPressable style={styles.unblockBtn} onPress={() => unblock(item.id)} accessibilityLabel={`Unblock ${item.display_name}`}>
                 <Text style={styles.unblockText}>Unblock</Text>
-              </Pressable>
+              </AnimatedPressable>
             </View>
           </SwipeToAction>
         )}

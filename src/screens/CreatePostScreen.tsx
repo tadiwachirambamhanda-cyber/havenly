@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, ActivityIndicator, PanResponder } from 'react-native';
+import { View, Text, StyleSheet, TextInput, ScrollView, ActivityIndicator, PanResponder } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { Image } from 'expo-image';
@@ -243,11 +244,11 @@ export default function CreatePostScreen() {
     <>
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></Pressable>
+        <AnimatedPressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></AnimatedPressable>
         <Text style={styles.headerTitle}>New post</Text>
-        <Pressable onPress={publish} disabled={publishing} accessibilityLabel="Publish post">
+        <AnimatedPressable onPress={publish} disabled={publishing} accessibilityLabel="Publish post">
           {publishing ? <ActivityIndicator color={colors.coral} /> : <Text style={[styles.headerBtn, styles.postBtn]}>Post</Text>}
-        </Pressable>
+        </AnimatedPressable>
       </View>
       {uploadStatus && (
         <View style={styles.progressWrap}>
@@ -258,7 +259,7 @@ export default function CreatePostScreen() {
         </View>
       )}
 
-      <Pressable onPress={pickMedia} style={styles.imagePicker} accessibilityLabel="Add a photo or video">
+      <AnimatedPressable onPress={pickMedia} style={styles.imagePicker} accessibilityLabel="Add a photo or video">
         {imageUri ? (
           <>
             <Image source={{ uri: imageUri }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
@@ -272,7 +273,7 @@ export default function CreatePostScreen() {
         ) : (
           <Text style={styles.imagePickerText}>+ Add a photo or video</Text>
         )}
-      </Pressable>
+      </AnimatedPressable>
 
       {videoUri && videoDurationMs != null && videoDurationMs > 0 && (
         <View style={styles.scrubberSection}>
@@ -308,9 +309,9 @@ export default function CreatePostScreen() {
         {TAG_OPTIONS.map((opt) => {
           const isSelected = tag === opt;
           return (
-            <Pressable key={opt} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); setTag(opt); }}>
+            <AnimatedPressable key={opt} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); setTag(opt); }}>
               <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt}</Text>
-            </Pressable>
+            </AnimatedPressable>
           );
         })}
       </View>
@@ -319,16 +320,16 @@ export default function CreatePostScreen() {
         <>
           <Text style={styles.sectionLabel}>Post to</Text>
           <View style={styles.chipGrid}>
-            <Pressable style={[styles.chip, !communityId && styles.chipSelected]} onPress={() => setCommunityId(null)}>
+            <AnimatedPressable style={[styles.chip, !communityId && styles.chipSelected]} onPress={() => setCommunityId(null)}>
               <Text style={[styles.chipText, !communityId && styles.chipTextSelected]}>Just Feed</Text>
-            </Pressable>
+            </AnimatedPressable>
             {myCommunities.map((c) => {
               const isSelected = communityId === c.id;
               return (
-                <Pressable key={c.id} style={[styles.chip, styles.chipWithIcon, isSelected && styles.chipSelected]} onPress={() => setCommunityId(c.id)}>
+                <AnimatedPressable key={c.id} style={[styles.chip, styles.chipWithIcon, isSelected && styles.chipSelected]} onPress={() => setCommunityId(c.id)}>
                   <Feather name={communityIcon(c)} size={12} color={isSelected ? colors.sand : colors.ink} />
                   <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{c.name}</Text>
-                </Pressable>
+                </AnimatedPressable>
               );
             })}
           </View>

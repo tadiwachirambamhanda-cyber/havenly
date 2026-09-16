@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, TextInput, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, TextInput, Keyboard } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { WebView } from 'react-native-webview';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -529,18 +530,18 @@ export default function MapScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </AnimatedPressable>
         <Text style={styles.title}>Map</Text>
       </View>
       {locationDenied && loaded && (
         <View style={styles.locationNotice}>
           <Feather name="map-pin" size={12} color={colors.inkSoft} />
           <Text style={styles.locationNoticeText}>Location off — showing Dubai.</Text>
-          <Pressable style={styles.locationEnableBtn} onPress={handleEnableLocation} accessibilityLabel="Enable location">
+          <AnimatedPressable style={styles.locationEnableBtn} onPress={handleEnableLocation} accessibilityLabel="Enable location">
             <Text style={styles.locationEnableBtnText}>Enable</Text>
-          </Pressable>
+          </AnimatedPressable>
         </View>
       )}
       <View style={styles.searchBar}>
@@ -554,9 +555,9 @@ export default function MapScreen() {
           returnKeyType="search"
         />
         {searchQuery.length > 0 && (
-          <Pressable onPress={() => setSearchQuery('')} accessibilityLabel="Clear search">
+          <AnimatedPressable onPress={() => setSearchQuery('')} accessibilityLabel="Clear search">
             <Feather name="x" size={15} color={colors.inkSoft} />
-          </Pressable>
+          </AnimatedPressable>
         )}
       </View>
       {searchQuery.trim().length > 0 && (
@@ -565,7 +566,7 @@ export default function MapScreen() {
             <Text style={styles.searchEmptyText}>No matches nearby.</Text>
           ) : (
             searchResults.map((r, i) => (
-              <Pressable key={r.key} style={[styles.searchResultRow, i === 0 && { borderTopWidth: 0 }]} onPress={() => handleSelectResult(r)}>
+              <AnimatedPressable key={r.key} style={[styles.searchResultRow, i === 0 && { borderTopWidth: 0 }]} onPress={() => handleSelectResult(r)}>
                 <View
                   style={[
                     styles.searchResultIcon,
@@ -582,7 +583,7 @@ export default function MapScreen() {
                   <Text style={styles.searchResultTitle} numberOfLines={1}>{r.title}</Text>
                   <Text style={styles.searchResultSubtitle} numberOfLines={1}>{r.subtitle}</Text>
                 </View>
-              </Pressable>
+              </AnimatedPressable>
             ))
           )}
         </View>
@@ -604,30 +605,30 @@ export default function MapScreen() {
         />
       )}
       <View style={styles.legend}>
-        <Pressable
+        <AnimatedPressable
           style={[styles.legendItem, hiddenTypes.offer && styles.legendItemOff]}
           onPress={() => toggleTypeFilter('offer')}
           accessibilityLabel={hiddenTypes.offer ? 'Show offers' : 'Hide offers'}
         >
           <Feather name="gift" size={12} color={hiddenTypes.offer ? colors.inkSoft : colors.coral} />
           <Text style={[styles.legendText, hiddenTypes.offer && styles.legendTextOff]}>Offers</Text>
-        </Pressable>
-        <Pressable
+        </AnimatedPressable>
+        <AnimatedPressable
           style={[styles.legendItem, hiddenTypes.event && styles.legendItemOff]}
           onPress={() => toggleTypeFilter('event')}
           accessibilityLabel={hiddenTypes.event ? 'Show events' : 'Hide events'}
         >
           <Feather name="calendar" size={12} color={hiddenTypes.event ? colors.inkSoft : colors.teal} />
           <Text style={[styles.legendText, hiddenTypes.event && styles.legendTextOff]}>Events</Text>
-        </Pressable>
-        <Pressable
+        </AnimatedPressable>
+        <AnimatedPressable
           style={[styles.legendItem, hiddenTypes.checkin && styles.legendItemOff]}
           onPress={() => toggleTypeFilter('checkin')}
           accessibilityLabel={hiddenTypes.checkin ? 'Show checked in' : 'Hide checked in'}
         >
           <View style={[styles.legendDot, hiddenTypes.checkin && { backgroundColor: colors.inkSoft }]} />
           <Text style={[styles.legendText, hiddenTypes.checkin && styles.legendTextOff]}>Checked in</Text>
-        </Pressable>
+        </AnimatedPressable>
       </View>
     </View>
   );

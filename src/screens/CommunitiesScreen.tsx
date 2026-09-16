@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, SectionList, Pressable, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, SectionList, RefreshControl } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Feather } from '@expo/vector-icons';
@@ -122,19 +124,20 @@ export default function CommunitiesScreen() {
           <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionLabel}>{section.title}</Text>
             {section.category === 'campus' && hasUniversity && (
-              <Pressable onPress={() => { haptics.tap(); setShowAllCampuses((v) => !v); }}>
+              <AnimatedPressable onPress={() => { haptics.tap(); setShowAllCampuses((v) => !v); }}>
                 <Text style={styles.sectionToggle}>{showAllCampuses ? 'Show only mine' : 'Show all'}</Text>
-              </Pressable>
+              </AnimatedPressable>
             )}
             {section.category === 'interest' && hasInterests && (
-              <Pressable onPress={() => { haptics.tap(); setShowAllInterests((v) => !v); }}>
+              <AnimatedPressable onPress={() => { haptics.tap(); setShowAllInterests((v) => !v); }}>
                 <Text style={styles.sectionToggle}>{showAllInterests ? 'Show only mine' : 'Show all'}</Text>
-              </Pressable>
+              </AnimatedPressable>
             )}
           </View>
         )}
-        renderItem={({ item }) => (
-          <Pressable style={styles.card} onPress={() => navigation.navigate('CommunityDetail', { communityId: item.id })}>
+        renderItem={({ item, index }) => (
+          <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).springify().damping(16)}>
+          <AnimatedPressable style={styles.card} onPress={() => navigation.navigate('CommunityDetail', { communityId: item.id })}>
             <View style={styles.iconChip}>
               <Feather name={communityIcon(item)} size={16} color={colors.teal} />
             </View>
@@ -145,7 +148,8 @@ export default function CommunitiesScreen() {
             {matchesUser(item) && (
               <View style={styles.matchBadge}><Text style={styles.matchBadgeText}>For you</Text></View>
             )}
-          </Pressable>
+          </AnimatedPressable>
+          </Animated.View>
         )}
       />
     </View>

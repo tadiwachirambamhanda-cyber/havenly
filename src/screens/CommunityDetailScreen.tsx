@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -85,9 +86,9 @@ export default function CommunityDetailScreen() {
   if (!community) {
     return loaded ? (
       <View style={styles.notFound}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </AnimatedPressable>
         <Text style={styles.notFoundText}>This community isn't available.</Text>
       </View>
     ) : (
@@ -108,9 +109,9 @@ export default function CommunityDetailScreen() {
       contentContainerStyle={{ paddingBottom: 40 }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
     >
-      <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+      <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
         <Feather name="arrow-left" size={17} color={colors.ink} />
-      </Pressable>
+      </AnimatedPressable>
       <View style={styles.body}>
         <View style={styles.iconChip}>
           <Feather name={communityIcon(community)} size={28} color={colors.teal} />
@@ -119,33 +120,33 @@ export default function CommunityDetailScreen() {
         <Text style={styles.members}>{formatCount(community.member_count)} members</Text>
         <Text style={styles.desc}>{community.description}</Text>
         {canJoin ? (
-          <Pressable
+          <AnimatedPressable
             style={[styles.joinBtn, joined && styles.joinBtnJoined]}
             onPress={toggleJoin}
             accessibilityLabel={joined ? 'Leave community' : 'Join community'}
           >
             <Text style={[styles.joinBtnText, joined && styles.joinBtnTextJoined]}>{joined ? 'Joined ✓' : 'Join community'}</Text>
-          </Pressable>
+          </AnimatedPressable>
         ) : profile?.university ? (
           <View style={styles.restrictedBox}>
             <Feather name="lock" size={13} color={colors.inkSoft} />
             <Text style={styles.restrictedText}>This community is for {community.related_university} students.</Text>
           </View>
         ) : (
-          <Pressable style={styles.restrictedBox} onPress={() => navigation.navigate('EditProfile')}>
+          <AnimatedPressable style={styles.restrictedBox} onPress={() => navigation.navigate('EditProfile')}>
             <Feather name="lock" size={13} color={colors.inkSoft} />
             <Text style={styles.restrictedText}>Set your university in Edit Profile to join this community.</Text>
-          </Pressable>
+          </AnimatedPressable>
         )}
       </View>
 
       <View style={styles.feedHeader}>
         <Text style={styles.feedLabel}>Posts</Text>
         {joined && (
-          <Pressable style={styles.newPostBtn} onPress={() => navigation.navigate('CreatePost', { communityId })}>
+          <AnimatedPressable style={styles.newPostBtn} onPress={() => navigation.navigate('CreatePost', { communityId })}>
             <Feather name="plus" size={13} color={colors.coral} />
             <Text style={styles.newPostBtnText}>New post</Text>
-          </Pressable>
+          </AnimatedPressable>
         )}
       </View>
 
@@ -155,7 +156,7 @@ export default function CommunityDetailScreen() {
         posts.map((post) => {
           const [from, to] = gradients[post.id.charCodeAt(0) % gradients.length];
           return (
-            <Pressable key={post.id} style={styles.postCard} onPress={() => navigation.navigate('PostDetail', { postId: post.id })}>
+            <AnimatedPressable key={post.id} style={styles.postCard} onPress={() => navigation.navigate('PostDetail', { postId: post.id })}>
               <View style={styles.postImage}>
                 <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
                 {post.video_url ? (
@@ -168,7 +169,7 @@ export default function CommunityDetailScreen() {
                 <Text style={styles.postTag}>{post.tag}</Text>
                 <Text style={styles.postTitle} numberOfLines={2}>{post.title}</Text>
                 <View style={styles.postMeta}>
-                  <Pressable
+                  <AnimatedPressable
                     style={styles.postUserTap}
                     disabled={post.is_editorial}
                     onPress={() => navigation.navigate('UserProfile', { userId: post.author_id })}
@@ -177,14 +178,14 @@ export default function CommunityDetailScreen() {
                     <Text style={styles.postUser} numberOfLines={1}>
                       {post.is_editorial ? 'Havenly Editorial' : `@${post.author?.username ?? 'user'}`}
                     </Text>
-                  </Pressable>
+                  </AnimatedPressable>
                   <View style={styles.postLikes}>
                     <Feather name="heart" size={10} color={colors.inkSoft} />
                     <Text style={styles.postLikesText}>{formatCount(post.like_count)}</Text>
                   </View>
                 </View>
               </View>
-            </Pressable>
+            </AnimatedPressable>
           );
         })
       )}
