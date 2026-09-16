@@ -56,6 +56,7 @@ export default function PostDetailScreen() {
   const [shareSheetVisible, setShareSheetVisible] = useState(false);
   const [blockConfirmVisible, setBlockConfirmVisible] = useState(false);
   const [deleteCommentTarget, setDeleteCommentTarget] = useState<Comment | null>(null);
+  const [deletePostConfirmVisible, setDeletePostConfirmVisible] = useState(false);
 
   const loadComments = useCallback(async () => {
     const { data } = await supabase.from('comments').select('*, author:profiles(*)')
@@ -223,6 +224,20 @@ export default function PostDetailScreen() {
     }
   };
 
+  const handleDeletePost = () => setDeletePostConfirmVisible(true);
+
+  const confirmDeletePost = async () => {
+    if (!post) return;
+    const { error } = await supabase.from('posts').delete().eq('id', post.id);
+    if (error) {
+      showToast('Couldn’t delete post. Try again.', 'error');
+      return;
+    }
+    haptics.success();
+    showToast('Post deleted');
+    navigation.goBack();
+  };
+
   const handleBlock = () => setBlockConfirmVisible(true);
 
   const confirmBlock = async () => {
@@ -318,15 +333,13 @@ export default function PostDetailScreen() {
         >
           <Feather name="arrow-left" size={18} color="white" />
         </Pressable>
-        {!isOwnPost && (
-          <Pressable
-            style={[styles.videoOverflow, { top: insets.top + 12 }]}
-            onPress={openOptions}
-            accessibilityLabel="More options"
-          >
-            <Feather name="more-horizontal" size={20} color="white" />
-          </Pressable>
-        )}
+        <Pressable
+          style={[styles.videoOverflow, { top: insets.top + 12 }]}
+          onPress={openOptions}
+          accessibilityLabel="More options"
+        >
+          <Feather name="more-horizontal" size={20} color="white" />
+        </Pressable>
 
         <View style={[styles.videoBottomRow, { paddingBottom: insets.bottom + 20 }]}>
           <View style={styles.videoInfo}>
@@ -428,10 +441,14 @@ export default function PostDetailScreen() {
         <ActionSheet
           visible={optionsVisible}
           onClose={() => setOptionsVisible(false)}
-          actions={[
-            { label: 'Report post', onPress: () => setReportModalVisible(true) },
-            { label: `Block @${post.author?.username ?? 'user'}`, destructive: true, onPress: handleBlock },
-          ]}
+          actions={
+            isOwnPost
+              ? [{ label: 'Delete post', destructive: true, onPress: handleDeletePost }]
+              : [
+                  { label: 'Report post', onPress: () => setReportModalVisible(true) },
+                  { label: `Block @${post.author?.username ?? 'user'}`, destructive: true, onPress: handleBlock },
+                ]
+          }
         />
         <ActionSheet
           visible={blockConfirmVisible}
@@ -439,6 +456,13 @@ export default function PostDetailScreen() {
           title={`Block @${post.author?.username ?? 'this user'}?`}
           message="They won't be able to message you or see each other's posts anymore."
           actions={[{ label: 'Block', destructive: true, onPress: confirmBlock }]}
+        />
+        <ActionSheet
+          visible={deletePostConfirmVisible}
+          onClose={() => setDeletePostConfirmVisible(false)}
+          title="Delete this post?"
+          message="This can't be undone — it'll remove the post along with its likes and comments."
+          actions={[{ label: 'Delete', destructive: true, onPress: confirmDeletePost }]}
         />
         <ActionSheet
           visible={!!deleteCommentTarget}
@@ -484,15 +508,13 @@ export default function PostDetailScreen() {
         >
           <Feather name="arrow-left" size={16} color="#20261F" />
         </Pressable>
-        {!isOwnPost && (
-          <Pressable
-            style={[styles.overflow, { top: insets.top + 12 }]}
-            onPress={openOptions}
-            accessibilityLabel="More options"
-          >
-            <Feather name="more-horizontal" size={17} color="#20261F" />
-          </Pressable>
-        )}
+        <Pressable
+          style={[styles.overflow, { top: insets.top + 12 }]}
+          onPress={openOptions}
+          accessibilityLabel="More options"
+        >
+          <Feather name="more-horizontal" size={17} color="#20261F" />
+        </Pressable>
       </View>
       <View style={styles.body}>
         <Text style={styles.tag}>{post.tag}</Text>
@@ -566,10 +588,14 @@ export default function PostDetailScreen() {
       <ActionSheet
         visible={optionsVisible}
         onClose={() => setOptionsVisible(false)}
-        actions={[
-          { label: 'Report post', onPress: () => setReportModalVisible(true) },
-          { label: `Block @${post.author?.username ?? 'user'}`, destructive: true, onPress: handleBlock },
-        ]}
+        actions={
+          isOwnPost
+            ? [{ label: 'Delete post', destructive: true, onPress: handleDeletePost }]
+            : [
+                { label: 'Report post', onPress: () => setReportModalVisible(true) },
+                { label: `Block @${post.author?.username ?? 'user'}`, destructive: true, onPress: handleBlock },
+              ]
+        }
       />
       <ActionSheet
         visible={blockConfirmVisible}
@@ -577,6 +603,13 @@ export default function PostDetailScreen() {
         title={`Block @${post.author?.username ?? 'this user'}?`}
         message="They won't be able to message you or see each other's posts anymore."
         actions={[{ label: 'Block', destructive: true, onPress: confirmBlock }]}
+      />
+      <ActionSheet
+        visible={deletePostConfirmVisible}
+        onClose={() => setDeletePostConfirmVisible(false)}
+        title="Delete this post?"
+        message="This can't be undone — it'll remove the post along with its likes and comments."
+        actions={[{ label: 'Delete', destructive: true, onPress: confirmDeletePost }]}
       />
       <ActionSheet
         visible={!!deleteCommentTarget}
