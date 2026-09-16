@@ -9,9 +9,11 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { formatCount } from '@/utils/formatCount';
 import { radius, spacing, gradients } from '@/theme/tokens';
+import ActionSheet from '@/components/ActionSheet';
 import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
 import VideoThumb from '@/components/VideoThumb';
@@ -35,6 +37,7 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { session } = useAuth();
   const { colors } = useTheme();
+  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState({ posts: 0, followers: 0, following: 0 });
@@ -43,6 +46,7 @@ export default function ProfileScreen() {
   const [activeTab, setActiveTab] = useState<GridTab>('posts');
   const [refreshing, setRefreshing] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Post | null>(null);
   const [visibleVideoIds, setVisibleVideoIds] = useState<Set<string>>(new Set());
   // FlatList (unlike FeedScreen's manual masonry ScrollView) has built-in
   // viewability tracking — no need to measure card positions by hand here.
@@ -84,6 +88,29 @@ export default function ProfileScreen() {
     setRefreshing(false);
   }, [load]);
 
+  const handleLongPressPost = (post: Post) => {
+    haptics.tap();
+    setDeleteTarget(post);
+  };
+
+  const confirmDeletePost = async () => {
+    const target = deleteTarget;
+    if (!target) return;
+    // Removed from the grid immediately — the whole point of a long-press
+    // shortcut is that it feels instant, not like it's waiting on a request.
+    setPosts((prev) => prev.filter((p) => p.id !== target.id));
+    setStats((prev) => ({ ...prev, posts: Math.max(prev.posts - 1, 0) }));
+    const { error } = await supabase.from('posts').delete().eq('id', target.id);
+    if (error) {
+      setPosts((prev) => [...prev, target].sort((a, b) => b.created_at.localeCompare(a.created_at)));
+      setStats((prev) => ({ ...prev, posts: prev.posts + 1 }));
+      showToast('Couldn’t delete post. Try again.', 'error');
+      return;
+    }
+    haptics.success();
+    showToast('Post deleted');
+  };
+
   if (!profile) {
     if (hasLoadedOnce) return null;
     return (
@@ -121,7 +148,12 @@ export default function ProfileScreen() {
       renderItem={({ item, index }) => {
         const [from, to] = gradients[index % gradients.length];
         return (
-          <Pressable style={styles.gridCell} onPress={() => navigation.navigate('PostDetail', { postId: item.id })}>
+          <Pressable
+            style={styles.gridCell}
+            onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
+            onLongPress={activeTab === 'posts' ? () => handleLongPressPost(item) : undefined}
+            delayLongPress={350}
+          >
             <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
             {item.video_url ? (
               <VideoThumb uri={item.video_url} isVisible={isFocused && visibleVideoIds.has(item.id)} />
@@ -212,7 +244,18 @@ export default function ProfileScreen() {
           </View>
         </View>
       }
-      ListFooterComponent={<View style={{ height: 24 }} />}
+      ListFooterComponent={
+        <>
+          <View style={{ height: 24 }} />
+          <ActionSheet
+            visible={!!deleteTarget}
+            onClose={() => setDeleteTarget(null)}
+            title="Delete this post?"
+            message="This can't be undone — it'll remove the post along with its likes and comments."
+            actions={[{ label: 'Delete', destructive: true, onPress: confirmDeletePost }]}
+          />
+        </>
+      }
     />
   );
 }
