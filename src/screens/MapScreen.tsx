@@ -4,6 +4,7 @@ import { WebView } from 'react-native-webview';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Feather } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -18,20 +19,48 @@ import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
+const MAPBOX_TOKEN: string = Constants.expoConfig?.extra?.mapboxToken ?? '';
+
 // Dubai city-center fallback when location is denied/unavailable, so the
 // map still opens to somewhere sensible instead of the middle of the ocean.
 const DUBAI_FALLBACK: Coords = { latitude: 25.2048, longitude: 55.2708 };
 
+// Feather's own outline icons, inlined as raw SVG so the web map (a plain
+// HTML string, not RN) matches the exact same icon language the rest of the
+// app already uses via @expo/vector-icons — no emoji anywhere on the map.
+const ICON_GIFT = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>';
+const ICON_CALENDAR = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
+const ICON_RADIO = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>';
+
 interface MapCheckIn extends CheckIn { user: Profile; place?: Offer | HavenlyEvent | null }
 
+interface MapPalette {
+  land: string; landuse: string; water: string; roadMinor: string; roadMajor: string;
+  building: string; label: string; labelHalo: string; boundary: string; teal: string; coral: string;
+}
+
+function paletteFor(colors: ColorTokens): MapPalette {
+  return {
+    land: colors.sand, landuse: colors.sandDeep, water: colors.tealSoft,
+    roadMinor: colors.line, roadMajor: colors.coral, building: colors.sandDeep,
+    label: colors.inkSoft, labelHalo: colors.sand, boundary: colors.line,
+    teal: colors.teal, coral: colors.coral,
+  };
+}
+
 // Builds the whole page as one string — markers, popups and the message
-// bridge back to RN are all defined here since there's nothing to reuse
-// this HTML for elsewhere. Positron tiles (no API key needed) keep the
-// basemap quiet and neutral so the brand-colored pins are what stands out.
+// bridge back to RN are all defined here since there's nothing to reuse this
+// HTML for elsewhere. Base style is one of Mapbox's own (dark-v11/light-v11,
+// matching the app's current theme), then every layer is recolored to
+// Havenly's own palette so it reads as a branded map, not a generic one.
 function buildMapHtml(params: {
   center: Coords; offers: Offer[]; events: HavenlyEvent[]; checkIns: MapCheckIn[]; myId: string | undefined;
+  mapboxToken: string; scheme: 'light' | 'dark'; colors: ColorTokens;
 }): string {
-  const { center, offers, events, checkIns, myId } = params;
+  const { center, offers, events, checkIns, myId, mapboxToken, scheme, colors } = params;
+  const palette = paletteFor(colors);
+  const baseStyle = scheme === 'dark' ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/light-v11';
+
   const offerPins = offers
     .filter((o) => o.latitude != null && o.longitude != null)
     .map((o) => ({ id: o.id, lat: o.latitude, lng: o.longitude, title: o.title, sub: o.brand?.name ?? '', discount: o.discount_label }));
@@ -53,71 +82,171 @@ function buildMapHtml(params: {
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" />
   <style>
-    html, body, #map { height: 100%; margin: 0; background: #EDEAE2; }
-    .havenly-pin { border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.35); border: 2px solid white; }
-    .havenly-pin span { transform: rotate(45deg); font-size: 15px; }
-    .checkin-pin { border-radius: 50%; border: 2.5px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.35); background-size: cover; background-position: center; background-color: #FF5A3C; }
-    .popup-title { font-family: -apple-system, sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 2px; }
-    .popup-sub { font-family: -apple-system, sans-serif; font-size: 11.5px; color: #5B6459; margin-bottom: 8px; }
-    .popup-btn { font-family: -apple-system, sans-serif; font-size: 12px; font-weight: 700; color: white; background: #FF5A3C; border: none; border-radius: 100px; padding: 7px 14px; }
-    .leaflet-popup-content-wrapper { border-radius: 14px; }
+    html, body, #map { height: 100%; margin: 0; background: ${palette.land}; }
+    .havenly-pin {
+      width: 34px; height: 34px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.35); border: 2px solid white; cursor: pointer;
+    }
+    .havenly-pin svg { transform: rotate(45deg); }
+    .checkin-wrap { position: relative; width: 36px; height: 36px; cursor: pointer; }
+    .checkin-pulse {
+      position: absolute; inset: -9px; border-radius: 50%;
+      background: ${palette.teal}59; animation: livePulse 2.2s ease-in-out infinite;
+    }
+    .checkin-pin {
+      position: absolute; inset: 0; border-radius: 50%; border: 2.5px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.35); background-size: cover; background-position: center;
+      background-color: ${palette.coral};
+    }
+    .ping-burst {
+      position: absolute; top: 50%; left: 50%; width: 36px; height: 36px; margin: -18px 0 0 -18px;
+      border-radius: 50%; border: 2.5px solid ${palette.coral}; animation: pingBurst 0.7s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes pingBurst { from { transform: scale(0.5); opacity: 0.9; } to { transform: scale(2.4); opacity: 0; } }
+    @keyframes livePulse { 0%, 100% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.3); opacity: 0; } }
+    .user-dot { position: relative; width: 16px; height: 16px; }
+    .user-dot-pulse { position: absolute; inset: -10px; border-radius: 50%; background: ${palette.teal}4d; animation: livePulse 2.6s ease-in-out infinite; }
+    .user-dot-core { position: absolute; inset: 0; border-radius: 50%; background: ${palette.teal}; border: 3px solid white; box-shadow: 0 0 0 3px ${palette.teal}4d; }
+    .mapboxgl-popup-content { border-radius: 14px; padding: 12px 14px; font-family: -apple-system, sans-serif; }
+    .popup-title { font-weight: 700; font-size: 13px; margin-bottom: 2px; color: #20261F; }
+    .popup-sub { font-size: 11.5px; color: #5B6459; margin-bottom: 8px; }
+    .popup-btn {
+      display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: white;
+      background: ${palette.coral}; border: none; border-radius: 100px; padding: 7px 14px; cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
   <script>
-    const map = L.map('map', { zoomControl: false }).setView([${center.latitude}, ${center.longitude}], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap, &copy; CARTO', maxZoom: 19,
-    }).addTo(map);
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    mapboxgl.accessToken = '${escapeJs(mapboxToken)}';
+    var map = new mapboxgl.Map({
+      container: 'map', style: '${baseStyle}', center: [${center.longitude}, ${center.latitude}], zoom: 13,
+      attributionControl: false, pitchWithRotate: false, dragRotate: false, touchPitch: false,
+    });
+    map.addControl(new mapboxgl.AttributionControl({ compact: true }));
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
     function post(msg) {
       if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify(msg));
     }
 
-    L.marker([${center.latitude}, ${center.longitude}], {
-      icon: L.divIcon({ className: '', html: '<div style="width:16px;height:16px;border-radius:50%;background:#0F8B82;border:3px solid white;box-shadow:0 0 0 3px rgba(15,139,130,0.3)"></div>', iconSize: [16, 16] }),
-      zIndexOffset: -100,
-    }).addTo(map);
+    // Recolors every layer of the stock Mapbox style to Havenly's own
+    // palette instead of the default blue-grey basemap. Matched loosely by
+    // layer type + id keyword (not exact ids) since Mapbox occasionally
+    // renames layers between style versions — each attempt is wrapped so an
+    // unsupported property on one layer never breaks the rest.
+    function recolor() {
+      var layers = map.getStyle().layers || [];
+      layers.forEach(function (layer) {
+        var id = layer.id;
+        try {
+          if (layer.type === 'background') {
+            map.setPaintProperty(id, 'background-color', '${palette.land}');
+          } else if (layer.type === 'fill' && /water/i.test(id)) {
+            map.setPaintProperty(id, 'fill-color', '${palette.water}');
+          } else if (layer.type === 'fill' && /building/i.test(id)) {
+            map.setPaintProperty(id, 'fill-color', '${palette.building}');
+            map.setPaintProperty(id, 'fill-opacity', 0.5);
+          } else if (layer.type === 'fill' && /park|landuse|landcover|pitch/i.test(id)) {
+            map.setPaintProperty(id, 'fill-color', '${palette.landuse}');
+          } else if (layer.type === 'line' && /admin|boundary/i.test(id)) {
+            map.setPaintProperty(id, 'line-color', '${palette.boundary}');
+          } else if (layer.type === 'line' && /motorway|trunk|primary/i.test(id)) {
+            map.setPaintProperty(id, 'line-color', '${palette.roadMajor}');
+            map.setPaintProperty(id, 'line-opacity', 0.55);
+          } else if (layer.type === 'line' && /road|street|secondary|tertiary|bridge|tunnel/i.test(id)) {
+            map.setPaintProperty(id, 'line-color', '${palette.roadMinor}');
+          } else if (layer.type === 'symbol') {
+            try { map.setPaintProperty(id, 'text-color', '${palette.label}'); } catch (e2) {}
+            try { map.setPaintProperty(id, 'text-halo-color', '${palette.labelHalo}'); } catch (e2) {}
+          }
+        } catch (e) {
+          // Property not supported on this layer/style version — skip it.
+        }
+      });
+    }
 
-    ${offerPins.map((p) => `
-      L.marker([${p.lat}, ${p.lng}], {
-        icon: L.divIcon({ className: '', iconSize: [34, 34], iconAnchor: [17, 34], html: '<div class="havenly-pin" style="width:34px;height:34px;background:#FF5A3C"><span>🎁</span></div>' }),
-      }).addTo(map).bindPopup(
-        '<div class="popup-title">${escapeJs(p.title)}</div><div class="popup-sub">${escapeJs(p.sub)} · ${escapeJs(p.discount)}</div><button class="popup-btn" onclick=\\'post({type:"openOffer",id:"${p.id}"})\\'>View offer</button>'
-      );
-    `).join('\n')}
+    // Marker elements are kept by check-in id so the ping button (which
+    // lives inside a Mapbox popup, a separate DOM subtree) can trigger a
+    // ripple burst on the marker itself when tapped.
+    var checkinEls = {};
+    function ripple(id) {
+      var el = checkinEls[id];
+      if (!el) return;
+      var burst = document.createElement('div');
+      burst.className = 'ping-burst';
+      el.appendChild(burst);
+      setTimeout(function () { burst.remove(); }, 700);
+    }
+    function pingClick(id) {
+      ripple(id);
+      post({ type: 'ping', id: id });
+    }
 
-    ${eventPins.map((p) => `
-      L.marker([${p.lat}, ${p.lng}], {
-        icon: L.divIcon({ className: 'havenly-pin', iconSize: [34, 34], iconAnchor: [17, 34], html: '<div class="havenly-pin" style="width:34px;height:34px;background:#0F8B82"><span>📅</span></div>' }),
-      }).addTo(map).bindPopup(
-        '<div class="popup-title">${escapeJs(p.title)}</div><div class="popup-sub">${escapeJs(p.sub)}</div><button class="popup-btn" onclick=\\'post({type:"openEvent",id:"${p.id}"})\\'>View event</button>'
-      );
-    `).join('\n')}
+    function addMarkers() {
+      var userEl = document.createElement('div');
+      userEl.className = 'user-dot';
+      userEl.innerHTML = '<div class="user-dot-pulse"></div><div class="user-dot-core"></div>';
+      new mapboxgl.Marker({ element: userEl, anchor: 'center' }).setLngLat([${center.longitude}, ${center.latitude}]).addTo(map);
 
-    ${checkInPins.map((p) => `
-      L.marker([${p.lat}, ${p.lng}], {
-        icon: L.divIcon({
-          className: '', iconSize: [36, 36], iconAnchor: [18, 18],
-          html: '<div class="checkin-pin" style="width:36px;height:36px;${p.avatar ? `background-image:url(${escapeJs(p.avatar)})` : ''}"></div>',
-        }),
-      }).addTo(map).bindPopup(
-        '<div class="popup-title">${escapeJs(p.name)}${p.mine ? ' (you)' : ''}</div><div class="popup-sub">Checked in at ${escapeJs(p.placeTitle)}</div>' +
-        ${p.mine ? "''" : `'<button class="popup-btn" onclick=\\'post({type:"ping",id:"${p.id}"})\\'>Ping 👋</button>'`}
-      );
-    `).join('\n')}
+      ${offerPins.map((p) => `
+      (function () {
+        var el = document.createElement('div');
+        el.className = 'havenly-pin';
+        el.style.background = '${palette.coral}';
+        el.innerHTML = '${ICON_GIFT}';
+        var popup = new mapboxgl.Popup({ offset: 26, closeButton: false }).setHTML(
+          '<div class="popup-title">${escapeJs(p.title)}</div><div class="popup-sub">${escapeJs(p.sub)} · ${escapeJs(p.discount)}</div><button class="popup-btn" onclick=\\'post({type:"openOffer",id:"${p.id}"})\\'>View offer</button>'
+        );
+        new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat([${p.lng}, ${p.lat}]).setPopup(popup).addTo(map);
+      })();
+      `).join('\n')}
+
+      ${eventPins.map((p) => `
+      (function () {
+        var el = document.createElement('div');
+        el.className = 'havenly-pin';
+        el.style.background = '${palette.teal}';
+        el.innerHTML = '${ICON_CALENDAR}';
+        var popup = new mapboxgl.Popup({ offset: 26, closeButton: false }).setHTML(
+          '<div class="popup-title">${escapeJs(p.title)}</div><div class="popup-sub">${escapeJs(p.sub)}</div><button class="popup-btn" onclick=\\'post({type:"openEvent",id:"${p.id}"})\\'>View event</button>'
+        );
+        new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat([${p.lng}, ${p.lat}]).setPopup(popup).addTo(map);
+      })();
+      `).join('\n')}
+
+      ${checkInPins.map((p) => `
+      (function () {
+        var el = document.createElement('div');
+        el.className = 'checkin-wrap';
+        el.innerHTML = '<div class="checkin-pulse"></div><div class="checkin-pin"${p.avatar ? ` style="background-image:url(${escapeJs(p.avatar)})"` : ''}></div>';
+        checkinEls['${p.id}'] = el;
+        var popup = new mapboxgl.Popup({ offset: 22, closeButton: false }).setHTML(
+          '<div class="popup-title">${escapeJs(p.name)}${p.mine ? ' (you)' : ''}</div><div class="popup-sub">Checked in at ${escapeJs(p.placeTitle)}</div>' +
+          ${p.mine ? "''" : `'<button class="popup-btn" onclick=\\'pingClick("${p.id}")\\'>${ICON_RADIO} Ping</button>'`}
+        );
+        new mapboxgl.Marker({ element: el, anchor: 'center' }).setLngLat([${p.lng}, ${p.lat}]).setPopup(popup).addTo(map);
+      })();
+      `).join('\n')}
+    }
+
+    map.on('load', function () {
+      recolor();
+      addMarkers();
+    });
   </script>
 </body>
 </html>`;
 }
 
 // Names/titles here are user- or admin-controlled text that ends up as HTML
-// inside the popup (via bindPopup's string argument, not a text node) — so
+// inside the popup (via setHTML's string argument, not a text node) — so
 // this has to neutralize markup (a display_name of "<img onerror=...>"
 // would otherwise execute in the WebView), not just make the value safe to
 // sit inside the JS template literal it's embedded in.
@@ -132,7 +261,7 @@ function escapeJs(s: string): string {
 export default function MapScreen() {
   const navigation = useNavigation<Nav>();
   const { session } = useAuth();
-  const { colors } = useTheme();
+  const { colors, scheme } = useTheme();
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
@@ -197,9 +326,9 @@ export default function MapScreen() {
   };
 
   const html = useMemo(() => {
-    if (!center) return null;
-    return buildMapHtml({ center, offers, events, checkIns, myId });
-  }, [center, offers, events, checkIns, myId]);
+    if (!center || !MAPBOX_TOKEN) return null;
+    return buildMapHtml({ center, offers, events, checkIns, myId, mapboxToken: MAPBOX_TOKEN, scheme, colors });
+  }, [center, offers, events, checkIns, myId, scheme, colors]);
 
   return (
     <View style={styles.container}>
@@ -215,7 +344,12 @@ export default function MapScreen() {
           <Text style={styles.locationNoticeText}>Location off — showing Dubai. Enable it for pins near you.</Text>
         </View>
       )}
-      {!loaded || !html ? (
+      {!MAPBOX_TOKEN ? (
+        <View style={styles.centered}>
+          <Feather name="alert-circle" size={22} color={colors.inkSoft} />
+          <Text style={styles.missingTokenText}>Map isn’t configured yet.</Text>
+        </View>
+      ) : !loaded || !html ? (
         <View style={styles.centered}><ActivityIndicator color={colors.coral} /></View>
       ) : (
         <WebView
@@ -227,8 +361,8 @@ export default function MapScreen() {
         />
       )}
       <View style={styles.legend}>
-        <View style={styles.legendItem}><Text style={styles.legendEmoji}>🎁</Text><Text style={styles.legendText}>Offers</Text></View>
-        <View style={styles.legendItem}><Text style={styles.legendEmoji}>📅</Text><Text style={styles.legendText}>Events</Text></View>
+        <View style={styles.legendItem}><Feather name="gift" size={12} color={colors.coral} /><Text style={styles.legendText}>Offers</Text></View>
+        <View style={styles.legendItem}><Feather name="calendar" size={12} color={colors.teal} /><Text style={styles.legendText}>Events</Text></View>
         <View style={styles.legendItem}><View style={styles.legendDot} /><Text style={styles.legendText}>Checked in</Text></View>
       </View>
     </View>
@@ -238,7 +372,8 @@ export default function MapScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  missingTokenText: { fontSize: 13, color: colors.inkSoft },
   header: {
     flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 12,
     paddingHorizontal: spacing.lg, backgroundColor: colors.sand, zIndex: 1,
@@ -255,7 +390,6 @@ function createStyles(colors: ColorTokens) {
     borderRadius: 100, paddingHorizontal: 14, paddingVertical: 9, borderWidth: 1, borderColor: colors.line,
   },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  legendEmoji: { fontSize: 12 },
   legendDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.coral },
   legendText: { fontSize: 10.5, fontWeight: '600', color: colors.inkSoft },
   });
