@@ -55,16 +55,17 @@ function paletteFor(colors: ColorTokens): MapPalette {
 // Havenly's own palette so it reads as a branded map, not a generic one.
 function buildMapHtml(params: {
   center: Coords; offers: Offer[]; events: HavenlyEvent[]; checkIns: MapCheckIn[]; myId: string | undefined;
-  mapboxToken: string; scheme: 'light' | 'dark'; colors: ColorTokens;
+  mapboxToken: string; colors: ColorTokens;
 }): string {
-  const { center, offers, events, checkIns, myId, mapboxToken, scheme, colors } = params;
+  const { center, offers, events, checkIns, myId, mapboxToken, colors } = params;
   const palette = paletteFor(colors);
-  // dark-v11/light-v11 are Mapbox's minimal "data backdrop" styles — barely
-  // any street names, business labels, or points of interest, which read as
-  // an empty map next to Google/Apple Maps. The navigation/streets styles
-  // carry the full POI + road-label set instead; recolor() below still
-  // retints everything to Havenly's palette on top of that richer base.
-  const baseStyle = scheme === 'dark' ? 'mapbox://styles/mapbox/navigation-night-v1' : 'mapbox://styles/mapbox/streets-v12';
+  // Every Mapbox dark preset (dark-v11, navigation-night-v1) is a stripped
+  // "driving at night" style with far fewer building/POI labels than
+  // streets-v12 — that's what was making dark mode show noticeably less
+  // than light mode. streets-v12 carries the full label set either way;
+  // recolor() below is what actually makes it look dark, by retinting
+  // every layer to Havenly's palette, so both themes get identical data.
+  const baseStyle = 'mapbox://styles/mapbox/streets-v12';
 
   const offerPins = offers
     .filter((o) => o.latitude != null && o.longitude != null)
@@ -266,7 +267,7 @@ function escapeJs(s: string): string {
 export default function MapScreen() {
   const navigation = useNavigation<Nav>();
   const { session } = useAuth();
-  const { colors, scheme } = useTheme();
+  const { colors } = useTheme();
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
@@ -343,8 +344,8 @@ export default function MapScreen() {
 
   const html = useMemo(() => {
     if (!center || !MAPBOX_TOKEN) return null;
-    return buildMapHtml({ center, offers, events, checkIns, myId, mapboxToken: MAPBOX_TOKEN, scheme, colors });
-  }, [center, offers, events, checkIns, myId, scheme, colors]);
+    return buildMapHtml({ center, offers, events, checkIns, myId, mapboxToken: MAPBOX_TOKEN, colors });
+  }, [center, offers, events, checkIns, myId, colors]);
 
   return (
     <View style={styles.container}>
