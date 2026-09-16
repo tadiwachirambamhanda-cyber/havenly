@@ -1,27 +1,45 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, type StyleProp, type ViewStyle } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming, Easing } from 'react-native-reanimated';
 import { useTheme } from '@/lib/ThemeContext';
 
 interface Props {
   style?: StyleProp<ViewStyle>;
 }
 
-// A pulsing placeholder block — used to build content-shaped loading states
-// (skeleton screens) instead of a bare spinner.
+// A shimmering placeholder block — a soft highlight band sweeps left to
+// right on loop instead of the whole block fading in and out, which is
+// what separates a "polished" skeleton (Facebook/LinkedIn-style) from a
+// plain pulsing box.
 export default function Skeleton({ style }: Props) {
   const { colors } = useTheme();
-  const opacity = useRef(new Animated.Value(0.5)).current;
+  const progress = useSharedValue(0);
+  const [width, setWidth] = useState(0);
 
   useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0.5, duration: 700, useNativeDriver: true }),
-      ])
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [opacity]);
+    progress.value = withRepeat(withTiming(1, { duration: 1100, easing: Easing.inOut(Easing.ease) }), -1, false);
+  }, [progress]);
 
-  return <Animated.View style={[{ backgroundColor: colors.sandDeep, borderRadius: 8, opacity }, style]} />;
+  const shimmerStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: (progress.value * 2 - 1) * width }],
+  }));
+
+  return (
+    <Animated.View
+      style={[{ backgroundColor: colors.sandDeep, borderRadius: 8, overflow: 'hidden' }, style]}
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+    >
+      {width > 0 && (
+        <Animated.View style={[StyleSheet.absoluteFill, shimmerStyle]}>
+          <LinearGradient
+            colors={['transparent', colors.line, 'transparent']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{ width, height: '100%' }}
+          />
+        </Animated.View>
+      )}
+    </Animated.View>
+  );
 }

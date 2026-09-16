@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl, useWindo
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useNavigation, useFocusEffect, useIsFocused, type CompositeNavigationProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -303,14 +304,14 @@ export default function FeedScreen() {
   // sectionKey distinguishes the same post rendered in more than one
   // section at once (see checkVideoVisibility) — doesn't need to be
   // anything but stable and unique per section.
-  const renderCard = (item: Post, sectionKey: string) => {
+  const renderCard = (item: Post, sectionKey: string, index = 0) => {
     const hash = hashString(item.id);
     const [from, to] = gradients[hash % gradients.length];
     const imageHeight = 110 + (hash % 60);
     const cardKey = `${sectionKey}:${item.id}`;
     return (
+      <Animated.View key={cardKey} entering={FadeInDown.delay(Math.min(index, 6) * 60).springify().damping(16)}>
       <Pressable
-        key={cardKey}
         style={[styles.card, item.is_editorial && styles.cardEditorial]}
         onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
       >
@@ -357,6 +358,7 @@ export default function FeedScreen() {
           </View>
         </View>
       </Pressable>
+      </Animated.View>
     );
   };
 
@@ -365,7 +367,7 @@ export default function FeedScreen() {
       <Text style={styles.sectionLabel}>{title}</Text>
       <View style={styles.masonryRow}>
         {columns.map((col, i) => (
-          <View key={i} style={styles.masonryColumn}>{col.map((post) => renderCard(post, sectionKey))}</View>
+          <View key={i} style={styles.masonryColumn}>{col.map((post, idx) => renderCard(post, sectionKey, idx))}</View>
         ))}
       </View>
     </View>

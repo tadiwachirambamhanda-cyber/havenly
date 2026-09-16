@@ -1,8 +1,10 @@
-import React, { useMemo } from 'react';
-import { View, Pressable, StyleSheet } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { useTheme } from '@/lib/ThemeContext';
 import type { ColorTokens } from '@/theme/tokens';
 import { useUnreadMessages } from '@/lib/useUnreadMessages';
@@ -22,6 +24,25 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const hasUnread = useUnreadMessages();
+  // Measured per-tab, not computed from the pill's total width divided
+  // evenly — the pill has its own padding and a gap between items, so a
+  // formula-based width would drift out of alignment with the real icons
+  // by a few px per step. Measuring each item directly is exact regardless.
+  const [itemLayouts, setItemLayouts] = useState<Record<number, { x: number; width: number }>>({});
+  const indicatorX = useSharedValue(0);
+  const indicatorWidth = useSharedValue(0);
+
+  const activeLayout = itemLayouts[state.index];
+  React.useEffect(() => {
+    if (!activeLayout) return;
+    indicatorX.value = withSpring(activeLayout.x, { damping: 18, stiffness: 220 });
+    indicatorWidth.value = withSpring(activeLayout.width, { damping: 18, stiffness: 220 });
+  }, [activeLayout, indicatorX, indicatorWidth]);
+
+  const indicatorStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: indicatorX.value }],
+    width: indicatorWidth.value,
+  }));
 
   const renderTab = (route: (typeof state.routes)[number], index: number) => {
     const config = TAB_CONFIG[route.name];
@@ -29,10 +50,15 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
     const isFocused = state.index === index;
 
     return (
-      <Pressable
+      <AnimatedPressable
         key={route.key}
-        style={[styles.pillItem, isFocused && styles.pillItemActive]}
+        style={styles.pillItem}
+        scaleTo={0.88}
         accessibilityLabel={route.name}
+        onLayout={(e) => {
+          const { x, width } = e.nativeEvent.layout;
+          setItemLayouts((prev) => ({ ...prev, [index]: { x, width } }));
+        }}
         onPress={() => {
           const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
           if (!isFocused && !event.defaultPrevented) {
@@ -43,15 +69,21 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
       >
         <Feather name={config.icon} size={18} color={isFocused ? 'white' : INACTIVE_COLOR} />
         {route.name === 'Inbox' && hasUnread && <View style={styles.unreadDot} />}
-      </Pressable>
+      </AnimatedPressable>
     );
   };
 
   return (
     <View style={[styles.container, { bottom: insets.bottom + 14 }]}>
-      <View style={styles.pill}>{state.routes.map(renderTab)}</View>
-      <Pressable
+      <View style={styles.pill}>
+        {activeLayout && (
+          <Animated.View pointerEvents="none" style={[styles.indicator, indicatorStyle]} />
+        )}
+        {state.routes.map(renderTab)}
+      </View>
+      <AnimatedPressable
         style={styles.fab}
+        scaleTo={0.88}
         accessibilityLabel="Create post"
         onPress={() => {
           haptics.tap();
@@ -59,7 +91,7 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
         }}
       >
         <Feather name="plus" size={20} color="white" />
-      </Pressable>
+      </AnimatedPressable>
     </View>
   );
 }
@@ -74,8 +106,16 @@ function createStyles(colors: ColorTokens) {
     borderRadius: 100, padding: 6,
     shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 10,
   },
+  // Slides between tabs instead of each item flipping its own background on
+  // and off — the continuous motion is what reads as premium rather than a
+  // plain state toggle.
+  // left:0 — position comes entirely from the measured translateX/width in
+  // indicatorStyle, not a fixed offset, so it lines up exactly with icons
+  // regardless of the pill's own padding/gap.
+  indicator: {
+    position: 'absolute', top: 6, bottom: 6, left: 0, borderRadius: 20, backgroundColor: colors.coral,
+  },
   pillItem: { flex: 1, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  pillItemActive: { backgroundColor: colors.coral },
   // colors.sand, not literal white — this dot sits on the ink-colored pill,
   // which flips to cream in dark mode, so the dot must flip the other way
   // to stay visible against it.

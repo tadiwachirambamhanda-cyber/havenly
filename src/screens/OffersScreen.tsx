@@ -5,6 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -12,6 +13,7 @@ import { getCurrentLocation, requestLocationAccess, openLocationSettings, distan
 import { haptics } from '@/lib/haptics';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import EmptyState from '@/components/EmptyState';
 import type { Offer } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -108,13 +110,14 @@ export default function OffersScreen() {
         contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.md, flexGrow: 1 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
         ListEmptyComponent={loaded ? <EmptyState icon="gift" text="No perks available right now — check back soon." /> : null}
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           const unlocked = myStreak >= item.min_streak;
           const distance = myLocation && item.latitude != null && item.longitude != null
             ? distanceKm(myLocation, { latitude: item.latitude, longitude: item.longitude })
             : null;
           return (
-            <Pressable style={styles.card} onPress={() => navigation.navigate('OfferDetail', { offerId: item.id })}>
+            <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 50).springify().damping(16)}>
+            <AnimatedPressable style={styles.card} onPress={() => navigation.navigate('OfferDetail', { offerId: item.id })}>
               {item.image_url ? (
                 <Image source={{ uri: item.image_url }} style={styles.cardImage} contentFit="cover" transition={200} />
               ) : (
@@ -141,7 +144,8 @@ export default function OffersScreen() {
                   <Text style={styles.lockBadgeText}>{item.min_streak}d</Text>
                 </View>
               )}
-            </Pressable>
+            </AnimatedPressable>
+            </Animated.View>
           );
         }}
       />

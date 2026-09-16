@@ -17,6 +17,7 @@ import { findOrCreateConversation } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
 import ActionSheet from '@/components/ActionSheet';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import PostVideoPlayer, { type PostVideoPlayerHandle } from '@/components/PostVideoPlayer';
 import { gradients, radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
@@ -360,7 +361,7 @@ export default function PostDetailScreen() {
                 </Text>
               </Pressable>
               {!isOwnPost && (
-                <Pressable
+                <AnimatedPressable
                   style={[styles.videoFollowBtn, following && styles.videoFollowBtnActive]}
                   onPress={toggleFollow}
                   accessibilityLabel={following ? 'Unfollow this user' : 'Follow this user'}
@@ -368,7 +369,7 @@ export default function PostDetailScreen() {
                   <Text style={[styles.videoFollowBtnText, following && styles.videoFollowBtnTextActive]}>
                     {following ? 'Following' : 'Follow'}
                   </Text>
-                </Pressable>
+                </AnimatedPressable>
               )}
             </View>
             <Text style={styles.videoTag}>{post.tag}</Text>
@@ -377,7 +378,7 @@ export default function PostDetailScreen() {
           </View>
 
           <View style={styles.videoRail}>
-            <Pressable
+            <AnimatedPressable
               style={styles.railItem}
               onPress={() => videoPlayerRef.current?.toggleMute()}
               accessibilityLabel={videoMuted ? 'Unmute' : 'Mute'}
@@ -385,28 +386,28 @@ export default function PostDetailScreen() {
               <View style={styles.railIconCircle}>
                 <Feather name={videoMuted ? 'volume-x' : 'volume-2'} size={20} color="white" />
               </View>
-            </Pressable>
-            <Pressable style={styles.railItem} onPress={toggleLike} accessibilityLabel={liked ? 'Unlike' : 'Like'}>
+            </AnimatedPressable>
+            <AnimatedPressable style={styles.railItem} onPress={toggleLike} accessibilityLabel={liked ? 'Unlike' : 'Like'}>
               <Animated.View style={[styles.railIconCircle, { transform: [{ scale: likeIconScale }] }]}>
                 <Feather name="heart" size={22} color={liked ? colors.coral : 'white'} />
               </Animated.View>
               <Text style={styles.railText}>{formatCount(post.like_count)}</Text>
-            </Pressable>
-            <Pressable style={styles.railItem} onPress={() => setCommentsVisible(true)} accessibilityLabel="View comments">
+            </AnimatedPressable>
+            <AnimatedPressable style={styles.railItem} onPress={() => setCommentsVisible(true)} accessibilityLabel="View comments">
               <View style={styles.railIconCircle}><Feather name="message-circle" size={22} color="white" /></View>
               <Text style={styles.railText}>{formatCount(post.comment_count)}</Text>
-            </Pressable>
+            </AnimatedPressable>
             {!isOwnPost && (
-              <Pressable style={styles.railItem} onPress={onMessage} accessibilityLabel="Message this user">
+              <AnimatedPressable style={styles.railItem} onPress={onMessage} accessibilityLabel="Message this user">
                 <View style={styles.railIconCircle}><Feather name="send" size={19} color="white" /></View>
-              </Pressable>
+              </AnimatedPressable>
             )}
-            <Pressable style={styles.railItem} onPress={openShare} accessibilityLabel="Share this post">
+            <AnimatedPressable style={styles.railItem} onPress={openShare} accessibilityLabel="Share this post">
               <View style={styles.railIconCircle}><Feather name="share-2" size={19} color="white" /></View>
-            </Pressable>
-            <Pressable style={styles.railItem} onPress={toggleSave} accessibilityLabel={saved ? 'Remove from saved' : 'Save this post'}>
+            </AnimatedPressable>
+            <AnimatedPressable style={styles.railItem} onPress={toggleSave} accessibilityLabel={saved ? 'Remove from saved' : 'Save this post'}>
               <View style={styles.railIconCircle}><Feather name="bookmark" size={19} color={saved ? colors.coral : 'white'} /></View>
-            </Pressable>
+            </AnimatedPressable>
           </View>
         </View>
 
@@ -539,10 +540,10 @@ export default function PostDetailScreen() {
           </Pressable>
           {!isOwnPost && (
             <View style={{ flexDirection: 'row', gap: 8 }}>
-              <Pressable style={styles.messageBtn} onPress={onMessage} accessibilityLabel="Message this user">
+              <AnimatedPressable style={styles.messageBtn} onPress={onMessage} accessibilityLabel="Message this user">
                 <Feather name="message-circle" size={14} color={colors.ink} />
-              </Pressable>
-              <Pressable
+              </AnimatedPressable>
+              <AnimatedPressable
                 style={[styles.followBtn, following && styles.followBtnActive]}
                 onPress={toggleFollow}
                 accessibilityLabel={following ? 'Unfollow this user' : 'Follow this user'}
@@ -550,7 +551,7 @@ export default function PostDetailScreen() {
                 <Text style={[styles.followBtnText, following && styles.followBtnTextActive]}>
                   {following ? 'Following' : 'Follow'}
                 </Text>
-              </Pressable>
+              </AnimatedPressable>
             </View>
           )}
         </View>
@@ -558,24 +559,24 @@ export default function PostDetailScreen() {
         {post.body ? <Text style={styles.text}>{post.body}</Text> : null}
 
         <View style={styles.actionBar}>
-          <Pressable style={styles.actionItem} onPress={toggleLike} accessibilityLabel={liked ? 'Unlike' : 'Like'}>
+          <AnimatedPressable style={styles.actionItem} onPress={toggleLike} accessibilityLabel={liked ? 'Unlike' : 'Like'}>
             <Animated.View style={{ transform: [{ scale: likeIconScale }] }}>
               <Feather name="heart" size={15} color={liked ? colors.coral : colors.inkSoft} />
             </Animated.View>
             <Text style={[styles.actionText, liked && styles.actionTextActive]}>{formatCount(post.like_count)}</Text>
-          </Pressable>
+          </AnimatedPressable>
           <View style={styles.actionItem}>
             <Feather name="message-circle" size={15} color={colors.inkSoft} />
             <Text style={styles.actionText}>{post.comment_count}</Text>
           </View>
-          <Pressable style={styles.actionItem} onPress={openShare} accessibilityLabel="Share this post">
+          <AnimatedPressable style={styles.actionItem} onPress={openShare} accessibilityLabel="Share this post">
             <Feather name="share-2" size={15} color={colors.inkSoft} />
             <Text style={styles.actionText}>Share</Text>
-          </Pressable>
-          <Pressable style={styles.actionItem} onPress={toggleSave} accessibilityLabel={saved ? 'Remove from saved' : 'Save this post'}>
+          </AnimatedPressable>
+          <AnimatedPressable style={styles.actionItem} onPress={toggleSave} accessibilityLabel={saved ? 'Remove from saved' : 'Save this post'}>
             <Feather name="bookmark" size={15} color={saved ? colors.coral : colors.inkSoft} />
             <Text style={[styles.actionText, saved && styles.actionTextActive]}>{saved ? 'Saved' : 'Save'}</Text>
-          </Pressable>
+          </AnimatedPressable>
         </View>
 
         <View style={styles.commentsSection}>

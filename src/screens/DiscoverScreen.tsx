@@ -5,6 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
+import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -16,6 +17,7 @@ import { communityIcon, interestIcon } from '@/constants/topicIcons';
 import { INTEREST_OPTIONS } from '@/constants/interests';
 import EmptyState from '@/components/EmptyState';
 import ActionSheet from '@/components/ActionSheet';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import type { Community, HavenlyEvent, Interest, Post, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -327,13 +329,13 @@ export default function DiscoverScreen() {
             {filteredSpots.map((spot, i) => {
               const [from, to] = gradients[(i + 2) % gradients.length];
               return (
-                <View key={spot.name} style={styles.spotCard}>
+                <Animated.View key={spot.name} entering={FadeInRight.delay(Math.min(i, 6) * 60).springify().damping(16)} style={styles.spotCard}>
                   <LinearGradient colors={[from, to]} style={styles.spotImage} />
                   <View style={styles.spotInfo}>
                     <Text style={styles.spotName}>{spot.name}</Text>
                     <Text style={styles.spotSub}>{spot.sub}</Text>
                   </View>
-                </View>
+                </Animated.View>
               );
             })}
           </ScrollView>
@@ -343,12 +345,16 @@ export default function DiscoverScreen() {
       {filteredEvents.length > 0 && (
         <>
           <Text style={styles.sectionLabel}>{isSearching ? 'Events' : 'This week on campus'}</Text>
-          {filteredEvents.map((event) => {
+          {filteredEvents.map((event, eventIndex) => {
             const date = new Date(event.event_date);
             const interested = myInterestIds.has(event.id);
             const friends = friendsGoing.get(event.id) ?? [];
             return (
-              <View key={event.id} style={styles.eventCard}>
+              <Animated.View
+                key={event.id}
+                entering={FadeInDown.delay(Math.min(eventIndex, 6) * 60).springify().damping(16)}
+                style={styles.eventCard}
+              >
                 <View style={styles.eventRow}>
                   <View style={styles.eventDate}>
                     <Text style={styles.eventDay}>{date.getDate()}</Text>
@@ -359,8 +365,9 @@ export default function DiscoverScreen() {
                     <Text style={styles.eventLoc}>{event.location}</Text>
                   </View>
                   <View style={styles.eventActions}>
-                    <Pressable
+                    <AnimatedPressable
                       style={styles.interestBtn}
+                      scaleTo={0.8}
                       onPress={() => toggleInterest(event.id)}
                       hitSlop={8}
                       accessibilityLabel={interested ? "Remove interest in this event" : "I'm interested in this event"}
@@ -369,7 +376,7 @@ export default function DiscoverScreen() {
                       <Text style={[styles.interestCount, interested && styles.interestCountActive]}>
                         {formatCount(event.interested_count)}
                       </Text>
-                    </Pressable>
+                    </AnimatedPressable>
                     {profile?.is_admin && (
                       <Pressable
                         style={styles.deleteBtn}
@@ -404,7 +411,7 @@ export default function DiscoverScreen() {
                     <Text style={styles.friendsText} numberOfLines={1}>{friendsGoingLabel(friends)}</Text>
                   </View>
                 )}
-              </View>
+              </Animated.View>
             );
           })}
         </>

@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -13,6 +14,7 @@ import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { formatCount } from '@/utils/formatCount';
 import { radius, spacing, gradients } from '@/theme/tokens';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import ActionSheet from '@/components/ActionSheet';
 import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
@@ -148,8 +150,10 @@ export default function ProfileScreen() {
       renderItem={({ item, index }) => {
         const [from, to] = gradients[index % gradients.length];
         return (
-          <Pressable
-            style={styles.gridCell}
+          <Animated.View entering={FadeIn.delay(Math.min(index, 11) * 30)} style={styles.gridCell}>
+          <AnimatedPressable
+            style={{ flex: 1 }}
+            scaleTo={0.93}
             onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
             onLongPress={activeTab === 'posts' ? () => handleLongPressPost(item) : undefined}
             delayLongPress={350}
@@ -160,7 +164,8 @@ export default function ProfileScreen() {
             ) : item.image_url ? (
               <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
             ) : null}
-          </Pressable>
+          </AnimatedPressable>
+          </Animated.View>
         );
       }}
       ListEmptyComponent={

@@ -12,6 +12,7 @@ import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { createCheckIn, deleteCheckIn, sendPing } from '@/lib/checkIns';
 import { toggleInterest } from '@/lib/interests';
+import AnimatedPressable from '@/components/AnimatedPressable';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { CheckIn, PlaceInterest, Offer, Profile } from '@/types';
@@ -166,9 +167,9 @@ export default function OfferDetailScreen() {
             <Text style={styles.code}>{claimCode}</Text>
           </View>
         ) : unlocked ? (
-          <Pressable style={styles.claimBtn} onPress={claim} disabled={claiming} accessibilityLabel="Claim this offer">
+          <AnimatedPressable style={styles.claimBtn} onPress={claim} disabled={claiming} accessibilityLabel="Claim this offer">
             {claiming ? <ActivityIndicator color="white" /> : <Text style={styles.claimBtnText}>Claim this perk</Text>}
-          </Pressable>
+          </AnimatedPressable>
         ) : (
           <View style={styles.lockedBox}>
             <Feather name="lock" size={14} color={colors.inkSoft} />
@@ -178,7 +179,7 @@ export default function OfferDetailScreen() {
 
         {offer.latitude != null && offer.longitude != null && (
           <View style={styles.checkInSection}>
-            <Pressable
+            <AnimatedPressable
               style={[styles.goingBtn, myInterest && styles.goingBtnActive]}
               onPress={toggleGoing}
               disabled={togglingInterest}
@@ -194,7 +195,7 @@ export default function OfferDetailScreen() {
                   </Text>
                 </>
               )}
-            </Pressable>
+            </AnimatedPressable>
             {interests.length > 0 && (
               <View style={styles.goingList}>
                 {interests.slice(0, 8).map((i) => (
@@ -210,7 +211,7 @@ export default function OfferDetailScreen() {
               </View>
             )}
 
-            <Pressable
+            <AnimatedPressable
               style={[styles.checkInBtn, myCheckIn && styles.checkInBtnActive]}
               onPress={toggleCheckIn}
               disabled={checkingIn}
@@ -226,7 +227,7 @@ export default function OfferDetailScreen() {
                   </Text>
                 </>
               )}
-            </Pressable>
+            </AnimatedPressable>
 
             {checkIns.length > 0 && (
               <View style={styles.checkInList}>
