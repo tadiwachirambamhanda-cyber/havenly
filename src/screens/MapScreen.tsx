@@ -10,9 +10,9 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
-import { getCurrentLocation, type Coords } from '@/lib/location';
+import { getCurrentLocation, requestLocationAccess, openLocationSettings, type Coords } from '@/lib/location';
 import { sendPing } from '@/lib/checkIns';
-import { spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { CheckIn, HavenlyEvent, Offer, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -308,6 +308,17 @@ export default function MapScreen() {
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
+  const handleEnableLocation = async () => {
+    haptics.tap();
+    const result = await requestLocationAccess();
+    if (result === 'granted') {
+      haptics.success();
+      await load();
+    } else if (result === 'blocked') {
+      openLocationSettings();
+    }
+  };
+
   const handlePing = async (checkInId: string) => {
     haptics.tap();
     try {
@@ -346,7 +357,10 @@ export default function MapScreen() {
       {locationDenied && loaded && (
         <View style={styles.locationNotice}>
           <Feather name="map-pin" size={12} color={colors.inkSoft} />
-          <Text style={styles.locationNoticeText}>Location off — showing Dubai. Enable it for pins near you.</Text>
+          <Text style={styles.locationNoticeText}>Location off — showing Dubai.</Text>
+          <Pressable style={styles.locationEnableBtn} onPress={handleEnableLocation} accessibilityLabel="Enable location">
+            <Text style={styles.locationEnableBtnText}>Enable</Text>
+          </Pressable>
         </View>
       )}
       {!MAPBOX_TOKEN ? (
@@ -390,6 +404,8 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: colors.sand,
   },
   locationNoticeText: { flex: 1, fontSize: 11.5, color: colors.inkSoft },
+  locationEnableBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.pill, backgroundColor: colors.tealSoft },
+  locationEnableBtnText: { fontSize: 11, fontWeight: '700', color: colors.teal },
   legend: {
     position: 'absolute', bottom: 16, left: 16, flexDirection: 'row', gap: 14, backgroundColor: colors.white,
     borderRadius: 100, paddingHorizontal: 14, paddingVertical: 9, borderWidth: 1, borderColor: colors.line,

@@ -8,7 +8,8 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
-import { getCurrentLocation, distanceKm, formatDistance, type Coords } from '@/lib/location';
+import { getCurrentLocation, requestLocationAccess, openLocationSettings, distanceKm, formatDistance, type Coords } from '@/lib/location';
+import { haptics } from '@/lib/haptics';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
@@ -26,11 +27,25 @@ export default function OffersScreen() {
   const [loaded, setLoaded] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [myLocation, setMyLocation] = useState<Coords | null>(null);
+  const [locationChecked, setLocationChecked] = useState(false);
   const myStreak = profile?.current_streak ?? 0;
 
   // Once per visit, not on every focus — no need to re-prompt/re-fetch GPS
   // each time this screen comes back into view.
-  useEffect(() => { getCurrentLocation().then(setMyLocation); }, []);
+  useEffect(() => {
+    getCurrentLocation().then((loc) => { setMyLocation(loc); setLocationChecked(true); });
+  }, []);
+
+  const handleEnableLocation = async () => {
+    haptics.tap();
+    const result = await requestLocationAccess();
+    if (result === 'granted') {
+      haptics.success();
+      setMyLocation(await getCurrentLocation());
+    } else if (result === 'blocked') {
+      openLocationSettings();
+    }
+  };
 
   const load = useCallback(async () => {
     const now = new Date().toISOString();
@@ -78,6 +93,15 @@ export default function OffersScreen() {
       <View style={styles.streakBanner}>
         <Text style={styles.streakBannerText}>🔥 Your streak: {myStreak} day{myStreak === 1 ? '' : 's'}</Text>
       </View>
+      {locationChecked && !myLocation && (
+        <View style={styles.locationNotice}>
+          <Feather name="map-pin" size={12} color={colors.inkSoft} />
+          <Text style={styles.locationNoticeText}>Turn on location to sort perks by distance.</Text>
+          <Pressable style={styles.locationEnableBtn} onPress={handleEnableLocation} accessibilityLabel="Enable location">
+            <Text style={styles.locationEnableBtnText}>Enable</Text>
+          </Pressable>
+        </View>
+      )}
       <FlatList
         data={sortedOffers}
         keyExtractor={(item) => item.id}
@@ -133,6 +157,14 @@ function createStyles(colors: ColorTokens) {
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
   streakBanner: { marginHorizontal: spacing.lg, marginBottom: 6, paddingVertical: 10, paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: colors.coralSoft, alignItems: 'center' },
   streakBannerText: { fontSize: 12.5, fontWeight: '700', color: colors.ink },
+  locationNotice: {
+    flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: spacing.lg, marginBottom: 10,
+    paddingVertical: 9, paddingHorizontal: 12, borderRadius: radius.md, backgroundColor: colors.white,
+    borderWidth: 1, borderColor: colors.line,
+  },
+  locationNoticeText: { flex: 1, fontSize: 11.5, color: colors.inkSoft },
+  locationEnableBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.pill, backgroundColor: colors.tealSoft },
+  locationEnableBtnText: { fontSize: 11, fontWeight: '700', color: colors.teal },
   card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: radius.md, padding: 12, marginBottom: 10 },
   cardImage: { width: 56, height: 56, borderRadius: 12 },
   cardBrand: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 10, textTransform: 'uppercase', color: colors.teal },

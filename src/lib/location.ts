@@ -1,4 +1,5 @@
 import * as Location from 'expo-location';
+import { Linking } from 'react-native';
 
 export interface Coords { latitude: number; longitude: number }
 
@@ -17,6 +18,28 @@ export async function getCurrentLocation(): Promise<Coords | null> {
   } catch {
     return null;
   }
+}
+
+// The "enable location" affordance shown after a denial: once the OS
+// permission prompt has been dismissed once (iOS) or "don't ask again" is
+// checked (Android), requesting again is silently a no-op — canAskAgain
+// tells us which case we're in, so the UI can either re-prompt or send the
+// user to the OS Settings screen, which is the only way back at that point.
+export async function requestLocationAccess(): Promise<'granted' | 'denied' | 'blocked'> {
+  try {
+    const current = await Location.getForegroundPermissionsAsync();
+    if (current.status === 'granted') return 'granted';
+    if (!current.canAskAgain) return 'blocked';
+    const requested = await Location.requestForegroundPermissionsAsync();
+    if (requested.status === 'granted') return 'granted';
+    return requested.canAskAgain ? 'denied' : 'blocked';
+  } catch {
+    return 'denied';
+  }
+}
+
+export function openLocationSettings(): void {
+  Linking.openSettings();
 }
 
 // Haversine distance in kilometers — plenty accurate at city scale, no
