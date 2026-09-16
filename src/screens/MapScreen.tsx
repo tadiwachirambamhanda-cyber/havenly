@@ -59,7 +59,12 @@ function buildMapHtml(params: {
 }): string {
   const { center, offers, events, checkIns, myId, mapboxToken, scheme, colors } = params;
   const palette = paletteFor(colors);
-  const baseStyle = scheme === 'dark' ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/light-v11';
+  // dark-v11/light-v11 are Mapbox's minimal "data backdrop" styles — barely
+  // any street names, business labels, or points of interest, which read as
+  // an empty map next to Google/Apple Maps. The navigation/streets styles
+  // carry the full POI + road-label set instead; recolor() below still
+  // retints everything to Havenly's palette on top of that richer base.
+  const baseStyle = scheme === 'dark' ? 'mapbox://styles/mapbox/navigation-night-v1' : 'mapbox://styles/mapbox/streets-v12';
 
   const offerPins = offers
     .filter((o) => o.latitude != null && o.longitude != null)
