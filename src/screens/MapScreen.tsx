@@ -131,7 +131,7 @@ function buildMapHtml(params: {
   <script>
     mapboxgl.accessToken = '${escapeJs(mapboxToken)}';
     var map = new mapboxgl.Map({
-      container: 'map', style: '${baseStyle}', center: [${center.longitude}, ${center.latitude}], zoom: 13,
+      container: 'map', style: '${baseStyle}', center: [${center.longitude}, ${center.latitude}], zoom: 15,
       attributionControl: false, pitchWithRotate: false, dragRotate: false, touchPitch: false,
     });
     map.addControl(new mapboxgl.AttributionControl({ compact: true }));
@@ -164,7 +164,7 @@ function buildMapHtml(params: {
             map.setPaintProperty(id, 'line-color', '${palette.boundary}');
           } else if (layer.type === 'line' && /motorway|trunk|primary/i.test(id)) {
             map.setPaintProperty(id, 'line-color', '${palette.roadMajor}');
-            map.setPaintProperty(id, 'line-opacity', 0.55);
+            map.setPaintProperty(id, 'line-opacity', 0.3);
           } else if (layer.type === 'line' && /road|street|secondary|tertiary|bridge|tunnel/i.test(id)) {
             map.setPaintProperty(id, 'line-color', '${palette.roadMinor}');
           } else if (layer.type === 'symbol') {
