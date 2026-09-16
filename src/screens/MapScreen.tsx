@@ -121,6 +121,11 @@ function buildMapHtml(params: {
       box-shadow: 0 2px 6px rgba(0,0,0,0.35); border: 2px solid white; cursor: pointer;
     }
     .havenly-pin svg { transform: rotate(45deg); }
+    .cluster-pin {
+      width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.35); cursor: pointer;
+      font-family: -apple-system, sans-serif; font-weight: 800; color: white; font-size: 14px;
+    }
     .checkin-wrap { position: relative; width: 36px; height: 36px; cursor: pointer; }
     .checkin-pulse {
       position: absolute; inset: -9px; border-radius: 50%;
@@ -171,6 +176,18 @@ function buildMapHtml(params: {
     function post(msg) {
       if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify(msg));
     }
+
+    // Names/titles here are user- or admin-controlled text landing in a
+    // popup's innerHTML (via setHTML), not a text node — has to neutralize
+    // markup (a display_name of "<img onerror=...>" would otherwise
+    // execute in the WebView), not just be embeddable in a JS string.
+    function escapeHtml(s) {
+      return (s == null ? '' : String(s)).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    var offerData = ${embedJson(offerPins)};
+    var eventData = ${embedJson(eventPins)};
+    var checkInData = ${embedJson(checkInPins)};
 
     // Recolors every layer of the stock Mapbox style to Havenly's own
     // palette instead of the default blue-grey basemap. Matched loosely by
@@ -226,45 +243,172 @@ function buildMapHtml(params: {
     }
 
     // Offer/event popups render from a rebuild function (captured over the
-    // pin's static title/sub/discount) rather than a fixed HTML string, so
+    // pin's title/sub/discount) rather than a fixed HTML string, so
     // toggling "down to go" can patch just that popup's content in place —
     // reloading the whole map for one count would reset the user's pan/zoom.
     var popupBuilders = {};
     var popupsById = {};
+    // Every point's data stays here by key regardless of whether it's
+    // currently rendered as its own marker or folded into a cluster —
+    // search's flyTo needs a target location even when clustered, and a
+    // toggled interest count has to survive a re-cluster/de-cluster cycle.
+    var pointDataById = {};
+    offerData.forEach(function (p) { pointDataById['offer:' + p.id] = p; });
+    eventData.forEach(function (p) { pointDataById['event:' + p.id] = p; });
+    checkInData.forEach(function (p) { pointDataById['checkin:' + p.id] = p; });
+
     window.setInterest = function (key, count, mine) {
       var popup = popupsById[key];
       var build = popupBuilders[key];
-      if (!popup || !build) return;
-      popup.setHTML(build(count, mine));
+      if (popup && build) popup.setHTML(build(count, mine));
+      var data = pointDataById[key];
+      if (data) { data.interestCount = count; data.mine = mine; }
     };
     function toggleInterestClick(type, id) {
       post({ type: 'toggleInterest', placeType: type, id: id });
     }
 
-    // Every marker is also registered here under a 'offer:<id>' /
-    // 'event:<id>' / 'checkin:<id>' key so RN's search bar can jump the map
-    // to a result via injectJavaScript — it has no other way to reach into
-    // this page's own Mapbox instance.
+    function offerPopupHtml(p, count, mine) {
+      return '<div class="popup-title">' + escapeHtml(p.title) + '</div>' +
+        '<div class="popup-sub">' + escapeHtml(p.sub) + ' · ' + escapeHtml(p.discount) + '</div>' +
+        '<div class="popup-row"><button class="popup-btn" onclick=\\'post({type:"openOffer",id:"' + p.id + '"})\\'>View offer</button>' +
+        '<button class="interest-btn' + (mine ? ' interest-btn-active' : '') + '" onclick=\\'toggleInterestClick("offer","' + p.id + '")\\'>${ICON_THUMB} ' +
+        (mine ? 'I\\'m in' : 'I\\'m down') + ' · ' + count + '</button></div>';
+    }
+    function eventPopupHtml(p, count, mine) {
+      return '<div class="popup-title">' + escapeHtml(p.title) + '</div>' +
+        '<div class="popup-sub">' + escapeHtml(p.sub) + '</div>' +
+        '<div class="popup-row"><button class="popup-btn" onclick=\\'post({type:"openEvent",id:"' + p.id + '"})\\'>View event</button>' +
+        '<button class="interest-btn' + (mine ? ' interest-btn-active' : '') + '" onclick=\\'toggleInterestClick("event","' + p.id + '")\\'>${ICON_THUMB} ' +
+        (mine ? 'I\\'m in' : 'I\\'m down') + ' · ' + count + '</button></div>';
+    }
+
+    // Every individually-rendered marker is registered here under a
+    // 'offer:<id>' / 'event:<id>' / 'checkin:<id>' key so RN's search bar
+    // can jump the map to a result via injectJavaScript. A clustered point
+    // has no entry until it's zoomed in enough to stand on its own.
     var markersById = {};
     window.flyTo = function (key) {
-      var m = markersById[key];
-      if (!m) return;
-      map.flyTo({ center: m.getLngLat(), zoom: Math.max(map.getZoom(), 16.5), essential: true });
-      var popup = m.getPopup();
-      if (popup && !popup.isOpen()) m.togglePopup();
+      var data = pointDataById[key];
+      if (!data) return;
+      var targetZoom = Math.max(map.getZoom(), 17);
+      map.flyTo({ center: [data.lng, data.lat], zoom: targetZoom, essential: true });
+      function tryOpenPopup(attemptsLeft) {
+        var m = markersById[key];
+        if (m) {
+          var popup = m.getPopup();
+          if (popup && !popup.isOpen()) m.togglePopup();
+        } else if (attemptsLeft > 0) {
+          setTimeout(function () { tryOpenPopup(attemptsLeft - 1); }, 150);
+        }
+      }
+      map.once('moveend', function () { tryOpenPopup(8); });
     };
 
-    // Legend taps toggle a whole pin category — add/remove each marker from
-    // the map rather than rebuilding the page, so it's instant and doesn't
-    // disturb the current pan/zoom.
+    // Legend taps toggle a whole pin category. typeVisible drives every
+    // (re)render below rather than just adding/removing existing markers,
+    // since which markers exist can itself change on zoom (clustering).
+    var typeVisible = { offer: true, event: true, checkin: true };
     window.setTypeVisible = function (type, visible) {
-      Object.keys(markersById).forEach(function (key) {
-        if (key.indexOf(type + ':') !== 0) return;
-        var m = markersById[key];
-        if (visible) m.addTo(map);
-        else m.remove();
-      });
+      typeVisible[type] = visible;
+      if (type === 'offer') renderOfferMarkers();
+      else if (type === 'event') renderEventMarkers();
+      else if (type === 'checkin') {
+        Object.keys(markersById).forEach(function (key) {
+          if (key.indexOf('checkin:') !== 0) return;
+          var m = markersById[key];
+          if (visible) m.addTo(map); else m.remove();
+        });
+      }
     };
+
+    // Greedy screen-space clustering: two points land in the same cluster
+    // once they're within pixelRadius of each other at the CURRENT zoom —
+    // not a spatial index, but points/events realistically number in the
+    // dozens here, so an O(n^2) pass is negligible.
+    function clusterPoints(points, pixelRadius) {
+      var proj = points.map(function (p) {
+        var pt = map.project([p.lng, p.lat]);
+        return { p: p, x: pt.x, y: pt.y };
+      });
+      var used = new Array(proj.length).fill(false);
+      var clusters = [];
+      for (var i = 0; i < proj.length; i++) {
+        if (used[i]) continue;
+        var group = [proj[i]];
+        used[i] = true;
+        for (var j = i + 1; j < proj.length; j++) {
+          if (used[j]) continue;
+          var dx = proj[i].x - proj[j].x, dy = proj[i].y - proj[j].y;
+          if (Math.sqrt(dx * dx + dy * dy) < pixelRadius) { group.push(proj[j]); used[j] = true; }
+        }
+        var lng = 0, lat = 0;
+        group.forEach(function (g) { lng += g.p.lng; lat += g.p.lat; });
+        clusters.push({ lng: lng / group.length, lat: lat / group.length, points: group.map(function (g) { return g.p; }) });
+      }
+      return clusters;
+    }
+
+    var renderedOffer = [];
+    var renderedEvent = [];
+
+    function renderTypeMarkers(list, opts) {
+      list.forEach(function (m) { m.remove(); });
+      list.length = 0;
+      if (!typeVisible[opts.type]) return;
+      var clusters = clusterPoints(opts.data, 50);
+      clusters.forEach(function (cluster) {
+        if (cluster.points.length === 1) {
+          var p = cluster.points[0];
+          var el = document.createElement('div');
+          el.className = 'havenly-pin';
+          el.style.background = opts.color;
+          el.innerHTML = opts.icon;
+          var key = opts.type + ':' + p.id;
+          var build = function (count, mine) { return opts.popupHtml(p, count, mine); };
+          popupBuilders[key] = build;
+          var popup = new mapboxgl.Popup({ offset: 26, closeButton: false }).setHTML(build(p.interestCount, p.mine));
+          popupsById[key] = popup;
+          var marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat([p.lng, p.lat]).setPopup(popup).addTo(map);
+          markersById[key] = marker;
+          list.push(marker);
+        } else {
+          var cEl = document.createElement('div');
+          cEl.className = 'cluster-pin';
+          cEl.style.background = opts.color;
+          cEl.textContent = String(cluster.points.length);
+          cEl.addEventListener('click', function () {
+            map.flyTo({ center: [cluster.lng, cluster.lat], zoom: Math.min(map.getZoom() + 3, 19), essential: true });
+          });
+          var clusterMarker = new mapboxgl.Marker({ element: cEl, anchor: 'center' }).setLngLat([cluster.lng, cluster.lat]).addTo(map);
+          list.push(clusterMarker);
+        }
+      });
+    }
+
+    function renderOfferMarkers() {
+      renderTypeMarkers(renderedOffer, { type: 'offer', data: offerData, color: '${palette.coral}', icon: '${ICON_GIFT}', popupHtml: offerPopupHtml });
+    }
+    function renderEventMarkers() {
+      renderTypeMarkers(renderedEvent, { type: 'event', data: eventData, color: '${palette.teal}', icon: '${ICON_CALENDAR}', popupHtml: eventPopupHtml });
+    }
+
+    function addCheckinMarkers() {
+      checkInData.forEach(function (p) {
+        var el = document.createElement('div');
+        el.className = 'checkin-wrap';
+        el.innerHTML = '<div class="checkin-pulse"></div><div class="checkin-pin"' +
+          (p.avatar ? ' style="background-image:url(' + escapeHtml(p.avatar) + ')"' : '') + '></div>';
+        checkinEls[p.id] = el;
+        var popup = new mapboxgl.Popup({ offset: 22, closeButton: false }).setHTML(
+          '<div class="popup-title">' + escapeHtml(p.name) + (p.mine ? ' (you)' : '') + '</div>' +
+          '<div class="popup-sub">Checked in at ' + escapeHtml(p.placeTitle) + '</div>' +
+          (p.mine ? '' : '<button class="popup-btn" onclick=\\'pingClick("' + p.id + '")\\'>${ICON_RADIO} Ping</button>')
+        );
+        var marker = new mapboxgl.Marker({ element: el, anchor: 'center' }).setLngLat([p.lng, p.lat]).setPopup(popup).addTo(map);
+        markersById['checkin:' + p.id] = marker;
+      });
+    }
 
     function addMarkers() {
       var userEl = document.createElement('div');
@@ -272,78 +416,46 @@ function buildMapHtml(params: {
       userEl.innerHTML = '<div class="user-dot-pulse"></div><div class="user-dot-core"></div>';
       new mapboxgl.Marker({ element: userEl, anchor: 'center' }).setLngLat([${center.longitude}, ${center.latitude}]).addTo(map);
 
-      ${offerPins.map((p) => `
-      (function () {
-        var el = document.createElement('div');
-        el.className = 'havenly-pin';
-        el.style.background = '${palette.coral}';
-        el.innerHTML = '${ICON_GIFT}';
-        var key = 'offer:${p.id}';
-        function build(count, mine) {
-          return '<div class="popup-title">${escapeJs(p.title)}</div><div class="popup-sub">${escapeJs(p.sub)} · ${escapeJs(p.discount)}</div><div class="popup-row"><button class="popup-btn" onclick=\\'post({type:"openOffer",id:"${p.id}"})\\'>View offer</button><button class="interest-btn' + (mine ? ' interest-btn-active' : '') + '" onclick=\\'toggleInterestClick("offer","${p.id}")\\'>${ICON_THUMB} ' + (mine ? "I'm in" : "I'm down") + ' · ' + count + '</button></div>';
-        }
-        popupBuilders[key] = build;
-        var popup = new mapboxgl.Popup({ offset: 26, closeButton: false }).setHTML(build(${p.interestCount}, ${p.mine}));
-        popupsById[key] = popup;
-        var marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat([${p.lng}, ${p.lat}]).setPopup(popup).addTo(map);
-        markersById[key] = marker;
-      })();
-      `).join('\n')}
-
-      ${eventPins.map((p) => `
-      (function () {
-        var el = document.createElement('div');
-        el.className = 'havenly-pin';
-        el.style.background = '${palette.teal}';
-        el.innerHTML = '${ICON_CALENDAR}';
-        var key = 'event:${p.id}';
-        function build(count, mine) {
-          return '<div class="popup-title">${escapeJs(p.title)}</div><div class="popup-sub">${escapeJs(p.sub)}</div><div class="popup-row"><button class="popup-btn" onclick=\\'post({type:"openEvent",id:"${p.id}"})\\'>View event</button><button class="interest-btn' + (mine ? ' interest-btn-active' : '') + '" onclick=\\'toggleInterestClick("event","${p.id}")\\'>${ICON_THUMB} ' + (mine ? "I'm in" : "I'm down") + ' · ' + count + '</button></div>';
-        }
-        popupBuilders[key] = build;
-        var popup = new mapboxgl.Popup({ offset: 26, closeButton: false }).setHTML(build(${p.interestCount}, ${p.mine}));
-        popupsById[key] = popup;
-        var marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat([${p.lng}, ${p.lat}]).setPopup(popup).addTo(map);
-        markersById[key] = marker;
-      })();
-      `).join('\n')}
-
-      ${checkInPins.map((p) => `
-      (function () {
-        var el = document.createElement('div');
-        el.className = 'checkin-wrap';
-        el.innerHTML = '<div class="checkin-pulse"></div><div class="checkin-pin"${p.avatar ? ` style="background-image:url(${escapeJs(p.avatar)})"` : ''}></div>';
-        checkinEls['${p.id}'] = el;
-        var popup = new mapboxgl.Popup({ offset: 22, closeButton: false }).setHTML(
-          '<div class="popup-title">${escapeJs(p.name)}${p.mine ? ' (you)' : ''}</div><div class="popup-sub">Checked in at ${escapeJs(p.placeTitle)}</div>' +
-          ${p.mine ? "''" : `'<button class="popup-btn" onclick=\\'pingClick("${p.id}")\\'>${ICON_RADIO} Ping</button>'`}
-        );
-        var marker = new mapboxgl.Marker({ element: el, anchor: 'center' }).setLngLat([${p.lng}, ${p.lat}]).setPopup(popup).addTo(map);
-        markersById['checkin:${p.id}'] = marker;
-      })();
-      `).join('\n')}
+      renderOfferMarkers();
+      renderEventMarkers();
+      addCheckinMarkers();
     }
 
     map.on('load', function () {
       recolor();
       addMarkers();
     });
+    // Screen-space clustering is zoom-dependent, not pan-dependent, so only
+    // re-cluster when the zoom level actually changes.
+    map.on('zoomend', function () {
+      renderOfferMarkers();
+      renderEventMarkers();
+    });
   </script>
 </body>
 </html>`;
 }
 
-// Names/titles here are user- or admin-controlled text that ends up as HTML
-// inside the popup (via setHTML's string argument, not a text node) — so
-// this has to neutralize markup (a display_name of "<img onerror=...>"
-// would otherwise execute in the WebView), not just make the value safe to
-// sit inside the JS template literal it's embedded in.
+// Only used for the mapbox token now (a fixed string, not user data) — the
+// actual user/admin-controlled text (titles, names) is escaped at runtime
+// inside the WebView's own escapeHtml() instead, since popups are now built
+// there from plain JSON data rather than generated per-pin as JS source.
 function escapeHtml(s: string): string {
   return (s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function escapeJs(s: string): string {
   return escapeHtml(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, ' ');
+}
+
+// Embeds a value as JSON inside a <script> block safely — a naive
+// JSON.stringify could contain the literal sequence "</script", which would
+// prematurely close the tag when the browser parses the HTML (this can
+// happen with ordinary user data, e.g. a display_name or title containing
+// that text) — escaping every "<" to < neutralizes that regardless of
+// what the value contains.
+function embedJson(value: unknown): string {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
 export default function MapScreen() {
