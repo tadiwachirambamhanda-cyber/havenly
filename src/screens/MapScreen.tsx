@@ -253,6 +253,18 @@ function buildMapHtml(params: {
       if (popup && !popup.isOpen()) m.togglePopup();
     };
 
+    // Legend taps toggle a whole pin category — add/remove each marker from
+    // the map rather than rebuilding the page, so it's instant and doesn't
+    // disturb the current pan/zoom.
+    window.setTypeVisible = function (type, visible) {
+      Object.keys(markersById).forEach(function (key) {
+        if (key.indexOf(type + ':') !== 0) return;
+        var m = markersById[key];
+        if (visible) m.addTo(map);
+        else m.remove();
+      });
+    };
+
     function addMarkers() {
       var userEl = document.createElement('div');
       userEl.className = 'user-dot';
@@ -350,6 +362,9 @@ export default function MapScreen() {
   const [loaded, setLoaded] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [hiddenTypes, setHiddenTypes] = useState<{ offer: boolean; event: boolean; checkin: boolean }>({
+    offer: false, event: false, checkin: false,
+  });
 
   const load = useCallback(async () => {
     const loc = await getCurrentLocation();
@@ -458,10 +473,31 @@ export default function MapScreen() {
     return results.slice(0, 8);
   }, [offers, events, checkIns, searchQuery]);
 
+  const filterTypeFor = (t: 'offer' | 'event' | 'person'): 'offer' | 'event' | 'checkin' => (t === 'person' ? 'checkin' : t);
+
+  const toggleTypeFilter = (type: 'offer' | 'event' | 'checkin') => {
+    haptics.tap();
+    const nextHidden = !hiddenTypes[type];
+    setHiddenTypes((prev) => ({ ...prev, [type]: nextHidden }));
+    if (typeof webviewRef.current?.injectJavaScript === 'function') {
+      webviewRef.current.injectJavaScript(`window.setTypeVisible && window.setTypeVisible(${JSON.stringify(type)}, ${!nextHidden}); true;`);
+    }
+  };
+
   const handleSelectResult = (result: SearchResult) => {
     haptics.tap();
     Keyboard.dismiss();
     setSearchQuery('');
+    // A hidden category's markers are removed from the map, so flying to
+    // one would land on nothing — make sure this result's type is visible
+    // first rather than leaving a confusing dead tap.
+    const filterType = filterTypeFor(result.type);
+    if (hiddenTypes[filterType]) {
+      setHiddenTypes((prev) => ({ ...prev, [filterType]: false }));
+      if (typeof webviewRef.current?.injectJavaScript === 'function') {
+        webviewRef.current.injectJavaScript(`window.setTypeVisible && window.setTypeVisible(${JSON.stringify(filterType)}, true); true;`);
+      }
+    }
     if (typeof webviewRef.current?.injectJavaScript === 'function') {
       webviewRef.current.injectJavaScript(`window.flyTo && window.flyTo(${JSON.stringify(result.key)}); true;`);
     }
@@ -568,9 +604,30 @@ export default function MapScreen() {
         />
       )}
       <View style={styles.legend}>
-        <View style={styles.legendItem}><Feather name="gift" size={12} color={colors.coral} /><Text style={styles.legendText}>Offers</Text></View>
-        <View style={styles.legendItem}><Feather name="calendar" size={12} color={colors.teal} /><Text style={styles.legendText}>Events</Text></View>
-        <View style={styles.legendItem}><View style={styles.legendDot} /><Text style={styles.legendText}>Checked in</Text></View>
+        <Pressable
+          style={[styles.legendItem, hiddenTypes.offer && styles.legendItemOff]}
+          onPress={() => toggleTypeFilter('offer')}
+          accessibilityLabel={hiddenTypes.offer ? 'Show offers' : 'Hide offers'}
+        >
+          <Feather name="gift" size={12} color={hiddenTypes.offer ? colors.inkSoft : colors.coral} />
+          <Text style={[styles.legendText, hiddenTypes.offer && styles.legendTextOff]}>Offers</Text>
+        </Pressable>
+        <Pressable
+          style={[styles.legendItem, hiddenTypes.event && styles.legendItemOff]}
+          onPress={() => toggleTypeFilter('event')}
+          accessibilityLabel={hiddenTypes.event ? 'Show events' : 'Hide events'}
+        >
+          <Feather name="calendar" size={12} color={hiddenTypes.event ? colors.inkSoft : colors.teal} />
+          <Text style={[styles.legendText, hiddenTypes.event && styles.legendTextOff]}>Events</Text>
+        </Pressable>
+        <Pressable
+          style={[styles.legendItem, hiddenTypes.checkin && styles.legendItemOff]}
+          onPress={() => toggleTypeFilter('checkin')}
+          accessibilityLabel={hiddenTypes.checkin ? 'Show checked in' : 'Hide checked in'}
+        >
+          <View style={[styles.legendDot, hiddenTypes.checkin && { backgroundColor: colors.inkSoft }]} />
+          <Text style={[styles.legendText, hiddenTypes.checkin && styles.legendTextOff]}>Checked in</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -617,7 +674,9 @@ function createStyles(colors: ColorTokens) {
     borderRadius: 100, paddingHorizontal: 14, paddingVertical: 9, borderWidth: 1, borderColor: colors.line,
   },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  legendItemOff: { opacity: 0.45 },
   legendDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.coral },
   legendText: { fontSize: 10.5, fontWeight: '600', color: colors.inkSoft },
+  legendTextOff: { textDecorationLine: 'line-through' },
   });
 }
