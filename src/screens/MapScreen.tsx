@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, TextInput, Keyboard } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -33,6 +33,13 @@ const ICON_CALENDAR = '<svg viewBox="0 0 24 24" width="15" height="15" fill="non
 const ICON_RADIO = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>';
 
 interface MapCheckIn extends CheckIn { user: Profile; place?: Offer | HavenlyEvent | null }
+
+interface SearchResult {
+  key: string; // 'offer:<id>' / 'event:<id>' / 'checkin:<id>' — matches the WebView's marker registry
+  type: 'offer' | 'event' | 'person';
+  title: string;
+  subtitle: string;
+}
 
 interface MapPalette {
   land: string; landuse: string; water: string; roadMinor: string; roadMajor: string;
@@ -195,6 +202,19 @@ function buildMapHtml(params: {
       post({ type: 'ping', id: id });
     }
 
+    // Every marker is also registered here under a 'offer:<id>' /
+    // 'event:<id>' / 'checkin:<id>' key so RN's search bar can jump the map
+    // to a result via injectJavaScript — it has no other way to reach into
+    // this page's own Mapbox instance.
+    var markersById = {};
+    window.flyTo = function (key) {
+      var m = markersById[key];
+      if (!m) return;
+      map.flyTo({ center: m.getLngLat(), zoom: Math.max(map.getZoom(), 16.5), essential: true });
+      var popup = m.getPopup();
+      if (popup && !popup.isOpen()) m.togglePopup();
+    };
+
     function addMarkers() {
       var userEl = document.createElement('div');
       userEl.className = 'user-dot';
@@ -210,7 +230,8 @@ function buildMapHtml(params: {
         var popup = new mapboxgl.Popup({ offset: 26, closeButton: false }).setHTML(
           '<div class="popup-title">${escapeJs(p.title)}</div><div class="popup-sub">${escapeJs(p.sub)} · ${escapeJs(p.discount)}</div><button class="popup-btn" onclick=\\'post({type:"openOffer",id:"${p.id}"})\\'>View offer</button>'
         );
-        new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat([${p.lng}, ${p.lat}]).setPopup(popup).addTo(map);
+        var marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat([${p.lng}, ${p.lat}]).setPopup(popup).addTo(map);
+        markersById['offer:${p.id}'] = marker;
       })();
       `).join('\n')}
 
@@ -223,7 +244,8 @@ function buildMapHtml(params: {
         var popup = new mapboxgl.Popup({ offset: 26, closeButton: false }).setHTML(
           '<div class="popup-title">${escapeJs(p.title)}</div><div class="popup-sub">${escapeJs(p.sub)}</div><button class="popup-btn" onclick=\\'post({type:"openEvent",id:"${p.id}"})\\'>View event</button>'
         );
-        new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat([${p.lng}, ${p.lat}]).setPopup(popup).addTo(map);
+        var marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat([${p.lng}, ${p.lat}]).setPopup(popup).addTo(map);
+        markersById['event:${p.id}'] = marker;
       })();
       `).join('\n')}
 
@@ -237,7 +259,8 @@ function buildMapHtml(params: {
           '<div class="popup-title">${escapeJs(p.name)}${p.mine ? ' (you)' : ''}</div><div class="popup-sub">Checked in at ${escapeJs(p.placeTitle)}</div>' +
           ${p.mine ? "''" : `'<button class="popup-btn" onclick=\\'pingClick("${p.id}")\\'>${ICON_RADIO} Ping</button>'`}
         );
-        new mapboxgl.Marker({ element: el, anchor: 'center' }).setLngLat([${p.lng}, ${p.lat}]).setPopup(popup).addTo(map);
+        var marker = new mapboxgl.Marker({ element: el, anchor: 'center' }).setLngLat([${p.lng}, ${p.lat}]).setPopup(popup).addTo(map);
+        markersById['checkin:${p.id}'] = marker;
       })();
       `).join('\n')}
     }
@@ -279,6 +302,7 @@ export default function MapScreen() {
   const [checkIns, setCheckIns] = useState<MapCheckIn[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const load = useCallback(async () => {
     const loc = await getCurrentLocation();
@@ -331,6 +355,46 @@ export default function MapScreen() {
     }
   };
 
+  // All client-side — offers/events/check-ins are already loaded for the
+  // map itself, and check-ins are already filtered server-side by
+  // can_see_checkin() (mutual follows + shared groups/communities), so
+  // searching this list can never surface a person the user isn't already
+  // allowed to see on the map.
+  const searchResults = useMemo<SearchResult[]>(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return [];
+    const results: SearchResult[] = [];
+    for (const o of offers) {
+      if (o.latitude == null || o.longitude == null) continue;
+      const hay = `${o.title} ${o.brand?.name ?? ''} ${o.discount_label}`.toLowerCase();
+      if (hay.includes(q)) results.push({ key: `offer:${o.id}`, type: 'offer', title: o.title, subtitle: o.brand?.name ?? 'Offer' });
+    }
+    for (const e of events) {
+      if (e.latitude == null || e.longitude == null) continue;
+      const hay = `${e.title} ${e.location} ${e.tag}`.toLowerCase();
+      if (hay.includes(q)) results.push({ key: `event:${e.id}`, type: 'event', title: e.title, subtitle: e.location });
+    }
+    for (const c of checkIns) {
+      const place = c.place;
+      if (!place || place.latitude == null || place.longitude == null) continue;
+      const hay = `${c.user.display_name} ${c.user.username}`.toLowerCase();
+      if (hay.includes(q)) {
+        const placeTitle = c.place_type === 'offer' ? (place as Offer).title : (place as HavenlyEvent).title;
+        results.push({ key: `checkin:${c.id}`, type: 'person', title: c.user.display_name, subtitle: `Nearby at ${placeTitle}` });
+      }
+    }
+    return results.slice(0, 8);
+  }, [offers, events, checkIns, searchQuery]);
+
+  const handleSelectResult = (result: SearchResult) => {
+    haptics.tap();
+    Keyboard.dismiss();
+    setSearchQuery('');
+    if (typeof webviewRef.current?.injectJavaScript === 'function') {
+      webviewRef.current.injectJavaScript(`window.flyTo && window.flyTo(${JSON.stringify(result.key)}); true;`);
+    }
+  };
+
   const onMessage = (event: { nativeEvent: { data: string } }) => {
     try {
       const msg = JSON.parse(event.nativeEvent.data);
@@ -362,6 +426,50 @@ export default function MapScreen() {
           <Pressable style={styles.locationEnableBtn} onPress={handleEnableLocation} accessibilityLabel="Enable location">
             <Text style={styles.locationEnableBtnText}>Enable</Text>
           </Pressable>
+        </View>
+      )}
+      <View style={styles.searchBar}>
+        <Feather name="search" size={15} color={colors.inkSoft} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search events, offers, friends nearby…"
+          placeholderTextColor={colors.inkSoft}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          returnKeyType="search"
+        />
+        {searchQuery.length > 0 && (
+          <Pressable onPress={() => setSearchQuery('')} accessibilityLabel="Clear search">
+            <Feather name="x" size={15} color={colors.inkSoft} />
+          </Pressable>
+        )}
+      </View>
+      {searchQuery.trim().length > 0 && (
+        <View style={styles.searchResults}>
+          {searchResults.length === 0 ? (
+            <Text style={styles.searchEmptyText}>No matches nearby.</Text>
+          ) : (
+            searchResults.map((r, i) => (
+              <Pressable key={r.key} style={[styles.searchResultRow, i === 0 && { borderTopWidth: 0 }]} onPress={() => handleSelectResult(r)}>
+                <View
+                  style={[
+                    styles.searchResultIcon,
+                    { backgroundColor: r.type === 'offer' ? colors.coralSoft : r.type === 'event' ? colors.tealSoft : colors.sandDeep },
+                  ]}
+                >
+                  <Feather
+                    name={r.type === 'offer' ? 'gift' : r.type === 'event' ? 'calendar' : 'user'}
+                    size={13}
+                    color={r.type === 'offer' ? colors.coral : r.type === 'event' ? colors.teal : colors.inkSoft}
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.searchResultTitle} numberOfLines={1}>{r.title}</Text>
+                  <Text style={styles.searchResultSubtitle} numberOfLines={1}>{r.subtitle}</Text>
+                </View>
+              </Pressable>
+            ))
+          )}
         </View>
       )}
       {!MAPBOX_TOKEN ? (
@@ -407,6 +515,24 @@ function createStyles(colors: ColorTokens) {
   locationNoticeText: { flex: 1, fontSize: 11.5, color: colors.inkSoft },
   locationEnableBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.pill, backgroundColor: colors.tealSoft },
   locationEnableBtnText: { fontSize: 11, fontWeight: '700', color: colors.teal },
+  searchBar: {
+    flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: spacing.lg, marginBottom: 10,
+    paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.pill, backgroundColor: colors.white,
+    borderWidth: 1, borderColor: colors.line,
+  },
+  searchInput: { flex: 1, fontSize: 13, color: colors.ink, padding: 0 },
+  searchResults: {
+    marginHorizontal: spacing.lg, marginBottom: 10, backgroundColor: colors.white, borderRadius: radius.md,
+    borderWidth: 1, borderColor: colors.line, overflow: 'hidden',
+  },
+  searchEmptyText: { fontSize: 12.5, color: colors.inkSoft, padding: 14, textAlign: 'center' },
+  searchResultRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 10,
+    borderTopWidth: 1, borderTopColor: colors.line,
+  },
+  searchResultIcon: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  searchResultTitle: { fontSize: 12.5, fontWeight: '700', color: colors.ink },
+  searchResultSubtitle: { fontSize: 11, color: colors.inkSoft, marginTop: 1 },
   legend: {
     position: 'absolute', bottom: 16, left: 16, flexDirection: 'row', gap: 14, backgroundColor: colors.white,
     borderRadius: 100, paddingHorizontal: 14, paddingVertical: 9, borderWidth: 1, borderColor: colors.line,
