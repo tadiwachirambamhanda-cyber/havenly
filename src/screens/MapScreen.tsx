@@ -131,7 +131,7 @@ function buildMapHtml(params: {
   <script>
     mapboxgl.accessToken = '${escapeJs(mapboxToken)}';
     var map = new mapboxgl.Map({
-      container: 'map', style: '${baseStyle}', center: [${center.longitude}, ${center.latitude}], zoom: 15,
+      container: 'map', style: '${baseStyle}', center: [${center.longitude}, ${center.latitude}], zoom: 16.5,
       attributionControl: false, pitchWithRotate: false, dragRotate: false, touchPitch: false,
     });
     map.addControl(new mapboxgl.AttributionControl({ compact: true }));
