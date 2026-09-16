@@ -77,3 +77,11 @@ export interface CheckIn {
   id: string; user_id: string; user?: Profile; place_type: CheckInPlaceType; place_id: string;
   created_at: string; expires_at: string;
 }
+
+// A forward-looking "I'm down to go" — same place_type/place_id shape as
+// CheckIn, but no expiry: it's a standing signal, not a live location.
+// Named PlaceInterest since `Interest` already means a profile topic tag.
+export interface PlaceInterest {
+  id: string; user_id: string; user?: Profile; place_type: CheckInPlaceType; place_id: string;
+  created_at: string;
+}

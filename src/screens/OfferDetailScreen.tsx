@@ -11,12 +11,14 @@ import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { createCheckIn, deleteCheckIn, sendPing } from '@/lib/checkIns';
+import { toggleInterest } from '@/lib/interests';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
-import type { CheckIn, Offer, Profile } from '@/types';
+import type { CheckIn, PlaceInterest, Offer, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type VisibleCheckIn = CheckIn & { user: Profile };
+type VisibleInterest = PlaceInterest & { user: Profile };
 
 type Route = RouteProp<RootStackParamList, 'OfferDetail'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -37,25 +39,44 @@ export default function OfferDetailScreen() {
   const [checkIns, setCheckIns] = useState<VisibleCheckIn[]>([]);
   const [checkingIn, setCheckingIn] = useState(false);
   const [pingingId, setPingingId] = useState<string | null>(null);
+  const [interests, setInterests] = useState<VisibleInterest[]>([]);
+  const [togglingInterest, setTogglingInterest] = useState(false);
 
   const load = useCallback(async () => {
     const now = new Date().toISOString();
-    const [{ data: offerData }, { data: claimData }, { data: checkInData }] = await Promise.all([
+    const [{ data: offerData }, { data: claimData }, { data: checkInData }, { data: interestData }] = await Promise.all([
       supabase.from('offers').select('*, brand:brands(*)').eq('id', offerId).maybeSingle(),
       profile
         ? supabase.from('offer_claims').select('code').eq('offer_id', offerId).eq('user_id', profile.id).maybeSingle()
         : Promise.resolve({ data: null as { code: string } | null }),
       supabase.from('check_ins').select('*, user:profiles(*)').eq('place_type', 'offer').eq('place_id', offerId).gt('expires_at', now),
+      supabase.from('interests').select('*, user:profiles(*)').eq('place_type', 'offer').eq('place_id', offerId),
     ]);
     setOffer(offerData as unknown as Offer);
     setClaimCode(claimData?.code ?? null);
     setCheckIns((checkInData as unknown as VisibleCheckIn[]) ?? []);
+    setInterests((interestData as unknown as VisibleInterest[]) ?? []);
     setLoaded(true);
   }, [offerId, profile]);
 
   useEffect(() => { load(); }, [load]);
 
   const myCheckIn = checkIns.find((c) => c.user_id === profile?.id) ?? null;
+  const myInterest = interests.find((i) => i.user_id === profile?.id) ?? null;
+
+  const toggleGoing = async () => {
+    if (!profile || togglingInterest) return;
+    setTogglingInterest(true);
+    haptics.tap();
+    try {
+      await toggleInterest(profile.id, 'offer', offerId);
+      await load();
+    } catch {
+      showToast('Couldn’t update — try again.', 'error');
+    } finally {
+      setTogglingInterest(false);
+    }
+  };
 
   const toggleCheckIn = async () => {
     if (!profile || checkingIn) return;
@@ -158,6 +179,38 @@ export default function OfferDetailScreen() {
         {offer.latitude != null && offer.longitude != null && (
           <View style={styles.checkInSection}>
             <Pressable
+              style={[styles.goingBtn, myInterest && styles.goingBtnActive]}
+              onPress={toggleGoing}
+              disabled={togglingInterest}
+              accessibilityLabel={myInterest ? "Not down to go anymore" : "I'm down to go"}
+            >
+              {togglingInterest ? (
+                <ActivityIndicator size="small" color={myInterest ? colors.gold : colors.ink} />
+              ) : (
+                <>
+                  <Feather name="thumbs-up" size={14} color={myInterest ? colors.gold : colors.ink} />
+                  <Text style={[styles.goingBtnText, myInterest && styles.goingBtnTextActive]}>
+                    {myInterest ? "You're down to go" : "I'm down to go"}
+                  </Text>
+                </>
+              )}
+            </Pressable>
+            {interests.length > 0 && (
+              <View style={styles.goingList}>
+                {interests.slice(0, 8).map((i) => (
+                  i.user.avatar_url ? (
+                    <Image key={i.id} source={{ uri: i.user.avatar_url }} style={styles.goingAvatar} transition={200} />
+                  ) : (
+                    <LinearGradient key={i.id} colors={['#E3A23A', '#FF5A3C']} style={styles.goingAvatar} />
+                  )
+                ))}
+                <Text style={styles.goingListText}>
+                  {interests.length} {interests.length === 1 ? 'person' : 'people'} down to go
+                </Text>
+              </View>
+            )}
+
+            <Pressable
               style={[styles.checkInBtn, myCheckIn && styles.checkInBtnActive]}
               onPress={toggleCheckIn}
               disabled={checkingIn}
@@ -242,9 +295,19 @@ function createStyles(colors: ColorTokens) {
   codeLabel: { fontSize: 11.5, color: colors.sand, opacity: 0.7, textTransform: 'uppercase', fontFamily: 'JetBrainsMono_500Medium' },
   code: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 30, fontWeight: '700', color: colors.sand, letterSpacing: 6, marginTop: 8 },
   checkInSection: { marginTop: 24, paddingTop: 20, borderTopWidth: 1, borderColor: colors.line },
+  goingBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.sandDeep,
+    paddingVertical: 13, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line,
+  },
+  goingBtnActive: { backgroundColor: `${colors.gold}26`, borderColor: colors.gold },
+  goingBtnText: { color: colors.ink, fontWeight: '700', fontSize: 13.5 },
+  goingBtnTextActive: { color: colors.gold },
+  goingList: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 12 },
+  goingAvatar: { width: 24, height: 24, borderRadius: 12, marginLeft: -8, borderWidth: 2, borderColor: colors.sand },
+  goingListText: { marginLeft: 6, fontSize: 11.5, color: colors.inkSoft, fontWeight: '600' },
   checkInBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.teal,
-    paddingVertical: 13, borderRadius: radius.pill,
+    paddingVertical: 13, borderRadius: radius.pill, marginTop: 20,
   },
   checkInBtnActive: { backgroundColor: colors.tealSoft, borderWidth: 1.5, borderColor: colors.teal },
   checkInBtnText: { color: 'white', fontWeight: '700', fontSize: 13.5 },
