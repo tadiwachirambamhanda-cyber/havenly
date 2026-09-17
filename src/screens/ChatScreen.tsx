@@ -239,14 +239,18 @@ export default function ChatScreen() {
           ref={listRef}
           data={messages}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: spacing.lg, gap: 8 }}
+          contentContainerStyle={{ padding: spacing.lg }}
           renderItem={({ item }) => {
             const mine = item.sender_id === myId;
             const textStyle = mine ? styles.bubbleTextMe : styles.bubbleTextThem;
             const senderName = isGroup && !mine ? memberById.get(item.sender_id)?.display_name : null;
             const isFresh = freshMessageIds.current.has(item.id);
             return (
-              <Animated.View entering={isFresh ? FadeInDown.duration(calmDuration).easing(calmEasing) : undefined}>
+              // marginBottom here, not `gap` on the FlatList's contentContainerStyle —
+              // gap inside a FlatList content container is unreliable on native (it
+              // renders fine on web, which is all that could be checked live here, but
+              // was reported as a much bigger gap than 8px on a real device).
+              <Animated.View style={{ marginBottom: 8 }} entering={isFresh ? FadeInDown.duration(calmDuration).easing(calmEasing) : undefined}>
                 {senderName && <Text style={styles.senderName}>{senderName}</Text>}
                 <View style={[styles.bubble, mine ? styles.bubbleMe : styles.bubbleThem, item.shared_post && styles.bubbleShared]}>
                   {item.shared_post ? (
