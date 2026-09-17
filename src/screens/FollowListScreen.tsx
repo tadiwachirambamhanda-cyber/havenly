@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
@@ -15,6 +15,7 @@ import { calmDuration, calmEasing } from '@/lib/animations';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
+import PersonRowSkeleton from '@/components/PersonRowSkeleton';
 import type { Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -99,7 +100,7 @@ export default function FollowListScreen() {
       </View>
 
       {loading ? (
-        <ActivityIndicator color={colors.coral} style={{ marginTop: 40 }} />
+        <PersonRowSkeleton />
       ) : (
         <FlatList
           data={list}

@@ -14,6 +14,7 @@ import { createCheckIn, deleteCheckIn, sendPing } from '@/lib/checkIns';
 import { toggleInterest } from '@/lib/interests';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import ActionSheet from '@/components/ActionSheet';
+import Skeleton from '@/components/Skeleton';
 import { gradients, radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { CheckIn, HavenlyEvent, PlaceInterest, Profile } from '@/types';
@@ -122,7 +123,21 @@ export default function EventDetailScreen() {
   };
 
   if (!loaded) {
-    return <View style={styles.centered}><ActivityIndicator color={colors.coral} /></View>;
+    return (
+      <View style={styles.container}>
+        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+          <Feather name="arrow-left" size={17} color={colors.ink} />
+        </Pressable>
+        <Skeleton style={{ height: 200, borderRadius: 0 }} />
+        <View style={styles.body}>
+          <Skeleton style={{ height: 11, width: '25%' }} />
+          <Skeleton style={{ height: 22, width: '75%', marginTop: 8 }} />
+          <Skeleton style={{ height: 14, width: '55%', marginTop: 14 }} />
+          <Skeleton style={{ height: 14, width: '40%', marginTop: 8 }} />
+          <Skeleton style={{ height: 48, width: '100%', marginTop: 20, borderRadius: 100 }} />
+        </View>
+      </View>
+    );
   }
   if (!event) {
     return (

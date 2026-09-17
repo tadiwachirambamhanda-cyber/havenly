@@ -13,6 +13,7 @@ import { haptics } from '@/lib/haptics';
 import { createCheckIn, deleteCheckIn, sendPing } from '@/lib/checkIns';
 import { toggleInterest } from '@/lib/interests';
 import AnimatedPressable from '@/components/AnimatedPressable';
+import Skeleton from '@/components/Skeleton';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { CheckIn, PlaceInterest, Offer, Profile } from '@/types';
@@ -125,7 +126,21 @@ export default function OfferDetailScreen() {
   };
 
   if (!loaded) {
-    return <View style={styles.centered}><ActivityIndicator color={colors.coral} /></View>;
+    return (
+      <View style={styles.container}>
+        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+          <Feather name="arrow-left" size={17} color={colors.ink} />
+        </Pressable>
+        <Skeleton style={{ height: 220, borderRadius: 0 }} />
+        <View style={styles.body}>
+          <Skeleton style={{ height: 11, width: '30%' }} />
+          <Skeleton style={{ height: 22, width: '70%', marginTop: 8 }} />
+          <Skeleton style={{ height: 15, width: '35%', marginTop: 8 }} />
+          <Skeleton style={{ height: 14, width: '90%', marginTop: 14 }} />
+          <Skeleton style={{ height: 48, width: '100%', marginTop: 20, borderRadius: 100 }} />
+        </View>
+      </View>
+    );
   }
   if (!offer) {
     return (

@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, RefreshControl, ActivityIndicator, type ViewToken } from 'react-native';
+import { View, Text, StyleSheet, FlatList, RefreshControl, type ViewToken } from 'react-native';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useNavigation, useRoute, useFocusEffect, useIsFocused, RouteProp } from '@react-navigation/native';
@@ -21,6 +21,7 @@ import type { ColorTokens } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
 import { interestIcon } from '@/constants/topicIcons';
 import EmptyState from '@/components/EmptyState';
+import Skeleton from '@/components/Skeleton';
 import VideoThumb from '@/components/VideoThumb';
 import ReportModal from '@/components/ReportModal';
 import ActionSheet from '@/components/ActionSheet';
@@ -173,8 +174,26 @@ export default function UserProfileScreen() {
 
   if (!profile) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator color={colors.coral} />
+      <View style={styles.container}>
+        <Skeleton style={{ height: 110, borderRadius: 0 }} />
+        <AnimatedPressable style={[styles.back, styles.backOverlay, { top: insets.top + 12 }]} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+          <Feather name="arrow-left" size={17} color="#20261F" />
+        </AnimatedPressable>
+        <View style={[styles.avatarRow, { marginTop: avatarMarginTop }]}>
+          <Skeleton style={{ width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand }} />
+          <View style={styles.actionRow}>
+            <Skeleton style={{ width: 36, height: 36, borderRadius: 18 }} />
+            <Skeleton style={{ width: 76, height: 32, borderRadius: radius.pill }} />
+          </View>
+        </View>
+        <Skeleton style={{ height: 20, width: '50%', marginTop: 12, marginHorizontal: spacing.lg }} />
+        <Skeleton style={{ height: 13, width: '35%', marginTop: 8, marginHorizontal: spacing.lg }} />
+        <View style={[styles.statsRow, { gap: 22 }]}>
+          {[0, 1, 2, 3].map((i) => <Skeleton key={i} style={{ width: 40, height: 30 }} />)}
+        </View>
+        <View style={styles.skeletonGrid}>
+          {[0, 1, 2, 3, 4, 5].map((i) => <Skeleton key={i} style={styles.skeletonGridCell} />)}
+        </View>
       </View>
     );
   }
@@ -315,6 +334,8 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   centered: { flex: 1, backgroundColor: colors.sand, alignItems: 'center', justifyContent: 'center' },
+  skeletonGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 2, marginTop: 20 },
+  skeletonGridCell: { width: '33%', aspectRatio: 1 / 1.15, borderRadius: 0 },
   notFound: { flex: 1, backgroundColor: colors.sand, paddingTop: 60, paddingHorizontal: spacing.lg },
   notFoundText: { color: colors.inkSoft, textAlign: 'center', marginTop: 100 },
   cover: { height: 110 },

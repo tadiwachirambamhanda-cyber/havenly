@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -15,6 +15,7 @@ import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
 import { formatCount } from '@/utils/formatCount';
 import EmptyState from '@/components/EmptyState';
+import Skeleton from '@/components/Skeleton';
 import VideoThumb from '@/components/VideoThumb';
 import type { Community, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -84,15 +85,39 @@ export default function CommunityDetailScreen() {
   };
 
   if (!community) {
-    return loaded ? (
+    if (!loaded) {
+      return (
+        <View style={styles.container}>
+          <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+            <Feather name="arrow-left" size={17} color={colors.ink} />
+          </AnimatedPressable>
+          <View style={styles.body}>
+            <Skeleton style={{ width: 68, height: 68, borderRadius: 34 }} />
+            <Skeleton style={{ height: 21, width: '55%', marginTop: 12 }} />
+            <Skeleton style={{ height: 12, width: '30%', marginTop: 8 }} />
+            <Skeleton style={{ height: 40, width: '100%', marginTop: 16, borderRadius: 100 }} />
+          </View>
+          <View style={{ paddingHorizontal: spacing.lg, gap: 14 }}>
+            {[0, 1, 2].map((i) => (
+              <View key={i} style={{ flexDirection: 'row', gap: 12 }}>
+                <Skeleton style={{ width: 66, height: 66, borderRadius: 12 }} />
+                <View style={{ flex: 1, gap: 6, justifyContent: 'center' }}>
+                  <Skeleton style={{ height: 10, width: '30%' }} />
+                  <Skeleton style={{ height: 14, width: '80%' }} />
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      );
+    }
+    return (
       <View style={styles.notFound}>
         <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
           <Feather name="arrow-left" size={17} color={colors.ink} />
         </AnimatedPressable>
         <Text style={styles.notFoundText}>This community isn't available.</Text>
       </View>
-    ) : (
-      <View style={styles.centered}><ActivityIndicator color={colors.coral} /></View>
     );
   }
 

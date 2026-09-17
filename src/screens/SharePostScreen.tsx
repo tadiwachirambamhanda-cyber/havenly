@@ -16,6 +16,7 @@ import { groupDisplayName } from '@/utils/groupDisplayName';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
+import PersonRowSkeleton from '@/components/PersonRowSkeleton';
 import type { Conversation, Post, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -134,7 +135,7 @@ export default function SharePostScreen() {
         />
       </View>
       {!loaded ? (
-        <ActivityIndicator color={colors.coral} style={{ marginTop: 40 }} />
+        <PersonRowSkeleton />
       ) : (
         <SectionList
           sections={sections}
