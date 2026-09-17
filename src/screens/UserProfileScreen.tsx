@@ -47,6 +47,14 @@ export default function UserProfileScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
   const isMe = userId === myId;
+  // The avatar normally overlaps the cover by 38px (see `avatarRow`'s base
+  // marginTop below), landing its top edge at 72px down from the cover's
+  // start. The back button floats over the cover too, pinned at
+  // insets.top + 12 — on a tall-inset device (Dynamic Island etc.) its
+  // bottom edge can sit past 72px and collide with the avatar. Only pull
+  // the avatar down further when that's actually the case, so the normal
+  // 38px overlap look is untouched on ordinary devices.
+  const avatarMarginTop = Math.max(-38, insets.top - 52);
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState({ posts: 0, followers: 0, following: 0 });
@@ -220,7 +228,7 @@ export default function UserProfileScreen() {
                 <Feather name="more-horizontal" size={17} color="#20261F" />
               </AnimatedPressable>
             )}
-            <View style={styles.avatarRow}>
+            <View style={[styles.avatarRow, { marginTop: avatarMarginTop }]}>
               {profile.avatar_url ? (
                 <Image source={{ uri: profile.avatar_url }} style={styles.avatar} transition={200} />
               ) : (
