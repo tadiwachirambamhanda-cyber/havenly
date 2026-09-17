@@ -13,6 +13,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
+import { calmDuration, calmEasing } from '@/lib/animations';
 import { timeAgo } from '@/utils/timeAgo';
 import { groupDisplayName } from '@/utils/groupDisplayName';
 import type { Conversation, Profile } from '@/types';
@@ -148,7 +149,7 @@ export default function InboxScreen() {
           sections.length > 1 ? <Text style={styles.sectionLabel}>{section.title}</Text> : null
         )}
         renderItem={({ item, index }) => (
-          <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).springify().damping(16)}>
+          <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(calmDuration).easing(calmEasing)}>
           <AnimatedPressable style={styles.row} onPress={() => openChat(item)}>
             <View>
               {item.is_group ? (

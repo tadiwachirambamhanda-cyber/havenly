@@ -13,6 +13,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useUnreadNotifications } from '@/lib/useUnreadNotifications';
 import { haptics } from '@/lib/haptics';
+import { calmDuration, calmEasing } from '@/lib/animations';
 import { radius, spacing, gradients } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
@@ -311,7 +312,7 @@ export default function FeedScreen() {
     const imageHeight = 110 + (hash % 60);
     const cardKey = `${sectionKey}:${item.id}`;
     return (
-      <Animated.View key={cardKey} entering={FadeInDown.delay(Math.min(index, 6) * 60).springify().damping(16)}>
+      <Animated.View key={cardKey} entering={FadeInDown.delay(Math.min(index, 6) * 60).duration(calmDuration).easing(calmEasing)}>
       <Pressable
         style={[styles.card, item.is_editorial && styles.cardEditorial]}
         onPress={() => navigation.navigate('PostDetail', { postId: item.id })}

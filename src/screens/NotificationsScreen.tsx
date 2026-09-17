@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
+import { calmDuration, calmEasing } from '@/lib/animations';
 import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
@@ -117,7 +118,7 @@ export default function NotificationsScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
         ListEmptyComponent={loaded ? <EmptyState icon="bell" text="No notifications yet." /> : null}
         renderItem={({ item, index }) => (
-          <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).springify().damping(16)}>
+          <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(calmDuration).easing(calmEasing)}>
           <AnimatedPressable
             style={[styles.row, !item.is_read && styles.rowUnread]}
             onPress={() => openNotification(item)}

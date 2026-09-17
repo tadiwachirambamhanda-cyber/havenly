@@ -11,6 +11,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
+import { calmDuration, calmEasing } from '@/lib/animations';
 import { haptics } from '@/lib/haptics';
 import { formatCount } from '@/utils/formatCount';
 import Skeleton from '@/components/Skeleton';
@@ -136,7 +137,7 @@ export default function CommunitiesScreen() {
           </View>
         )}
         renderItem={({ item, index }) => (
-          <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).springify().damping(16)}>
+          <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(calmDuration).easing(calmEasing)}>
           <AnimatedPressable style={styles.card} onPress={() => navigation.navigate('CommunityDetail', { communityId: item.id })}>
             <View style={styles.iconChip}>
               <Feather name={communityIcon(item)} size={16} color={colors.teal} />

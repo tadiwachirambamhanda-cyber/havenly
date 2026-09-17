@@ -14,6 +14,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
+import { calmDuration, calmEasing } from '@/lib/animations';
 import { markConversationRead, uploadGroupIcon } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
@@ -245,7 +246,7 @@ export default function ChatScreen() {
             const senderName = isGroup && !mine ? memberById.get(item.sender_id)?.display_name : null;
             const isFresh = freshMessageIds.current.has(item.id);
             return (
-              <Animated.View entering={isFresh ? FadeInDown.springify().damping(16) : undefined}>
+              <Animated.View entering={isFresh ? FadeInDown.duration(calmDuration).easing(calmEasing) : undefined}>
                 {senderName && <Text style={styles.senderName}>{senderName}</Text>}
                 <View style={[styles.bubble, mine ? styles.bubbleMe : styles.bubbleThem, item.shared_post && styles.bubbleShared]}>
                   {item.shared_post ? (

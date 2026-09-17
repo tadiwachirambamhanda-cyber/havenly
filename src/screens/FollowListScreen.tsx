@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { haptics } from '@/lib/haptics';
+import { calmDuration, calmEasing } from '@/lib/animations';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
@@ -109,7 +110,7 @@ export default function FollowListScreen() {
             const isMe = item.id === session?.user.id;
             const isFollowing = myFollowingIds.has(item.id);
             return (
-              <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).springify().damping(16)} style={styles.row}>
+              <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(calmDuration).easing(calmEasing)} style={styles.row}>
                 <AnimatedPressable
                   style={styles.rowAuthorTap}
                   onPress={() => navigation.navigate('UserProfile', { userId: item.id })}

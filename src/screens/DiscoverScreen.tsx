@@ -20,6 +20,7 @@ import EmptyState from '@/components/EmptyState';
 import ActionSheet from '@/components/ActionSheet';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BurstHeart from '@/components/BurstHeart';
+import { calmDuration, calmEasing } from '@/lib/animations';
 import type { Community, HavenlyEvent, Interest, Post, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -337,7 +338,7 @@ export default function DiscoverScreen() {
             {filteredSpots.map((spot, i) => {
               const [from, to] = gradients[(i + 2) % gradients.length];
               return (
-                <Animated.View key={spot.name} entering={FadeInRight.delay(Math.min(i, 6) * 60).springify().damping(16)} style={styles.spotCard}>
+                <Animated.View key={spot.name} entering={FadeInRight.delay(Math.min(i, 6) * 60).duration(calmDuration).easing(calmEasing)} style={styles.spotCard}>
                   <LinearGradient colors={[from, to]} style={styles.spotImage} />
                   <View style={styles.spotInfo}>
                     <Text style={styles.spotName}>{spot.name}</Text>
@@ -360,7 +361,7 @@ export default function DiscoverScreen() {
             return (
               <Animated.View
                 key={event.id}
-                entering={FadeInDown.delay(Math.min(eventIndex, 6) * 60).springify().damping(16)}
+                entering={FadeInDown.delay(Math.min(eventIndex, 6) * 60).duration(calmDuration).easing(calmEasing)}
                 style={styles.eventCard}
               >
                 <AnimatedPressable

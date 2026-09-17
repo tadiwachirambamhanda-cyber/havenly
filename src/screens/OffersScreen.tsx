@@ -11,6 +11,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { getCurrentLocation, requestLocationAccess, openLocationSettings, distanceKm, formatDistance, type Coords } from '@/lib/location';
 import { haptics } from '@/lib/haptics';
+import { calmDuration, calmEasing } from '@/lib/animations';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import AnimatedPressable from '@/components/AnimatedPressable';
@@ -116,7 +117,7 @@ export default function OffersScreen() {
             ? distanceKm(myLocation, { latitude: item.latitude, longitude: item.longitude })
             : null;
           return (
-            <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 50).springify().damping(16)}>
+            <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 50).duration(calmDuration).easing(calmEasing)}>
             <AnimatedPressable style={styles.card} onPress={() => navigation.navigate('OfferDetail', { offerId: item.id })}>
               {item.image_url ? (
                 <Image source={{ uri: item.image_url }} style={styles.cardImage} contentFit="cover" transition={200} />
