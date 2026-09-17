@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, interpolate, Extrapolation } from 'react-native-reanimated';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -25,6 +26,8 @@ type VisibleInterest = PlaceInterest & { user: Profile };
 type Route = RouteProp<RootStackParamList, 'OfferDetail'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
+const HERO_HEIGHT = 220;
+
 export default function OfferDetailScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
@@ -33,6 +36,21 @@ export default function OfferDetailScreen() {
   const { colors } = useTheme();
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
+
+  // Same parallax treatment as EventDetailScreen — the hero lags the
+  // scroll and dims slightly going down, and scales up to fill the
+  // rubber-band gap on iOS overscroll instead of leaving a blank strip.
+  const scrollY = useSharedValue(0);
+  const onScroll = useAnimatedScrollHandler((e) => { scrollY.value = e.contentOffset.y; });
+  const heroAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: interpolate(scrollY.value, [0, HERO_HEIGHT], [0, -HERO_HEIGHT / 3], Extrapolation.CLAMP) },
+      { scale: interpolate(scrollY.value, [-HERO_HEIGHT, 0], [2, 1], Extrapolation.CLAMP) },
+    ],
+  }));
+  const heroDimStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollY.value, [0, HERO_HEIGHT], [0, 0.35], Extrapolation.CLAMP),
+  }));
 
   const [offer, setOffer] = useState<Offer | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -154,15 +172,20 @@ export default function OfferDetailScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
+    <Animated.ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }} onScroll={onScroll} scrollEventThrottle={16}>
       <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
         <Feather name="arrow-left" size={17} color={colors.ink} />
       </Pressable>
-      {offer.image_url ? (
-        <Image source={{ uri: offer.image_url }} style={styles.hero} contentFit="cover" transition={200} />
-      ) : (
-        <LinearGradient colors={['#FF7A5C', '#0F8B82']} style={styles.hero} />
-      )}
+      <View style={styles.hero}>
+        <Animated.View style={[StyleSheet.absoluteFill, heroAnimatedStyle]}>
+          {offer.image_url ? (
+            <Image source={{ uri: offer.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+          ) : (
+            <LinearGradient colors={['#FF7A5C', '#0F8B82']} style={StyleSheet.absoluteFill} />
+          )}
+        </Animated.View>
+        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: '#000' }, heroDimStyle]} />
+      </View>
       <View style={styles.body}>
         <Text style={styles.brand}>{offer.brand?.name ?? 'Havenly Partner'}</Text>
         <Text style={styles.title}>{offer.title}</Text>
@@ -276,7 +299,7 @@ export default function OfferDetailScreen() {
           </View>
         )}
       </View>
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }
 
@@ -290,7 +313,7 @@ function createStyles(colors: ColorTokens) {
     position: 'absolute', top: 50, left: 16, zIndex: 1, width: 34, height: 34, borderRadius: 17,
     backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center',
   },
-  hero: { height: 220 },
+  hero: { height: 220, overflow: 'hidden' },
   body: { padding: spacing.lg },
   brand: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.teal },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 22, color: colors.ink, marginTop: 6 },

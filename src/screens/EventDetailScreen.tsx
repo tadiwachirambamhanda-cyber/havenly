@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, interpolate, Extrapolation } from 'react-native-reanimated';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -32,6 +33,8 @@ function hashString(str: string): number {
   return hash;
 }
 
+const HERO_HEIGHT = 200;
+
 export default function EventDetailScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
@@ -40,6 +43,22 @@ export default function EventDetailScreen() {
   const { colors } = useTheme();
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
+
+  // Parallax hero: scrolling down slides the gradient up more slowly than
+  // the page (a lag, not a 1:1 match) and dims it slightly; pulling down
+  // past the top (iOS bounce, negative offset) scales it up to fill the
+  // extra rubber-band space instead of showing a gap.
+  const scrollY = useSharedValue(0);
+  const onScroll = useAnimatedScrollHandler((e) => { scrollY.value = e.contentOffset.y; });
+  const heroAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: interpolate(scrollY.value, [0, HERO_HEIGHT], [0, -HERO_HEIGHT / 3], Extrapolation.CLAMP) },
+      { scale: interpolate(scrollY.value, [-HERO_HEIGHT, 0], [2, 1], Extrapolation.CLAMP) },
+    ],
+  }));
+  const heroDimStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollY.value, [0, HERO_HEIGHT], [0, 0.35], Extrapolation.CLAMP),
+  }));
 
   const [event, setEvent] = useState<HavenlyEvent | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -156,7 +175,7 @@ export default function EventDetailScreen() {
   const [from, to] = gradients[hashString(event.id) % gradients.length];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
+    <Animated.ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }} onScroll={onScroll} scrollEventThrottle={16}>
       <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
         <Feather name="arrow-left" size={17} color={colors.ink} />
       </Pressable>
@@ -165,7 +184,12 @@ export default function EventDetailScreen() {
           <Feather name="more-horizontal" size={17} color={colors.ink} />
         </Pressable>
       )}
-      <LinearGradient colors={[from, to]} style={styles.hero} />
+      <View style={styles.hero}>
+        <Animated.View style={[StyleSheet.absoluteFill, heroAnimatedStyle]}>
+          <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
+        </Animated.View>
+        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: '#000' }, heroDimStyle]} />
+      </View>
       <View style={styles.body}>
         <Text style={styles.tag}>{event.tag}</Text>
         <Text style={styles.title}>{event.title}</Text>
@@ -274,7 +298,7 @@ export default function EventDetailScreen() {
         message="This can't be undone."
         actions={[{ label: 'Delete', destructive: true, onPress: confirmDelete }]}
       />
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }
 
@@ -292,7 +316,7 @@ function createStyles(colors: ColorTokens) {
     position: 'absolute', top: 50, right: 16, zIndex: 1, width: 34, height: 34, borderRadius: 17,
     backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center',
   },
-  hero: { height: 200 },
+  hero: { height: 200, overflow: 'hidden' },
   body: { padding: spacing.lg },
   tag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.teal },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 22, color: colors.ink, marginTop: 6 },

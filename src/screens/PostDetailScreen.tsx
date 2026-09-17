@@ -1,5 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Animated, TextInput, KeyboardAvoidingView, Platform, Modal } from 'react-native';
+// Aliased — this file already uses the classic `Animated` API (react-native)
+// for the like-bounce/heart-pop effects; ReanimatedAnimated is only for the
+// new scroll-driven parallax hero, which needs a scroll handler that the
+// classic API can't do without a separate native listener.
+import ReanimatedAnimated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, interpolate, Extrapolation } from 'react-native-reanimated';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -28,6 +33,8 @@ import type { RootStackParamList } from '@/navigation/RootNavigator';
 type Route = RouteProp<RootStackParamList, 'PostDetail'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
+const HERO_HEIGHT = 340;
+
 export default function PostDetailScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
@@ -36,6 +43,22 @@ export default function PostDetailScreen() {
   const { colors } = useTheme();
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
+
+  // Same parallax treatment as Event/OfferDetailScreen — applied only to
+  // the background layer (gradient + video/image), not the back/overflow
+  // buttons or the double-tap heart-pop overlay, which stay fixed in place
+  // as siblings outside the animated wrapper.
+  const scrollY = useSharedValue(0);
+  const onScroll = useAnimatedScrollHandler((e) => { scrollY.value = e.contentOffset.y; });
+  const heroAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: interpolate(scrollY.value, [0, HERO_HEIGHT], [0, -HERO_HEIGHT / 3], Extrapolation.CLAMP) },
+      { scale: interpolate(scrollY.value, [-HERO_HEIGHT, 0], [2, 1], Extrapolation.CLAMP) },
+    ],
+  }));
+  const heroDimStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollY.value, [0, HERO_HEIGHT], [0, 0.35], Extrapolation.CLAMP),
+  }));
   const lastTapRef = useRef(0);
   const heartPopScale = useRef(new Animated.Value(0.5)).current;
   const heartPopOpacity = useRef(new Animated.Value(0)).current;
@@ -486,16 +509,19 @@ export default function PostDetailScreen() {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <View style={styles.container}>
-    <ScrollView>
+    <ReanimatedAnimated.ScrollView onScroll={onScroll} scrollEventThrottle={16}>
       <View style={styles.hero}>
-        <LinearGradient colors={[heroFrom, heroTo]} style={StyleSheet.absoluteFill} />
-        {post.video_url ? (
-          <PostVideoPlayer uri={post.video_url} onDoubleTap={() => { playHeartPop(); setLikedState(true); }} />
-        ) : post.image_url ? (
-          <Pressable style={StyleSheet.absoluteFill} onPress={handleImageTap}>
-            <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
-          </Pressable>
-        ) : null}
+        <ReanimatedAnimated.View style={[StyleSheet.absoluteFill, heroAnimatedStyle]}>
+          <LinearGradient colors={[heroFrom, heroTo]} style={StyleSheet.absoluteFill} />
+          {post.video_url ? (
+            <PostVideoPlayer uri={post.video_url} onDoubleTap={() => { playHeartPop(); setLikedState(true); }} />
+          ) : post.image_url ? (
+            <Pressable style={StyleSheet.absoluteFill} onPress={handleImageTap}>
+              <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+            </Pressable>
+          ) : null}
+        </ReanimatedAnimated.View>
+        <ReanimatedAnimated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: '#000' }, heroDimStyle]} />
         <Animated.View
           pointerEvents="none"
           style={[styles.heartPop, { opacity: heartPopOpacity, transform: [{ scale: heartPopScale }] }]}
@@ -626,7 +652,7 @@ export default function PostDetailScreen() {
           { label: 'Share externally', onPress: shareExternally },
         ]}
       />
-    </ScrollView>
+    </ReanimatedAnimated.ScrollView>
     <View style={styles.commentInputRow}>
       <TextInput
         style={styles.commentInput}
@@ -648,7 +674,7 @@ export default function PostDetailScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
-  hero: { width: '100%', height: 340 },
+  hero: { width: '100%', height: 340, overflow: 'hidden' },
   heartPop: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center',
     shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 12, shadowOffset: { width: 0, height: 2 },
