@@ -19,6 +19,7 @@ import { INTEREST_OPTIONS } from '@/constants/interests';
 import EmptyState from '@/components/EmptyState';
 import ActionSheet from '@/components/ActionSheet';
 import AnimatedPressable from '@/components/AnimatedPressable';
+import BurstHeart from '@/components/BurstHeart';
 import type { Community, HavenlyEvent, Interest, Post, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -383,7 +384,7 @@ export default function DiscoverScreen() {
                       hitSlop={8}
                       accessibilityLabel={interested ? "Remove interest in this event" : "I'm interested in this event"}
                     >
-                      <Feather name="heart" size={15} color={interested ? colors.coral : colors.inkSoft} />
+                      <BurstHeart active={interested} size={15} color={colors.inkSoft} activeColor={colors.coral} />
                       <Text style={[styles.interestCount, interested && styles.interestCountActive]}>
                         {formatCount(interestCounts.get(event.id) ?? 0)}
                       </Text>

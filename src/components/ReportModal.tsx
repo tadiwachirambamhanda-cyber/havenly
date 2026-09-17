@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
+import Animated, { SlideInDown } from 'react-native-reanimated';
 import { useTheme } from '@/lib/ThemeContext';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
@@ -18,17 +19,19 @@ export default function ReportModal({ visible, onClose, onSubmit }: Props) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
-          <Text style={styles.title}>Why are you reporting this?</Text>
-          {REASONS.map((reason) => (
-            <Pressable key={reason} style={styles.option} onPress={() => onSubmit(reason)}>
-              <Text style={styles.optionText}>{reason}</Text>
+        <Animated.View entering={SlideInDown.springify().damping(20).stiffness(220)}>
+          <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
+            <Text style={styles.title}>Why are you reporting this?</Text>
+            {REASONS.map((reason) => (
+              <Pressable key={reason} style={styles.option} onPress={() => onSubmit(reason)}>
+                <Text style={styles.optionText}>{reason}</Text>
+              </Pressable>
+            ))}
+            <Pressable style={styles.cancel} onPress={onClose}>
+              <Text style={styles.cancelText}>Cancel</Text>
             </Pressable>
-          ))}
-          <Pressable style={styles.cancel} onPress={onClose}>
-            <Text style={styles.cancelText}>Cancel</Text>
           </Pressable>
-        </Pressable>
+        </Animated.View>
       </Pressable>
     </Modal>
   );

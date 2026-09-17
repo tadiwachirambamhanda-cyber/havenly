@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
+import Animated, { SlideInDown } from 'react-native-reanimated';
 import { useTheme } from '@/lib/ThemeContext';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
@@ -32,26 +33,32 @@ export default function ActionSheet({ visible, onClose, title, message, actions,
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
-          {(title || message) && (
-            <View style={styles.header}>
-              {title ? <Text style={styles.title}>{title}</Text> : null}
-              {message ? <Text style={styles.message}>{message}</Text> : null}
-            </View>
-          )}
-          {actions.map((action) => (
-            <Pressable
-              key={action.label}
-              style={styles.option}
-              onPress={() => { onClose(); action.onPress(); }}
-            >
-              <Text style={[styles.optionText, action.destructive && styles.optionTextDestructive]}>{action.label}</Text>
+        {/* Wrapping Animated.View (not the Pressable itself) carries the
+            entering animation — the card remounts each time the Modal opens
+            (RN unmounts a Modal's children while visible=false), so this
+            replays on every open without any manual state tracking. */}
+        <Animated.View entering={SlideInDown.springify().damping(20).stiffness(220)}>
+          <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
+            {(title || message) && (
+              <View style={styles.header}>
+                {title ? <Text style={styles.title}>{title}</Text> : null}
+                {message ? <Text style={styles.message}>{message}</Text> : null}
+              </View>
+            )}
+            {actions.map((action) => (
+              <Pressable
+                key={action.label}
+                style={styles.option}
+                onPress={() => { onClose(); action.onPress(); }}
+              >
+                <Text style={[styles.optionText, action.destructive && styles.optionTextDestructive]}>{action.label}</Text>
+              </Pressable>
+            ))}
+            <Pressable style={styles.cancel} onPress={onClose}>
+              <Text style={styles.cancelText}>{cancelLabel}</Text>
             </Pressable>
-          ))}
-          <Pressable style={styles.cancel} onPress={onClose}>
-            <Text style={styles.cancelText}>{cancelLabel}</Text>
           </Pressable>
-        </Pressable>
+        </Animated.View>
       </Pressable>
     </Modal>
   );

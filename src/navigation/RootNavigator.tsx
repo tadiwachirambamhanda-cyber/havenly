@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useStreakBump } from '@/lib/useStreakBump';
 import TabBar from '@/navigation/TabBar';
+import LaunchAnimation from '@/components/LaunchAnimation';
 
 import LoginScreen from '@/screens/LoginScreen';
 import SignUpScreen from '@/screens/SignUpScreen';
@@ -97,12 +98,20 @@ export default function RootNavigator() {
   const { session, profile, loading } = useAuth();
   const { colors, scheme } = useTheme();
   useStreakBump();
+  // Plays exactly once per app process (not on every subsequent sign-in) —
+  // showLaunch starts true and never flips back, so it covers the initial
+  // `loading` window without needing to coordinate its own fixed-length
+  // animation against the real auth check's actual timing. If the auth
+  // check is still running once the animation finishes, falls through to
+  // the plain spinner below rather than blocking startup on a slow network.
+  const [showLaunch, setShowLaunch] = useState(true);
 
   const navTheme = useMemo(() => {
     const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
     return { ...base, colors: { ...base.colors, background: colors.sand, card: colors.sand, text: colors.ink, border: colors.line, primary: colors.coral } };
   }, [scheme, colors]);
 
+  if (showLaunch) return <LaunchAnimation onFinish={() => setShowLaunch(false)} />;
   if (loading) return <SplashLoading colors={colors} />;
   // Right after signing in, `session` updates a render before `profile` does
   // (AuthContext fetches it separately, after the fact) — without this,

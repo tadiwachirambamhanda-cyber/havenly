@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Modal, KeyboardAvoidingView, Platform } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -50,6 +51,16 @@ export default function ChatScreen() {
   const [groupNameDraft, setGroupNameDraft] = useState('');
   const [savingIcon, setSavingIcon] = useState(false);
   const listRef = useRef<FlatList>(null);
+  // Ids of messages that just arrived (sent locally or pushed in via
+  // realtime), so only those rows play an entrance animation — the initial
+  // history load, and any row FlatList recycles back into view on scroll,
+  // render statically. Each id expires itself a few seconds after being
+  // added so a later remount (scrolling away and back) never replays it.
+  const freshMessageIds = useRef<Set<string>>(new Set());
+  const markFresh = (id: string) => {
+    freshMessageIds.current.add(id);
+    setTimeout(() => freshMessageIds.current.delete(id), 4000);
+  };
   const isGroup = conversation?.is_group ?? false;
   const memberById = useMemo(() => new Map(members.map((m) => [m.id, m])), [members]);
 
@@ -117,6 +128,7 @@ export default function ChatScreen() {
               .select('id, title, tag, image_url, video_url').eq('id', incoming.shared_post_id).maybeSingle();
             incoming.shared_post = sharedPost as Message['shared_post'];
           }
+          markFresh(incoming.id);
           setMessages((prev) => (prev.some((m) => m.id === incoming.id) ? prev : [...prev, incoming]));
           if (myId) markConversationRead(conversationId, myId);
         })
@@ -140,6 +152,7 @@ export default function ChatScreen() {
       return;
     }
     haptics.confirm();
+    markFresh(inserted.id);
     setMessages((prev) => (prev.some((m) => m.id === inserted.id) ? prev : [...prev, inserted as Message]));
     await supabase.from('conversations').update({ last_message: body, last_message_at: new Date().toISOString() }).eq('id', conversationId);
     await markConversationRead(conversationId, myId);
@@ -230,8 +243,9 @@ export default function ChatScreen() {
             const mine = item.sender_id === myId;
             const textStyle = mine ? styles.bubbleTextMe : styles.bubbleTextThem;
             const senderName = isGroup && !mine ? memberById.get(item.sender_id)?.display_name : null;
+            const isFresh = freshMessageIds.current.has(item.id);
             return (
-              <View>
+              <Animated.View entering={isFresh ? FadeInDown.springify().damping(16) : undefined}>
                 {senderName && <Text style={styles.senderName}>{senderName}</Text>}
                 <View style={[styles.bubble, mine ? styles.bubbleMe : styles.bubbleThem, item.shared_post && styles.bubbleShared]}>
                   {item.shared_post ? (
@@ -256,7 +270,7 @@ export default function ChatScreen() {
                   )}
                   <Text style={mine ? styles.bubbleTimeMe : styles.bubbleTimeThem}>{timeAgo(item.created_at)}</Text>
                 </View>
-              </View>
+              </Animated.View>
             );
           }}
           onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
