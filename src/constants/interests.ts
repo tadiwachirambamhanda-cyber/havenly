@@ -9,3 +9,15 @@ export const INTEREST_OPTIONS: { key: Interest; label: string }[] = [
   { key: 'football', label: 'Football' }, { key: 'running', label: 'Running' },
   { key: 'art', label: 'Art & Culture' }, { key: 'gaming', label: 'Gaming' },
 ];
+
+// Groups the same 14 options into a few labeled clusters — a flat list
+// this long asks a new user to evaluate 14 options against each other at
+// once (Hick's Law: decision time grows with the number of choices).
+// Chunking them under headings turns that into four much smaller
+// decisions instead, without hiding anything.
+export const INTEREST_CATEGORIES: { label: string; keys: Interest[] }[] = [
+  { label: 'Food & Style', keys: ['cafes', 'fashion', 'beauty'] },
+  { label: 'Going Out', keys: ['nightlife', 'events', 'beach', 'travel'] },
+  { label: 'Active', keys: ['fitness', 'padel', 'football', 'running'] },
+  { label: 'Campus & Culture', keys: ['study', 'art', 'gaming'] },
+];

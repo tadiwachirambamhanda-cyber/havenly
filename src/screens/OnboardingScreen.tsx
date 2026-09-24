@@ -7,9 +7,11 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
-import { INTEREST_OPTIONS } from '@/constants/interests';
+import { INTEREST_OPTIONS, INTEREST_CATEGORIES } from '@/constants/interests';
 import { interestIcon } from '@/constants/topicIcons';
 import type { Interest } from '@/types';
+
+const optionByKey = new Map(INTEREST_OPTIONS.map((o) => [o.key, o]));
 
 export default function OnboardingScreen() {
   const { session, refreshProfile } = useAuth();
@@ -50,17 +52,24 @@ export default function OnboardingScreen() {
       </View>
       <View style={styles.panel}>
         <Text style={styles.question}>What are you into?</Text>
-        <View style={styles.chipGrid}>
-          {INTEREST_OPTIONS.map((opt) => {
-            const isSelected = selected.has(opt.key);
-            return (
-              <AnimatedPressable key={opt.key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => toggle(opt.key)}>
-                <Feather name={interestIcon(opt.key)} size={13} color={isSelected ? colors.sand : colors.ink} />
-                <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt.label}</Text>
-              </AnimatedPressable>
-            );
-          })}
-        </View>
+        <Text style={styles.questionHint}>Pick a few — you can change these anytime in your profile.</Text>
+        {INTEREST_CATEGORIES.map((category) => (
+          <View key={category.label} style={styles.categoryGroup}>
+            <Text style={styles.categoryLabel}>{category.label}</Text>
+            <View style={styles.chipGrid}>
+              {category.keys.map((key) => {
+                const opt = optionByKey.get(key)!;
+                const isSelected = selected.has(key);
+                return (
+                  <AnimatedPressable key={key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => toggle(key)}>
+                    <Feather name={interestIcon(key)} size={13} color={isSelected ? colors.sand : colors.ink} />
+                    <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt.label}</Text>
+                  </AnimatedPressable>
+                );
+              })}
+            </View>
+          </View>
+        ))}
         <AnimatedPressable style={styles.btnPrimary} onPress={handleContinue} disabled={saving}><Text style={styles.btnPrimaryText}>{saving ? 'Saving…' : 'Continue'}</Text></AnimatedPressable>
         <AnimatedPressable onPress={handleSkip} disabled={saving}><Text style={styles.skip}>Skip for now</Text></AnimatedPressable>
       </View>
@@ -78,8 +87,11 @@ function createStyles(colors: ColorTokens) {
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 38, color: '#FBF5EA', marginTop: 14, lineHeight: 42 },
   sub: { fontSize: 14.5, color: '#E7D9C8', marginTop: 14, lineHeight: 21, maxWidth: 280 },
   panel: { backgroundColor: colors.sand, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, marginTop: 20 },
-  question: { fontFamily: 'Fraunces_600SemiBold', fontSize: 22, color: colors.ink, marginBottom: 16 },
-  chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 9, marginBottom: 20 },
+  question: { fontFamily: 'Fraunces_600SemiBold', fontSize: 22, color: colors.ink },
+  questionHint: { fontSize: 12.5, color: colors.inkSoft, marginTop: 4, marginBottom: 20 },
+  categoryGroup: { marginBottom: 18 },
+  categoryLabel: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 10.5, textTransform: 'uppercase', color: colors.inkSoft, fontWeight: '600', marginBottom: 9 },
+  chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 9 },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: 10, paddingHorizontal: 16, borderRadius: 100, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
   chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
   chipText: { fontSize: 13.5, fontWeight: '600', color: colors.ink },
