@@ -55,7 +55,7 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
         </AnimatedPressable>
         <Text style={styles.title}>Settings</Text>

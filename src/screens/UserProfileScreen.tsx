@@ -164,7 +164,7 @@ export default function UserProfileScreen() {
   if (notFound) {
     return (
       <View style={styles.notFound}>
-        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
         </AnimatedPressable>
         <Text style={styles.notFoundText}>This account isn’t available.</Text>
@@ -176,7 +176,7 @@ export default function UserProfileScreen() {
     return (
       <View style={styles.container}>
         <Skeleton style={{ height: 110, borderRadius: 0 }} />
-        <AnimatedPressable style={[styles.back, styles.backOverlay, { top: insets.top + 12 }]} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <AnimatedPressable style={[styles.back, styles.backOverlay, { top: insets.top + 12 }]} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
           <Feather name="arrow-left" size={17} color="#20261F" />
         </AnimatedPressable>
         <View style={[styles.avatarRow, { marginTop: avatarMarginTop }]}>
@@ -235,7 +235,7 @@ export default function UserProfileScreen() {
             ) : (
               <LinearGradient colors={['#FF7A5C', '#E3A23A', '#0F8B82']} locations={[0, 0.6, 1]} style={styles.cover} />
             )}
-            <AnimatedPressable style={[styles.back, styles.backOverlay, { top: insets.top + 12 }]} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+            <AnimatedPressable style={[styles.back, styles.backOverlay, { top: insets.top + 12 }]} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
               <Feather name="arrow-left" size={17} color="#20261F" />
             </AnimatedPressable>
             {!isMe && (

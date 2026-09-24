@@ -144,7 +144,7 @@ export default function EventDetailScreen() {
   if (!loaded) {
     return (
       <View style={styles.container}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
         </Pressable>
         <Skeleton style={{ height: 200, borderRadius: 0 }} />
@@ -161,7 +161,7 @@ export default function EventDetailScreen() {
   if (!event) {
     return (
       <View style={styles.notFound}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
         </Pressable>
         <Text style={styles.notFoundText}>This event isn’t available.</Text>
@@ -176,7 +176,7 @@ export default function EventDetailScreen() {
 
   return (
     <Animated.ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }} onScroll={onScroll} scrollEventThrottle={16}>
-      <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+      <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
         <Feather name="arrow-left" size={17} color={colors.ink} />
       </Pressable>
       {profile?.is_admin && (

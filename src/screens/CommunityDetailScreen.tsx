@@ -88,7 +88,7 @@ export default function CommunityDetailScreen() {
     if (!loaded) {
       return (
         <View style={styles.container}>
-          <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+          <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
             <Feather name="arrow-left" size={17} color={colors.ink} />
           </AnimatedPressable>
           <View style={styles.body}>
@@ -113,7 +113,7 @@ export default function CommunityDetailScreen() {
     }
     return (
       <View style={styles.notFound}>
-        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
         </AnimatedPressable>
         <Text style={styles.notFoundText}>This community isn't available.</Text>
@@ -134,7 +134,7 @@ export default function CommunityDetailScreen() {
       contentContainerStyle={{ paddingBottom: 40 }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
     >
-      <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+      <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
         <Feather name="arrow-left" size={17} color={colors.ink} />
       </AnimatedPressable>
       <View style={styles.body}>

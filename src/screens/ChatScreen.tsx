@@ -201,7 +201,7 @@ export default function ChatScreen() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+          <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
             <Feather name="arrow-left" size={16} color={colors.ink} />
           </AnimatedPressable>
           <AnimatedPressable

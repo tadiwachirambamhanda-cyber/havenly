@@ -88,7 +88,7 @@ export default function OffersScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
         </Pressable>
         <Text style={styles.title}>Perks</Text>

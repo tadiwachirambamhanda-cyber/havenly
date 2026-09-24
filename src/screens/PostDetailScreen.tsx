@@ -298,6 +298,7 @@ export default function PostDetailScreen() {
           style={[styles.back, { top: insets.top + 12 }]}
           onPress={() => navigation.goBack()}
           accessibilityLabel="Go back"
+          hitSlop={8}
         >
           <Feather name="arrow-left" size={16} color="#20261F" />
         </Pressable>
@@ -354,6 +355,7 @@ export default function PostDetailScreen() {
           style={[styles.videoBack, { top: insets.top + 12 }]}
           onPress={() => navigation.goBack()}
           accessibilityLabel="Go back"
+          hitSlop={8}
         >
           <Feather name="arrow-left" size={18} color="white" />
         </Pressable>
@@ -532,6 +534,7 @@ export default function PostDetailScreen() {
           style={[styles.back, { top: insets.top + 12 }]}
           onPress={() => navigation.goBack()}
           accessibilityLabel="Go back"
+          hitSlop={8}
         >
           <Feather name="arrow-left" size={16} color="#20261F" />
         </Pressable>
