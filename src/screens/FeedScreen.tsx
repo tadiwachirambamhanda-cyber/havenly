@@ -253,6 +253,25 @@ export default function FeedScreen() {
     setSelectedInterest((prev) => (prev === label ? null : label));
   }, []);
 
+  // Selected gets the same coral-to-gold gradient treatment as the streak
+  // badge, instead of a plain solid fill — shadow lives on a separate outer
+  // View from the gradient's clip for the same reason as the streak badge:
+  // overflow: hidden (needed to clip the gradient to the pill) would
+  // otherwise clip the shadow itself into invisibility on iOS.
+  const renderInterestChip = (key: string, label: string, isSelected: boolean, onPress: () => void) =>
+    isSelected ? (
+      <View key={key} style={styles.interestChipShadow}>
+        <AnimatedPressable style={styles.interestChipSelected} onPress={onPress}>
+          <LinearGradient colors={['#FF7A45', '#E3A23A']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+          <Text style={styles.interestChipTextSelected}>{label}</Text>
+        </AnimatedPressable>
+      </View>
+    ) : (
+      <AnimatedPressable key={key} style={styles.interestChip} onPress={onPress}>
+        <Text style={styles.interestChipText}>{label}</Text>
+      </AnimatedPressable>
+    );
+
   // The masonry layout is a plain ScrollView (FlatList's numColumns forces
   // equal-height rows, which is exactly what breaks true masonry — see the
   // comment below), so there's no built-in onViewableItemsChanged to lean
@@ -460,23 +479,12 @@ export default function FeedScreen() {
           style={{ flexGrow: 0, flexShrink: 0 }}
           contentContainerStyle={styles.interestRow}
         >
-          <Pressable
-            style={[styles.interestChip, !selectedInterest && styles.interestChipSelected]}
-            onPress={() => { haptics.tap(); scrollRef.current?.scrollTo({ y: 0, animated: true }); setSelectedInterest(null); }}
-          >
-            <Text style={[styles.interestChipText, !selectedInterest && styles.interestChipTextSelected]}>All</Text>
-          </Pressable>
+          {renderInterestChip('all', 'All', !selectedInterest, () => {
+            haptics.tap(); scrollRef.current?.scrollTo({ y: 0, animated: true }); setSelectedInterest(null);
+          })}
           {interestChips.map((opt) => {
             const isSelected = selectedInterest === opt.label;
-            return (
-              <Pressable
-                key={opt.key}
-                style={[styles.interestChip, isSelected && styles.interestChipSelected]}
-                onPress={() => toggleInterestFilter(opt.label)}
-              >
-                <Text style={[styles.interestChipText, isSelected && styles.interestChipTextSelected]}>{opt.label}</Text>
-              </Pressable>
-            );
+            return renderInterestChip(opt.key, opt.label, isSelected, () => toggleInterestFilter(opt.label));
           })}
         </ScrollView>
       )}
@@ -567,9 +575,14 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line,
     borderRadius: radius.pill, paddingVertical: 7, paddingHorizontal: 14,
   },
-  interestChipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
+  interestChipShadow: {
+    borderRadius: radius.pill, shadowColor: '#FF5A3C', shadowOpacity: 0.3, shadowRadius: 5, shadowOffset: { width: 0, height: 2 }, elevation: 3,
+  },
+  interestChipSelected: {
+    borderRadius: radius.pill, paddingVertical: 7, paddingHorizontal: 14, overflow: 'hidden', alignItems: 'center', justifyContent: 'center',
+  },
   interestChipText: { fontSize: 11.5, fontWeight: '700', color: colors.ink },
-  interestChipTextSelected: { color: colors.sand },
+  interestChipTextSelected: { fontSize: 11.5, fontWeight: '800', color: '#FFFFFF' },
   myCommunitiesRow: { flexDirection: 'row', gap: 8, paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
   myCommunityChip: {
     flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.white, borderWidth: 1,
