@@ -241,8 +241,15 @@ export default function FeedScreen() {
     });
   }, [navigation, refreshFeed]);
 
+  // Switching the filter swaps the whole feed's shape — the multi-section
+  // layout (daily pick hero + Picked for you / Trending / community rows)
+  // for a flat single-topic grid, or back. If you're scrolled down when
+  // that swap happens, entirely different content lands under your
+  // viewport with no warning, which reads as a glitch — scrolling back to
+  // the top first makes the swap happen somewhere you're already looking.
   const toggleInterestFilter = useCallback((label: string) => {
     haptics.tap();
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
     setSelectedInterest((prev) => (prev === label ? null : label));
   }, []);
 
@@ -455,7 +462,7 @@ export default function FeedScreen() {
         >
           <Pressable
             style={[styles.interestChip, !selectedInterest && styles.interestChipSelected]}
-            onPress={() => { haptics.tap(); setSelectedInterest(null); }}
+            onPress={() => { haptics.tap(); scrollRef.current?.scrollTo({ y: 0, animated: true }); setSelectedInterest(null); }}
           >
             <Text style={[styles.interestChipText, !selectedInterest && styles.interestChipTextSelected]}>All</Text>
           </Pressable>
