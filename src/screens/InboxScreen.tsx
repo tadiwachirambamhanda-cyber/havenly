@@ -13,7 +13,10 @@ import { useTheme } from '@/lib/ThemeContext';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
+import SwipeToAction from '@/components/SwipeToAction';
 import { calmDuration, calmEasing } from '@/lib/animations';
+import { hideConversation } from '@/lib/conversations';
+import { haptics } from '@/lib/haptics';
 import { timeAgo } from '@/utils/timeAgo';
 import { groupDisplayName } from '@/utils/groupDisplayName';
 import type { Conversation, Profile } from '@/types';
@@ -38,27 +41,38 @@ export default function InboxScreen() {
   const load = useCallback(async () => {
     if (!myId) return;
 
-    const [{ data: conversations }, { data: reads }] = await Promise.all([
+    const [{ data: conversations }, { data: reads }, { data: hidden }] = await Promise.all([
       supabase.from('conversations').select('*')
         .contains('participant_ids', [myId])
         .neq('status', 'declined')
         .order('last_message_at', { ascending: false, nullsFirst: false }),
       supabase.from('conversation_reads').select('conversation_id, last_read_at').eq('user_id', myId),
+      supabase.from('conversation_hidden_for').select('conversation_id, hidden_at').eq('user_id', myId),
     ]);
     if (!conversations) return;
 
     const readAtByConversation = new Map((reads ?? []).map((r) => [r.conversation_id, r.last_read_at]));
+    // A conversation stays hidden only while nothing's happened in it since
+    // the hide — the moment a new message lands, last_message_at moves past
+    // hidden_at and it reappears on its own, same as WhatsApp/iMessage.
+    const hiddenAtByConversation = new Map((hidden ?? []).map((h) => [h.conversation_id, h.hidden_at]));
+    const visibleConversations = conversations.filter((c) => {
+      const hiddenAt = hiddenAtByConversation.get(c.id);
+      if (!hiddenAt) return true;
+      return !!c.last_message_at && new Date(c.last_message_at) > new Date(hiddenAt);
+    });
+
     // All other participants across every conversation, not just "the"
     // other person — a group needs every member, not one.
     const otherIds = Array.from(new Set(
-      conversations.flatMap((c) => c.participant_ids.filter((id: string) => id !== myId))
+      visibleConversations.flatMap((c) => c.participant_ids.filter((id: string) => id !== myId))
     ));
     const { data: profiles } = otherIds.length
       ? await supabase.from('profiles').select('*').in('id', otherIds)
       : { data: [] as Profile[] };
     const profileById = new Map((profiles ?? []).map((p) => [p.id, p as Profile]));
 
-    setRows(conversations.map((c) => {
+    setRows(visibleConversations.map((c) => {
       const readAt = readAtByConversation.get(c.id);
       const unread = !!c.last_message_at && (!readAt || new Date(readAt) < new Date(c.last_message_at));
       const members = (c.participant_ids as string[])
@@ -111,6 +125,16 @@ export default function InboxScreen() {
     navigation.navigate('Chat', { conversationId: row.id, otherUserId: row.otherUser?.id });
   };
 
+  // Removed from just this device's list, not deleted for the other
+  // participant(s) — optimistic since there's nothing to roll back to if
+  // the write fails quietly (worst case it reappears on the next load).
+  const handleDelete = (row: Row) => {
+    if (!myId) return;
+    haptics.tap();
+    setRows((prev) => prev.filter((r) => r.id !== row.id));
+    hideConversation(row.id, myId);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.titleRow}>
@@ -150,6 +174,7 @@ export default function InboxScreen() {
         )}
         renderItem={({ item, index }) => (
           <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(calmDuration).easing(calmEasing)}>
+          <SwipeToAction actionLabel="Delete" onAction={() => handleDelete(item)}>
           <AnimatedPressable style={styles.row} onPress={() => openChat(item)}>
             <View>
               {item.is_group ? (
@@ -175,6 +200,7 @@ export default function InboxScreen() {
             </View>
             {item.last_message_at && <Text style={styles.time}>{timeAgo(item.last_message_at)}</Text>}
           </AnimatedPressable>
+          </SwipeToAction>
           </Animated.View>
         )}
       />

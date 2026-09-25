@@ -53,3 +53,13 @@ export async function markConversationRead(conversationId: string, userId: strin
   await supabase.from('conversation_reads')
     .upsert({ conversation_id: conversationId, user_id: userId, last_read_at: new Date().toISOString() });
 }
+
+// Removes a conversation from just this user's Inbox — the other
+// participant(s) still see it and it's never deleted outright. A new
+// message reactivates it: InboxScreen only hides a conversation whose
+// hidden_at is at or after its last activity, so this timestamp is what
+// makes that comparison work, not a boolean.
+export async function hideConversation(conversationId: string, userId: string): Promise<void> {
+  await supabase.from('conversation_hidden_for')
+    .upsert({ conversation_id: conversationId, user_id: userId, hidden_at: new Date().toISOString() });
+}
