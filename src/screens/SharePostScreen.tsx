@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, SectionList, TextInput, ActivityIndicator } from 'react-native';
 import AnimatedPressable from '@/components/AnimatedPressable';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import BackButton from '@/components/BackButton';
+import { useRoute, RouteProp } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
@@ -21,7 +21,6 @@ import type { Conversation, Post, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Route = RouteProp<RootStackParamList, 'SharePost'>;
-type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 // A send target is either a specific person (send goes through
 // findOrCreateConversation) or a group already has a conversation id to
@@ -31,7 +30,6 @@ type Target =
   | { kind: 'group'; id: string; conversationId: string; name: string; subtitle: string; imageUrl: string | null };
 
 export default function SharePostScreen() {
-  const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const { postId } = route.params;
   const { session } = useAuth();
@@ -119,9 +117,9 @@ export default function SharePostScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+        <BackButton style={styles.back}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </AnimatedPressable>
+        </BackButton>
         <Text style={styles.title}>Send to</Text>
       </View>
       <View style={styles.searchBar}>

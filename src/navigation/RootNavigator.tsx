@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -105,13 +105,18 @@ export default function RootNavigator() {
   // check is still running once the animation finishes, falls through to
   // the plain spinner below rather than blocking startup on a slow network.
   const [showLaunch, setShowLaunch] = useState(true);
+  // Stable identity — LaunchAnimation's entrance effect depends on onFinish,
+  // so a fresh closure here on every re-render (auth/profile resolving
+  // mid-animation) would restart the splash sequence instead of letting it
+  // play once.
+  const handleLaunchFinish = useCallback(() => setShowLaunch(false), []);
 
   const navTheme = useMemo(() => {
     const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
     return { ...base, colors: { ...base.colors, background: colors.sand, card: colors.sand, text: colors.ink, border: colors.line, primary: colors.coral } };
   }, [scheme, colors]);
 
-  if (showLaunch) return <LaunchAnimation onFinish={() => setShowLaunch(false)} />;
+  if (showLaunch) return <LaunchAnimation onFinish={handleLaunchFinish} />;
   if (loading) return <SplashLoading colors={colors} />;
   // Right after signing in, `session` updates a render before `profile` does
   // (AuthContext fetches it separately, after the fact) — without this,

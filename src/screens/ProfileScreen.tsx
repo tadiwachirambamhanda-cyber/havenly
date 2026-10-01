@@ -41,6 +41,12 @@ export default function ProfileScreen() {
   const { colors } = useTheme();
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // Same collision guard as UserProfileScreen's avatarMarginTop: the avatar
+  // normally overlaps the cover by 38px, landing its top edge 72px down.
+  // The settings button floats over the cover pinned at insets.top + 12, so
+  // on a tall-inset device (Dynamic Island etc.) it can collide with the
+  // avatar unless pulled down further.
+  const avatarMarginTop = Math.max(-38, insets.top - 52);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState({ posts: 0, followers: 0, following: 0 });
   const [posts, setPosts] = useState<Post[]>([]);
@@ -118,7 +124,7 @@ export default function ProfileScreen() {
     return (
       <View style={styles.container}>
         <Skeleton style={{ height: 110, borderRadius: 0 }} />
-        <View style={styles.avatarRow}>
+        <View style={[styles.avatarRow, { marginTop: avatarMarginTop }]}>
           <Skeleton style={{ width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand }} />
           <Skeleton style={{ width: 96, height: 32, borderRadius: radius.pill, marginBottom: 6 }} />
         </View>
@@ -188,7 +194,7 @@ export default function ProfileScreen() {
           >
             <Feather name="settings" size={17} color="#20261F" />
           </Pressable>
-          <View style={styles.avatarRow}>
+          <View style={[styles.avatarRow, { marginTop: avatarMarginTop }]}>
             {profile.avatar_url ? (
               <Image source={{ uri: profile.avatar_url }} style={styles.avatar} transition={200} />
             ) : (

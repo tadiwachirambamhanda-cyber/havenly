@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import AnimatedPressable from '@/components/AnimatedPressable';
+import BackButton from '@/components/BackButton';
 import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -88,9 +89,9 @@ export default function CommunityDetailScreen() {
     if (!loaded) {
       return (
         <View style={styles.container}>
-          <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+          <BackButton style={styles.back}>
             <Feather name="arrow-left" size={17} color={colors.ink} />
-          </AnimatedPressable>
+          </BackButton>
           <View style={styles.body}>
             <Skeleton style={{ width: 68, height: 68, borderRadius: 34 }} />
             <Skeleton style={{ height: 21, width: '55%', marginTop: 12 }} />
@@ -113,9 +114,9 @@ export default function CommunityDetailScreen() {
     }
     return (
       <View style={styles.notFound}>
-        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+        <BackButton style={styles.back}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </AnimatedPressable>
+        </BackButton>
         <Text style={styles.notFoundText}>This community isn't available.</Text>
       </View>
     );
@@ -134,9 +135,9 @@ export default function CommunityDetailScreen() {
       contentContainerStyle={{ paddingBottom: 40 }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
     >
-      <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+      <BackButton style={styles.back}>
         <Feather name="arrow-left" size={17} color={colors.ink} />
-      </AnimatedPressable>
+      </BackButton>
       <View style={styles.body}>
         <View style={styles.iconChip}>
           <Feather name={communityIcon(community)} size={28} color={colors.teal} />

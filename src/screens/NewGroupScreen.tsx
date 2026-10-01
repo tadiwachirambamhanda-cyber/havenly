@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, ActivityIndicator } from 'react-native';
 import AnimatedPressable from '@/components/AnimatedPressable';
+import BackButton from '@/components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as ImagePicker from 'expo-image-picker';
@@ -98,9 +99,9 @@ export default function NewGroupScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+        <BackButton style={styles.back}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </AnimatedPressable>
+        </BackButton>
         <Text style={styles.title}>New group</Text>
       </View>
 

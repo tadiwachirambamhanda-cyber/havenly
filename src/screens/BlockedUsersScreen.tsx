@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import AnimatedPressable from '@/components/AnimatedPressable';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import BackButton from '@/components/BackButton';
+import { useFocusEffect } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
@@ -16,7 +17,6 @@ import SwipeToAction from '@/components/SwipeToAction';
 import type { Profile } from '@/types';
 
 export default function BlockedUsersScreen() {
-  const navigation = useNavigation();
   const { session } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -45,9 +45,9 @@ export default function BlockedUsersScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+        <BackButton style={styles.back}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </AnimatedPressable>
+        </BackButton>
         <Text style={styles.title}>Blocked accounts</Text>
       </View>
       <FlatList

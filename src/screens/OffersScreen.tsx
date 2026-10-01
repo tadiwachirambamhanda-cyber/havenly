@@ -15,6 +15,7 @@ import { calmDuration, calmEasing } from '@/lib/animations';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import AnimatedPressable from '@/components/AnimatedPressable';
+import BackButton from '@/components/BackButton';
 import EmptyState from '@/components/EmptyState';
 import type { Offer } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -88,9 +89,9 @@ export default function OffersScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+        <BackButton style={styles.back}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </BackButton>
         <Text style={styles.title}>Perks</Text>
       </View>
       <View style={styles.streakBanner}>

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TextInput, Keyboard } from 'react-native';
 import AnimatedPressable from '@/components/AnimatedPressable';
+import BackButton from '@/components/BackButton';
 import { WebView } from 'react-native-webview';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -547,9 +548,18 @@ export default function MapScreen() {
   // or a "down to go" count changing shows up live while this screen is
   // open, instead of only on the next reopen.
   const handleCheckInInsert = useCallback(async (row: CheckIn) => {
-    const place = row.place_type === 'offer'
+    let place = row.place_type === 'offer'
       ? offersRef.current.find((o) => o.id === row.place_id)
       : eventsRef.current.find((e) => e.id === row.place_id);
+    // Not in the last-loaded snapshot yet — either this event raced load()'s
+    // fetch, or the place was created after load() last ran. Fetch it
+    // directly rather than silently dropping the check-in.
+    if (!place) {
+      const { data } = row.place_type === 'offer'
+        ? await supabase.from('offers').select('*, brand:brands(*)').eq('id', row.place_id).maybeSingle()
+        : await supabase.from('events').select('*').eq('id', row.place_id).maybeSingle();
+      place = (data as unknown as Offer | HavenlyEvent) ?? undefined;
+    }
     if (!place || place.latitude == null || place.longitude == null) return;
 
     const { data: userData } = await supabase.from('profiles').select('*').eq('id', row.user_id).maybeSingle();
@@ -729,9 +739,9 @@ export default function MapScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+        <BackButton style={styles.back}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </AnimatedPressable>
+        </BackButton>
         <Text style={styles.title}>Map</Text>
       </View>
       {locationDenied && loaded && (

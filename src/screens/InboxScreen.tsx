@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, SectionList, RefreshControl, TextInput } from 'react-native';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -10,6 +10,7 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { useToast } from '@/lib/ToastContext';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
@@ -32,11 +33,17 @@ export default function InboxScreen() {
   const navigation = useNavigation<Nav>();
   const { session } = useAuth();
   const { colors } = useTheme();
+  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [rows, setRows] = useState<Row[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState('');
   const myId = session?.user.id;
+  // Every conversation id this user is part of (not just the visible ones) —
+  // lets the realtime subscription below skip load() for events on
+  // conversations that aren't this user's, instead of reloading on every
+  // message/conversation change anywhere in the app.
+  const myConversationIdsRef = useRef<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     if (!myId) return;
@@ -50,6 +57,7 @@ export default function InboxScreen() {
       supabase.from('conversation_hidden_for').select('conversation_id, hidden_at').eq('user_id', myId),
     ]);
     if (!conversations) return;
+    myConversationIdsRef.current = new Set(conversations.map((c) => c.id));
 
     const readAtByConversation = new Map((reads ?? []).map((r) => [r.conversation_id, r.last_read_at]));
     // A conversation stays hidden only while nothing's happened in it since
@@ -98,8 +106,14 @@ export default function InboxScreen() {
   useEffect(() => {
     if (!myId) return;
     const channel = supabase.channel('inbox-updates')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => load())
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations' }, () => load())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+        const row = payload.new as { conversation_id?: string };
+        if (row.conversation_id && myConversationIdsRef.current.has(row.conversation_id)) load();
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations' }, (payload) => {
+        const row = payload.new as { id?: string };
+        if (row.id && myConversationIdsRef.current.has(row.id)) load();
+      })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [myId, load]);
@@ -126,13 +140,18 @@ export default function InboxScreen() {
   };
 
   // Removed from just this device's list, not deleted for the other
-  // participant(s) — optimistic since there's nothing to roll back to if
-  // the write fails quietly (worst case it reappears on the next load).
-  const handleDelete = (row: Row) => {
+  // participant(s). Optimistic, but rolled back with a toast if the write
+  // actually fails rather than leaving the user unsure whether it worked.
+  const handleDelete = async (row: Row) => {
     if (!myId) return;
     haptics.tap();
     setRows((prev) => prev.filter((r) => r.id !== row.id));
-    hideConversation(row.id, myId);
+    try {
+      await hideConversation(row.id, myId);
+    } catch {
+      setRows((prev) => (prev.some((r) => r.id === row.id) ? prev : [...prev, row]));
+      showToast("Couldn't delete that conversation — try again", 'error');
+    }
   };
 
   return (

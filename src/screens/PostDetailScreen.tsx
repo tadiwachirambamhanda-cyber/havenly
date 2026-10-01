@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable, Animated, TextInput, Key
 // for the like-bounce/heart-pop effects; ReanimatedAnimated is only for the
 // new scroll-driven parallax hero, which needs a scroll handler that the
 // classic API can't do without a separate native listener.
-import ReanimatedAnimated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, interpolate, Extrapolation } from 'react-native-reanimated';
+import ReanimatedAnimated from 'react-native-reanimated';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,10 +19,12 @@ import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { formatCount } from '@/utils/formatCount';
 import { findOrCreateConversation } from '@/lib/conversations';
+import { useParallaxHero } from '@/lib/animations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
 import ActionSheet from '@/components/ActionSheet';
 import AnimatedPressable from '@/components/AnimatedPressable';
+import BackButton from '@/components/BackButton';
 import PostVideoPlayer, { type PostVideoPlayerHandle } from '@/components/PostVideoPlayer';
 import { gradients, radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
@@ -44,21 +46,10 @@ export default function PostDetailScreen() {
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
-  // Same parallax treatment as Event/OfferDetailScreen — applied only to
-  // the background layer (gradient + video/image), not the back/overflow
-  // buttons or the double-tap heart-pop overlay, which stay fixed in place
-  // as siblings outside the animated wrapper.
-  const scrollY = useSharedValue(0);
-  const onScroll = useAnimatedScrollHandler((e) => { scrollY.value = e.contentOffset.y; });
-  const heroAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateY: interpolate(scrollY.value, [0, HERO_HEIGHT], [0, -HERO_HEIGHT / 3], Extrapolation.CLAMP) },
-      { scale: interpolate(scrollY.value, [-HERO_HEIGHT, 0], [2, 1], Extrapolation.CLAMP) },
-    ],
-  }));
-  const heroDimStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(scrollY.value, [0, HERO_HEIGHT], [0, 0.35], Extrapolation.CLAMP),
-  }));
+  // Applied only to the background layer (gradient + video/image), not the
+  // back/overflow buttons or the double-tap heart-pop overlay, which stay
+  // fixed in place as siblings outside the animated wrapper.
+  const { onScroll, heroAnimatedStyle, heroDimStyle } = useParallaxHero(HERO_HEIGHT);
   const lastTapRef = useRef(0);
   const heartPopScale = useRef(new Animated.Value(0.5)).current;
   const heartPopOpacity = useRef(new Animated.Value(0)).current;
@@ -294,14 +285,9 @@ export default function PostDetailScreen() {
   if (!post) {
     return loaded ? (
       <View style={styles.notFound}>
-        <Pressable
-          style={[styles.back, { top: insets.top + 12 }]}
-          onPress={() => navigation.goBack()}
-          accessibilityLabel="Go back"
-          hitSlop={8}
-        >
+        <BackButton style={[styles.back, { top: insets.top + 12 }]}>
           <Feather name="arrow-left" size={16} color="#20261F" />
-        </Pressable>
+        </BackButton>
         <Text style={styles.notFoundText}>This post isn't available.</Text>
       </View>
     ) : null;
@@ -351,14 +337,9 @@ export default function PostDetailScreen() {
           <Feather name="heart" size={84} color="white" />
         </Animated.View>
 
-        <Pressable
-          style={[styles.videoBack, { top: insets.top + 12 }]}
-          onPress={() => navigation.goBack()}
-          accessibilityLabel="Go back"
-          hitSlop={8}
-        >
+        <BackButton style={[styles.videoBack, { top: insets.top + 12 }]}>
           <Feather name="arrow-left" size={18} color="white" />
-        </Pressable>
+        </BackButton>
         <Pressable
           style={[styles.videoOverflow, { top: insets.top + 12 }]}
           onPress={openOptions}
@@ -530,14 +511,9 @@ export default function PostDetailScreen() {
         >
           <Feather name="heart" size={84} color="white" />
         </Animated.View>
-        <Pressable
-          style={[styles.back, { top: insets.top + 12 }]}
-          onPress={() => navigation.goBack()}
-          accessibilityLabel="Go back"
-          hitSlop={8}
-        >
+        <BackButton style={[styles.back, { top: insets.top + 12 }]}>
           <Feather name="arrow-left" size={16} color="#20261F" />
-        </Pressable>
+        </BackButton>
         <Pressable
           style={[styles.overflow, { top: insets.top + 12 }]}
           onPress={openOptions}

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import AnimatedPressable from '@/components/AnimatedPressable';
+import BackButton from '@/components/BackButton';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -28,6 +29,13 @@ import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Route = RouteProp<RootStackParamList, 'Chat'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
+// A message that just arrived (sent locally or pushed in via realtime) only
+// plays its entrance animation while this timestamp is recent — carried on
+// the message itself, not a separate ref, so a row can't be inserted without
+// declaring whether it's fresh, and remounting later (scrolling away and
+// back) naturally stops replaying it once the timestamp ages out.
+type ChatMessage = Message & { _localInsertedAt?: number };
+const asFresh = (message: Message): ChatMessage => ({ ...message, _localInsertedAt: Date.now() });
 
 export default function ChatScreen() {
   const navigation = useNavigation<Nav>();
@@ -43,7 +51,7 @@ export default function ChatScreen() {
   const [otherUser, setOtherUser] = useState<Profile | null>(null);
   const [members, setMembers] = useState<Profile[]>([]);
   const [conversation, setConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [optionsVisible, setOptionsVisible] = useState(false);
@@ -52,16 +60,6 @@ export default function ChatScreen() {
   const [groupNameDraft, setGroupNameDraft] = useState('');
   const [savingIcon, setSavingIcon] = useState(false);
   const listRef = useRef<FlatList>(null);
-  // Ids of messages that just arrived (sent locally or pushed in via
-  // realtime), so only those rows play an entrance animation — the initial
-  // history load, and any row FlatList recycles back into view on scroll,
-  // render statically. Each id expires itself a few seconds after being
-  // added so a later remount (scrolling away and back) never replays it.
-  const freshMessageIds = useRef<Set<string>>(new Set());
-  const markFresh = (id: string) => {
-    freshMessageIds.current.add(id);
-    setTimeout(() => freshMessageIds.current.delete(id), 4000);
-  };
   const isGroup = conversation?.is_group ?? false;
   const memberById = useMemo(() => new Map(members.map((m) => [m.id, m])), [members]);
 
@@ -129,8 +127,7 @@ export default function ChatScreen() {
               .select('id, title, tag, image_url, video_url').eq('id', incoming.shared_post_id).maybeSingle();
             incoming.shared_post = sharedPost as Message['shared_post'];
           }
-          markFresh(incoming.id);
-          setMessages((prev) => (prev.some((m) => m.id === incoming.id) ? prev : [...prev, incoming]));
+          setMessages((prev) => (prev.some((m) => m.id === incoming.id) ? prev : [...prev, asFresh(incoming)]));
           if (myId) markConversationRead(conversationId, myId);
         })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations', filter: `id=eq.${conversationId}` },
@@ -153,8 +150,7 @@ export default function ChatScreen() {
       return;
     }
     haptics.confirm();
-    markFresh(inserted.id);
-    setMessages((prev) => (prev.some((m) => m.id === inserted.id) ? prev : [...prev, inserted as Message]));
+    setMessages((prev) => (prev.some((m) => m.id === inserted.id) ? prev : [...prev, asFresh(inserted as Message)]));
     await supabase.from('conversations').update({ last_message: body, last_message_at: new Date().toISOString() }).eq('id', conversationId);
     await markConversationRead(conversationId, myId);
   };
@@ -201,9 +197,9 @@ export default function ChatScreen() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <AnimatedPressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+          <BackButton style={styles.back}>
             <Feather name="arrow-left" size={16} color={colors.ink} />
-          </AnimatedPressable>
+          </BackButton>
           <AnimatedPressable
             style={styles.headerAuthorTap}
             onPress={() => (isGroup ? openMembersModal() : otherUserId && navigation.navigate('UserProfile', { userId: otherUserId }))}
@@ -240,17 +236,20 @@ export default function ChatScreen() {
           data={messages}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: spacing.lg }}
+          ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
           renderItem={({ item }) => {
             const mine = item.sender_id === myId;
             const textStyle = mine ? styles.bubbleTextMe : styles.bubbleTextThem;
             const senderName = isGroup && !mine ? memberById.get(item.sender_id)?.display_name : null;
-            const isFresh = freshMessageIds.current.has(item.id);
+            const isFresh = !!item._localInsertedAt && Date.now() - item._localInsertedAt < 4000;
             return (
-              // marginBottom here, not `gap` on the FlatList's contentContainerStyle —
-              // gap inside a FlatList content container is unreliable on native (it
-              // renders fine on web, which is all that could be checked live here, but
-              // was reported as a much bigger gap than 8px on a real device).
-              <Animated.View style={{ marginBottom: 8 }} entering={isFresh ? FadeInDown.duration(calmDuration).easing(calmEasing) : undefined}>
+              // ItemSeparatorComponent here, not `gap` on the FlatList's
+              // contentContainerStyle — gap inside a FlatList content container is
+              // unreliable on native (it renders fine on web, which is all that could
+              // be checked live here, but was reported as a much bigger gap than 8px
+              // on a real device) — and not per-row marginBottom either, since that
+              // adds space after the last message too, unlike a real separator.
+              <Animated.View entering={isFresh ? FadeInDown.duration(calmDuration).easing(calmEasing) : undefined}>
                 {senderName && <Text style={styles.senderName}>{senderName}</Text>}
                 <View style={[styles.bubble, mine ? styles.bubbleMe : styles.bubbleThem, item.shared_post && styles.bubbleShared]}>
                   {item.shared_post ? (

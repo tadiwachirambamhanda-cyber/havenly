@@ -60,6 +60,7 @@ export async function markConversationRead(conversationId: string, userId: strin
 // hidden_at is at or after its last activity, so this timestamp is what
 // makes that comparison work, not a boolean.
 export async function hideConversation(conversationId: string, userId: string): Promise<void> {
-  await supabase.from('conversation_hidden_for')
+  const { error } = await supabase.from('conversation_hidden_for')
     .upsert({ conversation_id: conversationId, user_id: userId, hidden_at: new Date().toISOString() });
+  if (error) throw error;
 }

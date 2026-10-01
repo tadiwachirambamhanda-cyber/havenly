@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
-import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, interpolate, Extrapolation } from 'react-native-reanimated';
+import BackButton from '@/components/BackButton';
+import Animated from 'react-native-reanimated';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -13,6 +14,7 @@ import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { createCheckIn, deleteCheckIn, sendPing } from '@/lib/checkIns';
 import { toggleInterest } from '@/lib/interests';
+import { useParallaxHero } from '@/lib/animations';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import ActionSheet from '@/components/ActionSheet';
 import Skeleton from '@/components/Skeleton';
@@ -44,21 +46,7 @@ export default function EventDetailScreen() {
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
-  // Parallax hero: scrolling down slides the gradient up more slowly than
-  // the page (a lag, not a 1:1 match) and dims it slightly; pulling down
-  // past the top (iOS bounce, negative offset) scales it up to fill the
-  // extra rubber-band space instead of showing a gap.
-  const scrollY = useSharedValue(0);
-  const onScroll = useAnimatedScrollHandler((e) => { scrollY.value = e.contentOffset.y; });
-  const heroAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateY: interpolate(scrollY.value, [0, HERO_HEIGHT], [0, -HERO_HEIGHT / 3], Extrapolation.CLAMP) },
-      { scale: interpolate(scrollY.value, [-HERO_HEIGHT, 0], [2, 1], Extrapolation.CLAMP) },
-    ],
-  }));
-  const heroDimStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(scrollY.value, [0, HERO_HEIGHT], [0, 0.35], Extrapolation.CLAMP),
-  }));
+  const { onScroll, heroAnimatedStyle, heroDimStyle } = useParallaxHero(HERO_HEIGHT);
 
   const [event, setEvent] = useState<HavenlyEvent | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -144,9 +132,9 @@ export default function EventDetailScreen() {
   if (!loaded) {
     return (
       <View style={styles.container}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+        <BackButton style={styles.back}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </BackButton>
         <Skeleton style={{ height: 200, borderRadius: 0 }} />
         <View style={styles.body}>
           <Skeleton style={{ height: 11, width: '25%' }} />
@@ -161,9 +149,9 @@ export default function EventDetailScreen() {
   if (!event) {
     return (
       <View style={styles.notFound}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+        <BackButton style={styles.back}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </BackButton>
         <Text style={styles.notFoundText}>This event isn’t available.</Text>
       </View>
     );
@@ -176,9 +164,9 @@ export default function EventDetailScreen() {
 
   return (
     <Animated.ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }} onScroll={onScroll} scrollEventThrottle={16}>
-      <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+      <BackButton style={styles.back}>
         <Feather name="arrow-left" size={17} color={colors.ink} />
-      </Pressable>
+      </BackButton>
       {profile?.is_admin && (
         <Pressable style={styles.overflow} onPress={() => setDeleteConfirmVisible(true)} accessibilityLabel="More options">
           <Feather name="more-horizontal" size={17} color={colors.ink} />

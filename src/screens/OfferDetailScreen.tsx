@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
-import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, interpolate, Extrapolation } from 'react-native-reanimated';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Animated from 'react-native-reanimated';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import BackButton from '@/components/BackButton';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
@@ -13,6 +13,7 @@ import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { createCheckIn, deleteCheckIn, sendPing } from '@/lib/checkIns';
 import { toggleInterest } from '@/lib/interests';
+import { useParallaxHero } from '@/lib/animations';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import Skeleton from '@/components/Skeleton';
 import { radius, spacing } from '@/theme/tokens';
@@ -24,12 +25,10 @@ type VisibleCheckIn = CheckIn & { user: Profile };
 type VisibleInterest = PlaceInterest & { user: Profile };
 
 type Route = RouteProp<RootStackParamList, 'OfferDetail'>;
-type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 const HERO_HEIGHT = 220;
 
 export default function OfferDetailScreen() {
-  const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const { offerId } = route.params;
   const { profile, refreshProfile } = useAuth();
@@ -37,20 +36,7 @@ export default function OfferDetailScreen() {
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
-  // Same parallax treatment as EventDetailScreen — the hero lags the
-  // scroll and dims slightly going down, and scales up to fill the
-  // rubber-band gap on iOS overscroll instead of leaving a blank strip.
-  const scrollY = useSharedValue(0);
-  const onScroll = useAnimatedScrollHandler((e) => { scrollY.value = e.contentOffset.y; });
-  const heroAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateY: interpolate(scrollY.value, [0, HERO_HEIGHT], [0, -HERO_HEIGHT / 3], Extrapolation.CLAMP) },
-      { scale: interpolate(scrollY.value, [-HERO_HEIGHT, 0], [2, 1], Extrapolation.CLAMP) },
-    ],
-  }));
-  const heroDimStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(scrollY.value, [0, HERO_HEIGHT], [0, 0.35], Extrapolation.CLAMP),
-  }));
+  const { onScroll, heroAnimatedStyle, heroDimStyle } = useParallaxHero(HERO_HEIGHT);
 
   const [offer, setOffer] = useState<Offer | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -146,9 +132,9 @@ export default function OfferDetailScreen() {
   if (!loaded) {
     return (
       <View style={styles.container}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+        <BackButton style={styles.back}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </BackButton>
         <Skeleton style={{ height: 220, borderRadius: 0 }} />
         <View style={styles.body}>
           <Skeleton style={{ height: 11, width: '30%' }} />
@@ -163,9 +149,9 @@ export default function OfferDetailScreen() {
   if (!offer) {
     return (
       <View style={styles.notFound}>
-        <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+        <BackButton style={styles.back}>
           <Feather name="arrow-left" size={17} color={colors.ink} />
-        </Pressable>
+        </BackButton>
         <Text style={styles.notFoundText}>This offer isn’t available.</Text>
       </View>
     );
@@ -173,9 +159,9 @@ export default function OfferDetailScreen() {
 
   return (
     <Animated.ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }} onScroll={onScroll} scrollEventThrottle={16}>
-      <Pressable style={styles.back} onPress={() => navigation.goBack()} accessibilityLabel="Go back" hitSlop={8}>
+      <BackButton style={styles.back}>
         <Feather name="arrow-left" size={17} color={colors.ink} />
-      </Pressable>
+      </BackButton>
       <View style={styles.hero}>
         <Animated.View style={[StyleSheet.absoluteFill, heroAnimatedStyle]}>
           {offer.image_url ? (
