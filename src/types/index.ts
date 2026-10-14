@@ -85,3 +85,36 @@ export interface PlaceInterest {
   id: string; user_id: string; user?: Profile; place_type: CheckInPlaceType; place_id: string;
   created_at: string;
 }
+
+export type BillingPeriod = 'year' | 'semester' | 'month';
+export type GenderPolicy = 'mixed' | 'female_only' | 'male_only';
+
+export interface RoomType {
+  id: string; residence_id: string; name: string; price_aed: number; billing_period: BillingPeriod;
+  occupancy: number; is_available: boolean; sort_order: number; created_at: string;
+}
+
+export interface Residence {
+  id: string; name: string; provider_name: string; description: string | null; area: string; address: string | null;
+  latitude: number | null; longitude: number | null; photo_urls: string[]; amenities: string[];
+  nearby_universities: string[]; gender_policy: GenderPolicy; is_active: boolean; created_at: string;
+  room_types?: RoomType[];
+}
+
+export interface ResidencePartnerTerms {
+  residence_id: string; referral_fee_percent: number; contact_name: string | null; contact_email: string | null;
+  contact_phone: string | null; notes: string | null; updated_at: string;
+}
+
+export type EnquiryKind = 'question' | 'viewing';
+export type EnquiryStatus = 'new' | 'contacted' | 'viewing_booked' | 'signed' | 'lost';
+
+export interface HousingEnquiry {
+  id: string; user_id: string; user?: Pick<Profile, 'id' | 'display_name' | 'username' | 'avatar_url' | 'university'>;
+  residence_id: string; residence?: Pick<Residence, 'id' | 'name' | 'area' | 'photo_urls' | 'provider_name'>;
+  room_type_id: string | null; room_type?: Pick<RoomType, 'id' | 'name' | 'price_aed' | 'billing_period'> | null;
+  kind: EnquiryKind; move_in_month: string; duration_months: number; budget_aed: number | null;
+  contact_phone: string; message: string | null; preferred_viewing: string | null; status: EnquiryStatus;
+  contract_value_aed: number | null; referral_fee_aed: number | null; fee_paid_at: string | null;
+  status_updated_at: string; created_at: string;
+}

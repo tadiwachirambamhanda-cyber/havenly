@@ -15,6 +15,7 @@ const INACTIVE_COLOR = '#8D8977';
 const TAB_CONFIG: Record<string, { icon: keyof typeof Feather.glyphMap }> = {
   Feed: { icon: 'home' },
   Discover: { icon: 'search' },
+  Housing: { icon: 'key' },
   Inbox: { icon: 'inbox' },
   Profile: { icon: 'user' },
 };

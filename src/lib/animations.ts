@@ -28,5 +28,5 @@ export function useParallaxHero(heroHeight: number) {
   const heroDimStyle = useAnimatedStyle(() => ({
     opacity: interpolate(scrollY.value, [0, heroHeight], [0, 0.35], Extrapolation.CLAMP),
   }));
-  return { onScroll, heroAnimatedStyle, heroDimStyle };
+  return { onScroll, scrollY, heroAnimatedStyle, heroDimStyle };
 }

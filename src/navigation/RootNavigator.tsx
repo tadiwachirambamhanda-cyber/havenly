@@ -37,6 +37,13 @@ import ManageBrandsScreen from '@/screens/ManageBrandsScreen';
 import CreateOfferScreen from '@/screens/CreateOfferScreen';
 import MapScreen from '@/screens/MapScreen';
 import EventDetailScreen from '@/screens/EventDetailScreen';
+import HousingScreen from '@/screens/HousingScreen';
+import ResidenceDetailScreen from '@/screens/ResidenceDetailScreen';
+import HousingEnquiryScreen from '@/screens/HousingEnquiryScreen';
+import MyEnquiriesScreen from '@/screens/MyEnquiriesScreen';
+import ManageHousingScreen from '@/screens/ManageHousingScreen';
+import AdminEnquiryScreen from '@/screens/AdminEnquiryScreen';
+import EditResidenceScreen from '@/screens/EditResidenceScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -63,11 +70,18 @@ export type RootStackParamList = {
   CreateOffer: undefined;
   Map: undefined;
   EventDetail: { eventId: string };
+  ResidenceDetail: { residenceId: string };
+  HousingEnquiry: { residenceId: string; kind: 'question' | 'viewing' };
+  MyEnquiries: undefined;
+  ManageHousing: undefined;
+  AdminEnquiry: { enquiryId: string };
+  EditResidence: { residenceId?: string };
 };
 
 export type MainTabParamList = {
   Feed: undefined;
   Discover: undefined;
+  Housing: undefined;
   Inbox: undefined;
   Profile: undefined;
 };
@@ -80,6 +94,7 @@ function MainTabs() {
     <Tab.Navigator screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
       <Tab.Screen name="Feed" component={FeedScreen} />
       <Tab.Screen name="Discover" component={DiscoverScreen} />
+      <Tab.Screen name="Housing" component={HousingScreen} />
       <Tab.Screen name="Inbox" component={InboxScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
@@ -161,6 +176,12 @@ export default function RootNavigator() {
             <Stack.Screen name="CreateOffer" component={CreateOfferScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Map" component={MapScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="EventDetail" component={EventDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="ResidenceDetail" component={ResidenceDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="HousingEnquiry" component={HousingEnquiryScreen} options={{ presentation: 'modal' }} />
+            <Stack.Screen name="MyEnquiries" component={MyEnquiriesScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="ManageHousing" component={ManageHousingScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="AdminEnquiry" component={AdminEnquiryScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="EditResidence" component={EditResidenceScreen} options={{ presentation: 'modal' }} />
           </>
         )}
       </Stack.Navigator>

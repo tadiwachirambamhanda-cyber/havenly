@@ -90,6 +90,11 @@ export default function SettingsScreen() {
       {profile?.is_admin && (
         <>
           <View style={styles.divider} />
+          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('ManageHousing')}>
+            <Text style={styles.rowText}>Manage housing</Text>
+            <Text style={styles.chevron}>›</Text>
+          </AnimatedPressable>
+          <View style={styles.divider} />
           <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('CreateEvent')}>
             <Text style={styles.rowText}>Create event</Text>
             <Text style={styles.chevron}>›</Text>
