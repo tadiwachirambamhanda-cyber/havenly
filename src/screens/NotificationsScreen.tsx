@@ -17,7 +17,7 @@ import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
 import { timeAgo } from '@/utils/timeAgo';
-import type { Notification } from '@/types';
+import type { EnquiryStatus, Notification } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -31,6 +31,14 @@ const ICON_BY_TYPE: Record<Notification['type'], keyof typeof Feather.glyphMap> 
   like: 'heart',
   comment: 'message-circle',
   ping: 'navigation',
+  enquiry_new: 'key',
+  enquiry_status: 'key',
+};
+
+const STATUS_MESSAGE: Partial<Record<EnquiryStatus, string>> = {
+  contacted: 'is getting in touch with you',
+  viewing_booked: 'booked your viewing',
+  signed: 'confirmed your room — welcome home',
 };
 
 function messageFor(n: Row): string {
@@ -38,6 +46,13 @@ function messageFor(n: Row): string {
   if (n.type === 'follow') return `${name} started following you`;
   if (n.type === 'like') return `${name} liked your post`;
   if (n.type === 'comment') return `${name} commented on your post`;
+  const residence = n.enquiry?.residence?.name ?? 'a residence';
+  if (n.type === 'enquiry_new') {
+    return `${name} sent a ${n.enquiry?.kind === 'viewing' ? 'viewing request' : 'question'} for ${residence}`;
+  }
+  if (n.type === 'enquiry_status') {
+    return `${residence} ${(n.enquiry_status && STATUS_MESSAGE[n.enquiry_status]) ?? 'updated your enquiry'}`;
+  }
   return `${name} pinged you${n.place_title ? ` from ${n.place_title}` : ''}`;
 }
 
@@ -56,7 +71,7 @@ export default function NotificationsScreen() {
   const load = useCallback(async () => {
     if (!myId) return;
     const { data } = await supabase.from('notifications')
-      .select('*, actor:profiles!notifications_actor_id_fkey(*), post:posts(id, title, image_url), check_in:check_ins(id, place_type, place_id)')
+      .select('*, actor:profiles!notifications_actor_id_fkey(*), post:posts(id, title, image_url), check_in:check_ins(id, place_type, place_id), enquiry:housing_enquiries(id, kind, residence:residences(id, name))')
       .eq('recipient_id', myId)
       .order('created_at', { ascending: false })
       .limit(100);
@@ -93,7 +108,11 @@ export default function NotificationsScreen() {
   }, [load]);
 
   const openNotification = (n: Row) => {
-    if (n.type === 'follow') {
+    if (n.type === 'enquiry_new' && n.enquiry_id) {
+      navigation.navigate('AdminEnquiry', { enquiryId: n.enquiry_id });
+    } else if (n.type === 'enquiry_status') {
+      navigation.navigate('MyEnquiries');
+    } else if (n.type === 'follow') {
       navigation.navigate('UserProfile', { userId: n.actor_id });
     } else if (n.type === 'ping' && n.check_in) {
       if (n.check_in.place_type === 'offer') navigation.navigate('OfferDetail', { offerId: n.check_in.place_id });
@@ -127,7 +146,11 @@ export default function NotificationsScreen() {
             <View style={styles.iconChip}>
               <Feather name={ICON_BY_TYPE[item.type]} size={15} color={colors.coral} />
             </View>
-            {item.actor?.avatar_url ? (
+            {item.type === 'enquiry_status' ? (
+              <View style={[styles.avatar, styles.brandAvatar]}>
+                <Text style={styles.brandMark}>h</Text>
+              </View>
+            ) : item.actor?.avatar_url ? (
               <Image source={{ uri: item.actor.avatar_url }} style={styles.avatar} transition={200} />
             ) : (
               <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
@@ -163,5 +186,7 @@ function createStyles(colors: ColorTokens) {
   message: { fontSize: 13, color: colors.ink, lineHeight: 18 },
   time: { fontSize: 11, color: colors.inkSoft, marginTop: 2 },
   postThumb: { width: 40, height: 40, borderRadius: 8 },
+  brandAvatar: { backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center' },
+  brandMark: { fontFamily: 'Fraunces_700Bold_Italic', fontSize: 20, color: 'white', marginTop: -2 },
   });
 }

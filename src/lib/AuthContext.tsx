@@ -18,7 +18,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const loadProfile = useCallback(async (userId: string) => {
-    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+    // No error but no row means the account itself is gone (deleted, maybe
+    // from another device) while this device still holds its session —
+    // without signing out, RootNavigator waits on a profile forever. A
+    // network error is left alone so a flaky connection never logs anyone out.
+    if (!error && !data) {
+      await supabase.auth.signOut();
+      return;
+    }
     setProfile((data as Profile) ?? null);
   }, []);
 

@@ -46,13 +46,15 @@ export interface HavenlyEvent {
   latitude: number | null; longitude: number | null;
 }
 
-export type NotificationType = 'follow' | 'like' | 'comment' | 'ping';
+export type NotificationType = 'follow' | 'like' | 'comment' | 'ping' | 'enquiry_new' | 'enquiry_status';
 
 export interface Notification {
   id: string; recipient_id: string; actor_id: string; actor?: Profile; type: NotificationType;
   post_id: string | null; post?: Pick<Post, 'id' | 'title' | 'image_url'> | null;
   comment_id: string | null;
   check_in_id: string | null; check_in?: Pick<CheckIn, 'id' | 'place_type' | 'place_id'> | null;
+  enquiry_id: string | null; enquiry_status: EnquiryStatus | null;
+  enquiry?: { id: string; kind: EnquiryKind; residence: { id: string; name: string } | null } | null;
   is_read: boolean; created_at: string;
 }
 
