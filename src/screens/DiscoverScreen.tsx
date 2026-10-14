@@ -222,7 +222,22 @@ export default function DiscoverScreen() {
       </View>
 
       {!isSearching && (
-        <Pressable style={styles.perksPromo} onPress={() => navigation.navigate('Offers')} accessibilityLabel="View perks">
+        <Pressable
+          style={styles.perksPromo}
+          onPress={() => navigation.navigate('MainTabs', { screen: 'Housing' })}
+          accessibilityLabel="Find housing"
+        >
+          <View style={[styles.perksPromoIcon, { backgroundColor: `${colors.gold}26` }]}><Feather name="home" size={18} color={colors.gold} /></View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.perksPromoTitle}>Housing</Text>
+            <Text style={styles.perksPromoSub}>Student rooms near campus, checked by the Havenly team</Text>
+          </View>
+          <Feather name="chevron-right" size={16} color={colors.inkSoft} />
+        </Pressable>
+      )}
+
+      {!isSearching && (
+        <Pressable style={[styles.perksPromo, { marginTop: 10 }]} onPress={() => navigation.navigate('Offers')} accessibilityLabel="View perks">
           <View style={styles.perksPromoIcon}><Feather name="gift" size={18} color={colors.coral} /></View>
           <View style={{ flex: 1 }}>
             <Text style={styles.perksPromoTitle}>Perks</Text>
@@ -237,7 +252,7 @@ export default function DiscoverScreen() {
           <View style={[styles.perksPromoIcon, { backgroundColor: colors.tealSoft }]}><Feather name="map-pin" size={18} color={colors.teal} /></View>
           <View style={{ flex: 1 }}>
             <Text style={styles.perksPromoTitle}>Map</Text>
-            <Text style={styles.perksPromoSub}>See offers, events, and who's checked in nearby</Text>
+            <Text style={styles.perksPromoSub}>See offers, events, housing, and who's checked in nearby</Text>
           </View>
           <Feather name="chevron-right" size={16} color={colors.inkSoft} />
         </Pressable>

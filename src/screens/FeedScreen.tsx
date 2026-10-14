@@ -14,6 +14,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { useUnreadNotifications } from '@/lib/useUnreadNotifications';
 import { haptics } from '@/lib/haptics';
 import { calmDuration, calmEasing } from '@/lib/animations';
+import { annualPrice, cheapestRoom, formatAed } from '@/lib/housing';
 import { radius, spacing, gradients } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
@@ -22,7 +23,7 @@ import { formatCount } from '@/utils/formatCount';
 import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
 import VideoThumb from '@/components/VideoThumb';
-import type { Community, Post } from '@/types';
+import type { Community, Post, Residence } from '@/types';
 import type { RootStackParamList, MainTabParamList } from '@/navigation/RootNavigator';
 
 // FeedScreen is actually a Tab.Screen nested inside the root stack, so its
@@ -183,6 +184,27 @@ export default function FeedScreen() {
     setTrendingPosts((trendingResult?.data as unknown as Post[]) ?? []);
     setCommunityPosts((communityResult?.data as unknown as Post[]) ?? []);
   }, [profile, topInterestLabel]);
+
+  // Housing is where Havenly earns, but students only find it if they
+  // wander into the tab — so the feed points to it once there's actually
+  // something listed (never an empty promise).
+  const [residences, setResidences] = useState<Residence[]>([]);
+  useFocusEffect(useCallback(() => {
+    supabase.from('residences').select('*, room_types(*)').eq('is_active', true)
+      .then(({ data }) => setResidences((data as Residence[]) ?? []));
+  }, []));
+  const housingTeaser = useMemo(() => {
+    if (!residences.length) return null;
+    const uni = profile?.university ?? null;
+    const near = uni ? residences.filter((r) => r.nearby_universities.includes(uni)) : [];
+    const pool = near.length ? near : residences;
+    const yearly = pool.map(cheapestRoom).filter((r): r is NonNullable<typeof r> => !!r).map(annualPrice);
+    return {
+      title: near.length ? `${near.length} ${near.length === 1 ? 'place' : 'places'} to live near your uni` : 'Find a place to live near campus',
+      priceLine: yearly.length ? `Rooms from ${formatAed(Math.min(...yearly))} a year` : 'Rooms listed by the Havenly team',
+      photo: pool.find((r) => r.photo_urls[0])?.photo_urls[0] ?? null,
+    };
+  }, [residences, profile?.university]);
 
   const fetchMyCommunities = useCallback(async (): Promise<Community[]> => {
     const userId = session?.user.id;
@@ -543,6 +565,28 @@ export default function FeedScreen() {
               </Pressable>
             )}
             {posts.length > 0 && renderSection('Picked for you', pickedColumns, 'picked')}
+            {housingTeaser && (
+              <AnimatedPressable
+                style={styles.housingCard}
+                scaleTo={0.98}
+                onPress={() => navigation.navigate('Housing')}
+                accessibilityLabel="Find housing"
+              >
+                {housingTeaser.photo ? (
+                  <Image source={{ uri: housingTeaser.photo }} style={styles.housingPhoto} contentFit="cover" transition={200} />
+                ) : (
+                  <View style={[styles.housingPhoto, styles.housingPhotoEmpty]}>
+                    <Feather name="home" size={22} color={colors.gold} />
+                  </View>
+                )}
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.housingEyebrow}>Housing</Text>
+                  <Text style={styles.housingTitle} numberOfLines={2}>{housingTeaser.title}</Text>
+                  <Text style={styles.housingSub} numberOfLines={1}>{housingTeaser.priceLine}</Text>
+                </View>
+                <Feather name="chevron-right" size={18} color={colors.inkSoft} />
+              </AnimatedPressable>
+            )}
             {topInterestLabel && trendingPosts.length > 0 && renderSection(`Trending in ${topInterestLabel}`, trendingColumns, 'trending')}
             {communityPosts.length > 0 && renderSection('New in your communities', communityColumns, 'community')}
           </>
@@ -595,6 +639,16 @@ function createStyles(colors: ColorTokens) {
     fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
     fontWeight: '600', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
   },
+  housingCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: spacing.lg, marginTop: spacing.sm,
+    marginBottom: spacing.md, padding: 12, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,
+    borderRadius: radius.md,
+  },
+  housingPhoto: { width: 64, height: 64, borderRadius: 12 },
+  housingPhotoEmpty: { backgroundColor: `${colors.gold}26`, alignItems: 'center', justifyContent: 'center' },
+  housingEyebrow: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 10, textTransform: 'uppercase', color: colors.teal, fontWeight: '700' },
+  housingTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 15.5, color: colors.ink, marginTop: 2, lineHeight: 20 },
+  housingSub: { fontSize: 12, color: colors.inkSoft, marginTop: 3 },
   dailyPickCard: {
     marginHorizontal: spacing.lg, marginTop: spacing.sm, marginBottom: spacing.md,
     height: 190, borderRadius: radius.lg, overflow: 'hidden', justifyContent: 'flex-end',

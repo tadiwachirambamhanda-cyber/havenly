@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme, type NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { ColorTokens } from '@/theme/tokens';
@@ -49,7 +49,7 @@ export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
   Onboarding: undefined;
-  MainTabs: undefined;
+  MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   PostDetail: { postId: string };
   UserProfile: { userId: string };
   Notifications: undefined;

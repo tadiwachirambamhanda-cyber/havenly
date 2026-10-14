@@ -11,14 +11,15 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { haptics } from '@/lib/haptics';
-import { gradients, spacing } from '@/theme/tokens';
+import { gradients, radius, spacing } from '@/theme/tokens';
+import { cheapestRoom, formatAed, PERIOD_LABEL } from '@/lib/housing';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
 import { formatCount } from '@/utils/formatCount';
 import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
 import VideoThumb from '@/components/VideoThumb';
-import type { Community, Post } from '@/types';
+import type { Community, Post, Residence } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Route = RouteProp<RootStackParamList, 'CommunityDetail'>;
@@ -35,6 +36,7 @@ export default function CommunityDetailScreen() {
   const [joined, setJoined] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [nearbyResidences, setNearbyResidences] = useState<Residence[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
@@ -43,6 +45,17 @@ export default function CommunityDetailScreen() {
     const { data } = await supabase.from('communities').select('*').eq('id', communityId).single();
     setCommunity(data as Community);
     setLoaded(true);
+
+    // A campus community is where students of one university already
+    // gather, so it's the natural place to show where they could live.
+    const uni = (data as Community | null)?.category === 'campus' ? (data as Community).related_university : null;
+    if (uni) {
+      const { data: residenceRows } = await supabase.from('residences').select('*, room_types(*)')
+        .eq('is_active', true).contains('nearby_universities', [uni]).order('created_at', { ascending: false });
+      setNearbyResidences((residenceRows as Residence[]) ?? []);
+    } else {
+      setNearbyResidences([]);
+    }
 
     const { data: postData } = await supabase.from('posts')
       .select('*, author:profiles!posts_author_id_fkey(*)')
@@ -166,6 +179,43 @@ export default function CommunityDetailScreen() {
         )}
       </View>
 
+      {nearbyResidences.length > 0 && (
+        <>
+          <View style={styles.feedHeader}>
+            <Text style={[styles.feedLabel, { flexShrink: 1, marginRight: 12 }]} numberOfLines={1}>Places to live nearby</Text>
+            <AnimatedPressable style={styles.newPostBtn} onPress={() => navigation.navigate('MainTabs', { screen: 'Housing' })}>
+              <Text style={styles.newPostBtnText}>See all</Text>
+            </AnimatedPressable>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.residenceRow}>
+            {nearbyResidences.map((r) => {
+              const room = cheapestRoom(r);
+              return (
+                <AnimatedPressable
+                  key={r.id}
+                  style={styles.residenceCard}
+                  onPress={() => navigation.navigate('ResidenceDetail', { residenceId: r.id })}
+                >
+                  <View style={styles.residencePhoto}>
+                    {r.photo_urls[0] ? (
+                      <Image source={{ uri: r.photo_urls[0] }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+                    ) : (
+                      <LinearGradient colors={['#0F8B82', '#E3A23A']} style={StyleSheet.absoluteFill} />
+                    )}
+                  </View>
+                  <View style={{ padding: 10 }}>
+                    <Text style={styles.residenceName} numberOfLines={1}>{r.name}</Text>
+                    <Text style={styles.residencePrice} numberOfLines={1}>
+                      {room ? `from ${formatAed(room.price_aed)} / ${PERIOD_LABEL[room.billing_period]}` : 'Currently full'}
+                    </Text>
+                  </View>
+                </AnimatedPressable>
+              );
+            })}
+          </ScrollView>
+        </>
+      )}
+
       <View style={styles.feedHeader}>
         <Text style={styles.feedLabel}>Posts</Text>
         {joined && (
@@ -243,6 +293,14 @@ function createStyles(colors: ColorTokens) {
     paddingVertical: 13, paddingHorizontal: 16, borderRadius: 100,
   },
   restrictedText: { flex: 1, color: colors.inkSoft, fontSize: 12.5, fontWeight: '600' },
+  residenceRow: { gap: 10, paddingHorizontal: spacing.lg, paddingBottom: spacing.sm },
+  residenceCard: {
+    width: 180, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,
+    borderRadius: radius.md, overflow: 'hidden',
+  },
+  residencePhoto: { height: 100, backgroundColor: colors.sandDeep },
+  residenceName: { fontSize: 13, fontWeight: '700', color: colors.ink },
+  residencePrice: { fontSize: 11.5, color: colors.inkSoft, marginTop: 2 },
   feedHeader: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: spacing.lg, marginTop: 8, marginBottom: 10,
