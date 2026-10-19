@@ -78,7 +78,6 @@ function createStyles(colors: ColorTokens) {
       flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.white,
       borderRadius: 100, paddingVertical: 12, paddingHorizontal: 16, maxWidth: 420,
       borderWidth: 1, borderColor: colors.line,
-      shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 6,
     },
     pillError: { borderColor: colors.coralSoft },
     text: { fontSize: 13, fontWeight: '600', color: colors.ink, flexShrink: 1 },

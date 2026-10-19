@@ -275,19 +275,13 @@ export default function FeedScreen() {
     setSelectedInterest((prev) => (prev === label ? null : label));
   }, []);
 
-  // Selected gets the same coral-to-gold gradient treatment as the streak
-  // badge, instead of a plain solid fill — shadow lives on a separate outer
-  // View from the gradient's clip for the same reason as the streak badge:
-  // overflow: hidden (needed to clip the gradient to the pill) would
-  // otherwise clip the shadow itself into invisibility on iOS.
+  // Selected is a flat coral fill: no gradient or glow, so it reads as a
+  // state rather than decoration.
   const renderInterestChip = (key: string, label: string, isSelected: boolean, onPress: () => void) =>
     isSelected ? (
-      <View key={key} style={styles.interestChipShadow}>
-        <AnimatedPressable style={styles.interestChipSelected} onPress={onPress}>
-          <LinearGradient colors={['#FF7A45', '#E3A23A']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
-          <Text style={styles.interestChipTextSelected}>{label}</Text>
-        </AnimatedPressable>
-      </View>
+      <AnimatedPressable key={key} style={styles.interestChipSelected} onPress={onPress}>
+        <Text style={styles.interestChipTextSelected}>{label}</Text>
+      </AnimatedPressable>
     ) : (
       <AnimatedPressable key={key} style={styles.interestChip} onPress={onPress}>
         <Text style={styles.interestChipText}>{label}</Text>
@@ -461,21 +455,13 @@ export default function FeedScreen() {
         </Pressable>
         <View style={styles.topBarActions}>
           {!!profile?.current_streak && (
-            <View style={styles.streakBadgeShadow}>
               <AnimatedPressable
                 style={styles.streakBadge}
                 onPress={() => { haptics.tap(); navigation.navigate('Offers'); }}
                 accessibilityLabel={`${profile.current_streak} day streak — view perks`}
               >
-                <LinearGradient
-                  colors={['#FF7A45', '#E3A23A']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={StyleSheet.absoluteFill}
-                />
                 <Text style={styles.streakBadgeText}>🔥 {profile.current_streak}</Text>
               </AnimatedPressable>
-            </View>
           )}
           <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Notifications')} accessibilityLabel="Notifications">
             <Icon name="bell" size={17} color={colors.ink} />
@@ -606,27 +592,19 @@ function createStyles(colors: ColorTokens) {
   topBarActions: { flexDirection: 'row', gap: spacing.sm },
   iconBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
   iconBtnDot: { position: 'absolute', top: 6, right: 7, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral, borderWidth: 1.5, borderColor: colors.white },
-  // Shadow and the gradient's clip live on separate layers — overflow:
-  // hidden (needed to clip the gradient to the pill) would otherwise clip
-  // the shadow itself into invisibility on iOS.
-  streakBadgeShadow: {
-    borderRadius: 18, shadowColor: '#FF5A3C', shadowOpacity: 0.35, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 3,
-  },
-  streakBadge: { height: 36, paddingHorizontal: 13, borderRadius: 18, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  streakBadgeText: { fontSize: 13.5, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.1 },
+  streakBadge: { height: 36, paddingHorizontal: 13, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.coral },
+  streakBadgeText: { fontSize: 13.5, fontWeight: '800', color: 'white', letterSpacing: 0.1 },
   interestRow: { flexDirection: 'row', gap: 8, paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
   interestChip: {
     backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line,
     borderRadius: radius.pill, paddingVertical: 7, paddingHorizontal: 14,
   },
-  interestChipShadow: {
-    borderRadius: radius.pill, shadowColor: '#FF5A3C', shadowOpacity: 0.3, shadowRadius: 5, shadowOffset: { width: 0, height: 2 }, elevation: 3,
-  },
   interestChipSelected: {
-    borderRadius: radius.pill, paddingVertical: 7, paddingHorizontal: 14, overflow: 'hidden', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: colors.coral, borderWidth: 1.5, borderColor: colors.coral,
+    borderRadius: radius.pill, paddingVertical: 7, paddingHorizontal: 14, alignItems: 'center', justifyContent: 'center',
   },
   interestChipText: { fontSize: 11.5, fontWeight: '700', color: colors.ink },
-  interestChipTextSelected: { fontSize: 11.5, fontWeight: '800', color: '#FFFFFF' },
+  interestChipTextSelected: { fontSize: 11.5, fontWeight: '800', color: 'white' },
   myCommunitiesRow: { flexDirection: 'row', gap: 8, paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
   myCommunityChip: {
     flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.white, borderWidth: 1,

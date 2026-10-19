@@ -233,7 +233,7 @@ function createStyles(colors: ColorTokens) {
     photoWrap: { height: 180, backgroundColor: colors.sandDeep },
     saveBtn: {
       position: 'absolute', top: 12, right: 12, width: 34, height: 34, borderRadius: 17,
-      backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center',
+      backgroundColor: 'rgba(251,245,234,0.92)', alignItems: 'center', justifyContent: 'center',
     },
     nearBadge: {
       position: 'absolute', left: 12, bottom: 12, flexDirection: 'row', alignItems: 'center', gap: 4,

@@ -1,7 +1,7 @@
 export const lightColors = {
   sand: '#FBF5EA', sandDeep: '#F2E8D8', ink: '#20261F', inkSoft: '#5B6459',
   coral: '#FF5A3C', coralSoft: '#FFE4DB', teal: '#0F8B82', tealSoft: '#DCF2EF',
-  gold: '#E3A23A', white: '#FFFFFF', line: '#E7DDC9',
+  gold: '#E3A23A', white: '#FFFCF6', line: '#E7DDC9',
 };
 
 // Same keys as lightColors, values flipped — every screen keeps referencing
@@ -38,7 +38,11 @@ export const tones = {
 } as const satisfies Record<string, readonly [string, string]>;
 
 // Stand-in backgrounds for posts and spots without a photo, picked by id.
+// All one family (coral, light to deep) so a grid of text-only posts reads
+// as varied shades of the brand rather than a rainbow of unrelated hues.
 export const gradients: [string, string][] = [
-  [...tones.coral], [...tones.teal], [...tones.gold], [...tones.olive],
-  ['#FFB8A3', '#FF8466'], ['#8FD3C9', '#2BA597'],
+  [...tones.coral],
+  ['#F7A991', '#E2674A'],
+  ['#E57A62', '#B8432C'],
+  ['#FFB8A3', '#FF8466'],
 ];

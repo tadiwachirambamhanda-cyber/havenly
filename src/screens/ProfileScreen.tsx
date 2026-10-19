@@ -280,7 +280,7 @@ function createStyles(colors: ColorTokens) {
   cover: { height: 110 },
   settingsBtn: {
     position: 'absolute', right: 16, width: 34, height: 34, borderRadius: 17,
-    backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(251,245,234,0.92)', alignItems: 'center', justifyContent: 'center',
   },
   avatarRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', paddingHorizontal: spacing.lg, marginTop: -38 },
   avatar: { width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand },

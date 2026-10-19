@@ -661,11 +661,11 @@ function createStyles(colors: ColorTokens) {
   },
   back: {
     position: 'absolute', top: 16, left: 16, width: 34, height: 34, borderRadius: 17,
-    backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(251,245,234,0.92)', alignItems: 'center', justifyContent: 'center',
   },
   overflow: {
     position: 'absolute', top: 16, right: 16, width: 34, height: 34, borderRadius: 17,
-    backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(251,245,234,0.92)', alignItems: 'center', justifyContent: 'center',
   },
   notFound: { flex: 1, backgroundColor: colors.sand, paddingTop: 60, paddingHorizontal: spacing.lg },
   notFoundText: { color: colors.inkSoft, textAlign: 'center', marginTop: 100 },

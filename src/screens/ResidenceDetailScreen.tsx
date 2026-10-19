@@ -292,11 +292,11 @@ function createStyles(colors: ColorTokens) {
     notFoundText: { color: colors.inkSoft, textAlign: 'center', marginTop: 160 },
     back: {
       position: 'absolute', left: 16, zIndex: 2, width: 34, height: 34, borderRadius: 17,
-      backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center',
+      backgroundColor: 'rgba(251,245,234,0.92)', alignItems: 'center', justifyContent: 'center',
     },
     saveBtn: {
       position: 'absolute', right: 16, zIndex: 2, width: 34, height: 34, borderRadius: 17,
-      backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center',
+      backgroundColor: 'rgba(251,245,234,0.92)', alignItems: 'center', justifyContent: 'center',
     },
     hero: { height: HERO_HEIGHT, overflow: 'hidden', backgroundColor: colors.sandDeep },
     compactHeader: {

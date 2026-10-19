@@ -105,7 +105,9 @@ function createStyles(colors: ColorTokens) {
   pill: {
     flex: 1, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.ink,
     borderRadius: 100, padding: 6,
-    shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 10,
+    // One soft shadow, only here: the bar floats over scrolling content and
+    // needs to separate from it. Nothing else in the app casts one.
+    shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6,
   },
   // Slides between tabs instead of each item flipping its own background on
   // and off — the continuous motion is what reads as premium rather than a
@@ -127,7 +129,6 @@ function createStyles(colors: ColorTokens) {
   fab: {
     width: 46, height: 46, borderRadius: 23, backgroundColor: colors.coral, flexShrink: 0,
     alignItems: 'center', justifyContent: 'center',
-    shadowColor: colors.coral, shadowOpacity: 0.5, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 8,
   },
   });
 }
