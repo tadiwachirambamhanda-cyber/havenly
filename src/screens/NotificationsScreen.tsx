@@ -6,8 +6,8 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import InitialsAvatar from '@/components/InitialsAvatar';
+import Icon, { type IconName } from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -26,11 +26,11 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 // events and there's no single join that covers both.
 type Row = Notification & { place_title?: string };
 
-const ICON_BY_TYPE: Record<Notification['type'], keyof typeof Feather.glyphMap> = {
+const ICON_BY_TYPE: Record<Notification['type'], IconName> = {
   follow: 'user-plus',
   like: 'heart',
   comment: 'message-circle',
-  ping: 'navigation',
+  ping: 'hand-waving',
   enquiry_new: 'key',
   enquiry_status: 'key',
 };
@@ -126,7 +126,7 @@ export default function NotificationsScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.title}>Notifications</Text>
       </View>
@@ -144,7 +144,7 @@ export default function NotificationsScreen() {
             onPress={() => openNotification(item)}
           >
             <View style={styles.iconChip}>
-              <Feather name={ICON_BY_TYPE[item.type]} size={15} color={colors.coral} />
+              <Icon name={ICON_BY_TYPE[item.type]} size={15} color={colors.coral} />
             </View>
             {item.type === 'enquiry_status' ? (
               <View style={[styles.avatar, styles.brandAvatar]}>
@@ -153,7 +153,7 @@ export default function NotificationsScreen() {
             ) : item.actor?.avatar_url ? (
               <Image source={{ uri: item.actor.avatar_url }} style={styles.avatar} transition={200} />
             ) : (
-              <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+              <InitialsAvatar name={item.actor?.display_name} style={styles.avatar} />
             )}
             <View style={{ flex: 1 }}>
               <Text style={styles.message}>{messageFor(item)}</Text>

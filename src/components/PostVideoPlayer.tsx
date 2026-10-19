@@ -2,7 +2,7 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
-import { Feather } from '@expo/vector-icons';
+import Icon from '@/components/Icon';
 
 export interface PostVideoPlayerHandle {
   toggleMute: () => void;
@@ -55,7 +55,7 @@ const PostVideoPlayer = forwardRef<PostVideoPlayerHandle, {
       <VideoView player={player} style={StyleSheet.absoluteFill} contentFit="cover" nativeControls={false} />
       {!isPlaying && (
         <View style={[StyleSheet.absoluteFill, styles.playOverlay]} pointerEvents="none">
-          <View style={styles.playCircle}><Feather name="play" size={24} color="white" /></View>
+          <View style={styles.playCircle}><Icon name="play" size={24} color="white" /></View>
         </View>
       )}
       <View style={styles.progressTrack}>

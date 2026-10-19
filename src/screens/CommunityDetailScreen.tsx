@@ -6,7 +6,8 @@ import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navig
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import PhotoPlaceholder from '@/components/PhotoPlaceholder';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -103,7 +104,7 @@ export default function CommunityDetailScreen() {
       return (
         <View style={styles.container}>
           <BackButton style={styles.back}>
-            <Feather name="arrow-left" size={17} color={colors.ink} />
+            <Icon name="arrow-left" size={17} color={colors.ink} />
           </BackButton>
           <View style={styles.body}>
             <Skeleton style={{ width: 68, height: 68, borderRadius: 34 }} />
@@ -128,7 +129,7 @@ export default function CommunityDetailScreen() {
     return (
       <View style={styles.notFound}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.notFoundText}>This community isn't available.</Text>
       </View>
@@ -149,11 +150,11 @@ export default function CommunityDetailScreen() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
     >
       <BackButton style={styles.back}>
-        <Feather name="arrow-left" size={17} color={colors.ink} />
+        <Icon name="arrow-left" size={17} color={colors.ink} />
       </BackButton>
       <View style={styles.body}>
         <View style={styles.iconChip}>
-          <Feather name={communityIcon(community)} size={28} color={colors.teal} />
+          <Icon name={communityIcon(community)} size={28} color={colors.teal} />
         </View>
         <Text style={styles.name}>{community.name}</Text>
         <Text style={styles.members}>{formatCount(community.member_count)} members</Text>
@@ -168,12 +169,12 @@ export default function CommunityDetailScreen() {
           </AnimatedPressable>
         ) : profile?.university ? (
           <View style={styles.restrictedBox}>
-            <Feather name="lock" size={13} color={colors.inkSoft} />
+            <Icon name="lock" size={13} color={colors.inkSoft} />
             <Text style={styles.restrictedText}>This community is for {community.related_university} students.</Text>
           </View>
         ) : (
           <AnimatedPressable style={styles.restrictedBox} onPress={() => navigation.navigate('EditProfile')}>
-            <Feather name="lock" size={13} color={colors.inkSoft} />
+            <Icon name="lock" size={13} color={colors.inkSoft} />
             <Text style={styles.restrictedText}>Set your university in Edit Profile to join this community.</Text>
           </AnimatedPressable>
         )}
@@ -200,7 +201,7 @@ export default function CommunityDetailScreen() {
                     {r.photo_urls[0] ? (
                       <Image source={{ uri: r.photo_urls[0] }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
                     ) : (
-                      <LinearGradient colors={['#0F8B82', '#E3A23A']} style={StyleSheet.absoluteFill} />
+                      <PhotoPlaceholder icon="home" style={StyleSheet.absoluteFill} />
                     )}
                   </View>
                   <View style={{ padding: 10 }}>
@@ -220,7 +221,7 @@ export default function CommunityDetailScreen() {
         <Text style={styles.feedLabel}>Posts</Text>
         {joined && (
           <AnimatedPressable style={styles.newPostBtn} onPress={() => navigation.navigate('CreatePost', { communityId })}>
-            <Feather name="plus" size={13} color={colors.coral} />
+            <Icon name="plus" size={13} color={colors.coral} />
             <Text style={styles.newPostBtnText}>New post</Text>
           </AnimatedPressable>
         )}
@@ -256,7 +257,7 @@ export default function CommunityDetailScreen() {
                     </Text>
                   </AnimatedPressable>
                   <View style={styles.postLikes}>
-                    <Feather name="heart" size={10} color={colors.inkSoft} />
+                    <Icon name="heart" size={10} color={colors.inkSoft} />
                     <Text style={styles.postLikesText}>{formatCount(post.like_count)}</Text>
                   </View>
                 </View>

@@ -1,4 +1,4 @@
-import type { Feather } from '@expo/vector-icons';
+import type { IconName } from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import type { BillingPeriod, EnquiryStatus, GenderPolicy, Residence, RoomType } from '@/types';
 
@@ -30,22 +30,22 @@ export const ADMIN_STATUS_LABEL: Record<EnquiryStatus, string> = {
 
 export const ENQUIRY_STATUSES: EnquiryStatus[] = ['new', 'contacted', 'viewing_booked', 'signed', 'lost'];
 
-export const AMENITIES: { key: string; icon: keyof typeof Feather.glyphMap }[] = [
-  { key: 'Furnished', icon: 'home' },
+export const AMENITIES: { key: string; icon: IconName }[] = [
+  { key: 'Furnished', icon: 'couch' },
   { key: 'Bills included', icon: 'zap' },
   { key: 'Wi-Fi', icon: 'wifi' },
-  { key: 'Campus shuttle', icon: 'truck' },
-  { key: 'Gym', icon: 'activity' },
-  { key: 'Pool', icon: 'droplet' },
+  { key: 'Campus shuttle', icon: 'bus' },
+  { key: 'Gym', icon: 'barbell' },
+  { key: 'Pool', icon: 'swimming-pool' },
   { key: 'Study rooms', icon: 'book-open' },
-  { key: 'Laundry', icon: 'refresh-cw' },
-  { key: 'Cleaning', icon: 'star' },
-  { key: '24/7 security', icon: 'shield' },
-  { key: 'Shared kitchen', icon: 'coffee' },
-  { key: 'Parking', icon: 'navigation' },
+  { key: 'Laundry', icon: 'washing-machine' },
+  { key: 'Cleaning', icon: 'broom' },
+  { key: '24/7 security', icon: 'shield-check' },
+  { key: 'Shared kitchen', icon: 'cooking-pot' },
+  { key: 'Parking', icon: 'car' },
 ];
 
-export function amenityIcon(key: string): keyof typeof Feather.glyphMap {
+export function amenityIcon(key: string): IconName {
   return AMENITIES.find((a) => a.key === key)?.icon ?? 'check';
 }
 

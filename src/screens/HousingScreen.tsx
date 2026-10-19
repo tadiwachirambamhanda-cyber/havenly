@@ -4,8 +4,8 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import PhotoPlaceholder from '@/components/PhotoPlaceholder';
+import Icon, { type IconName } from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -106,9 +106,9 @@ export default function HousingScreen() {
 
   const filtersActive = savedOnly || nearMyUni || budget !== 'any';
 
-  const chip = (key: string, label: string, selected: boolean, onPress: () => void, icon?: keyof typeof Feather.glyphMap) => (
+  const chip = (key: string, label: string, selected: boolean, onPress: () => void, icon?: IconName) => (
     <AnimatedPressable key={key} style={[styles.chip, selected && styles.chipSelected]} onPress={() => { haptics.tap(); onPress(); }}>
-      {icon && <Feather name={icon} size={12} color={selected ? colors.sand : colors.ink} />}
+      {icon && <Icon name={icon} size={12} color={selected ? colors.sand : colors.ink} />}
       <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
     </AnimatedPressable>
   );
@@ -121,7 +121,7 @@ export default function HousingScreen() {
           <Text style={styles.subtitle}>Student rooms, checked by the Havenly team</Text>
         </View>
         <AnimatedPressable style={styles.iconBtn} onPress={() => navigation.navigate('MyEnquiries')} accessibilityLabel="My enquiries">
-          <Feather name="clipboard" size={16} color={colors.ink} />
+          <Icon name="clipboard" size={16} color={colors.ink} />
         </AnimatedPressable>
       </View>
 
@@ -167,14 +167,14 @@ export default function HousingScreen() {
                     {item.photo_urls[0] ? (
                       <Image source={{ uri: item.photo_urls[0] }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
                     ) : (
-                      <LinearGradient colors={['#0F8B82', '#E3A23A']} style={StyleSheet.absoluteFill} />
+                      <PhotoPlaceholder icon="home" style={StyleSheet.absoluteFill} />
                     )}
                     <AnimatedPressable style={styles.saveBtn} scaleTo={0.85} onPress={() => toggleSaved(item)} accessibilityLabel={isSaved ? 'Remove from saved' : 'Save residence'}>
                       <BurstHeart active={isSaved} size={16} color="#20261F" activeColor="#FF5A3C" />
                     </AnimatedPressable>
                     {nearMine && (
                       <View style={styles.nearBadge}>
-                        <Feather name="map-pin" size={10} color="white" />
+                        <Icon name="map-pin" size={10} color="white" />
                         <Text style={styles.nearBadgeText}>Near your uni</Text>
                       </View>
                     )}

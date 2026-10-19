@@ -6,7 +6,8 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import InitialsAvatar from '@/components/InitialsAvatar';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -133,7 +134,7 @@ export default function EventDetailScreen() {
     return (
       <View style={styles.container}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Skeleton style={{ height: 200, borderRadius: 0 }} />
         <View style={styles.body}>
@@ -150,7 +151,7 @@ export default function EventDetailScreen() {
     return (
       <View style={styles.notFound}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.notFoundText}>This event isn’t available.</Text>
       </View>
@@ -165,11 +166,11 @@ export default function EventDetailScreen() {
   return (
     <Animated.ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }} onScroll={onScroll} scrollEventThrottle={16}>
       <BackButton style={styles.back}>
-        <Feather name="arrow-left" size={17} color={colors.ink} />
+        <Icon name="arrow-left" size={17} color={colors.ink} />
       </BackButton>
       {profile?.is_admin && (
         <Pressable style={styles.overflow} onPress={() => setDeleteConfirmVisible(true)} accessibilityLabel="More options">
-          <Feather name="more-horizontal" size={17} color={colors.ink} />
+          <Icon name="more-horizontal" size={17} color={colors.ink} />
         </Pressable>
       )}
       <View style={styles.hero}>
@@ -183,11 +184,11 @@ export default function EventDetailScreen() {
         <Text style={styles.title}>{event.title}</Text>
 
         <View style={styles.metaRow}>
-          <Feather name="calendar" size={13} color={colors.teal} />
+          <Icon name="calendar" size={13} color={colors.teal} />
           <Text style={styles.metaText}>{dateLabel} · {timeLabel}</Text>
         </View>
         <View style={styles.metaRow}>
-          <Feather name="map-pin" size={13} color={colors.teal} />
+          <Icon name="map-pin" size={13} color={colors.teal} />
           <Text style={styles.metaText}>{event.location}</Text>
         </View>
 
@@ -204,7 +205,7 @@ export default function EventDetailScreen() {
               <ActivityIndicator size="small" color={myInterest ? colors.gold : colors.ink} />
             ) : (
               <>
-                <Feather name="thumbs-up" size={14} color={myInterest ? colors.gold : colors.ink} />
+                <Icon name="thumbs-up" size={14} color={myInterest ? colors.gold : colors.ink} weight={myInterest ? 'fill' : undefined} />
                 <Text style={[styles.goingBtnText, myInterest && styles.goingBtnTextActive]}>
                   {myInterest ? "You're down to go" : "I'm down to go"}
                 </Text>
@@ -217,7 +218,7 @@ export default function EventDetailScreen() {
                 i.user.avatar_url ? (
                   <Image key={i.id} source={{ uri: i.user.avatar_url }} style={styles.goingAvatar} transition={200} />
                 ) : (
-                  <LinearGradient key={i.id} colors={['#E3A23A', '#FF5A3C']} style={styles.goingAvatar} />
+                  <InitialsAvatar key={i.id} name={i.user.display_name} style={styles.goingAvatar} />
                 )
               ))}
               <Text style={styles.goingListText}>
@@ -238,7 +239,7 @@ export default function EventDetailScreen() {
                   <ActivityIndicator size="small" color={myCheckIn ? colors.coral : 'white'} />
                 ) : (
                   <>
-                    <Feather name="map-pin" size={14} color={myCheckIn ? colors.coral : 'white'} />
+                    <Icon name="map-pin" size={14} color={myCheckIn ? colors.coral : 'white'} />
                     <Text style={[styles.checkInBtnText, myCheckIn && styles.checkInBtnTextActive]}>
                       {myCheckIn ? 'You’re checked in' : 'Check in here'}
                     </Text>
@@ -254,7 +255,7 @@ export default function EventDetailScreen() {
                       {c.user.avatar_url ? (
                         <Image source={{ uri: c.user.avatar_url }} style={styles.checkInAvatar} transition={200} />
                       ) : (
-                        <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.checkInAvatar} />
+                        <InitialsAvatar name={c.user.display_name} style={styles.checkInAvatar} />
                       )}
                       <Text style={styles.checkInName}>{c.user.display_name}{c.user_id === profile?.id ? ' (you)' : ''}</Text>
                       {c.user_id !== profile?.id && (

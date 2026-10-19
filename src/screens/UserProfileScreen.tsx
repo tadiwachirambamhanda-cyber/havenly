@@ -8,7 +8,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import InitialsAvatar from '@/components/InitialsAvatar';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -17,7 +18,7 @@ import { haptics } from '@/lib/haptics';
 import { formatCount } from '@/utils/formatCount';
 import { findOrCreateConversation } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
-import { radius, spacing, gradients } from '@/theme/tokens';
+import { radius, spacing, gradients, tones } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
 import { interestIcon } from '@/constants/topicIcons';
@@ -166,7 +167,7 @@ export default function UserProfileScreen() {
     return (
       <View style={styles.notFound}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.notFoundText}>This account isn’t available.</Text>
       </View>
@@ -178,7 +179,7 @@ export default function UserProfileScreen() {
       <View style={styles.container}>
         <Skeleton style={{ height: 110, borderRadius: 0 }} />
         <BackButton style={[styles.back, styles.backOverlay, { top: insets.top + 12 }]}>
-          <Feather name="arrow-left" size={17} color="#20261F" />
+          <Icon name="arrow-left" size={17} color="#20261F" />
         </BackButton>
         <View style={[styles.avatarRow, { marginTop: avatarMarginTop }]}>
           <Skeleton style={{ width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand }} />
@@ -234,10 +235,10 @@ export default function UserProfileScreen() {
             {profile.cover_url ? (
               <Image source={{ uri: profile.cover_url }} style={styles.cover} contentFit="cover" transition={200} />
             ) : (
-              <LinearGradient colors={['#FF7A5C', '#E3A23A', '#0F8B82']} locations={[0, 0.6, 1]} style={styles.cover} />
+              <LinearGradient colors={[...tones.coral]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cover} />
             )}
             <BackButton style={[styles.back, styles.backOverlay, { top: insets.top + 12 }]}>
-              <Feather name="arrow-left" size={17} color="#20261F" />
+              <Icon name="arrow-left" size={17} color="#20261F" />
             </BackButton>
             {!isMe && (
               <AnimatedPressable
@@ -245,19 +246,19 @@ export default function UserProfileScreen() {
                 onPress={() => setOptionsVisible(true)}
                 accessibilityLabel="More options"
               >
-                <Feather name="more-horizontal" size={17} color="#20261F" />
+                <Icon name="more-horizontal" size={17} color="#20261F" />
               </AnimatedPressable>
             )}
             <View style={[styles.avatarRow, { marginTop: avatarMarginTop }]}>
               {profile.avatar_url ? (
                 <Image source={{ uri: profile.avatar_url }} style={styles.avatar} transition={200} />
               ) : (
-                <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+                <InitialsAvatar name={profile.display_name} style={styles.avatar} />
               )}
               {!isMe && (
                 <View style={styles.actionRow}>
                   <AnimatedPressable style={styles.messageBtn} onPress={onMessage} disabled={messaging} accessibilityLabel="Message">
-                    <Feather name="message-circle" size={15} color={colors.ink} />
+                    <Icon name="message-circle" size={15} color={colors.ink} />
                   </AnimatedPressable>
                   <AnimatedPressable
                     style={[styles.followBtn, following && styles.followBtnActive]}
@@ -300,7 +301,7 @@ export default function UserProfileScreen() {
               <View style={styles.chipRow}>
                 {interestChips.map((chip) => (
                   <View key={chip.key} style={styles.chip}>
-                    <Feather name={interestIcon(chip.key)} size={11} color={colors.coral} />
+                    <Icon name={interestIcon(chip.key)} size={11} color={colors.coral} />
                     <Text style={styles.chipText}>{chip.label}</Text>
                   </View>
                 ))}

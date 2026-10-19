@@ -4,7 +4,7 @@ import AnimatedPressable from '@/components/AnimatedPressable';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Feather } from '@expo/vector-icons';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -140,7 +140,7 @@ export default function CommunitiesScreen() {
           <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(calmDuration).easing(calmEasing)}>
           <AnimatedPressable style={styles.card} onPress={() => navigation.navigate('CommunityDetail', { communityId: item.id })}>
             <View style={styles.iconChip}>
-              <Feather name={communityIcon(item)} size={16} color={colors.teal} />
+              <Icon name={communityIcon(item)} size={16} color={colors.teal} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.cardName}>{item.name}</Text>

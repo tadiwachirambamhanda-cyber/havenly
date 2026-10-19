@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
+import Icon from '@/components/Icon';
 import { useTheme } from '@/lib/ThemeContext';
 import { LEGAL_IS_DRAFT, LEGAL_LAST_UPDATED, PRIVACY_POLICY, TERMS_OF_USE } from '@/constants/legal';
 import BackButton from '@/components/BackButton';
@@ -23,7 +23,7 @@ export default function LegalScreen() {
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.title}>{doc.title}</Text>
       </View>
@@ -31,7 +31,7 @@ export default function LegalScreen() {
         <Text style={styles.updated}>Last updated {LEGAL_LAST_UPDATED}</Text>
         {LEGAL_IS_DRAFT && (
           <View style={styles.draftNote}>
-            <Feather name="info" size={13} color={colors.inkSoft} />
+            <Icon name="info" size={13} color={colors.inkSoft} />
             <Text style={styles.draftText}>Draft — being reviewed before Havenly launches.</Text>
           </View>
         )}

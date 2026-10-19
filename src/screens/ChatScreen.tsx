@@ -9,7 +9,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import InitialsAvatar from '@/components/InitialsAvatar';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -20,7 +21,7 @@ import { markConversationRead, uploadGroupIcon } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
 import ActionSheet from '@/components/ActionSheet';
-import { radius, spacing } from '@/theme/tokens';
+import { radius, spacing, gradients } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
 import { groupDisplayName } from '@/utils/groupDisplayName';
@@ -198,7 +199,7 @@ export default function ChatScreen() {
       <View style={styles.container}>
         <View style={styles.header}>
           <BackButton style={styles.back}>
-            <Feather name="arrow-left" size={16} color={colors.ink} />
+            <Icon name="arrow-left" size={16} color={colors.ink} />
           </BackButton>
           <AnimatedPressable
             style={styles.headerAuthorTap}
@@ -210,13 +211,13 @@ export default function ChatScreen() {
                 <Image source={{ uri: conversation.icon_url }} style={styles.headerAvatar} transition={200} />
               ) : (
                 <View style={[styles.headerAvatar, styles.groupAvatar]}>
-                  <Feather name="users" size={16} color={colors.teal} />
+                  <Icon name="users" size={16} color={colors.teal} />
                 </View>
               )
             ) : otherUser?.avatar_url ? (
               <Image source={{ uri: otherUser.avatar_url }} style={styles.headerAvatar} transition={200} />
             ) : (
-              <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.headerAvatar} />
+              <InitialsAvatar name={otherUser?.display_name} style={styles.headerAvatar} />
             )}
             <View>
               <Text style={styles.headerName}>{isGroup ? groupDisplayName(conversation!, members) : otherUser?.display_name ?? '…'}</Text>
@@ -226,7 +227,7 @@ export default function ChatScreen() {
           <View style={{ flex: 1 }} />
           {!isGroup && (
             <AnimatedPressable style={styles.overflow} onPress={openOptions} accessibilityLabel="More options">
-              <Feather name="more-horizontal" size={18} color={colors.ink} />
+              <Icon name="more-horizontal" size={18} color={colors.ink} />
             </AnimatedPressable>
           )}
         </View>
@@ -261,13 +262,13 @@ export default function ChatScreen() {
                       {item.shared_post.image_url ? (
                         <Image source={{ uri: item.shared_post.image_url }} style={styles.sharedPostThumb} contentFit="cover" transition={200} />
                       ) : (
-                        <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.sharedPostThumb} />
+                        <LinearGradient colors={gradients[item.shared_post.id.charCodeAt(0) % gradients.length]} style={styles.sharedPostThumb} />
                       )}
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.sharedPostTag, textStyle]}>{item.shared_post.tag}</Text>
                         <Text style={[styles.sharedPostTitle, textStyle]} numberOfLines={2}>{item.shared_post.title}</Text>
                       </View>
-                      <Feather name="chevron-right" size={14} color={mine ? 'rgba(255,255,255,0.8)' : colors.inkSoft} />
+                      <Icon name="chevron-right" size={14} color={mine ? 'rgba(255,255,255,0.8)' : colors.inkSoft} />
                     </AnimatedPressable>
                   ) : (
                     <Text style={textStyle}>{item.body}</Text>
@@ -307,7 +308,7 @@ export default function ChatScreen() {
                 onSubmitEditing={send}
               />
               <AnimatedPressable style={styles.sendBtn} onPress={send} accessibilityLabel="Send message">
-                <Feather name="send" size={15} color={colors.sand} />
+                <Icon name="send" size={15} color={colors.sand} />
               </AnimatedPressable>
             </View>
           </View>
@@ -338,11 +339,11 @@ export default function ChatScreen() {
                 <Image source={{ uri: conversation.icon_url }} style={styles.groupIconEditImg} transition={200} />
               ) : (
                 <View style={[styles.groupIconEditImg, styles.groupAvatar]}>
-                  <Feather name="users" size={22} color={colors.teal} />
+                  <Icon name="users" size={22} color={colors.teal} />
                 </View>
               )}
               <View style={styles.groupIconEditBadge}>
-                {savingIcon ? <Feather name="loader" size={11} color="white" /> : <Feather name="camera" size={11} color="white" />}
+                {savingIcon ? <Icon name="loader" size={11} color="white" /> : <Icon name="camera" size={11} color="white" />}
               </View>
             </AnimatedPressable>
             <View style={styles.groupNameRow}>
@@ -370,7 +371,7 @@ export default function ChatScreen() {
                   {item.avatar_url ? (
                     <Image source={{ uri: item.avatar_url }} style={styles.memberAvatar} transition={200} />
                   ) : (
-                    <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.memberAvatar} />
+                    <InitialsAvatar name={item.display_name} style={styles.memberAvatar} />
                   )}
                   <View>
                     <Text style={styles.memberName}>{item.display_name}</Text>

@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, ActivityIndicator, Linking } from 'react-native';
 import { useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
 import * as Clipboard from 'expo-clipboard';
-import { Feather } from '@expo/vector-icons';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
@@ -113,7 +113,7 @@ export default function AdminEnquiryScreen() {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <BackButton style={styles.back}><Feather name="arrow-left" size={17} color={colors.ink} /></BackButton>
+          <BackButton style={styles.back}><Icon name="arrow-left" size={17} color={colors.ink} /></BackButton>
           <Text style={styles.title}>Enquiry</Text>
         </View>
         <View style={{ padding: spacing.lg, gap: 10 }}>
@@ -128,7 +128,7 @@ export default function AdminEnquiryScreen() {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <BackButton style={styles.back}><Feather name="arrow-left" size={17} color={colors.ink} /></BackButton>
+          <BackButton style={styles.back}><Icon name="arrow-left" size={17} color={colors.ink} /></BackButton>
           <Text style={styles.title}>Enquiry</Text>
         </View>
         <Text style={styles.muted}>This enquiry no longer exists.</Text>
@@ -149,7 +149,7 @@ export default function AdminEnquiryScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }} keyboardShouldPersistTaps="handled">
       <View style={styles.header}>
-        <BackButton style={styles.back}><Feather name="arrow-left" size={17} color={colors.ink} /></BackButton>
+        <BackButton style={styles.back}><Icon name="arrow-left" size={17} color={colors.ink} /></BackButton>
         <Text style={styles.title}>Enquiry</Text>
         <Text style={styles.headerTime}>{timeAgo(enquiry.created_at)}</Text>
       </View>
@@ -172,11 +172,11 @@ export default function AdminEnquiryScreen() {
             <Text style={styles.phone}>{enquiry.contact_phone}</Text>
             <View style={styles.actionRow}>
               <AnimatedPressable style={styles.actionBtn} onPress={() => Linking.openURL(`https://wa.me/${phoneDigits}`)}>
-                <Feather name="message-circle" size={14} color={colors.ink} />
+                <Icon name="message-circle" size={14} color={colors.ink} />
                 <Text style={styles.actionText}>WhatsApp</Text>
               </AnimatedPressable>
               <AnimatedPressable style={styles.actionBtn} onPress={() => Linking.openURL(`tel:${enquiry.contact_phone?.replace(/\s/g, '')}`)}>
-                <Feather name="phone" size={14} color={colors.ink} />
+                <Icon name="phone" size={14} color={colors.ink} />
                 <Text style={styles.actionText}>Call</Text>
               </AnimatedPressable>
             </View>
@@ -194,7 +194,7 @@ export default function AdminEnquiryScreen() {
         {detail('Viewing', enquiry.preferred_viewing)}
         {enquiry.message ? <Text style={styles.message}>“{enquiry.message}”</Text> : null}
         <AnimatedPressable style={styles.copyBtn} onPress={copyLead}>
-          <Feather name="copy" size={14} color={colors.sand} />
+          <Icon name="copy" size={14} color={colors.sand} />
           <Text style={styles.copyBtnText}>Copy lead for the residence</Text>
         </AnimatedPressable>
       </View>
@@ -259,7 +259,7 @@ export default function AdminEnquiryScreen() {
               </Text>
             </View>
             <AnimatedPressable style={[styles.paidBtn, !!enquiry.fee_paid_at && styles.paidBtnActive]} onPress={togglePaid}>
-              <Feather name={enquiry.fee_paid_at ? 'check-circle' : 'circle'} size={14} color={enquiry.fee_paid_at ? colors.teal : colors.ink} />
+              <Icon name={enquiry.fee_paid_at ? 'check-circle' : 'circle'} size={14} color={enquiry.fee_paid_at ? colors.teal : colors.ink} />
               <Text style={styles.paidBtnText}>{enquiry.fee_paid_at ? 'Paid' : 'Mark paid'}</Text>
             </AnimatedPressable>
           </View>

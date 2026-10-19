@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, FlatList, Pressable, RefreshControl } from 'rea
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import PhotoPlaceholder from '@/components/PhotoPlaceholder';
+import Icon from '@/components/Icon';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -90,7 +90,7 @@ export default function OffersScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.title}>Perks</Text>
       </View>
@@ -99,7 +99,7 @@ export default function OffersScreen() {
       </View>
       {locationChecked && !myLocation && (
         <View style={styles.locationNotice}>
-          <Feather name="map-pin" size={12} color={colors.inkSoft} />
+          <Icon name="map-pin" size={12} color={colors.inkSoft} />
           <Text style={styles.locationNoticeText}>Turn on location to sort perks by distance.</Text>
           <Pressable style={styles.locationEnableBtn} onPress={handleEnableLocation} accessibilityLabel="Enable location">
             <Text style={styles.locationEnableBtnText}>Enable</Text>
@@ -123,7 +123,7 @@ export default function OffersScreen() {
               {item.image_url ? (
                 <Image source={{ uri: item.image_url }} style={styles.cardImage} contentFit="cover" transition={200} />
               ) : (
-                <LinearGradient colors={['#FF7A5C', '#0F8B82']} style={styles.cardImage} />
+                <PhotoPlaceholder icon="gift" style={styles.cardImage} />
               )}
               <View style={{ flex: 1 }}>
                 <Text style={styles.cardBrand}>{item.brand?.name ?? 'Havenly Partner'}</Text>
@@ -132,17 +132,17 @@ export default function OffersScreen() {
                   <Text style={styles.cardDiscount}>{item.discount_label}</Text>
                   {distance != null && (
                     <View style={styles.distancePill}>
-                      <Feather name="map-pin" size={9} color={colors.teal} />
+                      <Icon name="map-pin" size={9} color={colors.teal} />
                       <Text style={styles.distancePillText}>{formatDistance(distance)}</Text>
                     </View>
                   )}
                 </View>
               </View>
               {unlocked ? (
-                <Feather name="chevron-right" size={18} color={colors.inkSoft} />
+                <Icon name="chevron-right" size={18} color={colors.inkSoft} />
               ) : (
                 <View style={styles.lockBadge}>
-                  <Feather name="lock" size={11} color={colors.inkSoft} />
+                  <Icon name="lock" size={11} color={colors.inkSoft} />
                   <Text style={styles.lockBadgeText}>{item.min_streak}d</Text>
                 </View>
               )}

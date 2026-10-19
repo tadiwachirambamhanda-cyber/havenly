@@ -5,8 +5,8 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import InitialsAvatar from '@/components/InitialsAvatar';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -159,11 +159,11 @@ export default function InboxScreen() {
       <View style={styles.titleRow}>
         <Text style={styles.title}>Messages</Text>
         <AnimatedPressable style={styles.newGroupBtn} onPress={() => navigation.navigate('NewGroup')} accessibilityLabel="New group">
-          <Feather name="user-plus" size={16} color={colors.ink} />
+          <Icon name="user-plus" size={16} color={colors.ink} />
         </AnimatedPressable>
       </View>
       <View style={styles.searchBar}>
-        <Feather name="search" size={14} color={colors.inkSoft} />
+        <Icon name="search" size={14} color={colors.inkSoft} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search messages…"
@@ -173,7 +173,7 @@ export default function InboxScreen() {
         />
         {trimmed.length > 0 && (
           <AnimatedPressable style={styles.clearBtn} onPress={() => setQuery('')} accessibilityLabel="Clear search">
-            <Feather name="x" size={14} color={colors.inkSoft} />
+            <Icon name="x" size={14} color={colors.inkSoft} />
           </AnimatedPressable>
         )}
       </View>
@@ -201,13 +201,13 @@ export default function InboxScreen() {
                   <Image source={{ uri: item.icon_url }} style={styles.avatar} transition={200} />
                 ) : (
                   <View style={[styles.avatar, styles.groupAvatar]}>
-                    <Feather name="users" size={20} color={colors.teal} />
+                    <Icon name="users" size={20} color={colors.teal} />
                   </View>
                 )
               ) : item.otherUser?.avatar_url ? (
                 <Image source={{ uri: item.otherUser.avatar_url }} style={styles.avatar} transition={200} />
               ) : (
-                <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+                <InitialsAvatar name={item.otherUser?.display_name} style={styles.avatar} />
               )}
               {item.unread && <View style={styles.unreadDot} />}
             </View>

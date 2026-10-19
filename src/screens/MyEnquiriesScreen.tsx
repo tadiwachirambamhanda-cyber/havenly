@@ -4,8 +4,8 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import PhotoPlaceholder from '@/components/PhotoPlaceholder';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -62,7 +62,7 @@ export default function MyEnquiriesScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.title}>My enquiries</Text>
       </View>
@@ -87,7 +87,7 @@ export default function MyEnquiriesScreen() {
                   {photo ? (
                     <Image source={{ uri: photo }} style={styles.thumb} contentFit="cover" transition={200} />
                   ) : (
-                    <LinearGradient colors={['#0F8B82', '#E3A23A']} style={styles.thumb} />
+                    <PhotoPlaceholder icon="home" style={styles.thumb} />
                   )}
                   <View style={{ flex: 1 }}>
                     <Text style={styles.name} numberOfLines={1}>{item.residence?.name ?? 'Residence'}</Text>

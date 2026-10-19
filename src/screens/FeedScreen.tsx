@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl, useWindowDimensions, type NativeSyntheticEvent, type NativeScrollEvent } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import Icon from '@/components/Icon';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation, useFocusEffect, useIsFocused, type CompositeNavigationProp } from '@react-navigation/native';
@@ -385,7 +385,7 @@ export default function FeedScreen() {
           <Text style={styles.cardTag}>{item.tag}</Text>
           {item.community?.name && (
             <View style={styles.communityBadge}>
-              <Feather name="users" size={9} color={colors.teal} />
+              <Icon name="users" size={9} color={colors.teal} />
               <Text style={styles.communityBadgeText} numberOfLines={1}>{item.community.name}</Text>
             </View>
           )}
@@ -402,7 +402,7 @@ export default function FeedScreen() {
               </Text>
             </Pressable>
             <View style={styles.cardLikesRow}>
-              <Feather name="heart" size={11} color={colors.inkSoft} />
+              <Icon name="heart" size={11} color={colors.inkSoft} />
               <Text style={styles.cardLikes}>{formatCount(item.like_count)}</Text>
             </View>
           </View>
@@ -478,11 +478,11 @@ export default function FeedScreen() {
             </View>
           )}
           <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Notifications')} accessibilityLabel="Notifications">
-            <Feather name="bell" size={17} color={colors.ink} />
+            <Icon name="bell" size={17} color={colors.ink} />
             {hasUnreadNotifications && <View style={styles.iconBtnDot} />}
           </Pressable>
           <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Communities')} accessibilityLabel="Communities">
-            <Feather name="users" size={17} color={colors.ink} />
+            <Icon name="users" size={17} color={colors.ink} />
           </Pressable>
         </View>
       </View>
@@ -521,7 +521,7 @@ export default function FeedScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.myCommunitiesRow}>
             {myCommunities.map((c) => (
               <Pressable key={c.id} style={styles.myCommunityChip} onPress={() => navigation.navigate('CommunityDetail', { communityId: c.id })}>
-                <Feather name={communityIcon(c)} size={12} color={colors.teal} />
+                <Icon name={communityIcon(c)} size={12} color={colors.teal} />
                 <Text style={styles.myCommunityChipText} numberOfLines={1}>{c.name}</Text>
               </Pressable>
             ))}
@@ -576,7 +576,7 @@ export default function FeedScreen() {
                   <Image source={{ uri: housingTeaser.photo }} style={styles.housingPhoto} contentFit="cover" transition={200} />
                 ) : (
                   <View style={[styles.housingPhoto, styles.housingPhotoEmpty]}>
-                    <Feather name="home" size={22} color={colors.gold} />
+                    <Icon name="home" size={22} color={colors.gold} />
                   </View>
                 )}
                 <View style={{ flex: 1 }}>
@@ -584,7 +584,7 @@ export default function FeedScreen() {
                   <Text style={styles.housingTitle} numberOfLines={2}>{housingTeaser.title}</Text>
                   <Text style={styles.housingSub} numberOfLines={1}>{housingTeaser.priceLine}</Text>
                 </View>
-                <Feather name="chevron-right" size={18} color={colors.inkSoft} />
+                <Icon name="chevron-right" size={18} color={colors.inkSoft} />
               </AnimatedPressable>
             )}
             {topInterestLabel && trendingPosts.length > 0 && renderSection(`Trending in ${topInterestLabel}`, trendingColumns, 'trending')}

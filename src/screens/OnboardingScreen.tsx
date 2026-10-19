@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import AnimatedPressable from '@/components/AnimatedPressable';
-import { Feather } from '@expo/vector-icons';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -62,7 +62,7 @@ export default function OnboardingScreen() {
                 const isSelected = selected.has(key);
                 return (
                   <AnimatedPressable key={key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => toggle(key)}>
-                    <Feather name={interestIcon(key)} size={13} color={isSelected ? colors.sand : colors.ink} />
+                    <Icon name={interestIcon(key)} size={13} color={isSelected ? colors.sand : colors.ink} />
                     <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt.label}</Text>
                   </AnimatedPressable>
                 );

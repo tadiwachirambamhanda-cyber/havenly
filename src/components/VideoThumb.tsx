@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Pressable, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
-import { Feather } from '@expo/vector-icons';
+import Icon from '@/components/Icon';
 
 // Autoplaying, looping preview used in feed/grid contexts — starts muted,
 // but (unlike a plain thumbnail) carries its own small mute toggle so sound
@@ -47,7 +47,7 @@ export default function VideoThumb({
         hitSlop={10}
         accessibilityLabel={muted ? 'Unmute' : 'Mute'}
       >
-        <Feather name={muted ? 'volume-x' : 'volume-2'} size={11} color="white" />
+        <Icon name={muted ? 'volume-off' : 'volume-on'} size={11} color="white" />
       </Pressable>
     </>
   );

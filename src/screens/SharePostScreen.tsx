@@ -4,8 +4,8 @@ import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import InitialsAvatar from '@/components/InitialsAvatar';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -118,12 +118,12 @@ export default function SharePostScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.title}>Send to</Text>
       </View>
       <View style={styles.searchBar}>
-        <Feather name="search" size={14} color={colors.inkSoft} />
+        <Icon name="search" size={14} color={colors.inkSoft} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search people or groups…"
@@ -156,10 +156,10 @@ export default function SharePostScreen() {
                   <Image source={{ uri: item.imageUrl }} style={styles.avatar} transition={200} />
                 ) : item.kind === 'group' ? (
                   <View style={[styles.avatar, styles.groupAvatar]}>
-                    <Feather name="users" size={18} color={colors.teal} />
+                    <Icon name="users" size={18} color={colors.teal} />
                   </View>
                 ) : (
-                  <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+                  <InitialsAvatar name={item.name} style={styles.avatar} />
                 )}
                 <View style={{ flex: 1 }}>
                   <Text style={styles.name}>{item.name}</Text>

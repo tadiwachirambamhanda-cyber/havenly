@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Feather } from '@expo/vector-icons';
+import Icon from '@/components/Icon';
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring } from 'react-native-reanimated';
 
 interface Props {
@@ -34,7 +34,7 @@ export default function BurstHeart({ active, size, color, activeColor }: Props) 
 
   return (
     <Animated.View style={style}>
-      <Feather name="heart" size={size} color={active ? activeColor : color} />
+      <Icon name="heart" size={size} color={active ? activeColor : color} weight={active ? 'fill' : undefined} />
     </Animated.View>
   );
 }

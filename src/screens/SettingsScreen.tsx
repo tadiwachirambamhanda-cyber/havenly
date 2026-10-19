@@ -5,7 +5,7 @@ import BackButton from '@/components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
+import Icon, { type IconName } from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -20,7 +20,7 @@ import ActionSheet from '@/components/ActionSheet';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const MODE_OPTIONS: { key: ThemeMode; label: string; icon: keyof typeof Feather.glyphMap }[] = [
+const MODE_OPTIONS: { key: ThemeMode; label: string; icon: IconName }[] = [
   { key: 'system', label: 'System', icon: 'smartphone' },
   { key: 'light', label: 'Light', icon: 'sun' },
   { key: 'dark', label: 'Dark', icon: 'moon' },
@@ -57,7 +57,7 @@ export default function SettingsScreen() {
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.title}>Settings</Text>
       </View>
@@ -73,7 +73,7 @@ export default function SettingsScreen() {
               onPress={() => { haptics.tap(); setMode(opt.key); }}
               accessibilityLabel={`${opt.label} appearance`}
             >
-              <Feather name={opt.icon} size={14} color={isSelected ? colors.sand : colors.inkSoft} />
+              <Icon name={opt.icon} size={14} color={isSelected ? colors.sand : colors.inkSoft} />
               <Text style={[styles.segmentText, isSelected && styles.segmentTextActive]}>{opt.label}</Text>
             </AnimatedPressable>
           );

@@ -1,26 +1,21 @@
-import type { Feather } from '@expo/vector-icons';
+import type { IconName } from '@/components/Icon';
 import type { Community, Interest } from '@/types';
 
-type FeatherName = keyof typeof Feather.glyphMap;
 
-// Feather has no literal racket/graduation-cap/soccer-ball/game-controller
-// glyphs — padel, campus, football and gaming lean on a reasonable stand-in
-// (energy, achievement, flag, cpu) rather than a literal match, same
-// tradeoff as everywhere else this app uses Feather over emoji.
-const INTEREST_ICONS: Record<Interest, FeatherName> = {
-  cafes: 'coffee', fashion: 'shopping-bag', nightlife: 'moon', fitness: 'activity',
-  beach: 'umbrella', study: 'book-open', travel: 'compass', events: 'calendar',
-  padel: 'zap', beauty: 'star',
-  football: 'flag', running: 'wind', art: 'image', gaming: 'cpu',
+const INTEREST_ICONS: Record<Interest, IconName> = {
+  cafes: 'coffee', fashion: 'shopping-bag', nightlife: 'martini', fitness: 'barbell',
+  beach: 'waves', study: 'book-open', travel: 'airplane', events: 'confetti',
+  padel: 'tennis-ball', beauty: 'sparkle',
+  football: 'soccer-ball', running: 'sneaker', art: 'palette', gaming: 'game-controller',
 };
 
-const CAMPUS_ICON: FeatherName = 'award';
+const CAMPUS_ICON: IconName = 'graduation-cap';
 
-export function communityIcon(community: Pick<Community, 'category' | 'related_interest'>): FeatherName {
+export function communityIcon(community: Pick<Community, 'category' | 'related_interest'>): IconName {
   if (community.category === 'campus') return CAMPUS_ICON;
   return (community.related_interest && INTEREST_ICONS[community.related_interest]) || 'users';
 }
 
-export function interestIcon(interest: Interest): FeatherName {
+export function interestIcon(interest: Interest): IconName {
   return INTEREST_ICONS[interest];
 }

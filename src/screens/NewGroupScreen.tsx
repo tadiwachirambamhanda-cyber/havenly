@@ -6,8 +6,8 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import InitialsAvatar from '@/components/InitialsAvatar';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -100,7 +100,7 @@ export default function NewGroupScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.title}>New group</Text>
       </View>
@@ -110,7 +110,7 @@ export default function NewGroupScreen() {
           <Image source={{ uri: iconUri }} style={styles.iconPreview} transition={200} />
         ) : (
           <View style={[styles.iconPreview, styles.iconPlaceholder]}>
-            <Feather name="camera" size={20} color={colors.teal} />
+            <Icon name="camera" size={20} color={colors.teal} />
           </View>
         )}
         <Text style={styles.iconPickerText}>{iconUri ? 'Change group photo' : 'Add group photo'}</Text>
@@ -125,7 +125,7 @@ export default function NewGroupScreen() {
       />
 
       <View style={styles.searchBar}>
-        <Feather name="search" size={14} color={colors.inkSoft} />
+        <Icon name="search" size={14} color={colors.inkSoft} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search people you follow…"
@@ -155,14 +155,14 @@ export default function NewGroupScreen() {
                 {item.avatar_url ? (
                   <Image source={{ uri: item.avatar_url }} style={styles.avatar} transition={200} />
                 ) : (
-                  <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+                  <InitialsAvatar name={item.display_name} style={styles.avatar} />
                 )}
                 <View style={{ flex: 1 }}>
                   <Text style={styles.name}>{item.display_name}</Text>
                   <Text style={styles.handle}>@{item.username}</Text>
                 </View>
                 <View style={[styles.checkbox, selected && styles.checkboxSelected]}>
-                  {selected && <Feather name="check" size={13} color="white" />}
+                  {selected && <Icon name="check" size={13} color="white" />}
                 </View>
               </AnimatedPressable>
             );

@@ -27,8 +27,18 @@ export const fonts = {
   body: 'PlusJakartaSans_400Regular', bodySemiBold: 'PlusJakartaSans_600SemiBold',
   bodyBold: 'PlusJakartaSans_700Bold', mono: 'JetBrainsMono_500Medium',
 };
+// Tonal pairs: light to deep within one brand colour. Gradients never mix
+// two different hues (teal into coral made a muddy middle) and stay inside
+// the brand palette: no purple, blue or pink.
+export const tones = {
+  coral: ['#FF9478', '#E8492B'],
+  teal: ['#3DB5A9', '#0B6F68'],
+  gold: ['#F3C46D', '#CF8B22'],
+  olive: ['#7A8577', '#2E372D'],
+} as const satisfies Record<string, readonly [string, string]>;
+
+// Stand-in backgrounds for posts and spots without a photo, picked by id.
 export const gradients: [string, string][] = [
-  ['#FF9A76', '#FF5A3C'], ['#0F8B82', '#4ED9C8'], ['#E3A23A', '#FFD98A'],
-  ['#3A3A6B', '#8A6BFF'], ['#FF5A3C', '#E3A23A'], ['#0F8B82', '#20261F'],
-  ['#F06A9E', '#FFB0C8'], ['#4A6FE3', '#7EC8E3'],
+  [...tones.coral], [...tones.teal], [...tones.gold], [...tones.olive],
+  ['#FFB8A3', '#FF8466'], ['#8FD3C9', '#2BA597'],
 ];

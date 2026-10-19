@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
+import Icon from '@/components/Icon';
 import { useTheme } from '@/lib/ThemeContext';
 import type { ColorTokens } from '@/theme/tokens';
 
@@ -52,7 +52,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           style={[styles.container, { top: insets.top + 10, opacity, transform: [{ translateY }] }]}
         >
           <View style={[styles.pill, toast.type === 'error' && styles.pillError]}>
-            <Feather
+            <Icon
               name={toast.type === 'error' ? 'alert-circle' : 'check-circle'}
               size={15}
               color={toast.type === 'error' ? colors.coral : colors.teal}

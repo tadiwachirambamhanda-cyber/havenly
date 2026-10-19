@@ -4,8 +4,8 @@ import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
 import { useFocusEffect } from '@react-navigation/native';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import InitialsAvatar from '@/components/InitialsAvatar';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -46,7 +46,7 @@ export default function BlockedUsersScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.title}>Blocked accounts</Text>
       </View>
@@ -60,7 +60,7 @@ export default function BlockedUsersScreen() {
               {item.avatar_url ? (
                 <Image source={{ uri: item.avatar_url }} style={styles.avatar} transition={200} />
               ) : (
-                <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+                <InitialsAvatar name={item.display_name} style={styles.avatar} />
               )}
               <View style={{ flex: 1 }}>
                 <Text style={styles.name}>{item.display_name}</Text>
@@ -72,7 +72,7 @@ export default function BlockedUsersScreen() {
             </View>
           </SwipeToAction>
         )}
-        ListEmptyComponent={<EmptyState icon="shield" text="You haven't blocked anyone." />}
+        ListEmptyComponent={<EmptyState icon="shield-check" text="You haven't blocked anyone." />}
       />
     </View>
   );

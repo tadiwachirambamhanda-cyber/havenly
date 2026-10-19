@@ -4,7 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import InitialsAvatar from '@/components/InitialsAvatar';
+import Icon from '@/components/Icon';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -206,7 +207,7 @@ export default function DiscoverScreen() {
       <Text style={styles.title}>Discover Dubai</Text>
 
       <View style={styles.searchBar}>
-        <Feather name="search" size={14} color={colors.inkSoft} />
+        <Icon name="search" size={14} color={colors.inkSoft} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search interests, posts, communities, events…"
@@ -216,7 +217,7 @@ export default function DiscoverScreen() {
         />
         {isSearching && (
           <Pressable style={styles.clearBtn} onPress={() => setQuery('')} accessibilityLabel="Clear search">
-            <Feather name="x" size={14} color={colors.inkSoft} />
+            <Icon name="x" size={14} color={colors.inkSoft} />
           </Pressable>
         )}
       </View>
@@ -227,34 +228,34 @@ export default function DiscoverScreen() {
           onPress={() => navigation.navigate('MainTabs', { screen: 'Housing' })}
           accessibilityLabel="Find housing"
         >
-          <View style={[styles.perksPromoIcon, { backgroundColor: `${colors.gold}26` }]}><Feather name="home" size={18} color={colors.gold} /></View>
+          <View style={[styles.perksPromoIcon, { backgroundColor: `${colors.gold}26` }]}><Icon name="home" size={18} color={colors.gold} /></View>
           <View style={{ flex: 1 }}>
             <Text style={styles.perksPromoTitle}>Housing</Text>
             <Text style={styles.perksPromoSub}>Student rooms near campus, checked by the Havenly team</Text>
           </View>
-          <Feather name="chevron-right" size={16} color={colors.inkSoft} />
+          <Icon name="chevron-right" size={16} color={colors.inkSoft} />
         </Pressable>
       )}
 
       {!isSearching && (
         <Pressable style={[styles.perksPromo, { marginTop: 10 }]} onPress={() => navigation.navigate('Offers')} accessibilityLabel="View perks">
-          <View style={styles.perksPromoIcon}><Feather name="gift" size={18} color={colors.coral} /></View>
+          <View style={styles.perksPromoIcon}><Icon name="gift" size={18} color={colors.coral} /></View>
           <View style={{ flex: 1 }}>
             <Text style={styles.perksPromoTitle}>Perks</Text>
             <Text style={styles.perksPromoSub}>Unlock brand discounts with your streak</Text>
           </View>
-          <Feather name="chevron-right" size={16} color={colors.inkSoft} />
+          <Icon name="chevron-right" size={16} color={colors.inkSoft} />
         </Pressable>
       )}
 
       {!isSearching && (
         <Pressable style={[styles.perksPromo, { marginTop: 10 }]} onPress={() => navigation.navigate('Map')} accessibilityLabel="Open map">
-          <View style={[styles.perksPromoIcon, { backgroundColor: colors.tealSoft }]}><Feather name="map-pin" size={18} color={colors.teal} /></View>
+          <View style={[styles.perksPromoIcon, { backgroundColor: colors.tealSoft }]}><Icon name="map-pin" size={18} color={colors.teal} /></View>
           <View style={{ flex: 1 }}>
             <Text style={styles.perksPromoTitle}>Map</Text>
             <Text style={styles.perksPromoSub}>See offers, events, housing, and who's checked in nearby</Text>
           </View>
-          <Feather name="chevron-right" size={16} color={colors.inkSoft} />
+          <Icon name="chevron-right" size={16} color={colors.inkSoft} />
         </Pressable>
       )}
 
@@ -267,7 +268,7 @@ export default function DiscoverScreen() {
             const added = profile?.interests.includes(opt.key) ?? false;
             return (
               <View key={opt.key} style={styles.resultRow}>
-                <View style={styles.resultIcon}><Feather name={interestIcon(opt.key)} size={15} color={colors.coral} /></View>
+                <View style={styles.resultIcon}><Icon name={interestIcon(opt.key)} size={15} color={colors.coral} /></View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.resultTitle}>{opt.label}</Text>
                   <Text style={styles.resultSub}>Interest</Text>
@@ -306,7 +307,7 @@ export default function DiscoverScreen() {
                   <ActivityIndicator size="small" color={colors.ink} />
                 ) : (
                   <>
-                    <Feather name={interestIcon(opt.key)} size={13} color={colors.ink} />
+                    <Icon name={interestIcon(opt.key)} size={13} color={colors.ink} />
                     <Text style={styles.exploreInterestChipText}>{opt.label}</Text>
                   </>
                 )}
@@ -321,7 +322,7 @@ export default function DiscoverScreen() {
           <Text style={styles.sectionLabel}>Posts</Text>
           {posts.map((post) => (
             <Pressable key={post.id} style={styles.resultRow} onPress={() => navigation.navigate('PostDetail', { postId: post.id })}>
-              <View style={styles.resultIcon}><Feather name="file-text" size={15} color={colors.inkSoft} /></View>
+              <View style={styles.resultIcon}><Icon name="file-text" size={15} color={colors.inkSoft} /></View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.resultTitle} numberOfLines={1}>{post.title}</Text>
                 <Text style={styles.resultSub}>{post.tag}</Text>
@@ -336,7 +337,7 @@ export default function DiscoverScreen() {
           <Text style={styles.sectionLabel}>Communities</Text>
           {communities.map((c) => (
             <Pressable key={c.id} style={styles.resultRow} onPress={() => navigation.navigate('CommunityDetail', { communityId: c.id })}>
-              <View style={styles.resultIcon}><Feather name={communityIcon(c)} size={15} color={colors.teal} /></View>
+              <View style={styles.resultIcon}><Icon name={communityIcon(c)} size={15} color={colors.teal} /></View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.resultTitle}>{c.name}</Text>
                 <Text style={styles.resultSub}>{c.member_count} members</Text>
@@ -412,7 +413,7 @@ export default function DiscoverScreen() {
                         hitSlop={8}
                         accessibilityLabel="Delete event"
                       >
-                        <Feather name="trash-2" size={13} color={colors.inkSoft} />
+                        <Icon name="trash" size={13} color={colors.inkSoft} />
                       </Pressable>
                     )}
                   </View>
@@ -428,9 +429,9 @@ export default function DiscoverScreen() {
                             style={[styles.friendAvatar, i > 0 && { marginLeft: -8 }]}
                           />
                         ) : (
-                          <LinearGradient
+                          <InitialsAvatar
                             key={friend.id}
-                            colors={['#0F8B82', '#FF5A3C']}
+                            name={friend.display_name}
                             style={[styles.friendAvatar, i > 0 && { marginLeft: -8 }]}
                           />
                         )

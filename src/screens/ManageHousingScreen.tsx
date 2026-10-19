@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, FlatList, RefreshControl, ScrollView } from 're
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import PhotoPlaceholder from '@/components/PhotoPlaceholder';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/lib/ThemeContext';
 import { haptics } from '@/lib/haptics';
@@ -155,7 +155,7 @@ export default function ManageHousingScreen() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
       ListHeaderComponent={
         <AnimatedPressable style={styles.addBtn} onPress={() => navigation.navigate('EditResidence', {})}>
-          <Feather name="plus" size={15} color="white" />
+          <Icon name="plus" size={15} color="white" />
           <Text style={styles.addBtnText}>Add residence</Text>
         </AnimatedPressable>
       }
@@ -167,7 +167,7 @@ export default function ManageHousingScreen() {
             {item.photo_urls[0] ? (
               <Image source={{ uri: item.photo_urls[0] }} style={styles.thumb} contentFit="cover" transition={200} />
             ) : (
-              <LinearGradient colors={['#0F8B82', '#E3A23A']} style={styles.thumb} />
+              <PhotoPlaceholder icon="home" style={styles.thumb} />
             )}
             <View style={{ flex: 1 }}>
               <Text style={styles.rowTitle} numberOfLines={1}>{item.name}</Text>
@@ -180,7 +180,7 @@ export default function ManageHousingScreen() {
                 <Text style={[styles.statusText, { color: colors.inkSoft }]}>Hidden</Text>
               </View>
             )}
-            {!terms && <Feather name="alert-circle" size={15} color={colors.coral} />}
+            {!terms && <Icon name="alert-circle" size={15} color={colors.coral} />}
           </AnimatedPressable>
         );
       }}
@@ -191,7 +191,7 @@ export default function ManageHousingScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.title}>Manage housing</Text>
       </View>

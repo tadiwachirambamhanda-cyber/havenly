@@ -5,8 +5,8 @@ import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navig
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import PhotoPlaceholder from '@/components/PhotoPlaceholder';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -93,7 +93,7 @@ export default function ResidenceDetailScreen() {
     return (
       <View style={styles.container}>
         <BackButton style={[styles.back, { top: insets.top + 12 }]}>
-          <Feather name="arrow-left" size={17} color="#20261F" />
+          <Icon name="arrow-left" size={17} color="#20261F" />
         </BackButton>
         <Skeleton style={{ height: HERO_HEIGHT, borderRadius: 0 }} />
         <View style={styles.body}>
@@ -111,7 +111,7 @@ export default function ResidenceDetailScreen() {
     return (
       <View style={styles.notFound}>
         <BackButton style={[styles.back, { top: insets.top + 12 }]}>
-          <Feather name="arrow-left" size={17} color="#20261F" />
+          <Icon name="arrow-left" size={17} color="#20261F" />
         </BackButton>
         <Text style={styles.notFoundText}>This residence isn’t listed anymore.</Text>
       </View>
@@ -132,7 +132,7 @@ export default function ResidenceDetailScreen() {
             {heroPhoto ? (
               <Image source={{ uri: heroPhoto }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
             ) : (
-              <LinearGradient colors={['#0F8B82', '#E3A23A']} style={StyleSheet.absoluteFill} />
+              <PhotoPlaceholder icon="home" style={StyleSheet.absoluteFill} />
             )}
           </Animated.View>
           <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: '#000' }, heroDimStyle]} />
@@ -160,12 +160,12 @@ export default function ResidenceDetailScreen() {
 
           <View style={styles.factRow}>
             <View style={styles.fact}>
-              <Feather name="users" size={12} color={colors.inkSoft} />
+              <Icon name="users" size={12} color={colors.inkSoft} />
               <Text style={styles.factText}>{GENDER_POLICY_LABEL[residence.gender_policy]}</Text>
             </View>
             {residence.address ? (
               <View style={[styles.fact, { flexShrink: 1 }]}>
-                <Feather name="map-pin" size={12} color={colors.inkSoft} />
+                <Icon name="map-pin" size={12} color={colors.inkSoft} />
                 <Text style={styles.factText} numberOfLines={1}>{residence.address}</Text>
               </View>
             ) : null}
@@ -198,7 +198,7 @@ export default function ResidenceDetailScreen() {
               <View style={styles.amenityGrid}>
                 {residence.amenities.map((a) => (
                   <View key={a} style={styles.amenity}>
-                    <Feather name={amenityIcon(a)} size={13} color={colors.teal} />
+                    <Icon name={amenityIcon(a)} size={13} color={colors.teal} />
                     <Text style={styles.amenityText}>{a}</Text>
                   </View>
                 ))}
@@ -213,7 +213,7 @@ export default function ResidenceDetailScreen() {
                 const mine = u === myUniversity;
                 return (
                   <View key={u} style={styles.uniRow}>
-                    <Feather name="book" size={13} color={mine ? colors.coral : colors.inkSoft} />
+                    <Icon name="book" size={13} color={mine ? colors.coral : colors.inkSoft} />
                     <Text style={[styles.uniText, mine && styles.uniTextMine]}>{u}{mine ? ' · your uni' : ''}</Text>
                   </View>
                 );
@@ -229,7 +229,7 @@ export default function ResidenceDetailScreen() {
           ) : null}
 
           <View style={styles.howItWorks}>
-            <Feather name="info" size={14} color={colors.teal} />
+            <Icon name="info" size={14} color={colors.teal} />
             <Text style={styles.howItWorksText}>
               Havenly is free for students. Send an enquiry here, {residence.provider_name} gets in touch with you, and you sign directly with them.
             </Text>
@@ -244,7 +244,7 @@ export default function ResidenceDetailScreen() {
         <Text style={styles.compactTitle} numberOfLines={1}>{residence.name}</Text>
       </Animated.View>
       <BackButton style={[styles.back, { top: insets.top + 12 }]}>
-        <Feather name="arrow-left" size={17} color="#20261F" />
+        <Icon name="arrow-left" size={17} color="#20261F" />
       </BackButton>
       <AnimatedPressable
         style={[styles.saveBtn, { top: insets.top + 12 }]}
@@ -258,9 +258,9 @@ export default function ResidenceDetailScreen() {
       <View style={[styles.ctaBar, { paddingBottom: insets.bottom + 14 }]}>
         {openEnquiryStatus && (
           <AnimatedPressable style={styles.enquiryStatusRow} onPress={() => navigation.navigate('MyEnquiries')}>
-            <Feather name="check-circle" size={13} color={colors.teal} />
+            <Icon name="check-circle" size={13} color={colors.teal} />
             <Text style={styles.enquiryStatusText}>You’ve enquired · {ENQUIRY_STATUS_LABEL[openEnquiryStatus]}</Text>
-            <Feather name="chevron-right" size={13} color={colors.inkSoft} />
+            <Icon name="chevron-right" size={13} color={colors.inkSoft} />
           </AnimatedPressable>
         )}
         <View style={styles.ctaButtons}>

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, ScrollView, ActivityIndicator, Switc
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
-import { Feather } from '@expo/vector-icons';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
@@ -269,7 +269,7 @@ export default function EditResidenceScreen() {
                 onPress={() => { setPhotos((prev) => prev.filter((p) => p !== url)); setDirty(true); }}
                 accessibilityLabel="Remove photo"
               >
-                <Feather name="x" size={12} color="white" />
+                <Icon name="x" size={12} color="white" />
               </AnimatedPressable>
               {i > 0 && (
                 <AnimatedPressable
@@ -283,7 +283,7 @@ export default function EditResidenceScreen() {
             </View>
           ))}
           <AnimatedPressable style={[styles.photo, styles.photoAdd]} onPress={addPhotos} disabled={uploading} accessibilityLabel="Add photos">
-            {uploading ? <ActivityIndicator color={colors.coral} /> : <Feather name="plus" size={20} color={colors.inkSoft} />}
+            {uploading ? <ActivityIndicator color={colors.coral} /> : <Icon name="plus" size={20} color={colors.inkSoft} />}
           </AnimatedPressable>
         </ScrollView>
 
@@ -325,7 +325,7 @@ export default function EditResidenceScreen() {
           </View>
         ))}
         <AnimatedPressable style={styles.addRoomBtn} onPress={() => { setRooms((prev) => [...prev, newRoom()]); setDirty(true); }}>
-          <Feather name="plus" size={14} color={colors.ink} />
+          <Icon name="plus" size={14} color={colors.ink} />
           <Text style={styles.addRoomText}>Add room type</Text>
         </AnimatedPressable>
 

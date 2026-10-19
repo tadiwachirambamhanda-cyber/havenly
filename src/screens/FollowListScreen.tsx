@@ -6,8 +6,8 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import InitialsAvatar from '@/components/InitialsAvatar';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -86,7 +86,7 @@ export default function FollowListScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.title}>{displayName}</Text>
       </View>
@@ -121,7 +121,7 @@ export default function FollowListScreen() {
                   {item.avatar_url ? (
                     <Image source={{ uri: item.avatar_url }} style={styles.avatar} transition={200} />
                   ) : (
-                    <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+                    <InitialsAvatar name={item.display_name} style={styles.avatar} />
                   )}
                   <View style={{ flex: 1 }}>
                     <Text style={styles.name}>{item.display_name}</Text>

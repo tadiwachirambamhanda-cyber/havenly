@@ -4,7 +4,7 @@ import AnimatedPressable from '@/components/AnimatedPressable';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { Image } from 'expo-image';
-import { Feather } from '@expo/vector-icons';
+import Icon from '@/components/Icon';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -264,7 +264,7 @@ export default function CreatePostScreen() {
           <>
             <Image source={{ uri: imageUri }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
             {videoUri && (
-              <View style={styles.playBadge}><Feather name="play" size={16} color="white" /></View>
+              <View style={styles.playBadge}><Icon name="play" size={16} color="white" /></View>
             )}
             {regeneratingCover && (
               <View style={styles.coverLoading}><ActivityIndicator color="white" /></View>
@@ -327,7 +327,7 @@ export default function CreatePostScreen() {
               const isSelected = communityId === c.id;
               return (
                 <AnimatedPressable key={c.id} style={[styles.chip, styles.chipWithIcon, isSelected && styles.chipSelected]} onPress={() => setCommunityId(c.id)}>
-                  <Feather name={communityIcon(c)} size={12} color={isSelected ? colors.sand : colors.ink} />
+                  <Icon name={communityIcon(c)} size={12} color={isSelected ? colors.sand : colors.ink} />
                   <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{c.name}</Text>
                 </AnimatedPressable>
               );

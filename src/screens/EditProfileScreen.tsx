@@ -6,14 +6,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import InitialsAvatar from '@/components/InitialsAvatar';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { useConfirmDiscard } from '@/lib/useConfirmDiscard';
-import { radius, spacing } from '@/theme/tokens';
+import { radius, spacing, tones } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
 import { interestIcon } from '@/constants/topicIcons';
@@ -158,10 +159,10 @@ export default function EditProfileScreen() {
         {coverUri ? (
           <Image source={{ uri: coverUri }} style={styles.cover} transition={200} />
         ) : (
-          <LinearGradient colors={['#FF7A5C', '#E3A23A', '#0F8B82']} locations={[0, 0.6, 1]} style={styles.cover} />
+          <LinearGradient colors={[...tones.coral]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cover} />
         )}
         <View style={styles.coverEditBadge}>
-          <Feather name="camera" size={12} color="white" />
+          <Icon name="camera" size={12} color="white" />
           <Text style={styles.coverEditBadgeText}>Change cover</Text>
         </View>
       </AnimatedPressable>
@@ -170,10 +171,10 @@ export default function EditProfileScreen() {
         {avatarUri ? (
           <Image source={{ uri: avatarUri }} style={styles.avatar} transition={200} />
         ) : (
-          <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+          <InitialsAvatar name={displayName} style={styles.avatar} />
         )}
         <View style={styles.avatarEditBadge}>
-          <Feather name="camera" size={11} color="white" />
+          <Icon name="camera" size={11} color="white" />
         </View>
       </AnimatedPressable>
 
@@ -205,7 +206,7 @@ export default function EditProfileScreen() {
           const isSelected = interests.has(opt.key);
           return (
             <AnimatedPressable key={opt.key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); toggleInterest(opt.key); }}>
-              <Feather name={interestIcon(opt.key)} size={13} color={isSelected ? colors.sand : colors.ink} />
+              <Icon name={interestIcon(opt.key)} size={13} color={isSelected ? colors.sand : colors.ink} />
               <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt.label}</Text>
             </AnimatedPressable>
           );

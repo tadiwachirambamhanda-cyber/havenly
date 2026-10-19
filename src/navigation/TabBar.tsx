@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
+import Icon, { type IconName } from '@/components/Icon';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import AnimatedPressable from '@/components/AnimatedPressable';
@@ -12,7 +12,7 @@ import { haptics } from '@/lib/haptics';
 
 const INACTIVE_COLOR = '#8D8977';
 
-const TAB_CONFIG: Record<string, { icon: keyof typeof Feather.glyphMap }> = {
+const TAB_CONFIG: Record<string, { icon: IconName }> = {
   Feed: { icon: 'home' },
   Discover: { icon: 'search' },
   Housing: { icon: 'key' },
@@ -68,7 +68,7 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
           }
         }}
       >
-        <Feather name={config.icon} size={18} color={isFocused ? 'white' : INACTIVE_COLOR} />
+        <Icon name={config.icon} size={19} color={isFocused ? 'white' : INACTIVE_COLOR} weight={isFocused ? 'fill' : 'bold'} />
         {route.name === 'Inbox' && hasUnread && <View style={styles.unreadDot} />}
       </AnimatedPressable>
     );
@@ -91,7 +91,7 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
           navigation.getParent()?.navigate('CreatePost');
         }}
       >
-        <Feather name="plus" size={20} color="white" />
+        <Icon name="plus" size={20} color="white" />
       </AnimatedPressable>
     </View>
   );

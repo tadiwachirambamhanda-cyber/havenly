@@ -5,7 +5,7 @@ import BackButton from '@/components/BackButton';
 import { WebView } from 'react-native-webview';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Feather } from '@expo/vector-icons';
+import Icon from '@/components/Icon';
 import Constants from 'expo-constants';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -29,14 +29,14 @@ const MAPBOX_TOKEN: string = Constants.expoConfig?.extra?.mapboxToken ?? '';
 // map still opens to somewhere sensible instead of the middle of the ocean.
 const DUBAI_FALLBACK: Coords = { latitude: 25.2048, longitude: 55.2708 };
 
-// Feather's own outline icons, inlined as raw SVG so the web map (a plain
-// HTML string, not RN) matches the exact same icon language the rest of the
-// app already uses via @expo/vector-icons — no emoji anywhere on the map.
-const ICON_GIFT = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>';
-const ICON_CALENDAR = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
-const ICON_RADIO = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>';
-const ICON_HOME = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
-const ICON_THUMB = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>';
+// Phosphor icons (bold weight), inlined as raw SVG so the web map (a plain
+// HTML string, not RN) matches the icon set used everywhere else in the app
+// via src/components/Icon — no emoji anywhere on the map.
+const ICON_GIFT = '<svg viewBox="0 0 256 256" width="15" height="15" fill="white"><path d="M216 68h-25.94A33.8 33.8 0 0 0 196 49.69 36.62 36.62 0 0 0 158.31 12 33.44 33.44 0 0 0 134 23.25a54.7 54.7 0 0 0-6 8.3 54.7 54.7 0 0 0-6-8.3A33.44 33.44 0 0 0 97.69 12 36.62 36.62 0 0 0 60 49.69 33.8 33.8 0 0 0 65.94 68H40a20 20 0 0 0-20 20v32a20 20 0 0 0 16 19.6V200a20 20 0 0 0 20 20h144a20 20 0 0 0 20-20v-60.4a20 20 0 0 0 16-19.6V88a20 20 0 0 0-20-20m-4 48h-72V92h72Zm-60-76.83a9.6 9.6 0 0 1 7-3.17h.35A12.62 12.62 0 0 1 172 49a9.6 9.6 0 0 1-3.17 7c-6.9 6.12-18.25 9.26-27.63 10.76 1.5-9.34 4.64-20.69 10.8-27.59m-64.3.53a12.8 12.8 0 0 1 8.91-3.7H97a9.6 9.6 0 0 1 7 3.17c6.12 6.9 9.26 18.24 10.75 27.61C105.45 65.27 94 62.13 87.17 56A9.6 9.6 0 0 1 84 49a12.72 12.72 0 0 1 3.7-9.3M44 92h72v24H44Zm16 48h56v56H60Zm80 56v-56h56v56Z"></path></svg>';
+const ICON_CALENDAR = '<svg viewBox="0 0 256 256" width="15" height="15" fill="white"><path d="M208 28h-20v-4a12 12 0 0 0-24 0v4H92v-4a12 12 0 0 0-24 0v4H48a20 20 0 0 0-20 20v160a20 20 0 0 0 20 20h160a20 20 0 0 0 20-20V48a20 20 0 0 0-20-20M68 52a12 12 0 0 0 24 0h72a12 12 0 0 0 24 0h16v24H52V52ZM52 204V100h152v104Z"></path></svg>';
+const ICON_PING = '<svg viewBox="0 0 256 256" width="13" height="13" fill="white"><path d="M184.63 23.14a12 12 0 0 1 15-8A72.34 72.34 0 0 1 228.4 32a12 12 0 0 1-16.58 17.35 48.3 48.3 0 0 0-19.2-11.2 12 12 0 0 1-7.99-15.01m48.22 144.66A92 92 0 0 1 64.31 190l-40-69.32A32 32 0 0 1 36 77a31.7 31.7 0 0 1 7.54-3.14 32 32 0 0 1 45.11-41.41 32 32 0 0 1 53 3.55l14.53 25.17A32 32 0 0 1 206.35 68l17.31 30a91.38 91.38 0 0 1 9.19 69.8m-30-57.81L185.57 80a8 8 0 0 0-13.86 8l6.68 11.57a12 12 0 0 1-3.18 15.59 28 28 0 0 0-6.41 38.1 12 12 0 1 1-19.86 13.46 52.05 52.05 0 0 1 3.9-63.4L120.9 48a8 8 0 0 0-13.9 8l24.25 42a12 12 0 1 1-20.78 12L79.33 56a8 8 0 0 0-13.85 8L99 122a12 12 0 0 1-20.78 12l-19.29-33.33a8 8 0 1 0-13.85 8L85.1 178a68 68 0 0 0 117.78-68ZM50.46 198a12 12 0 1 0-20.78 12 132.8 132.8 0 0 0 20 26.38 12 12 0 1 0 17.17-16.76A109.2 109.2 0 0 1 50.46 198"></path></svg>';
+const ICON_HOME = '<svg viewBox="0 0 256 256" width="15" height="15" fill="white"><path d="m222.14 105.85-80-80a20 20 0 0 0-28.28 0l-80 80A19.86 19.86 0 0 0 28 120v96a12 12 0 0 0 12 12h64a12 12 0 0 0 12-12v-52h24v52a12 12 0 0 0 12 12h64a12 12 0 0 0 12-12v-96a19.86 19.86 0 0 0-5.86-14.15M204 204h-40v-52a12 12 0 0 0-12-12h-48a12 12 0 0 0-12 12v52H52v-82.35l76-76 76 76Z"></path></svg>';
+const ICON_THUMB = '<svg viewBox="0 0 256 256" width="12" height="12" fill="currentColor"><path d="M237 77.47A28 28 0 0 0 216 68h-52V56a44.05 44.05 0 0 0-44-44 12 12 0 0 0-10.73 6.63L72.58 92H32a20 20 0 0 0-20 20v88a20 20 0 0 0 20 20h172a28 28 0 0 0 27.78-24.53l12-96a28 28 0 0 0-6.78-22M36 116h32v80H36Zm184-19.5-12 96a4 4 0 0 1-4 3.5H92v-89.17l34.82-69.63A20 20 0 0 1 140 56v24a12 12 0 0 0 12 12h64a4 4 0 0 1 4 4.5"></path></svg>';
 
 interface MapCheckIn extends CheckIn { user: Profile; place?: Offer | HavenlyEvent | null }
 
@@ -430,7 +430,7 @@ function buildMapHtml(params: {
       var popup = new mapboxgl.Popup({ offset: 22, closeButton: false }).setHTML(
         '<div class="popup-title">' + escapeHtml(p.name) + (p.mine ? ' (you)' : '') + '</div>' +
         '<div class="popup-sub">Checked in at ' + escapeHtml(p.placeTitle) + '</div>' +
-        (p.mine ? '' : '<button class="popup-btn" onclick=\\'pingClick("' + p.id + '")\\'>${ICON_RADIO} Ping</button>')
+        (p.mine ? '' : '<button class="popup-btn" onclick=\\'pingClick("' + p.id + '")\\'>${ICON_PING} Ping</button>')
       );
       var marker = new mapboxgl.Marker({ element: el, anchor: 'center' }).setLngLat([p.lng, p.lat]).setPopup(popup).addTo(map);
       markersById['checkin:' + p.id] = marker;
@@ -779,13 +779,13 @@ export default function MapScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <BackButton style={styles.back}>
-          <Feather name="arrow-left" size={17} color={colors.ink} />
+          <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
         <Text style={styles.title}>Map</Text>
       </View>
       {locationDenied && loaded && (
         <View style={styles.locationNotice}>
-          <Feather name="map-pin" size={12} color={colors.inkSoft} />
+          <Icon name="map-pin" size={12} color={colors.inkSoft} />
           <Text style={styles.locationNoticeText}>Location off — showing Dubai.</Text>
           <AnimatedPressable style={styles.locationEnableBtn} onPress={handleEnableLocation} accessibilityLabel="Enable location">
             <Text style={styles.locationEnableBtnText}>Enable</Text>
@@ -793,7 +793,7 @@ export default function MapScreen() {
         </View>
       )}
       <View style={styles.searchBar}>
-        <Feather name="search" size={15} color={colors.inkSoft} />
+        <Icon name="search" size={15} color={colors.inkSoft} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search events, offers, housing, friends…"
@@ -804,7 +804,7 @@ export default function MapScreen() {
         />
         {searchQuery.length > 0 && (
           <AnimatedPressable onPress={() => setSearchQuery('')} accessibilityLabel="Clear search">
-            <Feather name="x" size={15} color={colors.inkSoft} />
+            <Icon name="x" size={15} color={colors.inkSoft} />
           </AnimatedPressable>
         )}
       </View>
@@ -821,7 +821,7 @@ export default function MapScreen() {
                     { backgroundColor: r.type === 'offer' ? colors.coralSoft : r.type === 'event' ? colors.tealSoft : r.type === 'residence' ? `${colors.gold}26` : colors.sandDeep },
                   ]}
                 >
-                  <Feather
+                  <Icon
                     name={r.type === 'offer' ? 'gift' : r.type === 'event' ? 'calendar' : r.type === 'residence' ? 'home' : 'user'}
                     size={13}
                     color={r.type === 'offer' ? colors.coral : r.type === 'event' ? colors.teal : r.type === 'residence' ? colors.gold : colors.inkSoft}
@@ -838,7 +838,7 @@ export default function MapScreen() {
       )}
       {!MAPBOX_TOKEN ? (
         <View style={styles.centered}>
-          <Feather name="alert-circle" size={22} color={colors.inkSoft} />
+          <Icon name="alert-circle" size={22} color={colors.inkSoft} />
           <Text style={styles.missingTokenText}>Map isn’t configured yet.</Text>
         </View>
       ) : !loaded || !html ? (
@@ -858,7 +858,7 @@ export default function MapScreen() {
           onPress={() => toggleTypeFilter('offer')}
           accessibilityLabel={hiddenTypes.offer ? 'Show offers' : 'Hide offers'}
         >
-          <Feather name="gift" size={12} color={hiddenTypes.offer ? colors.inkSoft : colors.coral} />
+          <Icon name="gift" size={12} color={hiddenTypes.offer ? colors.inkSoft : colors.coral} />
           <Text style={[styles.legendText, hiddenTypes.offer && styles.legendTextOff]}>Offers</Text>
         </AnimatedPressable>
         <AnimatedPressable
@@ -866,7 +866,7 @@ export default function MapScreen() {
           onPress={() => toggleTypeFilter('event')}
           accessibilityLabel={hiddenTypes.event ? 'Show events' : 'Hide events'}
         >
-          <Feather name="calendar" size={12} color={hiddenTypes.event ? colors.inkSoft : colors.teal} />
+          <Icon name="calendar" size={12} color={hiddenTypes.event ? colors.inkSoft : colors.teal} />
           <Text style={[styles.legendText, hiddenTypes.event && styles.legendTextOff]}>Events</Text>
         </AnimatedPressable>
         <AnimatedPressable
@@ -874,7 +874,7 @@ export default function MapScreen() {
           onPress={() => toggleTypeFilter('residence')}
           accessibilityLabel={hiddenTypes.residence ? 'Show housing' : 'Hide housing'}
         >
-          <Feather name="home" size={12} color={hiddenTypes.residence ? colors.inkSoft : colors.gold} />
+          <Icon name="home" size={12} color={hiddenTypes.residence ? colors.inkSoft : colors.gold} />
           <Text style={[styles.legendText, hiddenTypes.residence && styles.legendTextOff]}>Housing</Text>
         </AnimatedPressable>
         <AnimatedPressable

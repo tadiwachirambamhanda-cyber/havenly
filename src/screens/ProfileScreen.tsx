@@ -5,7 +5,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import InitialsAvatar from '@/components/InitialsAvatar';
+import Icon from '@/components/Icon';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -13,7 +14,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { formatCount } from '@/utils/formatCount';
-import { radius, spacing, gradients } from '@/theme/tokens';
+import { radius, spacing, gradients, tones } from '@/theme/tokens';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import ActionSheet from '@/components/ActionSheet';
 import EmptyState from '@/components/EmptyState';
@@ -185,20 +186,20 @@ export default function ProfileScreen() {
           {profile.cover_url ? (
             <Image source={{ uri: profile.cover_url }} style={styles.cover} contentFit="cover" transition={200} />
           ) : (
-            <LinearGradient colors={['#FF7A5C', '#E3A23A', '#0F8B82']} locations={[0, 0.6, 1]} style={styles.cover} />
+            <LinearGradient colors={[...tones.coral]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cover} />
           )}
           <Pressable
             style={[styles.settingsBtn, { top: insets.top + 12 }]}
             onPress={() => navigation.navigate('Settings')}
             accessibilityLabel="Settings"
           >
-            <Feather name="settings" size={17} color="#20261F" />
+            <Icon name="settings" size={17} color="#20261F" />
           </Pressable>
           <View style={[styles.avatarRow, { marginTop: avatarMarginTop }]}>
             {profile.avatar_url ? (
               <Image source={{ uri: profile.avatar_url }} style={styles.avatar} transition={200} />
             ) : (
-              <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+              <InitialsAvatar name={profile.display_name} style={styles.avatar} />
             )}
             <Pressable style={styles.editBtn} onPress={() => navigation.navigate('EditProfile')} accessibilityLabel="Edit profile">
               <Text style={styles.editBtnText}>Edit profile</Text>
@@ -229,16 +230,16 @@ export default function ProfileScreen() {
             </Pressable>
           </View>
           <Pressable style={styles.perksRow} onPress={() => navigation.navigate('Offers')} accessibilityLabel="View your perks">
-            <Feather name="gift" size={13} color={colors.coral} />
+            <Icon name="gift" size={13} color={colors.coral} />
             <Text style={styles.perksRowText}>View your perks</Text>
-            <Feather name="chevron-right" size={13} color={colors.inkSoft} />
+            <Icon name="chevron-right" size={13} color={colors.inkSoft} />
           </Pressable>
 
           {interestChips.length > 0 && (
             <View style={styles.chipRow}>
               {interestChips.map((chip) => (
                 <View key={chip.key} style={styles.chip}>
-                  <Feather name={interestIcon(chip.key)} size={11} color={colors.coral} />
+                  <Icon name={interestIcon(chip.key)} size={11} color={colors.coral} />
                   <Text style={styles.chipText}>{chip.label}</Text>
                 </View>
               ))}

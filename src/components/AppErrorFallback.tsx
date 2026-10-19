@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import Icon from '@/components/Icon';
 import { useTheme } from '@/lib/ThemeContext';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
@@ -17,7 +17,7 @@ export default function AppErrorFallback({ onRetry }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.icon}>
-        <Feather name="alert-triangle" size={22} color={colors.coral} />
+        <Icon name="alert-triangle" size={22} color={colors.coral} />
       </View>
       <Text style={styles.title}>Something went wrong</Text>
       <Text style={styles.body}>Havenly hit an unexpected error. Try again, and if it keeps happening, close and reopen the app.</Text>

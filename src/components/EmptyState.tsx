@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import Icon, { type IconName } from '@/components/Icon';
 import { useTheme } from '@/lib/ThemeContext';
 import type { ColorTokens } from '@/theme/tokens';
 
 interface Props {
-  icon: keyof typeof Feather.glyphMap;
+  icon: IconName;
   text: string;
   style?: StyleProp<ViewStyle>;
 }
@@ -15,7 +15,7 @@ export default function EmptyState({ icon, text, style }: Props) {
   const styles = createStyles(colors);
   return (
     <View style={[styles.container, style]}>
-      <Feather name={icon} size={22} color={colors.inkSoft} />
+      <Icon name={icon} size={22} color={colors.inkSoft} />
       <Text style={styles.text}>{text}</Text>
     </View>
   );

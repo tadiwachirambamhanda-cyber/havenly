@@ -11,7 +11,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Clipboard from 'expo-clipboard';
-import { Feather } from '@expo/vector-icons';
+import InitialsAvatar from '@/components/InitialsAvatar';
+import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -286,7 +287,7 @@ export default function PostDetailScreen() {
     return loaded ? (
       <View style={styles.notFound}>
         <BackButton style={[styles.back, { top: insets.top + 12 }]}>
-          <Feather name="arrow-left" size={16} color="#20261F" />
+          <Icon name="arrow-left" size={16} color="#20261F" />
         </BackButton>
         <Text style={styles.notFoundText}>This post isn't available.</Text>
       </View>
@@ -306,7 +307,7 @@ export default function PostDetailScreen() {
       {comment.author?.avatar_url ? (
         <Image source={{ uri: comment.author.avatar_url }} style={styles.commentAvatar} transition={200} />
       ) : (
-        <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.commentAvatar} />
+        <InitialsAvatar name={comment.author?.display_name} style={styles.commentAvatar} />
       )}
       <View style={{ flex: 1 }}>
         <Text style={styles.commentMeta}>
@@ -334,18 +335,18 @@ export default function PostDetailScreen() {
           pointerEvents="none"
           style={[styles.heartPop, { opacity: heartPopOpacity, transform: [{ scale: heartPopScale }] }]}
         >
-          <Feather name="heart" size={84} color="white" />
+          <Icon name="heart" size={84} color="white" weight="fill" />
         </Animated.View>
 
         <BackButton style={[styles.videoBack, { top: insets.top + 12 }]}>
-          <Feather name="arrow-left" size={18} color="white" />
+          <Icon name="arrow-left" size={18} color="white" />
         </BackButton>
         <Pressable
           style={[styles.videoOverflow, { top: insets.top + 12 }]}
           onPress={openOptions}
           accessibilityLabel="More options"
         >
-          <Feather name="more-horizontal" size={20} color="white" />
+          <Icon name="more-horizontal" size={20} color="white" />
         </Pressable>
 
         <View style={[styles.videoBottomRow, { paddingBottom: insets.bottom + 20 }]}>
@@ -360,7 +361,7 @@ export default function PostDetailScreen() {
                 {post.author?.avatar_url ? (
                   <Image source={{ uri: post.author.avatar_url }} style={styles.videoAvatar} transition={200} />
                 ) : (
-                  <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.videoAvatar} />
+                  <InitialsAvatar name={post.author?.display_name} style={styles.videoAvatar} />
                 )}
                 <Text style={styles.videoUsername} numberOfLines={1}>
                   {post.is_editorial ? 'Havenly Editorial' : `@${post.author?.username ?? 'user'}`}
@@ -390,29 +391,29 @@ export default function PostDetailScreen() {
               accessibilityLabel={videoMuted ? 'Unmute' : 'Mute'}
             >
               <View style={styles.railIconCircle}>
-                <Feather name={videoMuted ? 'volume-x' : 'volume-2'} size={20} color="white" />
+                <Icon name={videoMuted ? 'volume-off' : 'volume-on'} size={20} color="white" />
               </View>
             </AnimatedPressable>
             <AnimatedPressable style={styles.railItem} onPress={toggleLike} accessibilityLabel={liked ? 'Unlike' : 'Like'}>
               <Animated.View style={[styles.railIconCircle, { transform: [{ scale: likeIconScale }] }]}>
-                <Feather name="heart" size={22} color={liked ? colors.coral : 'white'} />
+                <Icon name="heart" size={22} color={liked ? colors.coral : 'white'} weight={liked ? 'fill' : undefined} />
               </Animated.View>
               <Text style={styles.railText}>{formatCount(post.like_count)}</Text>
             </AnimatedPressable>
             <AnimatedPressable style={styles.railItem} onPress={() => setCommentsVisible(true)} accessibilityLabel="View comments">
-              <View style={styles.railIconCircle}><Feather name="message-circle" size={22} color="white" /></View>
+              <View style={styles.railIconCircle}><Icon name="message-circle" size={22} color="white" /></View>
               <Text style={styles.railText}>{formatCount(post.comment_count)}</Text>
             </AnimatedPressable>
             {!isOwnPost && (
               <AnimatedPressable style={styles.railItem} onPress={onMessage} accessibilityLabel="Message this user">
-                <View style={styles.railIconCircle}><Feather name="send" size={19} color="white" /></View>
+                <View style={styles.railIconCircle}><Icon name="send" size={19} color="white" /></View>
               </AnimatedPressable>
             )}
             <AnimatedPressable style={styles.railItem} onPress={openShare} accessibilityLabel="Share this post">
-              <View style={styles.railIconCircle}><Feather name="share-2" size={19} color="white" /></View>
+              <View style={styles.railIconCircle}><Icon name="share" size={19} color="white" /></View>
             </AnimatedPressable>
             <AnimatedPressable style={styles.railItem} onPress={toggleSave} accessibilityLabel={saved ? 'Remove from saved' : 'Save this post'}>
-              <View style={styles.railIconCircle}><Feather name="bookmark" size={19} color={saved ? colors.coral : 'white'} /></View>
+              <View style={styles.railIconCircle}><Icon name="bookmark" size={19} color={saved ? colors.coral : 'white'} weight={saved ? 'fill' : undefined} /></View>
             </AnimatedPressable>
           </View>
         </View>
@@ -437,7 +438,7 @@ export default function PostDetailScreen() {
                   onSubmitEditing={addComment}
                 />
                 <Pressable style={styles.commentSendBtn} onPress={addComment} accessibilityLabel="Post comment">
-                  <Feather name="send" size={15} color={colors.sand} />
+                  <Icon name="send" size={15} color={colors.sand} />
                 </Pressable>
               </View>
             </View>
@@ -509,17 +510,17 @@ export default function PostDetailScreen() {
           pointerEvents="none"
           style={[styles.heartPop, { opacity: heartPopOpacity, transform: [{ scale: heartPopScale }] }]}
         >
-          <Feather name="heart" size={84} color="white" />
+          <Icon name="heart" size={84} color="white" weight="fill" />
         </Animated.View>
         <BackButton style={[styles.back, { top: insets.top + 12 }]}>
-          <Feather name="arrow-left" size={16} color="#20261F" />
+          <Icon name="arrow-left" size={16} color="#20261F" />
         </BackButton>
         <Pressable
           style={[styles.overflow, { top: insets.top + 12 }]}
           onPress={openOptions}
           accessibilityLabel="More options"
         >
-          <Feather name="more-horizontal" size={17} color="#20261F" />
+          <Icon name="more-horizontal" size={17} color="#20261F" />
         </Pressable>
       </View>
       <View style={styles.body}>
@@ -536,7 +537,7 @@ export default function PostDetailScreen() {
             {post.author?.avatar_url ? (
               <Image source={{ uri: post.author.avatar_url }} style={styles.avatar} transition={200} />
             ) : (
-              <LinearGradient colors={['#0F8B82', '#FF5A3C']} style={styles.avatar} />
+              <InitialsAvatar name={post.author?.display_name} style={styles.avatar} />
             )}
             <View style={{ flex: 1 }}>
               <Text style={styles.username}>{post.is_editorial ? 'Havenly Editorial' : `@${post.author?.username ?? 'user'}`}</Text>
@@ -546,7 +547,7 @@ export default function PostDetailScreen() {
           {!isOwnPost && (
             <View style={{ flexDirection: 'row', gap: 8 }}>
               <AnimatedPressable style={styles.messageBtn} onPress={onMessage} accessibilityLabel="Message this user">
-                <Feather name="message-circle" size={14} color={colors.ink} />
+                <Icon name="message-circle" size={14} color={colors.ink} />
               </AnimatedPressable>
               <AnimatedPressable
                 style={[styles.followBtn, following && styles.followBtnActive]}
@@ -566,20 +567,20 @@ export default function PostDetailScreen() {
         <View style={styles.actionBar}>
           <AnimatedPressable style={styles.actionItem} onPress={toggleLike} accessibilityLabel={liked ? 'Unlike' : 'Like'}>
             <Animated.View style={{ transform: [{ scale: likeIconScale }] }}>
-              <Feather name="heart" size={15} color={liked ? colors.coral : colors.inkSoft} />
+              <Icon name="heart" size={15} color={liked ? colors.coral : colors.inkSoft} weight={liked ? 'fill' : undefined} />
             </Animated.View>
             <Text style={[styles.actionText, liked && styles.actionTextActive]}>{formatCount(post.like_count)}</Text>
           </AnimatedPressable>
           <View style={styles.actionItem}>
-            <Feather name="message-circle" size={15} color={colors.inkSoft} />
+            <Icon name="message-circle" size={15} color={colors.inkSoft} />
             <Text style={styles.actionText}>{post.comment_count}</Text>
           </View>
           <AnimatedPressable style={styles.actionItem} onPress={openShare} accessibilityLabel="Share this post">
-            <Feather name="share-2" size={15} color={colors.inkSoft} />
+            <Icon name="share" size={15} color={colors.inkSoft} />
             <Text style={styles.actionText}>Share</Text>
           </AnimatedPressable>
           <AnimatedPressable style={styles.actionItem} onPress={toggleSave} accessibilityLabel={saved ? 'Remove from saved' : 'Save this post'}>
-            <Feather name="bookmark" size={15} color={saved ? colors.coral : colors.inkSoft} />
+            <Icon name="bookmark" size={15} color={saved ? colors.coral : colors.inkSoft} weight={saved ? 'fill' : undefined} />
             <Text style={[styles.actionText, saved && styles.actionTextActive]}>{saved ? 'Saved' : 'Save'}</Text>
           </AnimatedPressable>
         </View>
@@ -642,7 +643,7 @@ export default function PostDetailScreen() {
         onSubmitEditing={addComment}
       />
       <Pressable style={styles.commentSendBtn} onPress={addComment} accessibilityLabel="Post comment">
-        <Feather name="send" size={15} color={colors.sand} />
+        <Icon name="send" size={15} color={colors.sand} />
       </Pressable>
     </View>
     </View>
