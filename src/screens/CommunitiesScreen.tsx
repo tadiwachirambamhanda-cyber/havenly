@@ -14,7 +14,7 @@ import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
 import { calmDuration, calmEasing } from '@/lib/animations';
 import { haptics } from '@/lib/haptics';
-import { formatCount } from '@/utils/formatCount';
+import { formatMembers } from '@/utils/formatCount';
 import Skeleton from '@/components/Skeleton';
 import type { Community, CommunityCategory } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -145,7 +145,7 @@ export default function CommunitiesScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.cardName}>{item.name}</Text>
-              <Text style={styles.cardMeta}>{formatCount(item.member_count)} members</Text>
+              <Text style={styles.cardMeta}>{formatMembers(item.member_count)}</Text>
             </View>
             {matchesUser(item) && (
               <View style={styles.matchBadge}><Text style={styles.matchBadgeText}>For you</Text></View>
@@ -170,10 +170,10 @@ function createStyles(colors: ColorTokens) {
   sectionLabel: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft },
   sectionToggle: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.coral },
   card: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginHorizontal: spacing.lg, marginBottom: spacing.sm, backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, padding: spacing.md },
-  iconChip: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  iconChip: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },
   cardName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   cardMeta: { fontSize: 11, color: colors.inkSoft, marginTop: 2 },
-  matchBadge: { backgroundColor: colors.tealSoft, paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.tag },
+  matchBadge: { backgroundColor: colors.sandDeep, paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.tag },
   matchBadgeText: { fontSize: 10, fontWeight: '700', color: colors.teal },
   });
 }

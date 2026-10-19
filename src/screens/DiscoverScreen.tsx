@@ -12,7 +12,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { haptics } from '@/lib/haptics';
 import { toggleInterest as togglePlaceInterest } from '@/lib/interests';
-import { formatCount } from '@/utils/formatCount';
+import { formatCount, formatMembers } from '@/utils/formatCount';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon, interestIcon } from '@/constants/topicIcons';
@@ -313,7 +313,7 @@ export default function DiscoverScreen() {
               <View style={styles.resultIcon}><Icon name={communityIcon(c)} size={15} color={colors.teal} /></View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.resultTitle}>{c.name}</Text>
-                <Text style={styles.resultSub}>{c.member_count} members</Text>
+                <Text style={styles.resultSub}>{formatMembers(c.member_count)}</Text>
               </View>
             </Pressable>
           ))}
@@ -350,7 +350,7 @@ export default function DiscoverScreen() {
                   <View style={styles.eventActions}>
                     <AnimatedPressable
                       style={styles.interestBtn}
-                      scaleTo={0.8}
+                      scaleTo={0.92}
                       onPress={() => toggleInterest(event.id)}
                       hitSlop={8}
                       accessibilityLabel={interested ? "Remove interest in this event" : "I'm interested in this event"}
@@ -460,7 +460,7 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: radius.md, padding: spacing.md,
   },
   eventRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  eventDate: { width: 46, height: 46, borderRadius: radius.sm, backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  eventDate: { width: 46, height: 46, borderRadius: radius.sm, backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },
   eventDay: { fontSize: 15, lineHeight: 17, fontWeight: '800', color: colors.teal },
   eventMonth: { fontSize: 8.5, textTransform: 'uppercase', fontWeight: '800', color: colors.teal },
   eventName: { fontSize: 12.5, fontWeight: '700', color: colors.ink },

@@ -396,7 +396,7 @@ function createStyles(colors: ColorTokens) {
   overflow: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   headerAuthorTap: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   headerAvatar: { width: 34, height: 34, borderRadius: 17 },
-  groupAvatar: { backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  groupAvatar: { backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },
   headerName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   headerSub: { fontSize: 10.5, color: colors.inkSoft, marginTop: 1 },
   senderName: { fontSize: 10.5, fontWeight: '700', color: colors.inkSoft, marginBottom: 3, marginLeft: 4 },

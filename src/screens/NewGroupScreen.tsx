@@ -196,7 +196,7 @@ function createStyles(colors: ColorTokens) {
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
   iconPicker: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: spacing.lg, marginBottom: 14 },
   iconPreview: { width: 56, height: 56, borderRadius: 28 },
-  iconPlaceholder: { backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  iconPlaceholder: { backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },
   iconPickerText: { fontSize: 13, fontWeight: '700', color: colors.teal },
   nameInput: {
     marginHorizontal: spacing.lg, marginBottom: 10, backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line,

@@ -16,7 +16,7 @@ import { radius, spacing } from '@/theme/tokens';
 import { cheapestRoom, formatAed, PERIOD_LABEL } from '@/lib/housing';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
-import { formatCount } from '@/utils/formatCount';
+import { formatCount, formatMembers } from '@/utils/formatCount';
 import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
 import VideoThumb from '@/components/VideoThumb';
@@ -157,7 +157,7 @@ export default function CommunityDetailScreen() {
           <Icon name={communityIcon(community)} size={28} color={colors.teal} />
         </View>
         <Text style={styles.name}>{community.name}</Text>
-        <Text style={styles.members}>{formatCount(community.member_count)} members</Text>
+        <Text style={styles.members}>{formatMembers(community.member_count)}</Text>
         <Text style={styles.desc}>{community.description}</Text>
         {canJoin ? (
           <AnimatedPressable
@@ -278,7 +278,7 @@ function createStyles(colors: ColorTokens) {
   notFound: { flex: 1, backgroundColor: colors.sand, paddingTop: 60, paddingHorizontal: spacing.lg },
   notFoundText: { color: colors.inkSoft, textAlign: 'center', marginTop: 100 },
   body: { padding: spacing.lg },
-  iconChip: { width: 68, height: 68, borderRadius: 34, backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  iconChip: { width: 68, height: 68, borderRadius: 34, backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },
   name: { fontFamily: 'Fraunces_600SemiBold', fontSize: 21, color: colors.ink, marginTop: 8 },
   members: { fontSize: 12, color: colors.inkSoft, marginTop: 4 },
   desc: { fontSize: 13, color: colors.inkSoft, lineHeight: 20, marginTop: 12 },

@@ -204,7 +204,7 @@ function createStyles(colors: ColorTokens) {
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
   avatar: { width: 44, height: 44, borderRadius: 22 },
-  groupAvatar: { backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  groupAvatar: { backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },
   name: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   handle: { fontSize: 11.5, color: colors.inkSoft, marginTop: 2 },
   sendBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: radius.button, backgroundColor: colors.ink, minWidth: 72, alignItems: 'center' },

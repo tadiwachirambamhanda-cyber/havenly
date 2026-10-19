@@ -820,7 +820,7 @@ export default function MapScreen() {
                 <View
                   style={[
                     styles.searchResultIcon,
-                    { backgroundColor: r.type === 'offer' ? colors.coralSoft : r.type === 'event' ? colors.tealSoft : r.type === 'residence' ? `${colors.gold}26` : colors.sandDeep },
+                    { backgroundColor: colors.sandDeep },
                   ]}
                 >
                   <Icon
@@ -908,7 +908,7 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: colors.sand,
   },
   locationNoticeText: { flex: 1, fontSize: 11.5, color: colors.inkSoft },
-  locationEnableBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.button, backgroundColor: colors.tealSoft },
+  locationEnableBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.teal },
   locationEnableBtnText: { fontSize: 11, fontWeight: '700', color: colors.teal },
   searchBar: {
     flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: spacing.lg, marginBottom: 10,

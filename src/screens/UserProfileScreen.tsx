@@ -370,8 +370,8 @@ function createStyles(colors: ColorTokens) {
   streakStat: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   statLabel: { fontSize: 10.5, color: colors.inkSoft, fontWeight: '600', marginTop: 2 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, paddingHorizontal: spacing.lg, paddingVertical: 14 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.tag, backgroundColor: colors.coralSoft },
-  chipText: { fontSize: 11, fontWeight: '700', color: colors.coral },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.tag, backgroundColor: colors.sandDeep },
+  chipText: { fontSize: 11, fontWeight: '700', color: colors.ink },
   sectionLabel: {
     fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 6, marginBottom: 10,
   },

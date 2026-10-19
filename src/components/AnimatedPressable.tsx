@@ -10,11 +10,11 @@ interface Props extends Omit<PressableProps, 'style'> {
   children?: React.ReactNode;
 }
 
-// The one press-feedback primitive for the whole app — every "best" app's
-// buttons/cards visibly settle into a tap rather than just firing an
-// onPress with no physical feedback. A spring (not a timing curve) is what
-// makes it read as touch-responsive rather than a generic fade.
-export default function AnimatedPressable({ style, scaleTo = 0.95, onPressIn, onPressOut, children, ...rest }: Props) {
+// The one press-feedback primitive for the whole app: buttons and cards
+// settle slightly into a tap rather than firing with no physical feedback.
+// Kept small (0.97 default, 0.92 at most for small icon buttons); a big
+// bouncy squish on everything reads as a template effect.
+export default function AnimatedPressable({ style, scaleTo = 0.97, onPressIn, onPressOut, children, ...rest }: Props) {
   const scale = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 

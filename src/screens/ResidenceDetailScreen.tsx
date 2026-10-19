@@ -249,7 +249,7 @@ export default function ResidenceDetailScreen() {
       </BackButton>
       <AnimatedPressable
         style={[styles.saveBtn, { top: insets.top + 12 }]}
-        scaleTo={0.85}
+        scaleTo={0.92}
         onPress={toggleSaved}
         accessibilityLabel={saved ? 'Remove from saved' : 'Save residence'}
       >
@@ -333,7 +333,7 @@ function createStyles(colors: ColorTokens) {
     roomPeriod: { fontSize: 11, color: colors.inkSoft, marginTop: 1 },
     amenityGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     amenity: {
-      flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.tealSoft,
+      flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.sandDeep,
       paddingHorizontal: 10, paddingVertical: 7, borderRadius: radius.tag,
     },
     amenityText: { fontSize: 12, fontWeight: '600', color: colors.ink },

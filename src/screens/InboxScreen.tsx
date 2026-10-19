@@ -245,7 +245,7 @@ function createStyles(colors: ColorTokens) {
     width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,
     alignItems: 'center', justifyContent: 'center',
   },
-  groupAvatar: { backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  groupAvatar: { backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },
   searchBar: {
     flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: spacing.lg, marginTop: 12, marginBottom: 6,
     paddingHorizontal: 16, paddingVertical: 11, backgroundColor: colors.white, borderWidth: 1.5,

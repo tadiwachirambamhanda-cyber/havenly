@@ -8,3 +8,8 @@ export function formatCount(n: number): string {
   if (n < 1_000_000) return divide(n / 1000, 'k');
   return divide(n / 1_000_000, 'M');
 }
+
+// "1 member", "0 members", "3.2k members".
+export function formatMembers(n: number): string {
+  return `${formatCount(n)} ${n === 1 ? 'member' : 'members'}`;
+}

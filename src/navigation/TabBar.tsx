@@ -54,7 +54,7 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
       <AnimatedPressable
         key={route.key}
         style={styles.pillItem}
-        scaleTo={0.88}
+        scaleTo={0.92}
         accessibilityLabel={route.name}
         onLayout={(e) => {
           const { x, width } = e.nativeEvent.layout;
@@ -84,7 +84,7 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
       </View>
       <AnimatedPressable
         style={styles.fab}
-        scaleTo={0.88}
+        scaleTo={0.92}
         accessibilityLabel="Create post"
         onPress={() => {
           haptics.tap();
