@@ -290,7 +290,7 @@ function createStyles(colors: ColorTokens) {
     actionRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
     actionBtn: {
       flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 12,
-      borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line,
+      borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.line,
     },
     actionText: { fontSize: 12.5, fontWeight: '700', color: colors.ink },
     detailRow: { flexDirection: 'row', gap: 10, paddingVertical: 4 },
@@ -299,7 +299,7 @@ function createStyles(colors: ColorTokens) {
     message: { fontSize: 13, color: colors.ink, lineHeight: 19, marginTop: 8, fontStyle: 'italic' },
     copyBtn: {
       flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: colors.ink,
-      paddingVertical: 11, borderRadius: radius.pill, marginTop: 14,
+      paddingVertical: 11, borderRadius: radius.button, marginTop: 14,
     },
     copyBtnText: { color: colors.sand, fontWeight: '700', fontSize: 13 },
     partnerName: { fontSize: 14, fontWeight: '700', color: colors.ink, marginBottom: 4 },
@@ -315,7 +315,7 @@ function createStyles(colors: ColorTokens) {
       padding: 12, fontSize: 15, color: colors.ink, fontVariant: ['tabular-nums'],
     },
     feePreview: { fontSize: 12.5, fontWeight: '700', color: colors.teal, marginTop: 8 },
-    saveBtn: { marginTop: 14, backgroundColor: colors.coral, paddingVertical: 12, borderRadius: radius.pill, alignItems: 'center' },
+    saveBtn: { marginTop: 14, backgroundColor: colors.coral, paddingVertical: 12, borderRadius: radius.button, alignItems: 'center' },
     saveBtnText: { color: 'white', fontWeight: '700', fontSize: 13.5 },
     feeBox: {
       flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 14, paddingTop: 14,
@@ -324,7 +324,7 @@ function createStyles(colors: ColorTokens) {
     feeAmount: { fontSize: 20, fontWeight: '800', color: colors.ink, fontVariant: ['tabular-nums'] },
     paidBtn: {
       flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 12,
-      borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line,
+      borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.line,
     },
     paidBtnActive: { borderColor: colors.teal, backgroundColor: colors.tealSoft },
     paidBtnText: { fontSize: 12.5, fontWeight: '700', color: colors.ink },

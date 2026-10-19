@@ -20,7 +20,10 @@ export type ColorTokens = typeof lightColors;
 // Default export used by any file not yet migrated to useTheme() — kept as
 // the light palette so nothing breaks mid-migration.
 export const colors = lightColors;
-export const radius = { lg: 26, md: 16, sm: 10, pill: 100 };
+// pill is for things you tap to toggle (filter chips, segments) and the
+// floating tab bar/toast; buttons and inputs use button; read-only labels
+// (status, amenities, badges) use tag, so shape alone says "tappable" or not.
+export const radius = { lg: 26, md: 16, sm: 10, button: 14, tag: 6, pill: 100 };
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 20, xl: 28 };
 export const fonts = {
   display: 'Fraunces_600SemiBold', displayItalic: 'Fraunces_500Medium_Italic',

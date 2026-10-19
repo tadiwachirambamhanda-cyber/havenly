@@ -237,7 +237,7 @@ function createStyles(colors: ColorTokens) {
     },
     nearBadge: {
       position: 'absolute', left: 12, bottom: 12, flexDirection: 'row', alignItems: 'center', gap: 4,
-      backgroundColor: 'rgba(15,139,130,0.92)', paddingHorizontal: 9, paddingVertical: 5, borderRadius: radius.pill,
+      backgroundColor: 'rgba(15,139,130,0.92)', paddingHorizontal: 9, paddingVertical: 5, borderRadius: radius.tag,
     },
     nearBadgeText: { color: 'white', fontSize: 11, fontWeight: '700' },
     cardBody: { padding: 14 },
@@ -246,7 +246,7 @@ function createStyles(colors: ColorTokens) {
     cardMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
     cardPrice: { fontSize: 12.5, color: colors.inkSoft },
     cardPriceStrong: { fontWeight: '800', color: colors.ink },
-    policyPill: { backgroundColor: colors.sandDeep, paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill },
+    policyPill: { backgroundColor: colors.sandDeep, paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.tag },
     policyPillText: { fontSize: 10.5, fontWeight: '700', color: colors.inkSoft },
   });
 }

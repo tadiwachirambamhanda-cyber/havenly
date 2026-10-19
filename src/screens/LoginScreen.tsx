@@ -6,7 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/lib/ThemeContext';
-import { spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -119,7 +119,7 @@ function createStyles(colors: ColorTokens) {
   },
   inputFocused: { borderBottomColor: colors.coral },
   error: { color: colors.coral, fontSize: 13, marginBottom: 14, lineHeight: 18 },
-  btnPrimary: { backgroundColor: colors.coral, paddingVertical: 16, borderRadius: 100, alignItems: 'center', marginTop: 10 },
+  btnPrimary: { backgroundColor: colors.coral, paddingVertical: 16, borderRadius: radius.button, alignItems: 'center', marginTop: 10 },
   btnPrimaryText: { color: 'white', fontWeight: '700', fontSize: 15 },
   switchLink: { textAlign: 'center', marginTop: 18, fontSize: 13.5, color: colors.inkSoft },
   switchLinkBold: { color: colors.teal, fontWeight: '700' },

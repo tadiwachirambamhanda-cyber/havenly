@@ -419,7 +419,7 @@ function createStyles(colors: ColorTokens) {
     },
     photoCover: {
       position: 'absolute', left: 5, bottom: 5, paddingHorizontal: 6, paddingVertical: 2,
-      borderRadius: radius.pill, backgroundColor: 'rgba(0,0,0,0.6)',
+      borderRadius: radius.tag, backgroundColor: 'rgba(0,0,0,0.6)',
     },
     photoCoverText: { color: 'white', fontSize: 10, fontWeight: '700' },
     roomCard: {
@@ -432,7 +432,7 @@ function createStyles(colors: ColorTokens) {
     removeText: { fontSize: 12.5, fontWeight: '700', color: colors.coral },
     addRoomBtn: {
       flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginHorizontal: spacing.lg,
-      paddingVertical: 11, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line,
+      paddingVertical: 11, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.line,
     },
     addRoomText: { fontSize: 13, fontWeight: '700', color: colors.ink },
     chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: spacing.lg },

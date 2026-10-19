@@ -105,7 +105,7 @@ export default function OfferDetailScreen() {
     try {
       await sendPing(checkIn.id);
       haptics.success();
-      showToast(`Pinged ${checkIn.user.display_name} 👋`);
+      showToast(`Pinged ${checkIn.user.display_name}`);
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Couldn’t send ping.', 'error');
     } finally {
@@ -142,7 +142,7 @@ export default function OfferDetailScreen() {
           <Skeleton style={{ height: 22, width: '70%', marginTop: 8 }} />
           <Skeleton style={{ height: 15, width: '35%', marginTop: 8 }} />
           <Skeleton style={{ height: 14, width: '90%', marginTop: 14 }} />
-          <Skeleton style={{ height: 48, width: '100%', marginTop: 20, borderRadius: 100 }} />
+          <Skeleton style={{ height: 48, width: '100%', marginTop: 20, borderRadius: radius.button }} />
         </View>
       </View>
     );
@@ -275,7 +275,10 @@ export default function OfferDetailScreen() {
                         {pingingId === c.id ? (
                           <ActivityIndicator size="small" color={colors.ink} />
                         ) : (
-                          <Text style={styles.pingBtnText}>Ping 👋</Text>
+                          <>
+                              <Icon name="hand-waving" size={13} color={colors.ink} />
+                              <Text style={styles.pingBtnText}>Ping</Text>
+                            </>
                         )}
                       </Pressable>
                     )}
@@ -308,11 +311,11 @@ function createStyles(colors: ColorTokens) {
   description: { fontSize: 13.5, color: colors.inkSoft, lineHeight: 20, marginTop: 12 },
   streakRow: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 16 },
   streakRowText: { fontSize: 12.5, color: colors.inkSoft },
-  claimBtn: { marginTop: 20, backgroundColor: colors.coral, paddingVertical: 15, borderRadius: radius.pill, alignItems: 'center' },
+  claimBtn: { marginTop: 20, backgroundColor: colors.coral, paddingVertical: 15, borderRadius: radius.button, alignItems: 'center' },
   claimBtnText: { color: 'white', fontWeight: '700', fontSize: 14 },
   lockedBox: {
     flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 20, backgroundColor: colors.sandDeep,
-    paddingVertical: 13, paddingHorizontal: 16, borderRadius: radius.pill,
+    paddingVertical: 13, paddingHorizontal: 16, borderRadius: radius.button,
   },
   lockedText: { flex: 1, color: colors.inkSoft, fontSize: 12.5, fontWeight: '600' },
   codeCard: {
@@ -323,7 +326,7 @@ function createStyles(colors: ColorTokens) {
   checkInSection: { marginTop: 24, paddingTop: 20, borderTopWidth: 1, borderColor: colors.line },
   goingBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.sandDeep,
-    paddingVertical: 13, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line,
+    paddingVertical: 13, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.line,
   },
   goingBtnActive: { backgroundColor: `${colors.gold}26`, borderColor: colors.gold },
   goingBtnText: { color: colors.ink, fontWeight: '700', fontSize: 13.5 },
@@ -333,7 +336,7 @@ function createStyles(colors: ColorTokens) {
   goingListText: { marginLeft: 6, fontSize: 11.5, color: colors.inkSoft, fontWeight: '600' },
   checkInBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.teal,
-    paddingVertical: 13, borderRadius: radius.pill, marginTop: 20,
+    paddingVertical: 13, borderRadius: radius.button, marginTop: 20,
   },
   checkInBtnActive: { backgroundColor: colors.tealSoft, borderWidth: 1.5, borderColor: colors.teal },
   checkInBtnText: { color: 'white', fontWeight: '700', fontSize: 13.5 },
@@ -346,7 +349,7 @@ function createStyles(colors: ColorTokens) {
   checkInRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
   checkInAvatar: { width: 32, height: 32, borderRadius: 16 },
   checkInName: { flex: 1, fontSize: 12.5, fontWeight: '600', color: colors.ink },
-  pingBtn: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: radius.pill, backgroundColor: colors.sandDeep, borderWidth: 1, borderColor: colors.line },
+  pingBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 7, borderRadius: radius.button, backgroundColor: colors.sandDeep, borderWidth: 1, borderColor: colors.line },
   pingBtnText: { fontSize: 11.5, fontWeight: '700', color: colors.ink },
   });
 }

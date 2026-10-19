@@ -5,7 +5,7 @@ import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
-import { spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { INTEREST_OPTIONS, INTEREST_CATEGORIES } from '@/constants/interests';
 import { interestIcon } from '@/constants/topicIcons';
@@ -96,7 +96,7 @@ function createStyles(colors: ColorTokens) {
   chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
   chipText: { fontSize: 13.5, fontWeight: '600', color: colors.ink },
   chipTextSelected: { color: colors.sand },
-  btnPrimary: { backgroundColor: colors.coral, paddingVertical: 16, borderRadius: 100, alignItems: 'center' },
+  btnPrimary: { backgroundColor: colors.coral, paddingVertical: 16, borderRadius: radius.button, alignItems: 'center' },
   btnPrimaryText: { color: 'white', fontWeight: '700', fontSize: 15 },
   skip: { textAlign: 'center', marginTop: 12, fontSize: 12.5, color: colors.inkSoft, fontWeight: '600' },
   });

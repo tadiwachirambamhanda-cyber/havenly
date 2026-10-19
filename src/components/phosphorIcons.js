@@ -37,6 +37,7 @@ import { GameControllerIcon } from 'phosphor-react-native/src/icons/GameControll
 import { GearIcon } from 'phosphor-react-native/src/icons/Gear';
 import { GiftIcon } from 'phosphor-react-native/src/icons/Gift';
 import { GraduationCapIcon } from 'phosphor-react-native/src/icons/GraduationCap';
+import { FlameIcon } from 'phosphor-react-native/src/icons/Flame';
 import { HandWavingIcon } from 'phosphor-react-native/src/icons/HandWaving';
 import { HeartIcon } from 'phosphor-react-native/src/icons/Heart';
 import { HouseIcon } from 'phosphor-react-native/src/icons/House';
@@ -111,6 +112,7 @@ export const ICONS = {
   'gift': GiftIcon,
   'graduation-cap': GraduationCapIcon,
   'grid': SquaresFourIcon,
+  'flame': FlameIcon,
   'hand-waving': HandWavingIcon,
   'heart': HeartIcon,
   'home': HouseIcon,

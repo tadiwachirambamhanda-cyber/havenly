@@ -125,7 +125,7 @@ function createStyles(colors: ColorTokens) {
     name: { fontSize: 14, fontWeight: '700', color: colors.ink },
     meta: { fontSize: 12, color: colors.inkSoft, marginTop: 2 },
     footRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 7 },
-    statusPill: { paddingHorizontal: 9, paddingVertical: 3, borderRadius: radius.pill },
+    statusPill: { paddingHorizontal: 9, paddingVertical: 3, borderRadius: radius.tag },
     statusText: { fontSize: 11, fontWeight: '700' },
     time: { fontSize: 11, color: colors.inkSoft },
   });

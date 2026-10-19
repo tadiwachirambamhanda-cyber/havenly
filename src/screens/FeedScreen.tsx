@@ -372,7 +372,7 @@ export default function FeedScreen() {
             <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
           ) : null}
           {item.is_editorial && (
-            <View style={styles.editorialBadge}><Text style={styles.editorialBadgeText}>★ Havenly Picks</Text></View>
+            <View style={styles.editorialBadge}><Text style={styles.editorialBadgeText}>Havenly Pick</Text></View>
           )}
         </View>
         <View style={styles.cardBody}>
@@ -460,7 +460,8 @@ export default function FeedScreen() {
                 onPress={() => { haptics.tap(); navigation.navigate('Offers'); }}
                 accessibilityLabel={`${profile.current_streak} day streak — view perks`}
               >
-                <Text style={styles.streakBadgeText}>🔥 {profile.current_streak}</Text>
+                <Icon name="flame" size={15} color="white" weight="fill" />
+                <Text style={styles.streakBadgeText}>{profile.current_streak}</Text>
               </AnimatedPressable>
           )}
           <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Notifications')} accessibilityLabel="Notifications">
@@ -542,7 +543,7 @@ export default function FeedScreen() {
                 )}
                 <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={StyleSheet.absoluteFill} />
                 <View style={styles.dailyPickBody}>
-                  <Text style={styles.dailyPickEyebrow}>★ Today's pick</Text>
+                  <Text style={styles.dailyPickEyebrow}>Today's pick</Text>
                   <Text style={styles.dailyPickTitle} numberOfLines={2}>{dailyPick.title}</Text>
                   <Text style={styles.dailyPickMeta}>
                     {dailyPick.tag} · {dailyPick.is_editorial ? 'Havenly Editorial' : `@${dailyPick.author?.username ?? 'user'}`}
@@ -592,7 +593,7 @@ function createStyles(colors: ColorTokens) {
   topBarActions: { flexDirection: 'row', gap: spacing.sm },
   iconBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
   iconBtnDot: { position: 'absolute', top: 6, right: 7, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral, borderWidth: 1.5, borderColor: colors.white },
-  streakBadge: { height: 36, paddingHorizontal: 13, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.coral },
+  streakBadge: { height: 36, paddingHorizontal: 12, borderRadius: 18, flexDirection: 'row', gap: 4, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.coral },
   streakBadgeText: { fontSize: 13.5, fontWeight: '800', color: 'white', letterSpacing: 0.1 },
   interestRow: { flexDirection: 'row', gap: 8, paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
   interestChip: {
@@ -645,7 +646,7 @@ function createStyles(colors: ColorTokens) {
   cardImage: { justifyContent: 'flex-start' },
   // Fixed dark plaque regardless of theme — colors.ink would flip to cream in
   // dark mode and break the gold text's contrast, so this one stays literal.
-  editorialBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: '#20261F', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 100 },
+  editorialBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: '#20261F', paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.tag },
   editorialBadgeText: { color: colors.gold, fontSize: 9, fontWeight: '700' },
   cardBody: { padding: 11 },
   cardTag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 9.5, color: colors.teal, textTransform: 'uppercase' },

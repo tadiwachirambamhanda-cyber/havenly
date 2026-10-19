@@ -204,7 +204,7 @@ function createStyles(colors: ColorTokens) {
   searchBar: {
     flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: spacing.lg, marginBottom: 6,
     paddingHorizontal: 16, paddingVertical: 11, backgroundColor: colors.white, borderWidth: 1.5,
-    borderColor: colors.line, borderRadius: radius.pill,
+    borderColor: colors.line, borderRadius: radius.button,
   },
   searchInput: { flex: 1, fontSize: 13, color: colors.ink },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
@@ -220,7 +220,7 @@ function createStyles(colors: ColorTokens) {
     position: 'absolute', left: 0, right: 0, bottom: 0, padding: spacing.lg,
     backgroundColor: colors.sand, borderTopWidth: 1, borderColor: colors.line,
   },
-  createBtn: { backgroundColor: colors.coral, borderRadius: radius.pill, paddingVertical: 14, alignItems: 'center' },
+  createBtn: { backgroundColor: colors.coral, borderRadius: radius.button, paddingVertical: 14, alignItems: 'center' },
   createBtnDisabled: { backgroundColor: colors.sandDeep, borderWidth: 1, borderColor: colors.line },
   createBtnText: { fontSize: 14, fontWeight: '700', color: 'white' },
   createBtnTextDisabled: { color: colors.inkSoft },

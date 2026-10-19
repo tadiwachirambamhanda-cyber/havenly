@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Icon from '@/components/Icon';
 import { useTheme } from '@/lib/ThemeContext';
 import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
@@ -35,7 +36,7 @@ export default function UniversityPickerModal({ visible, selected, onClose, onSe
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
           <Pressable style={styles.row} onPress={() => pick(null)}>
             <Text style={styles.rowText}>Not listed / prefer not to say</Text>
-            {!selected && <Text style={styles.check}>✓</Text>}
+            {!selected && <Icon name="check" size={17} color={colors.coral} />}
           </Pressable>
           {emirates.map((emirate) => (
             <View key={emirate}>
@@ -43,7 +44,7 @@ export default function UniversityPickerModal({ visible, selected, onClose, onSe
               {UNIVERSITIES.filter((u) => u.emirate === emirate).map((u) => (
                 <Pressable key={u.name} style={styles.row} onPress={() => pick(u.name)}>
                   <Text style={styles.rowText}>{u.name}</Text>
-                  {selected === u.name && <Text style={styles.check}>✓</Text>}
+                  {selected === u.name && <Icon name="check" size={17} color={colors.coral} />}
                 </Pressable>
               ))}
             </View>
@@ -69,6 +70,5 @@ function createStyles(colors: ColorTokens) {
     paddingHorizontal: spacing.lg, paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: colors.line,
   },
   rowText: { fontSize: 14, color: colors.ink, flex: 1, paddingRight: 12 },
-  check: { fontSize: 15, fontWeight: '700', color: colors.coral },
   });
 }

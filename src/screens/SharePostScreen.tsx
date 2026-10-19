@@ -103,7 +103,7 @@ export default function SharePostScreen() {
         .insert({ conversation_id: conversationId, sender_id: myId, body: post.title, shared_post_id: post.id });
       if (error) throw error;
       await supabase.from('conversations')
-        .update({ last_message: `📎 Shared: ${post.title}`, last_message_at: new Date().toISOString() })
+        .update({ last_message: `Shared a post: ${post.title}`, last_message_at: new Date().toISOString() })
         .eq('id', conversationId);
       haptics.confirm();
       setSentIds((prev) => new Set(prev).add(target.id));
@@ -174,7 +174,7 @@ export default function SharePostScreen() {
                   {sendingId === item.id ? (
                     <ActivityIndicator size="small" color={colors.ink} />
                   ) : (
-                    <Text style={[styles.sendBtnText, sent && styles.sendBtnTextSent]}>{sent ? 'Sent ✓' : 'Send'}</Text>
+                    <Text style={[styles.sendBtnText, sent && styles.sendBtnTextSent]}>{sent ? 'Sent' : 'Send'}</Text>
                   )}
                 </AnimatedPressable>
               </View>
@@ -195,7 +195,7 @@ function createStyles(colors: ColorTokens) {
   searchBar: {
     flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: spacing.lg, marginBottom: 6,
     paddingHorizontal: 16, paddingVertical: 11, backgroundColor: colors.white, borderWidth: 1.5,
-    borderColor: colors.line, borderRadius: radius.pill,
+    borderColor: colors.line, borderRadius: radius.button,
   },
   searchInput: { flex: 1, fontSize: 13, color: colors.ink },
   sectionLabel: {
@@ -207,7 +207,7 @@ function createStyles(colors: ColorTokens) {
   groupAvatar: { backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
   name: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   handle: { fontSize: 11.5, color: colors.inkSoft, fontFamily: 'JetBrainsMono_500Medium', marginTop: 2 },
-  sendBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: radius.pill, backgroundColor: colors.ink, minWidth: 72, alignItems: 'center' },
+  sendBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: radius.button, backgroundColor: colors.ink, minWidth: 72, alignItems: 'center' },
   sendBtnSent: { backgroundColor: colors.sandDeep, borderWidth: 1, borderColor: colors.line },
   sendBtnText: { fontSize: 12, fontWeight: '700', color: colors.sand },
   sendBtnTextSent: { color: colors.inkSoft },

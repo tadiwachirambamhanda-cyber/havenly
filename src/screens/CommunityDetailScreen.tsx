@@ -110,7 +110,7 @@ export default function CommunityDetailScreen() {
             <Skeleton style={{ width: 68, height: 68, borderRadius: 34 }} />
             <Skeleton style={{ height: 21, width: '55%', marginTop: 12 }} />
             <Skeleton style={{ height: 12, width: '30%', marginTop: 8 }} />
-            <Skeleton style={{ height: 40, width: '100%', marginTop: 16, borderRadius: 100 }} />
+            <Skeleton style={{ height: 40, width: '100%', marginTop: 16, borderRadius: radius.button }} />
           </View>
           <View style={{ paddingHorizontal: spacing.lg, gap: 14 }}>
             {[0, 1, 2].map((i) => (
@@ -165,7 +165,7 @@ export default function CommunityDetailScreen() {
             onPress={toggleJoin}
             accessibilityLabel={joined ? 'Leave community' : 'Join community'}
           >
-            <Text style={[styles.joinBtnText, joined && styles.joinBtnTextJoined]}>{joined ? 'Joined ✓' : 'Join community'}</Text>
+            <Text style={[styles.joinBtnText, joined && styles.joinBtnTextJoined]}>{joined ? 'Joined' : 'Join community'}</Text>
           </AnimatedPressable>
         ) : profile?.university ? (
           <View style={styles.restrictedBox}>
@@ -282,7 +282,7 @@ function createStyles(colors: ColorTokens) {
   name: { fontFamily: 'Fraunces_600SemiBold', fontSize: 21, color: colors.ink, marginTop: 8 },
   members: { fontSize: 12, color: colors.inkSoft, marginTop: 4 },
   desc: { fontSize: 13, color: colors.inkSoft, lineHeight: 20, marginTop: 12 },
-  joinBtn: { marginTop: 16, backgroundColor: colors.coral, paddingVertical: 13, borderRadius: 100, alignItems: 'center' },
+  joinBtn: { marginTop: 16, backgroundColor: colors.coral, paddingVertical: 13, borderRadius: radius.button, alignItems: 'center' },
   joinBtnJoined: { backgroundColor: colors.ink },
   joinBtnText: { color: 'white', fontWeight: '700', fontSize: 14 },
   // joinBtn stays coral regardless of theme, so its text stays literal white;
@@ -291,7 +291,7 @@ function createStyles(colors: ColorTokens) {
   joinBtnTextJoined: { color: colors.sand },
   restrictedBox: {
     flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 16, backgroundColor: colors.sandDeep,
-    paddingVertical: 13, paddingHorizontal: 16, borderRadius: 100,
+    paddingVertical: 13, paddingHorizontal: 16, borderRadius: radius.button,
   },
   restrictedText: { flex: 1, color: colors.inkSoft, fontSize: 12.5, fontWeight: '600' },
   residenceRow: { gap: 10, paddingHorizontal: spacing.lg, paddingBottom: spacing.sm },

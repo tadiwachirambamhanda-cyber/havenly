@@ -282,7 +282,7 @@ export default function DiscoverScreen() {
                   {addingInterest === opt.key ? (
                     <ActivityIndicator size="small" color={added ? colors.inkSoft : colors.coral} />
                   ) : (
-                    <Text style={[styles.addInterestBtnText, added && styles.addInterestBtnTextAdded]}>{added ? 'Added ✓' : '+ Add'}</Text>
+                    <Text style={[styles.addInterestBtnText, added && styles.addInterestBtnTextAdded]}>{added ? 'Added' : '+ Add'}</Text>
                   )}
                 </Pressable>
               </View>
@@ -465,7 +465,7 @@ function createStyles(colors: ColorTokens) {
   searchBar: {
     flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: spacing.lg, marginTop: 14,
     paddingHorizontal: 16, paddingVertical: 4, backgroundColor: colors.white, borderWidth: 1.5,
-    borderColor: colors.line, borderRadius: radius.pill,
+    borderColor: colors.line, borderRadius: radius.button,
   },
   searchInput: { flex: 1, fontSize: 13, color: colors.ink, paddingVertical: 10 },
   clearBtn: { paddingHorizontal: 4 },
@@ -489,7 +489,7 @@ function createStyles(colors: ColorTokens) {
   resultTitle: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   resultSub: { fontSize: 11, color: colors.inkSoft, marginTop: 2 },
   addInterestBtn: {
-    paddingVertical: 7, paddingHorizontal: 12, borderRadius: radius.pill,
+    paddingVertical: 7, paddingHorizontal: 12, borderRadius: radius.button,
     borderWidth: 1.5, borderColor: colors.coral, minWidth: 66, alignItems: 'center',
   },
   addInterestBtnAdded: { borderColor: colors.line, backgroundColor: colors.sandDeep },

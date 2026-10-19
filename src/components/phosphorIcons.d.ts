@@ -31,6 +31,7 @@ export declare const ICONS: {
   readonly 'gift': PhosphorIcon;
   readonly 'graduation-cap': PhosphorIcon;
   readonly 'grid': PhosphorIcon;
+  readonly 'flame': PhosphorIcon;
   readonly 'hand-waving': PhosphorIcon;
   readonly 'heart': PhosphorIcon;
   readonly 'home': PhosphorIcon;

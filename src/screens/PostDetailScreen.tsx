@@ -678,7 +678,7 @@ function createStyles(colors: ColorTokens) {
   username: { fontSize: 13, fontWeight: '700', color: colors.ink },
   meta: { fontSize: 11, color: colors.inkSoft },
   messageBtn: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
-  followBtn: { paddingHorizontal: 16, paddingVertical: 7, borderRadius: 100, backgroundColor: colors.ink },
+  followBtn: { paddingHorizontal: 16, paddingVertical: 7, borderRadius: radius.button, backgroundColor: colors.ink },
   followBtnActive: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   followBtnText: { fontSize: 11.5, fontWeight: '700', color: colors.sand },
   followBtnTextActive: { color: colors.ink },
@@ -696,7 +696,7 @@ function createStyles(colors: ColorTokens) {
   commentBody: { fontSize: 13, color: colors.inkSoft, marginTop: 3, lineHeight: 18 },
   noComments: { fontSize: 12.5, color: colors.inkSoft },
   commentInputRow: { flexDirection: 'row', gap: 9, alignItems: 'center', padding: spacing.md, borderTopWidth: 1, borderColor: colors.line, backgroundColor: colors.sand },
-  commentInput: { flex: 1, backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line, borderRadius: radius.pill, paddingHorizontal: 16, paddingVertical: 11, fontSize: 13, color: colors.ink },
+  commentInput: { flex: 1, backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line, borderRadius: radius.button, paddingHorizontal: 16, paddingVertical: 11, fontSize: 13, color: colors.ink },
   commentSendBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' },
   // Fixed black background regardless of theme — a full-screen video player
   // reads the same way (and the overlaid white text/icons stay legible)
@@ -720,7 +720,7 @@ function createStyles(colors: ColorTokens) {
   videoAuthorTap: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
   videoAvatar: { width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: 'white' },
   videoUsername: { fontSize: 13.5, fontWeight: '700', color: 'white', flexShrink: 1 },
-  videoFollowBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.pill, borderWidth: 1.5, borderColor: 'white' },
+  videoFollowBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.button, borderWidth: 1.5, borderColor: 'white' },
   videoFollowBtnActive: { backgroundColor: 'rgba(255,255,255,0.25)' },
   videoFollowBtnText: { fontSize: 11, fontWeight: '700', color: 'white' },
   videoFollowBtnTextActive: { color: 'white' },

@@ -253,7 +253,7 @@ function createStyles(colors: ColorTokens) {
     error: { color: colors.coral, fontSize: 13, marginTop: 14, marginHorizontal: spacing.lg },
     sendBtn: {
       marginHorizontal: spacing.lg, marginTop: spacing.lg, backgroundColor: colors.coral,
-      paddingVertical: 15, borderRadius: radius.pill, alignItems: 'center',
+      paddingVertical: 15, borderRadius: radius.button, alignItems: 'center',
     },
     sendBtnText: { color: 'white', fontWeight: '700', fontSize: 14.5 },
   });

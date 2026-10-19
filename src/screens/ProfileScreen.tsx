@@ -127,7 +127,7 @@ export default function ProfileScreen() {
         <Skeleton style={{ height: 110, borderRadius: 0 }} />
         <View style={[styles.avatarRow, { marginTop: avatarMarginTop }]}>
           <Skeleton style={{ width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand }} />
-          <Skeleton style={{ width: 96, height: 32, borderRadius: radius.pill, marginBottom: 6 }} />
+          <Skeleton style={{ width: 96, height: 32, borderRadius: radius.button, marginBottom: 6 }} />
         </View>
         <Skeleton style={{ height: 20, width: '50%', marginTop: 12, marginHorizontal: spacing.lg }} />
         <Skeleton style={{ height: 13, width: '35%', marginTop: 8, marginHorizontal: spacing.lg }} />
@@ -225,7 +225,10 @@ export default function ProfileScreen() {
               <Text style={styles.statNum}>{formatCount(stats.following)}</Text><Text style={styles.statLabel}>Following</Text>
             </Pressable>
             <Pressable onPress={() => navigation.navigate('Offers')} accessibilityLabel="View your perks">
-              <Text style={styles.statNum}>🔥 {profile.current_streak}</Text>
+              <View style={styles.streakStat}>
+                <Icon name="flame" size={15} color={colors.coral} weight="fill" />
+                <Text style={styles.statNum}>{profile.current_streak}</Text>
+              </View>
               <Text style={styles.statLabel}>Streak</Text>
             </Pressable>
           </View>
@@ -284,18 +287,19 @@ function createStyles(colors: ColorTokens) {
   },
   avatarRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', paddingHorizontal: spacing.lg, marginTop: -38 },
   avatar: { width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand },
-  editBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white, marginBottom: 6 },
+  editBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white, marginBottom: 6 },
   editBtnText: { fontSize: 12, fontWeight: '700', color: colors.ink },
   name: { fontFamily: 'Fraunces_600SemiBold', fontSize: 20, color: colors.ink, paddingHorizontal: spacing.lg, paddingTop: 12 },
   handle: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 12.5, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 2 },
   bio: { fontSize: 13, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 10, lineHeight: 20 },
   statsRow: { flexDirection: 'row', gap: 22, paddingHorizontal: spacing.lg, paddingTop: 16, paddingBottom: 6 },
   statNum: { fontSize: 16, fontWeight: '800', color: colors.ink },
+  streakStat: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   statLabel: { fontSize: 10.5, color: colors.inkSoft, fontWeight: '600', marginTop: 2 },
   perksRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: spacing.lg, paddingTop: 10 },
   perksRowText: { flex: 1, fontSize: 12, fontWeight: '700', color: colors.ink },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, paddingHorizontal: spacing.lg, paddingVertical: 14 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill, backgroundColor: colors.coralSoft },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.tag, backgroundColor: colors.coralSoft },
   chipText: { fontSize: 11, fontWeight: '700', color: colors.coral },
   tabRow: { flexDirection: 'row', borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.line, marginTop: 6 },
   tab: { flex: 1, alignItems: 'center', paddingVertical: 11 },

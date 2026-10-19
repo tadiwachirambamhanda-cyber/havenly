@@ -214,7 +214,7 @@ export default function InboxScreen() {
             <View style={{ flex: 1 }}>
               <Text style={styles.name}>{item.is_group ? groupDisplayName(item, item.members) : item.otherUser?.display_name ?? 'Havenly user'}</Text>
               <Text style={[styles.preview, item.unread && styles.previewUnread]} numberOfLines={1}>
-                {item.status === 'pending' && item.initiator_id === myId ? 'Request sent' : item.last_message ?? 'Say hi 👋'}
+                {item.status === 'pending' && item.initiator_id === myId ? 'Request sent' : item.last_message ?? 'Say hi'}
               </Text>
             </View>
             {item.last_message_at && <Text style={styles.time}>{timeAgo(item.last_message_at)}</Text>}
@@ -241,7 +241,7 @@ function createStyles(colors: ColorTokens) {
   searchBar: {
     flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: spacing.lg, marginTop: 12, marginBottom: 6,
     paddingHorizontal: 16, paddingVertical: 11, backgroundColor: colors.white, borderWidth: 1.5,
-    borderColor: colors.line, borderRadius: radius.pill,
+    borderColor: colors.line, borderRadius: radius.button,
   },
   searchInput: { flex: 1, fontSize: 13, color: colors.ink },
   clearBtn: { paddingHorizontal: 4 },

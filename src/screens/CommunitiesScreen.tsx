@@ -172,7 +172,7 @@ function createStyles(colors: ColorTokens) {
   iconChip: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
   cardName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   cardMeta: { fontSize: 11, color: colors.inkSoft, marginTop: 2 },
-  matchBadge: { backgroundColor: colors.tealSoft, paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.pill },
+  matchBadge: { backgroundColor: colors.tealSoft, paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.tag },
   matchBadgeText: { fontSize: 10, fontWeight: '700', color: colors.teal },
   });
 }

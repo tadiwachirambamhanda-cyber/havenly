@@ -138,7 +138,7 @@ function createStyles(colors: ColorTokens) {
   chipTextSelected: { color: colors.sand },
   createBtn: {
     marginHorizontal: spacing.lg, marginTop: spacing.lg, backgroundColor: colors.coral,
-    paddingVertical: 14, borderRadius: radius.pill, alignItems: 'center',
+    paddingVertical: 14, borderRadius: radius.button, alignItems: 'center',
   },
   createBtnText: { color: 'white', fontWeight: '700', fontSize: 14 },
   emptyText: { color: colors.inkSoft, fontSize: 13, paddingHorizontal: spacing.lg },
@@ -148,7 +148,7 @@ function createStyles(colors: ColorTokens) {
   },
   brandName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   brandMeta: { fontSize: 11.5, color: colors.inkSoft, marginTop: 2 },
-  toggleBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line },
+  toggleBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.line },
   toggleBtnText: { fontSize: 11.5, fontWeight: '700', color: colors.ink },
   });
 }

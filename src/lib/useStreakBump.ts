@@ -29,7 +29,7 @@ export function useStreakBump() {
       await refreshProfile();
       if (isMilestone(current_streak)) {
         haptics.success();
-        showToast(`🔥 ${current_streak}-day streak!`);
+        showToast(`${current_streak}-day streak`);
       }
     });
     // Deliberately keyed on just these two — refreshProfile/showToast come

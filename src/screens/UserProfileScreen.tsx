@@ -185,7 +185,7 @@ export default function UserProfileScreen() {
           <Skeleton style={{ width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand }} />
           <View style={styles.actionRow}>
             <Skeleton style={{ width: 36, height: 36, borderRadius: 18 }} />
-            <Skeleton style={{ width: 76, height: 32, borderRadius: radius.pill }} />
+            <Skeleton style={{ width: 76, height: 32, borderRadius: radius.button }} />
           </View>
         </View>
         <Skeleton style={{ height: 20, width: '50%', marginTop: 12, marginHorizontal: spacing.lg }} />
@@ -292,7 +292,10 @@ export default function UserProfileScreen() {
                 <Text style={styles.statNum}>{formatCount(stats.following)}</Text><Text style={styles.statLabel}>Following</Text>
               </AnimatedPressable>
               <View>
-                <Text style={styles.statNum}>🔥 {profile.current_streak}</Text>
+                <View style={styles.streakStat}>
+                  <Icon name="flame" size={15} color={colors.coral} weight="fill" />
+                  <Text style={styles.statNum}>{profile.current_streak}</Text>
+                </View>
                 <Text style={styles.statLabel}>Streak</Text>
               </View>
             </View>
@@ -354,7 +357,7 @@ function createStyles(colors: ColorTokens) {
     width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center',
     backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line,
   },
-  followBtn: { paddingHorizontal: 18, paddingVertical: 9, borderRadius: radius.pill, backgroundColor: colors.ink },
+  followBtn: { paddingHorizontal: 18, paddingVertical: 9, borderRadius: radius.button, backgroundColor: colors.ink },
   followBtnActive: { backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line },
   followBtnText: { fontSize: 12.5, fontWeight: '700', color: colors.sand },
   followBtnTextActive: { color: colors.ink },
@@ -363,9 +366,10 @@ function createStyles(colors: ColorTokens) {
   bio: { fontSize: 13, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 10, lineHeight: 20 },
   statsRow: { flexDirection: 'row', gap: 22, paddingHorizontal: spacing.lg, paddingTop: 16, paddingBottom: 6 },
   statNum: { fontSize: 16, fontWeight: '800', color: colors.ink },
+  streakStat: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   statLabel: { fontSize: 10.5, color: colors.inkSoft, fontWeight: '600', marginTop: 2 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, paddingHorizontal: spacing.lg, paddingVertical: 14 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill, backgroundColor: colors.coralSoft },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.tag, backgroundColor: colors.coralSoft },
   chipText: { fontSize: 11, fontWeight: '700', color: colors.coral },
   sectionLabel: {
     fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,

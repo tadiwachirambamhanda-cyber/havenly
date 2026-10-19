@@ -167,7 +167,7 @@ function createStyles(colors: ColorTokens) {
   avatar: { width: 44, height: 44, borderRadius: 22 },
   name: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   handle: { fontSize: 11.5, color: colors.inkSoft, fontFamily: 'JetBrainsMono_500Medium', marginTop: 2 },
-  followBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: radius.pill, backgroundColor: colors.ink },
+  followBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: radius.button, backgroundColor: colors.ink },
   followBtnActive: { backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line },
   followBtnText: { fontSize: 12, fontWeight: '700', color: colors.sand },
   followBtnTextActive: { color: colors.ink },

@@ -655,7 +655,7 @@ export default function MapScreen() {
     try {
       await sendPing(checkInId);
       haptics.success();
-      showToast('Ping sent 👋');
+      showToast('Ping sent');
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Couldn’t send ping.', 'error');
     }
@@ -906,11 +906,11 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: colors.sand,
   },
   locationNoticeText: { flex: 1, fontSize: 11.5, color: colors.inkSoft },
-  locationEnableBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.pill, backgroundColor: colors.tealSoft },
+  locationEnableBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.button, backgroundColor: colors.tealSoft },
   locationEnableBtnText: { fontSize: 11, fontWeight: '700', color: colors.teal },
   searchBar: {
     flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: spacing.lg, marginBottom: 10,
-    paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.pill, backgroundColor: colors.white,
+    paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.button, backgroundColor: colors.white,
     borderWidth: 1, borderColor: colors.line,
   },
   searchInput: { flex: 1, fontSize: 13, color: colors.ink, padding: 0 },
@@ -928,7 +928,7 @@ function createStyles(colors: ColorTokens) {
   searchResultSubtitle: { fontSize: 11, color: colors.inkSoft, marginTop: 1 },
   legend: {
     position: 'absolute', bottom: 16, left: 16, flexDirection: 'row', gap: 14, backgroundColor: colors.white,
-    borderRadius: 100, paddingHorizontal: 14, paddingVertical: 9, borderWidth: 1, borderColor: colors.line,
+    borderRadius: radius.button, paddingHorizontal: 14, paddingVertical: 9, borderWidth: 1, borderColor: colors.line,
   },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   legendItemOff: { opacity: 0.45 },

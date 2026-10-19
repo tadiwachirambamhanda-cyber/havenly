@@ -314,7 +314,7 @@ function createStyles(colors: ColorTokens) {
     factRow: { flexDirection: 'row', gap: 8, marginTop: 14, flexWrap: 'wrap' },
     fact: {
       flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.white, borderWidth: 1,
-      borderColor: colors.line, paddingHorizontal: 10, paddingVertical: 6, borderRadius: radius.pill,
+      borderColor: colors.line, paddingHorizontal: 10, paddingVertical: 6, borderRadius: radius.tag,
     },
     factText: { fontSize: 12, fontWeight: '600', color: colors.ink },
     sectionLabel: {
@@ -334,7 +334,7 @@ function createStyles(colors: ColorTokens) {
     amenityGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     amenity: {
       flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.tealSoft,
-      paddingHorizontal: 10, paddingVertical: 7, borderRadius: radius.pill,
+      paddingHorizontal: 10, paddingVertical: 7, borderRadius: radius.tag,
     },
     amenityText: { fontSize: 12, fontWeight: '600', color: colors.ink },
     uniRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 5 },
@@ -353,7 +353,7 @@ function createStyles(colors: ColorTokens) {
     enquiryStatusRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
     enquiryStatusText: { flex: 1, fontSize: 12.5, fontWeight: '600', color: colors.ink },
     ctaButtons: { flexDirection: 'row', gap: 10 },
-    ctaBtn: { flex: 1, paddingVertical: 14, borderRadius: radius.pill, alignItems: 'center' },
+    ctaBtn: { flex: 1, paddingVertical: 14, borderRadius: radius.button, alignItems: 'center' },
     ctaSecondary: { borderWidth: 1.5, borderColor: colors.ink },
     ctaSecondaryText: { fontSize: 14, fontWeight: '700', color: colors.ink },
     ctaPrimary: { backgroundColor: colors.coral },
