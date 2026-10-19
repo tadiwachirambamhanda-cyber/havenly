@@ -87,6 +87,20 @@ export default function SettingsScreen() {
         <Text style={styles.chevron}>›</Text>
       </AnimatedPressable>
 
+      <View style={styles.divider} />
+
+      <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('Legal', { doc: 'privacy' })}>
+        <Text style={styles.rowText}>Privacy policy</Text>
+        <Text style={styles.chevron}>›</Text>
+      </AnimatedPressable>
+
+      <View style={styles.divider} />
+
+      <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('Legal', { doc: 'terms' })}>
+        <Text style={styles.rowText}>Terms of use</Text>
+        <Text style={styles.chevron}>›</Text>
+      </AnimatedPressable>
+
       {profile?.is_admin && (
         <>
           <View style={styles.divider} />

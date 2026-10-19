@@ -44,6 +44,7 @@ import MyEnquiriesScreen from '@/screens/MyEnquiriesScreen';
 import ManageHousingScreen from '@/screens/ManageHousingScreen';
 import AdminEnquiryScreen from '@/screens/AdminEnquiryScreen';
 import EditResidenceScreen from '@/screens/EditResidenceScreen';
+import LegalScreen from '@/screens/LegalScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -76,6 +77,7 @@ export type RootStackParamList = {
   ManageHousing: undefined;
   AdminEnquiry: { enquiryId: string };
   EditResidence: { residenceId?: string };
+  Legal: { doc: 'privacy' | 'terms' };
 };
 
 export type MainTabParamList = {
@@ -148,6 +150,7 @@ export default function RootNavigator() {
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="SignUp" component={SignUpScreen} />
+            <Stack.Screen name="Legal" component={LegalScreen} options={{ presentation: 'card' }} />
           </>
         ) : !profile?.has_completed_onboarding ? (
           // Signed in, first-time user — onboarding only.
@@ -182,6 +185,7 @@ export default function RootNavigator() {
             <Stack.Screen name="ManageHousing" component={ManageHousingScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="AdminEnquiry" component={AdminEnquiryScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="EditResidence" component={EditResidenceScreen} options={{ presentation: 'modal' }} />
+            <Stack.Screen name="Legal" component={LegalScreen} options={{ presentation: 'card' }} />
           </>
         )}
       </Stack.Navigator>

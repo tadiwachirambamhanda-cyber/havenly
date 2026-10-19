@@ -111,6 +111,12 @@ export default function SignUpScreen() {
         <AnimatedPressable onPress={() => navigation.navigate('Login')}>
           <Text style={styles.switchLink}>Already have an account? <Text style={styles.switchLinkBold}>Log in</Text></Text>
         </AnimatedPressable>
+        <Text style={styles.legalNote}>
+          By creating an account you agree to our{' '}
+          <Text style={styles.legalLink} onPress={() => navigation.navigate('Legal', { doc: 'terms' })} accessibilityRole="link">Terms of use</Text>
+          {' '}and{' '}
+          <Text style={styles.legalLink} onPress={() => navigation.navigate('Legal', { doc: 'privacy' })} accessibilityRole="link">Privacy policy</Text>.
+        </Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -118,6 +124,8 @@ export default function SignUpScreen() {
 
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
+  legalNote: { fontSize: 12, lineHeight: 18, color: colors.inkSoft, textAlign: 'center', marginTop: 18 },
+  legalLink: { color: colors.ink, fontWeight: '700', textDecorationLine: 'underline' },
   container: { flex: 1, backgroundColor: colors.sand },
   masthead: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   brandDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral },
