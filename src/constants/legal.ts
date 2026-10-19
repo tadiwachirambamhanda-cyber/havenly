@@ -33,7 +33,7 @@ export const PRIVACY_POLICY: LegalDocument = {
         'What you post and do: posts, photos, videos, comments, likes, saved posts, communities you join, people you follow, and your daily activity streak.',
         'Messages: direct and group messages, including posts you share in them.',
         'Location: only while you use the map or location-based sorting, and only if you allow it. We don\'t track your location in the background. A check-in is something you choose to make; it expires after 4 hours and is only visible to mutual follows, members of group chats you share, and members of communities you share.',
-        'Housing: residences you save, and enquiries you send — move-in month, length of stay, room, budget, viewing availability, your message and the phone or WhatsApp number you give us. If you sign with a residence, we record the contract value so we can work out the fee the residence owes us.',
+        'Housing: residences you save, and enquiries you send: move-in month, length of stay, room, budget, viewing availability, your message and the phone or WhatsApp number you give us. If you sign with a residence, we record the contract value so we can work out the fee the residence owes us.',
         'Perks: offers you claim and their redemption codes.',
         'Safety: people you block and reports you make.',
         'Technical data: standard logs from our hosting provider (such as IP address, device type and request times), and crash reports when the app hits an error, used to keep the service running and secure.',
@@ -105,7 +105,7 @@ export const TERMS_OF_USE: LegalDocument = {
   sections: [
     {
       heading: 'Who can use Havenly',
-      paragraphs: ['You must be at least 18 and able to agree to these terms. One account per person, with accurate details — including your university, since some communities are only open to its students.'],
+      paragraphs: ['You must be at least 18 and able to agree to these terms. One account per person, with accurate details, including your university, since some communities are only open to its students.'],
     },
     {
       heading: 'Your account',
@@ -135,7 +135,7 @@ export const TERMS_OF_USE: LegalDocument = {
         'Havenly introduces students to student residences. We are not a landlord, a real estate broker or an agent for either side, and we are not a party to any tenancy.',
         'Any tenancy, deposit or payment is between you and the residence, on their terms. Havenly never collects rent or deposits. Read the residence\'s contract carefully before you sign.',
         'Havenly is free for students. Residences may pay Havenly a referral fee when a student we introduced signs with them.',
-        'Listings are written from information residences give us. We check them, but we can\'t guarantee availability, prices or descriptions — confirm details with the residence, and visit before you commit. For your safety, meet residences at their premises and never pay anyone through Havenly messages.',
+        'Listings are written from information residences give us. We check them, but we can\'t guarantee availability, prices or descriptions. Confirm details with the residence, and visit before you commit. For your safety, meet residences at their premises and never pay anyone through Havenly messages.',
       ],
     },
     {
@@ -151,7 +151,7 @@ export const TERMS_OF_USE: LegalDocument = {
     },
     {
       heading: 'Ending your account',
-      paragraphs: ['You can delete your account at any time in Settings. We may close accounts that break these terms. Sections that by their nature should continue — such as content licences already used, disclaimers and the limits on liability — continue after your account ends.'],
+      paragraphs: ['You can delete your account at any time in Settings. We may close accounts that break these terms. Sections that by their nature should continue (such as content licences already used, disclaimers and the limits on liability) continue after your account ends.'],
     },
     {
       heading: 'Disclaimers and liability',

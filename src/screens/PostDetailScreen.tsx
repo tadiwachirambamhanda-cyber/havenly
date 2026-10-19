@@ -214,7 +214,7 @@ export default function PostDetailScreen() {
   // real native share dialog (navigator.share) when the browser has one.
   const shareExternally = async () => {
     if (!post) return;
-    const message = `${post.title} — via Havenly`;
+    const message = `${post.title} (via Havenly)`;
     if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.share) {
       try { await navigator.share({ title: post.title, text: message }); } catch { /* user cancelled — not an error */ }
       return;
@@ -223,7 +223,7 @@ export default function PostDetailScreen() {
       await Clipboard.setStringAsync(message);
       showToast('Copied to clipboard');
     } catch {
-      showToast('Couldn’t copy — try again', 'error');
+      showToast('Couldn’t copy. Try again.', 'error');
     }
   };
 
@@ -277,7 +277,7 @@ export default function PostDetailScreen() {
     if (!post || !session?.user) return;
     try {
       await submitReport(session.user.id, 'post', post.id, reason);
-      showToast('Thanks — we’ve got your report.');
+      showToast('Thanks, we’ve got your report.');
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Couldn’t submit report.', 'error');
     }
@@ -426,7 +426,7 @@ export default function PostDetailScreen() {
               <Text style={[styles.commentsLabel, { paddingHorizontal: spacing.lg }]}>Comments</Text>
               <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.lg }}>
                 {comments.map(renderCommentRow)}
-                {comments.length === 0 && <Text style={styles.noComments}>No comments yet — be the first.</Text>}
+                {comments.length === 0 && <Text style={styles.noComments}>No comments yet.</Text>}
               </ScrollView>
               <View style={styles.commentInputRow}>
                 <TextInput
@@ -469,7 +469,7 @@ export default function PostDetailScreen() {
           visible={deletePostConfirmVisible}
           onClose={() => setDeletePostConfirmVisible(false)}
           title="Delete this post?"
-          message="This can't be undone — it'll remove the post along with its likes and comments."
+          message="This removes the post with its likes and comments. You can't undo it."
           actions={[{ label: 'Delete', destructive: true, onPress: confirmDeletePost }]}
         />
         <ActionSheet
@@ -588,7 +588,7 @@ export default function PostDetailScreen() {
         <View style={styles.commentsSection}>
           <Text style={styles.commentsLabel}>Comments</Text>
           {comments.map(renderCommentRow)}
-          {comments.length === 0 && <Text style={styles.noComments}>No comments yet — be the first.</Text>}
+          {comments.length === 0 && <Text style={styles.noComments}>No comments yet.</Text>}
         </View>
       </View>
       <ReportModal visible={reportModalVisible} onClose={() => setReportModalVisible(false)} onSubmit={handleReportSubmit} />
@@ -615,7 +615,7 @@ export default function PostDetailScreen() {
         visible={deletePostConfirmVisible}
         onClose={() => setDeletePostConfirmVisible(false)}
         title="Delete this post?"
-        message="This can't be undone — it'll remove the post along with its likes and comments."
+        message="This removes the post with its likes and comments. You can't undo it."
         actions={[{ label: 'Delete', destructive: true, onPress: confirmDeletePost }]}
       />
       <ActionSheet

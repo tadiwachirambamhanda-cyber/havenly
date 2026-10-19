@@ -38,7 +38,7 @@ const ICON_BY_TYPE: Record<Notification['type'], IconName> = {
 const STATUS_MESSAGE: Partial<Record<EnquiryStatus, string>> = {
   contacted: 'is getting in touch with you',
   viewing_booked: 'booked your viewing',
-  signed: 'confirmed your room — welcome home',
+  signed: 'confirmed your room. Time to plan the move.',
 };
 
 function messageFor(n: Row): string {

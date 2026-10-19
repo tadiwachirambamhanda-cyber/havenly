@@ -66,8 +66,8 @@ export default function SignUpScreen() {
         </View>
 
         <Text style={styles.eyebrow}>Join Havenly</Text>
-        <Text style={styles.title}>Find your{'\n'}people in Dubai.</Text>
-        <Text style={styles.sub}>Cafés, communities, and events — picked by people just like you.</Text>
+        <Text style={styles.title}>Made for students in Dubai.</Text>
+        <Text style={styles.sub}>Events, cafés, student perks and rooms near campus, posted by other students.</Text>
 
         <View style={styles.rule} />
 

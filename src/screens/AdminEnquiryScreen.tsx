@@ -106,7 +106,7 @@ export default function AdminEnquiryScreen() {
   const copyLead = async () => {
     await Clipboard.setStringAsync(leadSummary);
     haptics.success();
-    showToast('Lead copied — paste it to the residence', 'success');
+    showToast('Lead copied. Paste it to the residence.', 'success');
   };
 
   if (!loaded) {
@@ -210,7 +210,7 @@ export default function AdminEnquiryScreen() {
             {detail('Referral fee', `${Number(terms.referral_fee_percent)}% of contract value`)}
           </>
         ) : (
-          <Text style={styles.warn}>No referral fee set for this residence — add one in its listing before marking a deal as signed.</Text>
+          <Text style={styles.warn}>This residence has no referral fee yet. Add one in its listing before marking a deal as signed.</Text>
         )}
       </View>
 

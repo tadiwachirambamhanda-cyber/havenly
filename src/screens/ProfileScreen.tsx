@@ -266,7 +266,7 @@ export default function ProfileScreen() {
             visible={!!deleteTarget}
             onClose={() => setDeleteTarget(null)}
             title="Delete this post?"
-            message="This can't be undone — it'll remove the post along with its likes and comments."
+            message="This removes the post with its likes and comments. You can't undo it."
             actions={[{ label: 'Delete', destructive: true, onPress: confirmDeletePost }]}
           />
         </>

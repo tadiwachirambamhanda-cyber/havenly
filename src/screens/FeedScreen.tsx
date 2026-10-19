@@ -458,7 +458,7 @@ export default function FeedScreen() {
               <AnimatedPressable
                 style={styles.streakBadge}
                 onPress={() => { haptics.tap(); navigation.navigate('Offers'); }}
-                accessibilityLabel={`${profile.current_streak} day streak — view perks`}
+                accessibilityLabel={`${profile.current_streak}-day streak. View perks`}
               >
                 <Icon name="flame" size={15} color="white" weight="fill" />
                 <Text style={styles.streakBadgeText}>{profile.current_streak}</Text>
@@ -528,7 +528,7 @@ export default function FeedScreen() {
             </View>
           )
         ) : posts.length === 0 && trendingPosts.length === 0 && communityPosts.length === 0 ? (
-          <EmptyState icon="image" text="Nothing here yet — be the first to post." />
+          <EmptyState icon="image" text="No posts here yet. Share a spot you like." />
         ) : (
           <>
             {dailyPick && (

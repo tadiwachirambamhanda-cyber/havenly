@@ -33,7 +33,7 @@ export async function uploadWithProgress(
       if (xhr.status >= 200 && xhr.status < 300) resolve();
       else reject(new Error(`Upload failed (${xhr.status})`));
     };
-    xhr.onerror = () => reject(new Error('Upload failed — check your connection.'));
+    xhr.onerror = () => reject(new Error('Upload failed. Check your connection.'));
     xhr.send(body);
   });
 }

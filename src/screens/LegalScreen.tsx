@@ -32,7 +32,7 @@ export default function LegalScreen() {
         {LEGAL_IS_DRAFT && (
           <View style={styles.draftNote}>
             <Icon name="info" size={13} color={colors.inkSoft} />
-            <Text style={styles.draftText}>Draft — being reviewed before Havenly launches.</Text>
+            <Text style={styles.draftText}>Draft. This is being reviewed before Havenly launches.</Text>
           </View>
         )}
         <Text style={styles.intro}>{doc.intro}</Text>

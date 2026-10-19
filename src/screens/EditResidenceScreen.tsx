@@ -134,7 +134,7 @@ export default function EditResidenceScreen() {
       setPhotos((prev) => [...prev, ...urls]);
       setDirty(true);
     } catch {
-      showToast('Some photos didn’t upload — try again', 'error');
+      showToast('Some photos didn’t upload. Try again.', 'error');
     } finally {
       setUploading(false);
     }
@@ -154,7 +154,7 @@ export default function EditResidenceScreen() {
   const save = async () => {
     setError(null);
     if (!name.trim()) return setError('Add the residence’s name.');
-    if (!providerName.trim()) return setError('Add who runs it — the operator or agency students sign with.');
+    if (!providerName.trim()) return setError('Add who runs it: the operator or agency students sign with.');
     if (!area.trim()) return setError('Add the area, e.g. Dubai International Academic City.');
     const fee = Number(feePercent);
     if (!feePercent.trim() || !Number.isFinite(fee) || fee < 0 || fee > 100) return setError('Set the referral fee as a % between 0 and 100.');
@@ -170,7 +170,7 @@ export default function EditResidenceScreen() {
       const price = Number(r.price.replace(/[^\d]/g, ''));
       if (!r.name.trim()) return setError('Every room type needs a name, e.g. "Studio".');
       if (!Number.isFinite(price) || price <= 0) return setError(`Add a price for "${r.name.trim()}".`);
-      if (price > MAX_ROOM_PRICE) return setError(`"${r.name.trim()}" is priced at ${price.toLocaleString('en-US')} AED — that looks like a typo.`);
+      if (price > MAX_ROOM_PRICE) return setError(`"${r.name.trim()}" is priced at ${price.toLocaleString('en-US')} AED. That looks like a typo.`);
     }
 
     setSaving(true);
@@ -209,7 +209,7 @@ export default function EditResidenceScreen() {
     setSaving(false);
     if (saveError) {
       console.error('save_residence failed:', saveError.message);
-      setError('Couldn’t save the residence. Nothing was changed — check your connection and try again.');
+      setError('Couldn’t save the residence, so nothing was changed. Check your connection and try again.');
       return;
     }
     setSaved(true);
@@ -259,7 +259,7 @@ export default function EditResidenceScreen() {
           <Switch value={isActive} onValueChange={edit(setIsActive)} trackColor={{ true: colors.teal, false: colors.line }} />
         </View>
 
-        <Text style={styles.sectionLabel}>Photos — first one is the cover</Text>
+        <Text style={styles.sectionLabel}>Photos (the first one is the cover)</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.photoRow}>
           {photos.map((url, i) => (
             <View key={url} style={styles.photo}>
@@ -356,7 +356,7 @@ export default function EditResidenceScreen() {
           {matchingUniversities.slice(0, 14).map((u) => chip(u.name, u.name, false, () => setUniversities((prev) => [...prev, u.name])))}
         </View>
 
-        <Text style={styles.sectionLabel}>Partner terms — private, never shown to students</Text>
+        <Text style={styles.sectionLabel}>Partner terms (private, never shown to students)</Text>
         <TextInput
           style={[styles.fieldInput, { marginTop: 0 }]}
           placeholder="Referral fee % of contract value, e.g. 8"

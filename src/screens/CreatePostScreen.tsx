@@ -131,7 +131,7 @@ export default function CreatePostScreen() {
 
     if (asset.type === 'video') {
       if (asset.duration && asset.duration > MAX_VIDEO_SECONDS * 1000) {
-        setError(`Videos can be up to ${MAX_VIDEO_SECONDS} seconds — that one's longer.`);
+        setError(`Videos can be up to ${MAX_VIDEO_SECONDS} seconds, and that one's longer.`);
         return;
       }
       setError(null);
@@ -144,7 +144,7 @@ export default function CreatePostScreen() {
         setVideoDurationMs(asset.duration ?? null);
         setCoverTimeMs(100);
       } catch {
-        setError('Couldn\'t process that video — try a different one.');
+        setError('Couldn\'t process that video. Try a different one.');
       }
     } else {
       setError(null);
@@ -181,7 +181,7 @@ export default function CreatePostScreen() {
   const captureFromCamera = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      setError('Camera access is off for Havenly — enable it in your phone\'s Settings to take a photo or video.');
+      setError('Camera access is off for Havenly. Turn it on in your phone\'s Settings to take a photo or video.');
       return;
     }
     const result = await ImagePicker.launchCameraAsync({

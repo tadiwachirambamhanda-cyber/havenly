@@ -46,13 +46,13 @@ export default function OnboardingScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
       <View style={styles.hero}>
-        <Text style={styles.eyebrow}>Welcome to Dubai's feed</Text>
-        <Text style={styles.title}>Your city, curated by you.</Text>
-        <Text style={styles.sub}>Discover cafés, drops, campus events & weekend plans — picked by people just like you.</Text>
+        <Text style={styles.eyebrow}>Set up your feed</Text>
+        <Text style={styles.title}>Start with what you like.</Text>
+        <Text style={styles.sub}>Your picks decide which cafés, drops, campus events and weekend plans show up first.</Text>
       </View>
       <View style={styles.panel}>
         <Text style={styles.question}>What are you into?</Text>
-        <Text style={styles.questionHint}>Pick a few — you can change these anytime in your profile.</Text>
+        <Text style={styles.questionHint}>Pick as many as you like. You can change them later in your profile.</Text>
         {INTEREST_CATEGORIES.map((category) => (
           <View key={category.label} style={styles.categoryGroup}>
             <Text style={styles.categoryLabel}>{category.label}</Text>

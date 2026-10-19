@@ -228,7 +228,7 @@ export default function CommunityDetailScreen() {
       </View>
 
       {posts.length === 0 ? (
-        <EmptyState icon="image" text={joined ? 'No posts yet — be the first to post here.' : 'No posts yet in this community.'} />
+        <EmptyState icon="image" text={joined ? 'No posts yet. Start the first one.' : 'No posts yet in this community.'} />
       ) : (
         posts.map((post) => {
           const [from, to] = gradients[post.id.charCodeAt(0) % gradients.length];

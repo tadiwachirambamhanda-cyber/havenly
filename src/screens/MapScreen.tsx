@@ -680,7 +680,7 @@ export default function MapScreen() {
         webviewRef.current.injectJavaScript(`window.setInterest && window.setInterest(${JSON.stringify(key)}, ${count}, ${nowMine}); true;`);
       }
     } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Couldn’t update — try again.', 'error');
+      showToast(e instanceof Error ? e.message : 'Couldn’t update. Try again.', 'error');
     }
   };
 
@@ -786,7 +786,7 @@ export default function MapScreen() {
       {locationDenied && loaded && (
         <View style={styles.locationNotice}>
           <Icon name="map-pin" size={12} color={colors.inkSoft} />
-          <Text style={styles.locationNoticeText}>Location off — showing Dubai.</Text>
+          <Text style={styles.locationNoticeText}>Location is off, so the map shows all of Dubai.</Text>
           <AnimatedPressable style={styles.locationEnableBtn} onPress={handleEnableLocation} accessibilityLabel="Enable location">
             <Text style={styles.locationEnableBtnText}>Enable</Text>
           </AnimatedPressable>

@@ -84,7 +84,7 @@ export default function EventDetailScreen() {
       await toggleInterest('event', eventId);
       await load();
     } catch {
-      showToast('Couldn’t update — try again.', 'error');
+      showToast('Couldn’t update. Try again.', 'error');
     } finally {
       setTogglingInterest(false);
     }
@@ -99,7 +99,7 @@ export default function EventDetailScreen() {
       else await createCheckIn(profile.id, 'event', eventId);
       await load();
     } catch {
-      showToast('Couldn’t update your check-in — try again.', 'error');
+      showToast('Couldn’t update your check-in. Try again.', 'error');
     } finally {
       setCheckingIn(false);
     }

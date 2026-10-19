@@ -50,7 +50,7 @@ export default function CreateEventScreen() {
 
     const eventDate = new Date(`${date}T${time}:00`);
     if (Number.isNaN(eventDate.getTime())) return setError('That date and time isn’t valid.');
-    if (eventDate.getTime() <= Date.now()) return setError('Event date must be in the future — Discover only shows upcoming events.');
+    if (eventDate.getTime() <= Date.now()) return setError('Pick a future date. Discover only shows upcoming events.');
 
     let lat: number | null = null;
     let lng: number | null = null;

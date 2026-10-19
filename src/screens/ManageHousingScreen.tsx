@@ -159,7 +159,7 @@ export default function ManageHousingScreen() {
           <Text style={styles.addBtnText}>Add residence</Text>
         </AnimatedPressable>
       }
-      ListEmptyComponent={loaded ? <EmptyState icon="home" text="No residences yet — add your first partner." /> : null}
+      ListEmptyComponent={loaded ? <EmptyState icon="home" text="No residences yet. Add your first partner." /> : null}
       renderItem={({ item }) => {
         const terms = termsByResidence.get(item.id);
         return (

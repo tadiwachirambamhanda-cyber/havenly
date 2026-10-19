@@ -85,7 +85,7 @@ export default function ResidenceDetailScreen() {
       await setResidenceSaved(myId, residenceId, next);
     } catch {
       setSaved(!next);
-      showToast('Couldn’t update your saved list — try again', 'error');
+      showToast('Couldn’t update your saved list. Try again.', 'error');
     }
   };
 
@@ -173,7 +173,7 @@ export default function ResidenceDetailScreen() {
 
           <Text style={styles.sectionLabel}>Rooms</Text>
           {rooms.length === 0 ? (
-            <Text style={styles.muted}>Room prices are coming soon — send a question to ask.</Text>
+            <Text style={styles.muted}>Room prices aren’t listed yet. Send a question to ask.</Text>
           ) : (
             rooms.map((room) => (
               <View key={room.id} style={[styles.roomRow, !room.is_available && styles.roomRowFull]}>

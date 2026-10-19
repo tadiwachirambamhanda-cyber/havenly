@@ -112,7 +112,7 @@ export default function OffersScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.md, flexGrow: 1 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
-        ListEmptyComponent={loaded ? <EmptyState icon="gift" text="No perks available right now — check back soon." /> : null}
+        ListEmptyComponent={loaded ? <EmptyState icon="gift" text="No perks right now." /> : null}
         renderItem={({ item, index }) => {
           const unlocked = myStreak >= item.min_streak;
           const distance = myLocation && item.latitude != null && item.longitude != null

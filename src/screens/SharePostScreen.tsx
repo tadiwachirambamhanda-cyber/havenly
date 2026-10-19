@@ -108,7 +108,7 @@ export default function SharePostScreen() {
       haptics.confirm();
       setSentIds((prev) => new Set(prev).add(target.id));
     } catch {
-      showToast('Couldn’t send — try again.', 'error');
+      showToast('Couldn’t send. Try again.', 'error');
     } finally {
       setSendingId(null);
     }

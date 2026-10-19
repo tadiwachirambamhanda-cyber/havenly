@@ -90,7 +90,7 @@ export default function HousingScreen() {
         if (willSave) next.delete(residence.id); else next.add(residence.id);
         return next;
       });
-      showToast('Couldn’t update your saved list — try again', 'error');
+      showToast('Couldn’t update your saved list. Try again.', 'error');
     }
   };
 
@@ -153,7 +153,7 @@ export default function HousingScreen() {
           ListEmptyComponent={
             <EmptyState
               icon={filtersActive ? 'filter' : 'home'}
-              text={filtersActive ? 'Nothing matches those filters yet — try loosening them.' : 'New residences are being added — check back soon.'}
+              text={filtersActive ? 'Nothing matches those filters. Try a wider price range.' : 'No residences listed yet. We’re adding partners near the main campuses.'}
             />
           }
           renderItem={({ item, index }) => {

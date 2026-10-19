@@ -79,7 +79,7 @@ export default function OfferDetailScreen() {
       await toggleInterest('offer', offerId);
       await load();
     } catch {
-      showToast('Couldn’t update — try again.', 'error');
+      showToast('Couldn’t update. Try again.', 'error');
     } finally {
       setTogglingInterest(false);
     }
@@ -94,7 +94,7 @@ export default function OfferDetailScreen() {
       else await createCheckIn(profile.id, 'offer', offerId);
       await load();
     } catch {
-      showToast('Couldn’t update your check-in — try again.', 'error');
+      showToast('Couldn’t update your check-in. Try again.', 'error');
     } finally {
       setCheckingIn(false);
     }
@@ -182,7 +182,7 @@ export default function OfferDetailScreen() {
         {offer.min_streak > 0 && (
           <View style={styles.streakRow}>
             <Icon name="zap" size={13} color={colors.coral} />
-            <Text style={styles.streakRowText}>Requires a {offer.min_streak}-day streak — you’re at {myStreak}.</Text>
+            <Text style={styles.streakRowText}>Requires a {offer.min_streak}-day streak. You’re at {myStreak}.</Text>
           </View>
         )}
 

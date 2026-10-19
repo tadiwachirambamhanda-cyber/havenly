@@ -73,7 +73,7 @@ export default function ChatScreen() {
     const trimmed = groupNameDraft.trim();
     if (!conversation || trimmed === (conversation.name ?? '')) return;
     const { error } = await supabase.from('conversations').update({ name: trimmed || null }).eq('id', conversationId);
-    if (error) { showToast('Couldn’t rename group — try again.', 'error'); return; }
+    if (error) { showToast('Couldn’t rename the group. Try again.', 'error'); return; }
     setConversation((prev) => prev && { ...prev, name: trimmed || null });
   };
 
@@ -85,7 +85,7 @@ export default function ChatScreen() {
       const iconUrl = await uploadGroupIcon(conversationId, result.assets[0].uri);
       setConversation((prev) => prev && { ...prev, icon_url: iconUrl });
     } catch {
-      showToast('Couldn’t update group photo — try again.', 'error');
+      showToast('Couldn’t update the group photo. Try again.', 'error');
     } finally {
       setSavingIcon(false);
     }
@@ -147,7 +147,7 @@ export default function ChatScreen() {
     if (error) {
       console.error('Failed to send message:', error.message);
       setInput(body);
-      showToast('Couldn’t send — this conversation may no longer be available.', 'error');
+      showToast('Couldn’t send. This conversation may have been closed.', 'error');
       return;
     }
     haptics.confirm();
@@ -183,7 +183,7 @@ export default function ChatScreen() {
     if (!myId || !otherUserId) return;
     try {
       await submitReport(myId, 'user', otherUserId, reason);
-      showToast('Thanks — we’ve got your report.');
+      showToast('Thanks, we’ve got your report.');
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Couldn’t submit report.', 'error');
     }

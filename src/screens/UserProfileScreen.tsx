@@ -157,7 +157,7 @@ export default function UserProfileScreen() {
     if (!myId) return;
     try {
       await submitReport(myId, 'user', userId, reason);
-      showToast('Thanks — we’ve got your report.');
+      showToast('Thanks, we’ve got your report.');
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Couldn’t submit report.', 'error');
     }

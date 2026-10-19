@@ -150,7 +150,7 @@ export default function InboxScreen() {
       await hideConversation(row.id, myId);
     } catch {
       setRows((prev) => (prev.some((r) => r.id === row.id) ? prev : [...prev, row]));
-      showToast("Couldn't delete that conversation — try again", 'error');
+      showToast("Couldn't delete that conversation. Try again.", 'error');
     }
   };
 

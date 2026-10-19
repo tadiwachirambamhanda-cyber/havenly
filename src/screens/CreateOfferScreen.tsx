@@ -113,7 +113,7 @@ export default function CreateOfferScreen() {
 
       <Text style={styles.sectionLabel}>Brand</Text>
       {brands.length === 0 ? (
-        <Text style={styles.emptyText}>No active brands yet — add one in Manage brands first.</Text>
+        <Text style={styles.emptyText}>No active brands yet. Add one in Manage brands first.</Text>
       ) : (
         <View style={styles.chipGrid}>
           {brands.map((brand) => {
@@ -155,7 +155,7 @@ export default function CreateOfferScreen() {
         keyboardType="numbers-and-punctuation"
       />
 
-      <Text style={styles.sectionLabel}>Location (optional — lets it show on the map)</Text>
+      <Text style={styles.sectionLabel}>Location (optional, shows it on the map)</Text>
       <Text style={styles.hint}>Right-click the spot on Google Maps and tap the coordinates to copy them.</Text>
       <TextInput style={[styles.fieldInput, { marginTop: spacing.sm }]} placeholder="Address (optional)…" placeholderTextColor={colors.inkSoft} value={address} onChangeText={setAddress} />
       <View style={styles.dateRow}>

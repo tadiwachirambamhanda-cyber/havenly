@@ -91,7 +91,7 @@ export default function NewGroupScreen() {
       }
       navigation.replace('Chat', { conversationId });
     } catch {
-      showToast('Couldn’t create group — try again.', 'error');
+      showToast('Couldn’t create the group. Try again.', 'error');
       setCreating(false);
     }
   };
