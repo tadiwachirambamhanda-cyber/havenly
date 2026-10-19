@@ -8,7 +8,7 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import InitialsAvatar from '@/components/InitialsAvatar';
 import Icon from '@/components/Icon';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -157,7 +157,7 @@ export default function ProfileScreen() {
       viewabilityConfig={viewabilityConfig}
       renderItem={({ item, index }) => {
         return (
-          <Animated.View entering={FadeIn.delay(Math.min(index, 11) * 30)} style={styles.gridCell}>
+          <Animated.View style={styles.gridCell}>
           <AnimatedPressable
             style={{ flex: 1 }}
             scaleTo={0.93}

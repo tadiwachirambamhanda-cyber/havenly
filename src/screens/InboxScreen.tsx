@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View, StyleSheet, SectionList, RefreshControl } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -17,7 +17,6 @@ import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
 import PersonRowSkeleton from '@/components/PersonRowSkeleton';
 import SwipeToAction from '@/components/SwipeToAction';
-import { calmDuration, calmEasing } from '@/lib/animations';
 import { hideConversation } from '@/lib/conversations';
 import { haptics } from '@/lib/haptics';
 import { timeAgo } from '@/utils/timeAgo';
@@ -200,7 +199,7 @@ export default function InboxScreen() {
           sections.length > 1 ? <Text style={styles.sectionLabel}>{section.title}</Text> : null
         )}
         renderItem={({ item, index }) => (
-          <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(calmDuration).easing(calmEasing)}>
+          <Animated.View>
           <SwipeToAction actionLabel="Delete" onAction={() => handleDelete(item)}>
           <AnimatedPressable style={styles.row} onPress={() => openChat(item)}>
             <View>

@@ -3,7 +3,7 @@ import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -13,7 +13,6 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
-import { calmDuration, calmEasing } from '@/lib/animations';
 import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
@@ -140,7 +139,7 @@ export default function NotificationsScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
         ListEmptyComponent={loaded ? <EmptyState icon="bell" text="No notifications yet." /> : <PersonRowSkeleton count={8} />}
         renderItem={({ item, index }) => (
-          <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(calmDuration).easing(calmEasing)}>
+          <Animated.View>
           <AnimatedPressable
             style={[styles.row, !item.is_read && styles.rowUnread]}
             onPress={() => openNotification(item)}

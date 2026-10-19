@@ -6,7 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import InitialsAvatar from '@/components/InitialsAvatar';
 import Icon from '@/components/Icon';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -21,7 +21,6 @@ import EmptyState from '@/components/EmptyState';
 import ActionSheet from '@/components/ActionSheet';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BurstHeart from '@/components/BurstHeart';
-import { calmDuration, calmEasing } from '@/lib/animations';
 import type { Community, HavenlyEvent, Interest, Post, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -331,7 +330,6 @@ export default function DiscoverScreen() {
             return (
               <Animated.View
                 key={event.id}
-                entering={FadeInDown.delay(Math.min(eventIndex, 6) * 60).duration(calmDuration).easing(calmEasing)}
                 style={styles.eventCard}
               >
                 <AnimatedPressable

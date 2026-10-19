@@ -3,7 +3,7 @@ import { View, StyleSheet, FlatList, RefreshControl, type ViewToken } from 'reac
 import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { useNavigation, useRoute, useFocusEffect, useIsFocused, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -217,7 +217,7 @@ export default function UserProfileScreen() {
         viewabilityConfig={viewabilityConfig}
         renderItem={({ item, index }) => {
           return (
-            <Animated.View entering={FadeIn.delay(Math.min(index, 11) * 30)} style={styles.gridCell}>
+            <Animated.View style={styles.gridCell}>
             <AnimatedPressable style={{ flex: 1 }} onPress={() => navigation.navigate('PostDetail', { postId: item.id })}>
               {item.video_url ? (
                 <VideoThumb uri={item.video_url} isVisible={isFocused && visibleVideoIds.has(item.id)} />

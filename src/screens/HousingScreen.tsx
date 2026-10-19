@@ -3,7 +3,7 @@ import { View, StyleSheet, FlatList, RefreshControl, ScrollView } from 'react-na
 import { Text } from '@/components/Text';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { Image } from 'expo-image';
 import PhotoPlaceholder from '@/components/PhotoPlaceholder';
 import Icon, { type IconName } from '@/components/Icon';
@@ -12,7 +12,6 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
-import { calmDuration, calmEasing } from '@/lib/animations';
 import { annualPrice, cheapestRoom, formatAed, GENDER_POLICY_LABEL, PERIOD_LABEL, setResidenceSaved } from '@/lib/housing';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BurstHeart from '@/components/BurstHeart';
@@ -162,7 +161,7 @@ export default function HousingScreen() {
             const isSaved = savedIds.has(item.id);
             const nearMine = !!myUniversity && item.nearby_universities.includes(myUniversity);
             return (
-              <Animated.View entering={FadeInDown.delay(Math.min(index, 6) * 50).duration(calmDuration).easing(calmEasing)}>
+              <Animated.View>
                 <AnimatedPressable style={styles.card} scaleTo={0.98} onPress={() => navigation.navigate('ResidenceDetail', { residenceId: item.id })}>
                   <View style={styles.photoWrap}>
                     {item.photo_urls[0] ? (

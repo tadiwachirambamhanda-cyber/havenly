@@ -4,7 +4,7 @@ import { Text } from '@/components/Text';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from '@/components/Icon';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation, useFocusEffect, useIsFocused, type CompositeNavigationProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -14,7 +14,6 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useUnreadNotifications } from '@/lib/useUnreadNotifications';
 import { haptics } from '@/lib/haptics';
-import { calmDuration, calmEasing } from '@/lib/animations';
 import { annualPrice, cheapestRoom, formatAed } from '@/lib/housing';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
@@ -361,7 +360,7 @@ export default function FeedScreen() {
     const hasMedia = !!(item.video_url || item.image_url);
     const cardKey = `${sectionKey}:${item.id}`;
     return (
-      <Animated.View key={cardKey} entering={FadeInDown.delay(Math.min(index, 6) * 60).duration(calmDuration).easing(calmEasing)}>
+      <Animated.View key={cardKey}>
       <Pressable
         style={[styles.card, item.is_editorial && styles.cardEditorial]}
         onPress={() => navigation.navigate('PostDetail', { postId: item.id })}

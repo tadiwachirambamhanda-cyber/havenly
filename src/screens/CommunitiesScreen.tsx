@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, SectionList, RefreshControl } from 'react-native';
 import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from '@/components/Icon';
@@ -12,7 +12,6 @@ import { useTheme } from '@/lib/ThemeContext';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
-import { calmDuration, calmEasing } from '@/lib/animations';
 import { haptics } from '@/lib/haptics';
 import { formatMembers } from '@/utils/formatCount';
 import Skeleton from '@/components/Skeleton';
@@ -138,7 +137,7 @@ export default function CommunitiesScreen() {
           </View>
         )}
         renderItem={({ item, index }) => (
-          <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(calmDuration).easing(calmEasing)}>
+          <Animated.View>
           <AnimatedPressable style={styles.card} onPress={() => navigation.navigate('CommunityDetail', { communityId: item.id })}>
             <View style={styles.iconChip}>
               <Icon name={communityIcon(item)} size={16} color={colors.teal} />

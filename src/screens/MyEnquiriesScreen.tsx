@@ -3,14 +3,13 @@ import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { Text } from '@/components/Text';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { Image } from 'expo-image';
 import PhotoPlaceholder from '@/components/PhotoPlaceholder';
 import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
-import { calmDuration, calmEasing } from '@/lib/animations';
 import { ENQUIRY_STATUS_LABEL, formatMonth } from '@/lib/housing';
 import { timeAgo } from '@/utils/timeAgo';
 import AnimatedPressable from '@/components/AnimatedPressable';
@@ -80,7 +79,7 @@ export default function MyEnquiriesScreen() {
             const tone = statusTone(item.status);
             const photo = item.residence?.photo_urls?.[0];
             return (
-              <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(calmDuration).easing(calmEasing)}>
+              <Animated.View>
                 <AnimatedPressable
                   style={styles.card}
                   onPress={() => item.residence && navigation.navigate('ResidenceDetail', { residenceId: item.residence.id })}
