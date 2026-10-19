@@ -164,7 +164,8 @@ code { font-family: var(--font-mono); font-size: 0.86em; background: var(--deep)
           <ul>
             <li>Mapbox GL JS, loaded in a WebView for the map</li>
             <li>Google Fonts via Expo font packages, bundled</li>
-            <li>No analytics, ads or crash reporting</li>
+            <li>Sentry for crash reports, once its key is added</li>
+            <li>No analytics or ads</li>
           </ul>
         </div>
       </div>
@@ -312,7 +313,7 @@ code { font-family: var(--font-mono); font-size: 0.86em; background: var(--deep)
         <li><b>Configuration</b> (Supabase URL, public key, Mapbox token) lives in <code>app.json</code> under <code>extra</code>.</li>
         <li><b>Database changes</b> are new migration files in <code>supabase/migrations</code>, applied with <code>npx supabase db push --linked</code>. An applied migration is never edited; fixes go in a new one. <code>schema.sql</code> is updated in the same change.</li>
         <li><b>The app</b> runs through Expo Go and the web preview. There is no EAS build configuration and no store build yet. Bundle identifier: <code>com.havenly.app</code> on both platforms.</li>
-        <li><b>Source control</b> is a local git repository with no remote.</li>
+        <li><b>Source control:</b> private GitHub repository (<code>tadiwachirambamhanda-cyber/havenly</code>), pushed after every change.</li>
       </ul>
     </section>
 
@@ -345,14 +346,14 @@ code { font-family: var(--font-mono); font-size: 0.86em; background: var(--deep)
         <table>
           <thead><tr><th>Issue</th><th>Impact</th><th>Severity</th></tr></thead>
           <tbody>
-            <tr><td>No git remote: the code exists only on one Mac</td><td>A lost or broken laptop loses the whole app</td><td><span class="pill sev-critical">Critical</span></td></tr>
+            <tr><td>No git remote: the code existed only on one Mac</td><td>Fixed: backed up to a private GitHub repository</td><td><span class="pill built">Fixed</span></td></tr>
             <tr><td>One Supabase project for development and production, on the free tier</td><td>Test data and real users share a database; the project can pause</td><td><span class="pill open">High</span></td></tr>
-            <tr><td>Deleting an account deletes the student's signed enquiries</td><td>Lost referral fee records</td><td><span class="pill open">High</span></td></tr>
-            <tr><td>Uploaded photos and videos stay in storage after account deletion</td><td>Privacy policy has to carry a caveat</td><td><span class="pill partial">Medium</span></td></tr>
-            <tr><td><code>app.json</code> sets the interface style to light, while the app supports dark mode</td><td>Store builds may ignore the phone's dark mode setting; needs checking on a device</td><td><span class="pill partial">Medium</span></td></tr>
-            <tr><td>Sessions in expo-secure-store, which warns above 2 KB per value; Supabase sessions can exceed that</td><td>Possible login persistence problems on some devices; needs checking on a store build</td><td><span class="pill partial">Medium</span></td></tr>
+            <tr><td>Deleting an account deleted the student's signed enquiries</td><td>Fixed: signed deals are kept with the student's details removed</td><td><span class="pill built">Fixed</span></td></tr>
+            <tr><td>Cover photos and files beyond the first 100 stayed in storage after account deletion</td><td>Fixed: every upload folder is cleared</td><td><span class="pill built">Fixed</span></td></tr>
+            <tr><td><code>app.json</code> forced light mode while the app supports dark mode</td><td>Fixed in config (follows the phone); confirm on a device build</td><td><span class="pill partial">Check on device</span></td></tr>
+            <tr><td>Keychain warns above 2 KB per value; Supabase sessions can exceed that</td><td>Fixed: long values are split into pieces under the limit; confirm on a device build</td><td><span class="pill partial">Check on device</span></td></tr>
             <tr><td>Map and Inbox real-time listeners receive events for the whole app and filter on the device</td><td>Wasted traffic as the user base grows</td><td><span class="pill partial">Medium</span></td></tr>
-            <tr><td>No push notifications, crash reporting, automated tests or CI</td><td>Missed leads, invisible crashes, regressions caught late</td><td><span class="pill partial">Medium</span></td></tr>
+            <tr><td>No push notifications, automated tests or CI; crash reporting built but off until a Sentry key is added</td><td>Missed leads, regressions caught late</td><td><span class="pill partial">Medium</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -361,7 +362,7 @@ code { font-family: var(--font-mono); font-size: 0.86em; background: var(--deep)
     <section id="launch">
       <h2>Launch requirements</h2>
       <div class="req">
-        <div class="req-head"><span class="req-id">T0-1</span><span class="req-title">Back up the code</span><span class="pill open">Open</span></div>
+        <div class="req-head"><span class="req-id">T0-1</span><span class="req-title">Back up the code</span><span class="pill built">Done</span></div>
         <ul><li>Private GitHub (or similar) repository with the full history pushed; pushed after every change.</li></ul>
       </div>
       <div class="req">
@@ -381,12 +382,12 @@ code { font-family: var(--font-mono); font-size: 0.86em; background: var(--deep)
         </ul>
       </div>
       <div class="req">
-        <div class="req-head"><span class="req-id">T0-4</span><span class="req-title">Account deletion fixes</span><span class="pill open">Open</span></div>
-        <ul><li>Signed referral records kept in anonymised form; uploaded files removed from storage. Both are already written up as follow-up tasks.</li></ul>
+        <div class="req-head"><span class="req-id">T0-4</span><span class="req-title">Account deletion fixes</span><span class="pill built">Done</span></div>
+        <ul><li>Signed referral records kept in anonymised form; every upload folder cleared, including cover photos.</li></ul>
       </div>
       <div class="req">
-        <div class="req-head"><span class="req-id">T0-5</span><span class="req-title">Crash reporting</span><span class="pill open">Open</span></div>
-        <ul><li>A crash reporter (for example Sentry) with personal data scrubbed, disclosed in the privacy policy.</li></ul>
+        <div class="req-head"><span class="req-id">T0-5</span><span class="req-title">Crash reporting</span><span class="pill partial">Needs Sentry key</span></div>
+        <ul><li>Sentry is wired in with personal data scrubbed and disclosed in the privacy policy, plus an error screen. Create a Sentry project and add its DSN to <code>app.json</code> to switch it on.</li></ul>
       </div>
       <h3>Soon after launch</h3>
       <ul>
