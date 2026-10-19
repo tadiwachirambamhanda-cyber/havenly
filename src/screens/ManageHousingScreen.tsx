@@ -245,7 +245,7 @@ function createStyles(colors: ColorTokens) {
     statusPill: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.tag },
     statusText: { fontSize: 10.5, fontWeight: '700' },
     feeText: { fontSize: 11, fontWeight: '700', color: colors.ink, fontVariant: ['tabular-nums'] },
-    thumb: { width: 46, height: 46, borderRadius: 10 },
+    thumb: { width: 46, height: 46, borderRadius: radius.sm },
     addBtn: {
       flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: colors.coral,
       paddingVertical: 12, borderRadius: radius.button, marginBottom: 14,

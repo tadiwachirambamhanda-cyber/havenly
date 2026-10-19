@@ -9,7 +9,6 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import InitialsAvatar from '@/components/InitialsAvatar';
 import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
@@ -22,7 +21,7 @@ import { markConversationRead, uploadGroupIcon } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
 import ReportModal from '@/components/ReportModal';
 import ActionSheet from '@/components/ActionSheet';
-import { radius, spacing, gradients } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
 import { groupDisplayName } from '@/utils/groupDisplayName';
@@ -260,10 +259,8 @@ export default function ChatScreen() {
                       onPress={() => navigation.navigate('PostDetail', { postId: item.shared_post!.id })}
                       accessibilityLabel={`Open post: ${item.shared_post.title}`}
                     >
-                      {item.shared_post.image_url ? (
+                      {item.shared_post.image_url && (
                         <Image source={{ uri: item.shared_post.image_url }} style={styles.sharedPostThumb} contentFit="cover" transition={200} />
-                      ) : (
-                        <LinearGradient colors={gradients[item.shared_post.id.charCodeAt(0) % gradients.length]} style={styles.sharedPostThumb} />
                       )}
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.sharedPostTag, textStyle]}>{item.shared_post.tag}</Text>
@@ -403,7 +400,7 @@ function createStyles(colors: ColorTokens) {
   headerName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   headerSub: { fontSize: 10.5, color: colors.inkSoft, marginTop: 1 },
   senderName: { fontSize: 10.5, fontWeight: '700', color: colors.inkSoft, marginBottom: 3, marginLeft: 4 },
-  bubble: { maxWidth: '75%', padding: 12, borderRadius: 18 },
+  bubble: { maxWidth: '75%', padding: 12, borderRadius: 14 },
   bubbleThem: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignSelf: 'flex-start' },
   bubbleMe: { backgroundColor: colors.coral, alignSelf: 'flex-end' },
   bubbleTextThem: { color: colors.ink, fontSize: 13 },
@@ -412,7 +409,7 @@ function createStyles(colors: ColorTokens) {
   bubbleTimeMe: { color: 'rgba(255,255,255,0.75)', fontSize: 9.5, marginTop: 3 },
   bubbleShared: { padding: 8 },
   sharedPostRow: { flexDirection: 'row', alignItems: 'center', gap: 10, minWidth: 190 },
-  sharedPostThumb: { width: 46, height: 46, borderRadius: 10 },
+  sharedPostThumb: { width: 46, height: 46, borderRadius: radius.sm },
   sharedPostTag: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 9, textTransform: 'uppercase', letterSpacing: 0.8, opacity: 0.7 },
   sharedPostTitle: { fontSize: 12.5, fontWeight: '700', marginTop: 2, lineHeight: 16 },
   inputRow: { padding: spacing.md, borderTopWidth: 1, borderColor: colors.line },

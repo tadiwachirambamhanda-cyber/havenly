@@ -6,14 +6,13 @@ import BackButton from '@/components/BackButton';
 import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import PhotoPlaceholder from '@/components/PhotoPlaceholder';
 import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { haptics } from '@/lib/haptics';
-import { gradients, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import { cheapestRoom, formatAed, PERIOD_LABEL } from '@/lib/housing';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
@@ -116,7 +115,7 @@ export default function CommunityDetailScreen() {
           <View style={{ paddingHorizontal: spacing.lg, gap: 14 }}>
             {[0, 1, 2].map((i) => (
               <View key={i} style={{ flexDirection: 'row', gap: 12 }}>
-                <Skeleton style={{ width: 66, height: 66, borderRadius: 12 }} />
+                <Skeleton style={{ width: 66, height: 66, borderRadius: radius.sm }} />
                 <View style={{ flex: 1, gap: 6, justifyContent: 'center' }}>
                   <Skeleton style={{ height: 10, width: '30%' }} />
                   <Skeleton style={{ height: 14, width: '80%' }} />
@@ -232,17 +231,17 @@ export default function CommunityDetailScreen() {
         <EmptyState icon="image" text={joined ? 'No posts yet. Start the first one.' : 'No posts yet in this community.'} />
       ) : (
         posts.map((post) => {
-          const [from, to] = gradients[post.id.charCodeAt(0) % gradients.length];
           return (
             <AnimatedPressable key={post.id} style={styles.postCard} onPress={() => navigation.navigate('PostDetail', { postId: post.id })}>
-              <View style={styles.postImage}>
-                <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
-                {post.video_url ? (
-                  <VideoThumb uri={post.video_url} />
-                ) : post.image_url ? (
-                  <Image source={{ uri: post.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
-                ) : null}
-              </View>
+              {(post.video_url || post.image_url) && (
+                <View style={styles.postImage}>
+                  {post.video_url ? (
+                    <VideoThumb uri={post.video_url} />
+                  ) : (
+                    <Image source={{ uri: post.image_url! }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+                  )}
+                </View>
+              )}
               <View style={{ flex: 1 }}>
                 <Text style={styles.postTag}>{post.tag}</Text>
                 <Text style={styles.postTitle} numberOfLines={2}>{post.title}</Text>
@@ -315,9 +314,9 @@ function createStyles(colors: ColorTokens) {
   emptyText: { color: colors.inkSoft, textAlign: 'center', marginTop: 24, paddingHorizontal: spacing.lg, fontSize: 13 },
   postCard: {
     flexDirection: 'row', gap: 12, marginHorizontal: spacing.lg, marginBottom: 12,
-    backgroundColor: colors.white, borderRadius: 16, borderWidth: 1, borderColor: colors.line, padding: 10, overflow: 'hidden',
+    backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, padding: 10, overflow: 'hidden',
   },
-  postImage: { width: 66, height: 66, borderRadius: 12, overflow: 'hidden' },
+  postImage: { width: 66, height: 66, borderRadius: radius.sm, overflow: 'hidden' },
   postTag: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 9, color: colors.teal, textTransform: 'uppercase', letterSpacing: 0.8 },
   postTitle: { fontSize: 13, fontWeight: '700', color: colors.ink, marginTop: 3, lineHeight: 17 },
   postMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 },

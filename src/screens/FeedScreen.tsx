@@ -16,7 +16,7 @@ import { useUnreadNotifications } from '@/lib/useUnreadNotifications';
 import { haptics } from '@/lib/haptics';
 import { calmDuration, calmEasing } from '@/lib/animations';
 import { annualPrice, cheapestRoom, formatAed } from '@/lib/housing';
-import { radius, spacing, gradients } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon } from '@/constants/topicIcons';
 import { INTEREST_OPTIONS } from '@/constants/interests';
@@ -78,7 +78,10 @@ function hashString(str: string): number {
 // just consistent enough that columns end up close in length.
 function estimateCardHeight(post: Post, imageHeight: number): number {
   const titleLines = post.title.length < 28 ? 1 : post.title.length < 56 ? 2 : 3;
-  return imageHeight + 64 + titleLines * 18;
+  // Text-only cards have no image block but show up to 4 lines of body.
+  const hasMedia = !!(post.video_url || post.image_url);
+  const excerpt = !hasMedia && post.body ? Math.min(4, Math.ceil(post.body.length / 26)) * 17 + 5 : 0;
+  return (hasMedia ? imageHeight : 0) + 64 + titleLines * 18 + excerpt;
 }
 
 // Deterministically picks one post out of a candidate pool from a seed —
@@ -351,8 +354,10 @@ export default function FeedScreen() {
   // anything but stable and unique per section.
   const renderCard = (item: Post, sectionKey: string, index = 0) => {
     const hash = hashString(item.id);
-    const [from, to] = gradients[hash % gradients.length];
     const imageHeight = 110 + (hash % 60);
+    // Text-only posts show their own words instead of a decorative colour
+    // block standing in for a photo that doesn't exist.
+    const hasMedia = !!(item.video_url || item.image_url);
     const cardKey = `${sectionKey}:${item.id}`;
     return (
       <Animated.View key={cardKey} entering={FadeInDown.delay(Math.min(index, 6) * 60).duration(calmDuration).easing(calmEasing)}>
@@ -360,8 +365,8 @@ export default function FeedScreen() {
         style={[styles.card, item.is_editorial && styles.cardEditorial]}
         onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
       >
+        {hasMedia && (
         <View style={[styles.cardImage, { height: imageHeight }]}>
-          <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
           {item.video_url ? (
             <View
               style={StyleSheet.absoluteFill}
@@ -376,8 +381,9 @@ export default function FeedScreen() {
             <View style={styles.editorialBadge}><Text style={styles.editorialBadgeText}>Havenly Pick</Text></View>
           )}
         </View>
+        )}
         <View style={styles.cardBody}>
-          <Text style={styles.cardTag}>{item.tag}</Text>
+          <Text style={styles.cardTag}>{item.tag}{item.is_editorial && !hasMedia ? ' · Havenly Pick' : ''}</Text>
           {item.community?.name && (
             <View style={styles.communityBadge}>
               <Icon name="users" size={9} color={colors.teal} />
@@ -385,6 +391,7 @@ export default function FeedScreen() {
             </View>
           )}
           <Text style={styles.cardTitle} numberOfLines={3}>{item.title}</Text>
+          {!hasMedia && !!item.body && <Text style={styles.cardExcerpt} numberOfLines={4}>{item.body}</Text>}
           <View style={styles.cardMeta}>
             <Pressable
               style={styles.cardUserTap}
@@ -534,18 +541,19 @@ export default function FeedScreen() {
           <>
             {dailyPick && (
               <Pressable
-                style={styles.dailyPickCard}
+                style={[styles.dailyPickCard, !dailyPick.image_url && styles.dailyPickTextOnly]}
                 onPress={() => navigation.navigate('PostDetail', { postId: dailyPick.id })}
               >
-                {dailyPick.image_url ? (
-                  <Image source={{ uri: dailyPick.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
-                ) : (
-                  <LinearGradient colors={gradients[hashString(dailyPick.id) % gradients.length]} style={StyleSheet.absoluteFill} />
+                {dailyPick.image_url && (
+                  <>
+                    <Image source={{ uri: dailyPick.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+                    <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={StyleSheet.absoluteFill} />
+                  </>
                 )}
-                <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={StyleSheet.absoluteFill} />
                 <View style={styles.dailyPickBody}>
                   <Text style={styles.dailyPickEyebrow}>Today's pick</Text>
                   <Text style={styles.dailyPickTitle} numberOfLines={2}>{dailyPick.title}</Text>
+                  {!dailyPick.image_url && !!dailyPick.body && <Text style={styles.dailyPickExcerpt} numberOfLines={2}>{dailyPick.body}</Text>}
                   <Text style={styles.dailyPickMeta}>
                     {dailyPick.tag} · {dailyPick.is_editorial ? 'Havenly Editorial' : `@${dailyPick.author?.username ?? 'user'}`}
                   </Text>
@@ -623,7 +631,7 @@ function createStyles(colors: ColorTokens) {
     marginBottom: spacing.md, padding: 12, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,
     borderRadius: radius.md,
   },
-  housingPhoto: { width: 64, height: 64, borderRadius: 12 },
+  housingPhoto: { width: 64, height: 64, borderRadius: radius.sm },
   housingPhotoEmpty: { backgroundColor: `${colors.gold}26`, alignItems: 'center', justifyContent: 'center' },
   housingEyebrow: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
   housingTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 15.5, color: colors.ink, marginTop: 2, lineHeight: 20 },
@@ -632,18 +640,21 @@ function createStyles(colors: ColorTokens) {
     marginHorizontal: spacing.lg, marginTop: spacing.sm, marginBottom: spacing.md,
     height: 190, borderRadius: radius.lg, overflow: 'hidden', justifyContent: 'flex-end',
   },
+  // No photo: a plain dark card sized to its text, not a gradient poster.
+  dailyPickTextOnly: { height: undefined, backgroundColor: '#20261F' },
   dailyPickBody: { padding: spacing.lg },
   // Literal white/gold regardless of theme — this card is always a photo or
   // gradient with a dark overlay gradient under it, same reasoning as the
   // full-screen video layout's own white text.
   dailyPickEyebrow: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10.5, color: colors.gold, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 },
   dailyPickTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: 'white', lineHeight: 24 },
+  dailyPickExcerpt: { fontSize: 12.5, color: 'rgba(255,255,255,0.75)', lineHeight: 18, marginTop: 6 },
   dailyPickMeta: { fontSize: 11.5, color: 'rgba(255,255,255,0.8)', fontWeight: '600', marginTop: 6 },
   masonryRow: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.lg },
   masonryColumn: { flex: 1, gap: spacing.sm },
   card: { borderRadius: radius.md, overflow: 'hidden', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   cardEditorial: { borderColor: colors.gold, borderWidth: 1.5 },
-  cardImage: { justifyContent: 'flex-start' },
+  cardImage: { justifyContent: 'flex-start', backgroundColor: colors.sandDeep },
   // Fixed dark plaque regardless of theme — colors.ink would flip to cream in
   // dark mode and break the gold text's contrast, so this one stays literal.
   editorialBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: '#20261F', paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.tag },
@@ -651,6 +662,7 @@ function createStyles(colors: ColorTokens) {
   cardBody: { padding: 11 },
   cardTag: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 9.5, color: colors.teal, textTransform: 'uppercase', letterSpacing: 0.8 },
   cardTitle: { fontSize: 13.5, fontWeight: '700', marginTop: 5, color: colors.ink, lineHeight: 18 },
+  cardExcerpt: { fontSize: 12, color: colors.inkSoft, marginTop: 5, lineHeight: 17 },
   cardMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 9 },
   cardUserTap: { flex: 1 },
   cardUser: { fontSize: 11, color: colors.inkSoft, fontWeight: '600' },

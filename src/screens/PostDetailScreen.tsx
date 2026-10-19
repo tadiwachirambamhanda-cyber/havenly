@@ -10,7 +10,6 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Clipboard from 'expo-clipboard';
 import InitialsAvatar from '@/components/InitialsAvatar';
 import Icon from '@/components/Icon';
@@ -28,7 +27,7 @@ import ActionSheet from '@/components/ActionSheet';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
 import PostVideoPlayer, { type PostVideoPlayerHandle } from '@/components/PostVideoPlayer';
-import { gradients, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
 import type { Comment, Post } from '@/types';
@@ -296,7 +295,9 @@ export default function PostDetailScreen() {
   }
 
   const isOwnPost = post.author_id === session?.user.id;
-  const [heroFrom, heroTo] = gradients[post.id.charCodeAt(0) % gradients.length];
+  // No photo or video: no hero at all, just a top bar, so the post opens
+  // on its words rather than a block of decorative colour.
+  const hasMedia = !!(post.video_url || post.image_url);
 
   const renderCommentRow = (comment: Comment) => (
     <Pressable
@@ -495,9 +496,10 @@ export default function PostDetailScreen() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <View style={styles.container}>
     <ReanimatedAnimated.ScrollView onScroll={onScroll} scrollEventThrottle={16}>
-      <View style={styles.hero}>
+      <View style={hasMedia ? styles.hero : { height: insets.top + 58 }}>
+        {hasMedia && (
+        <>
         <ReanimatedAnimated.View style={[StyleSheet.absoluteFill, heroAnimatedStyle]}>
-          <LinearGradient colors={[heroFrom, heroTo]} style={StyleSheet.absoluteFill} />
           {post.video_url ? (
             <PostVideoPlayer uri={post.video_url} onDoubleTap={() => { playHeartPop(); setLikedState(true); }} />
           ) : post.image_url ? (
@@ -513,15 +515,17 @@ export default function PostDetailScreen() {
         >
           <Icon name="heart" size={84} color="white" weight="fill" />
         </Animated.View>
-        <BackButton style={[styles.back, { top: insets.top + 12 }]}>
-          <Icon name="arrow-left" size={16} color="#20261F" />
+        </>
+        )}
+        <BackButton style={[styles.back, !hasMedia && styles.bareBtn, { top: insets.top + 12 }]}>
+          <Icon name="arrow-left" size={16} color={hasMedia ? '#20261F' : colors.ink} />
         </BackButton>
         <Pressable
-          style={[styles.overflow, { top: insets.top + 12 }]}
+          style={[styles.overflow, !hasMedia && styles.bareBtn, { top: insets.top + 12 }]}
           onPress={openOptions}
           accessibilityLabel="More options"
         >
-          <Icon name="more-horizontal" size={17} color="#20261F" />
+          <Icon name="more-horizontal" size={17} color={hasMedia ? '#20261F' : colors.ink} />
         </Pressable>
       </View>
       <View style={styles.body}>
@@ -656,6 +660,7 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   hero: { width: '100%', height: 340, overflow: 'hidden' },
+  bareBtn: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   heartPop: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center',
     shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 12, shadowOffset: { width: 0, height: 2 },

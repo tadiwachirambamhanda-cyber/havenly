@@ -23,7 +23,10 @@ export const colors = lightColors;
 // pill is for things you tap to toggle (filter chips, segments) and the
 // floating tab bar/toast; buttons and inputs use button; read-only labels
 // (status, amenities, badges) use tag, so shape alone says "tappable" or not.
-export const radius = { lg: 26, md: 16, sm: 10, button: 14, tag: 6, pill: 100 };
+// Kept tight on purpose: large soft radii on every card read as a generic
+// template. lg is for sheets and the hero card, md for cards, sm for
+// thumbnails and small tiles.
+export const radius = { lg: 16, md: 12, sm: 8, button: 10, tag: 4, pill: 100 };
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 20, xl: 28 };
 // Small uppercase labels use bodyBold with ~0.8 letter spacing. mono is only
 // for things that must be read character by character (a perk's redeem
@@ -42,13 +45,3 @@ export const tones = {
   gold: ['#F3C46D', '#CF8B22'],
   olive: ['#7A8577', '#2E372D'],
 } as const satisfies Record<string, readonly [string, string]>;
-
-// Stand-in backgrounds for posts and spots without a photo, picked by id.
-// All one family (coral, light to deep) so a grid of text-only posts reads
-// as varied shades of the brand rather than a rainbow of unrelated hues.
-export const gradients: [string, string][] = [
-  [...tones.coral],
-  ['#F7A991', '#E2674A'],
-  ['#E57A62', '#B8432C'],
-  ['#FFB8A3', '#FF8466'],
-];

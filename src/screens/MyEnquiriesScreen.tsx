@@ -122,7 +122,7 @@ function createStyles(colors: ColorTokens) {
       flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.white, borderWidth: 1,
       borderColor: colors.line, borderRadius: radius.md, padding: 12, marginBottom: 10,
     },
-    thumb: { width: 60, height: 60, borderRadius: 12 },
+    thumb: { width: 60, height: 60, borderRadius: radius.sm },
     name: { fontSize: 14, fontWeight: '700', color: colors.ink },
     meta: { fontSize: 12, color: colors.inkSoft, marginTop: 2 },
     footRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 7 },

@@ -6,7 +6,6 @@ import Animated from 'react-native-reanimated';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import InitialsAvatar from '@/components/InitialsAvatar';
 import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
@@ -16,11 +15,10 @@ import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { createCheckIn, deleteCheckIn, sendPing } from '@/lib/checkIns';
 import { toggleInterest } from '@/lib/interests';
-import { useParallaxHero } from '@/lib/animations';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import ActionSheet from '@/components/ActionSheet';
 import Skeleton from '@/components/Skeleton';
-import { gradients, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { CheckIn, HavenlyEvent, PlaceInterest, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -31,14 +29,6 @@ type VisibleInterest = PlaceInterest & { user: Profile };
 type Route = RouteProp<RootStackParamList, 'EventDetail'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-function hashString(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
-  return hash;
-}
-
-const HERO_HEIGHT = 200;
-
 export default function EventDetailScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
@@ -48,7 +38,6 @@ export default function EventDetailScreen() {
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
-  const { onScroll, heroAnimatedStyle, heroDimStyle } = useParallaxHero(HERO_HEIGHT);
 
   const [event, setEvent] = useState<HavenlyEvent | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -162,10 +151,10 @@ export default function EventDetailScreen() {
   const date = new Date(event.event_date);
   const dateLabel = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   const timeLabel = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  const [from, to] = gradients[hashString(event.id) % gradients.length];
+  const monthLabel = date.toLocaleDateString('en-US', { month: 'short' });
 
   return (
-    <Animated.ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }} onScroll={onScroll} scrollEventThrottle={16}>
+    <Animated.ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
       <BackButton style={styles.back}>
         <Icon name="arrow-left" size={17} color={colors.ink} />
       </BackButton>
@@ -174,11 +163,13 @@ export default function EventDetailScreen() {
           <Icon name="more-horizontal" size={17} color={colors.ink} />
         </Pressable>
       )}
-      <View style={styles.hero}>
-        <Animated.View style={[StyleSheet.absoluteFill, heroAnimatedStyle]}>
-          <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
-        </Animated.View>
-        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: '#000' }, heroDimStyle]} />
+      {/* Events have no photo, so the top of the page is the date itself
+          rather than a decorative colour block. */}
+      <View style={styles.dateHeader}>
+        <View style={styles.datePlaque}>
+          <Text style={styles.dateMonth}>{monthLabel}</Text>
+          <Text style={styles.dateDay}>{date.getDate()}</Text>
+        </View>
       </View>
       <View style={styles.body}>
         <Text style={styles.tag}>{event.tag}</Text>
@@ -309,7 +300,13 @@ function createStyles(colors: ColorTokens) {
     position: 'absolute', top: 50, right: 16, zIndex: 1, width: 34, height: 34, borderRadius: 17,
     backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center',
   },
-  hero: { height: 200, overflow: 'hidden' },
+  dateHeader: { paddingTop: 96, paddingHorizontal: spacing.lg },
+  datePlaque: {
+    alignSelf: 'flex-start', minWidth: 64, alignItems: 'center', paddingVertical: 8, paddingHorizontal: 12,
+    borderRadius: radius.sm, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white,
+  },
+  dateMonth: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.coral },
+  dateDay: { fontFamily: 'Fraunces_600SemiBold', fontSize: 30, color: colors.ink, lineHeight: 34 },
   body: { padding: spacing.lg },
   tag: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 22, color: colors.ink, marginTop: 6 },

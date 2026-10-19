@@ -411,7 +411,7 @@ function createStyles(colors: ColorTokens) {
     },
     switchTitle: { fontSize: 14, fontWeight: '700', color: colors.ink },
     photoRow: { gap: 10, paddingHorizontal: spacing.lg },
-    photo: { width: 96, height: 72, borderRadius: 10, overflow: 'hidden', backgroundColor: colors.sandDeep },
+    photo: { width: 96, height: 72, borderRadius: radius.sm, overflow: 'hidden', backgroundColor: colors.sandDeep },
     photoAdd: { alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.line },
     photoRemove: {
       position: 'absolute', top: 5, right: 5, width: 20, height: 20, borderRadius: 10,

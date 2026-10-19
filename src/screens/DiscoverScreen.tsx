@@ -460,7 +460,7 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: radius.md, padding: spacing.md,
   },
   eventRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  eventDate: { width: 46, height: 46, borderRadius: 10, backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  eventDate: { width: 46, height: 46, borderRadius: radius.sm, backgroundColor: colors.tealSoft, alignItems: 'center', justifyContent: 'center' },
   eventDay: { fontSize: 15, lineHeight: 17, fontWeight: '800', color: colors.teal },
   eventMonth: { fontSize: 8.5, textTransform: 'uppercase', fontWeight: '800', color: colors.teal },
   eventName: { fontSize: 12.5, fontWeight: '700', color: colors.ink },

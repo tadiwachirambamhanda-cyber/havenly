@@ -19,7 +19,7 @@ import { haptics } from '@/lib/haptics';
 import { formatCount } from '@/utils/formatCount';
 import { findOrCreateConversation } from '@/lib/conversations';
 import { blockUser, submitReport } from '@/lib/safety';
-import { radius, spacing, gradients, tones } from '@/theme/tokens';
+import { radius, spacing, tones } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
 import { interestIcon } from '@/constants/topicIcons';
@@ -216,16 +216,16 @@ export default function UserProfileScreen() {
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
         renderItem={({ item, index }) => {
-          const [from, to] = gradients[index % gradients.length];
           return (
             <Animated.View entering={FadeIn.delay(Math.min(index, 11) * 30)} style={styles.gridCell}>
             <AnimatedPressable style={{ flex: 1 }} onPress={() => navigation.navigate('PostDetail', { postId: item.id })}>
-              <LinearGradient colors={[from, to]} style={StyleSheet.absoluteFill} />
               {item.video_url ? (
                 <VideoThumb uri={item.video_url} isVisible={isFocused && visibleVideoIds.has(item.id)} />
               ) : item.image_url ? (
                 <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
-              ) : null}
+              ) : (
+                <View style={styles.gridText}><Text style={styles.gridTextTitle} numberOfLines={5}>{item.title}</Text></View>
+              )}
             </AnimatedPressable>
             </Animated.View>
           );
@@ -376,5 +376,8 @@ function createStyles(colors: ColorTokens) {
     fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 6, marginBottom: 10,
   },
   gridCell: { flex: 1, aspectRatio: 1 / 1.15, overflow: 'hidden', marginBottom: 2 },
+  // Text-only post in the grid: its title on a quiet tile, not a colour block.
+  gridText: { flex: 1, backgroundColor: colors.sandDeep, padding: 10, justifyContent: 'flex-end' },
+  gridTextTitle: { fontSize: 12, fontWeight: '700', color: colors.ink, lineHeight: 16 },
   });
 }
