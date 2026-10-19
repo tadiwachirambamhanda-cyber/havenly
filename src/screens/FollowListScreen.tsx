@@ -75,10 +75,16 @@ export default function FollowListScreen() {
       isFollowing ? next.delete(targetId) : next.add(targetId);
       return next;
     });
-    if (isFollowing) {
-      await supabase.from('follows').delete().eq('follower_id', myId).eq('following_id', targetId);
-    } else {
-      await supabase.from('follows').insert({ follower_id: myId, following_id: targetId });
+    const { error } = isFollowing
+      ? await supabase.from('follows').delete().eq('follower_id', myId).eq('following_id', targetId)
+      : await supabase.from('follows').insert({ follower_id: myId, following_id: targetId });
+    if (error) {
+      // Put the button back the way it was if the write failed.
+      setMyFollowingIds((prev) => {
+        const next = new Set(prev);
+        isFollowing ? next.add(targetId) : next.delete(targetId);
+        return next;
+      });
     }
   };
 

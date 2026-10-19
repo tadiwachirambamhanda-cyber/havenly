@@ -43,7 +43,7 @@ export default function PostDetailScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const insets = useSafeAreaInsets();
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
   const { colors } = useTheme();
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -134,7 +134,13 @@ export default function PostDetailScreen() {
     haptics.tap();
     if (next) playLikeBounce();
     const { data, error } = await supabase.rpc('toggle_post_like', { post_id_input: post.id });
-    if (error) { console.error('Failed to toggle like:', error.message); return; }
+    if (error) {
+      console.error('Failed to toggle like:', error.message);
+      setLiked(!next);
+      setPost((prev) => prev && { ...prev, like_count: prev.like_count + (next ? -1 : 1) });
+      showToast('Couldn’t update your like', 'error');
+      return;
+    }
     const result = data?.[0];
     if (result) {
       setLiked(result.liked);
@@ -173,14 +179,28 @@ export default function PostDetailScreen() {
     setPostingComment(true);
     const body = commentInput.trim();
     setCommentInput('');
+    // Add the comment straight away under the viewer's own profile, then
+    // swap in the saved row (or take it back out if the insert fails).
+    const tempId = `pending-${Date.now()}`;
+    const pending = {
+      id: tempId, post_id: post.id, author_id: session.user.id, body,
+      created_at: new Date().toISOString(), author: profile ?? undefined,
+    } as Comment;
+    setComments((prev) => [...prev, pending]);
+    setPost((prev) => prev && { ...prev, comment_count: prev.comment_count + 1 });
     const { data, error } = await supabase.from('comments')
       .insert({ post_id: post.id, author_id: session.user.id, body })
       .select('*, author:profiles(*)').single();
     setPostingComment(false);
-    if (error) { showToast('Couldn’t post comment', 'error'); return; }
+    if (error) {
+      setComments((prev) => prev.filter((c) => c.id !== tempId));
+      setPost((prev) => prev && { ...prev, comment_count: Math.max(prev.comment_count - 1, 0) });
+      setCommentInput(body);
+      showToast('Couldn’t post comment', 'error');
+      return;
+    }
     haptics.confirm();
-    setComments((prev) => [...prev, data as unknown as Comment]);
-    setPost((prev) => prev && { ...prev, comment_count: prev.comment_count + 1 });
+    setComments((prev) => prev.map((c) => (c.id === tempId ? (data as unknown as Comment) : c)));
   };
 
   const deleteComment = (comment: Comment) => setDeleteCommentTarget(comment);
@@ -188,21 +208,30 @@ export default function PostDetailScreen() {
   const confirmDeleteComment = async () => {
     const comment = deleteCommentTarget;
     if (!comment) return;
-    await supabase.from('comments').delete().eq('id', comment.id);
     haptics.tap();
+    const before = comments;
     setComments((prev) => prev.filter((c) => c.id !== comment.id));
     setPost((prev) => prev && { ...prev, comment_count: Math.max(prev.comment_count - 1, 0) });
+    const { error } = await supabase.from('comments').delete().eq('id', comment.id);
+    if (error) {
+      setComments(before);
+      setPost((prev) => prev && { ...prev, comment_count: prev.comment_count + 1 });
+      showToast('Couldn’t delete comment', 'error');
+    }
   };
 
   const toggleFollow = async () => {
     if (!post || !session?.user) return;
     haptics.tap();
-    if (following) {
-      await supabase.from('follows').delete().eq('follower_id', session.user.id).eq('following_id', post.author_id);
-    } else {
-      await supabase.from('follows').insert({ follower_id: session.user.id, following_id: post.author_id });
+    const wasFollowing = following;
+    setFollowing(!wasFollowing);
+    const { error } = wasFollowing
+      ? await supabase.from('follows').delete().eq('follower_id', session.user.id).eq('following_id', post.author_id)
+      : await supabase.from('follows').insert({ follower_id: session.user.id, following_id: post.author_id });
+    if (error) {
+      setFollowing(wasFollowing);
+      showToast('Couldn’t update follow', 'error');
     }
-    setFollowing(!following);
   };
 
   const openShare = () => setShareSheetVisible(true);
@@ -322,7 +351,7 @@ export default function PostDetailScreen() {
       key={comment.id}
       style={styles.commentRow}
       onPress={() => navigation.navigate('UserProfile', { userId: comment.author_id })}
-      onLongPress={() => comment.author_id === session?.user.id && deleteComment(comment)}
+      onLongPress={() => comment.author_id === session?.user.id && !comment.id.startsWith('pending-') && deleteComment(comment)}
     >
       {comment.author?.avatar_url ? (
         <Image source={{ uri: comment.author.avatar_url }} style={styles.commentAvatar} transition={200} />

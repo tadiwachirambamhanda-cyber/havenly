@@ -8,7 +8,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { useConfirmDiscard } from '@/lib/useConfirmDiscard';
-import { TAG_OPTIONS } from '@/constants/tags';
+import { TAG_GROUPS, TAG_OPTIONS } from '@/constants/tags';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 
@@ -156,16 +156,21 @@ export default function CreateEventScreen() {
       </View>
 
       <Text style={styles.sectionLabel}>Tag</Text>
-      <View style={styles.chipGrid}>
-        {TAG_OPTIONS.map((opt) => {
-          const isSelected = tag === opt;
-          return (
-            <AnimatedPressable key={opt} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); setTag(opt); }}>
-              <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt}</Text>
-            </AnimatedPressable>
-          );
-        })}
-      </View>
+      {TAG_GROUPS.map((group) => (
+        <View key={group.label}>
+          <Text style={styles.groupLabel}>{group.label}</Text>
+          <View style={styles.chipGrid}>
+            {group.tags.map((opt) => {
+              const isSelected = tag === opt;
+              return (
+                <AnimatedPressable key={opt} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); setTag(opt); }}>
+                  <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt}</Text>
+                </AnimatedPressable>
+              );
+            })}
+          </View>
+        </View>
+      ))}
 
       {error && <Text style={styles.error}>{error}</Text>}
     </ScrollView>
@@ -194,6 +199,7 @@ function createStyles(colors: ColorTokens) {
     marginHorizontal: spacing.lg, marginTop: spacing.sm, minHeight: 90, backgroundColor: colors.white, borderWidth: 1,
     borderColor: colors.line, borderRadius: radius.sm, padding: 14, fontSize: 14, color: colors.ink, textAlignVertical: 'top',
   },
+  groupLabel: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 10, marginBottom: 6 },
   sectionLabel: {
     fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
   },

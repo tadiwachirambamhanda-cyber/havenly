@@ -81,15 +81,15 @@ export default function SettingsScreen() {
         })}
       </View>
 
-      <View style={styles.divider} />
-
+      {/* Grouped under short headings rather than one flat list of up to
+          ten rows, so each group is a quick scan (Miller's Law). */}
+      <Text style={styles.sectionLabel}>Privacy & safety</Text>
       <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('BlockedUsers')}>
         <Text style={styles.rowText}>Blocked accounts</Text>
         <Text style={styles.chevron}>›</Text>
       </AnimatedPressable>
 
-      <View style={styles.divider} />
-
+      <Text style={styles.sectionLabel}>Legal</Text>
       <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('Legal', { doc: 'privacy' })}>
         <Text style={styles.rowText}>Privacy policy</Text>
         <Text style={styles.chevron}>›</Text>
@@ -104,7 +104,7 @@ export default function SettingsScreen() {
 
       {profile?.is_admin && (
         <>
-          <View style={styles.divider} />
+          <Text style={styles.sectionLabel}>Havenly team</Text>
           <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('ManageHousing')}>
             <Text style={styles.rowText}>Manage housing</Text>
             <Text style={styles.chevron}>›</Text>
@@ -127,8 +127,7 @@ export default function SettingsScreen() {
         </>
       )}
 
-      <View style={styles.divider} />
-
+      <Text style={styles.sectionLabel}>Account</Text>
       <AnimatedPressable style={styles.row} onPress={handleLogout}>
         <Text style={[styles.rowText, styles.logoutText]}>Log out</Text>
       </AnimatedPressable>
@@ -164,10 +163,10 @@ function createStyles(colors: ColorTokens) {
     back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
     title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
     sectionLabel: {
-      fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginBottom: 10,
+      fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: spacing.lg, marginBottom: 4,
     },
     segmentRow: {
-      flexDirection: 'row', gap: 6, marginHorizontal: spacing.lg, backgroundColor: colors.sandDeep,
+      flexDirection: 'row', gap: 6, marginHorizontal: spacing.lg, marginTop: 6, backgroundColor: colors.sandDeep,
       borderRadius: 100, padding: 4,
     },
     segment: {

@@ -190,7 +190,8 @@ export default function OfferDetailScreen() {
         {claimCode ? (
           <View style={styles.codeCard}>
             <Text style={styles.codeLabel}>Show this to staff</Text>
-            <Text style={styles.code}>{claimCode}</Text>
+            {/* Shown in two blocks of three ("A1B 2C3") so staff can read it at a glance. */}
+            <Text style={styles.code}>{claimCode.replace(/^(.{3})(.+)$/, '$1 $2')}</Text>
           </View>
         ) : unlocked ? (
           <AnimatedPressable style={styles.claimBtn} onPress={claim} disabled={claiming} accessibilityLabel="Claim this offer">

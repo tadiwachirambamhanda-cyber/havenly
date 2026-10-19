@@ -17,7 +17,7 @@ import { haptics } from '@/lib/haptics';
 import { useConfirmDiscard } from '@/lib/useConfirmDiscard';
 import { radius, spacing, tones } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
-import { INTEREST_OPTIONS } from '@/constants/interests';
+import { INTEREST_CATEGORIES, INTEREST_OPTIONS } from '@/constants/interests';
 import { interestIcon } from '@/constants/topicIcons';
 import UniversityPickerModal from '@/components/UniversityPickerModal';
 import type { Interest } from '@/types';
@@ -202,17 +202,23 @@ export default function EditProfileScreen() {
       />
 
       <Text style={styles.label}>Interests</Text>
-      <View style={styles.chipGrid}>
-        {INTEREST_OPTIONS.map((opt) => {
-          const isSelected = interests.has(opt.key);
-          return (
-            <AnimatedPressable key={opt.key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); toggleInterest(opt.key); }}>
-              <Icon name={interestIcon(opt.key)} size={13} color={isSelected ? colors.sand : colors.ink} />
-              <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt.label}</Text>
-            </AnimatedPressable>
-          );
-        })}
-      </View>
+      {INTEREST_CATEGORIES.map((category) => (
+        <View key={category.label}>
+          <Text style={styles.groupLabel}>{category.label}</Text>
+          <View style={styles.chipGrid}>
+            {category.keys.map((key) => {
+              const opt = INTEREST_OPTIONS.find((o) => o.key === key)!;
+              const isSelected = interests.has(opt.key);
+              return (
+                <AnimatedPressable key={opt.key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); toggleInterest(opt.key); }}>
+                  <Icon name={interestIcon(opt.key)} size={13} color={isSelected ? colors.sand : colors.ink} />
+                  <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt.label}</Text>
+                </AnimatedPressable>
+              );
+            })}
+          </View>
+        </View>
+      ))}
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </ScrollView>
@@ -249,6 +255,7 @@ function createStyles(colors: ColorTokens) {
   bioInput: { minHeight: 80, textAlignVertical: 'top' },
   universityValue: { fontSize: 14, color: colors.ink },
   universityPlaceholder: { fontSize: 14, color: colors.inkSoft },
+  groupLabel: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 10, marginBottom: 6 },
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 9, paddingHorizontal: spacing.lg },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: 9, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
   chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
