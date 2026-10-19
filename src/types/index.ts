@@ -112,11 +112,11 @@ export type EnquiryKind = 'question' | 'viewing';
 export type EnquiryStatus = 'new' | 'contacted' | 'viewing_booked' | 'signed' | 'lost';
 
 export interface HousingEnquiry {
-  id: string; user_id: string; user?: Pick<Profile, 'id' | 'display_name' | 'username' | 'avatar_url' | 'university'>;
+  id: string; user_id: string | null; user?: Pick<Profile, 'id' | 'display_name' | 'username' | 'avatar_url' | 'university'> | null;
   residence_id: string; residence?: Pick<Residence, 'id' | 'name' | 'area' | 'photo_urls' | 'provider_name'>;
   room_type_id: string | null; room_type?: Pick<RoomType, 'id' | 'name' | 'price_aed' | 'billing_period'> | null;
   kind: EnquiryKind; move_in_month: string; duration_months: number; budget_aed: number | null;
-  contact_phone: string; message: string | null; preferred_viewing: string | null; status: EnquiryStatus;
+  contact_phone: string | null; message: string | null; preferred_viewing: string | null; status: EnquiryStatus;
   contract_value_aed: number | null; referral_fee_aed: number | null; fee_paid_at: string | null;
   status_updated_at: string; created_at: string;
 }

@@ -93,8 +93,8 @@ export default function AdminEnquiryScreen() {
 
   const leadSummary = enquiry ? [
     `New Havenly student enquiry for ${enquiry.residence?.name ?? 'your residence'}`,
-    `Student: ${enquiry.user?.display_name ?? ''}${enquiry.user?.university ? ` (${enquiry.user.university})` : ''}`,
-    `Phone: ${enquiry.contact_phone}`,
+    `Student: ${enquiry.user?.display_name ?? 'Deleted account'}${enquiry.user?.university ? ` (${enquiry.user.university})` : ''}`,
+    enquiry.contact_phone ? `Phone: ${enquiry.contact_phone}` : null,
     `Type: ${enquiry.kind === 'viewing' ? 'Viewing request' : 'Question'}`,
     enquiry.room_type ? `Room: ${enquiry.room_type.name}` : null,
     `Move-in: ${formatMonth(enquiry.move_in_month)} for ${enquiry.duration_months} months`,
@@ -156,19 +156,32 @@ export default function AdminEnquiryScreen() {
 
       <View style={styles.card}>
         <Text style={styles.cardLabel}>Student</Text>
-        <Text style={styles.bigName}>{enquiry.user?.display_name ?? 'Student'}</Text>
-        <Text style={styles.muted2}>@{enquiry.user?.username}{enquiry.user?.university ? ` · ${enquiry.user.university}` : ''}</Text>
-        <Text style={styles.phone}>{enquiry.contact_phone}</Text>
-        <View style={styles.actionRow}>
-          <AnimatedPressable style={styles.actionBtn} onPress={() => Linking.openURL(`https://wa.me/${phoneDigits}`)}>
-            <Feather name="message-circle" size={14} color={colors.ink} />
-            <Text style={styles.actionText}>WhatsApp</Text>
-          </AnimatedPressable>
-          <AnimatedPressable style={styles.actionBtn} onPress={() => Linking.openURL(`tel:${enquiry.contact_phone.replace(/\s/g, '')}`)}>
-            <Feather name="phone" size={14} color={colors.ink} />
-            <Text style={styles.actionText}>Call</Text>
-          </AnimatedPressable>
-        </View>
+        {enquiry.user ? (
+          <>
+            <Text style={styles.bigName}>{enquiry.user.display_name}</Text>
+            <Text style={styles.muted2}>@{enquiry.user.username}{enquiry.user.university ? ` · ${enquiry.user.university}` : ''}</Text>
+          </>
+        ) : (
+          <>
+            <Text style={styles.bigName}>Deleted account</Text>
+            <Text style={styles.muted2}>The student deleted their account. This signed deal is kept so the fee can still be invoiced.</Text>
+          </>
+        )}
+        {enquiry.contact_phone ? (
+          <>
+            <Text style={styles.phone}>{enquiry.contact_phone}</Text>
+            <View style={styles.actionRow}>
+              <AnimatedPressable style={styles.actionBtn} onPress={() => Linking.openURL(`https://wa.me/${phoneDigits}`)}>
+                <Feather name="message-circle" size={14} color={colors.ink} />
+                <Text style={styles.actionText}>WhatsApp</Text>
+              </AnimatedPressable>
+              <AnimatedPressable style={styles.actionBtn} onPress={() => Linking.openURL(`tel:${enquiry.contact_phone?.replace(/\s/g, '')}`)}>
+                <Feather name="phone" size={14} color={colors.ink} />
+                <Text style={styles.actionText}>Call</Text>
+              </AnimatedPressable>
+            </View>
+          </>
+        ) : null}
       </View>
 
       <View style={styles.card}>

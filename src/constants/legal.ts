@@ -71,7 +71,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       heading: 'How long we keep it',
       paragraphs: [
         'We keep your information while your account is open. Expired check-ins stop being shown after 4 hours.',
-        `If you delete your account (Settings → Delete account), your account, profile, posts, comments, messages you sent, saved items and enquiries are deleted. Photos and videos you uploaded may remain in file storage until they're cleared; email ${LEGAL_CONTACT_EMAIL} if you want them removed straight away. Information a residence already received from an enquiry is held by that residence.`,
+        `If you delete your account (Settings → Delete account), we delete your account, profile, posts, comments, messages you sent, saved items, enquiries, and the photos and videos you uploaded. If you signed with a residence through Havenly, we keep a record of that deal (the residence, dates, contract value and fee) with your name, phone number and messages removed, because we need it for accounting. Information a residence already received from an enquiry is held by that residence.`,
       ],
     },
     {

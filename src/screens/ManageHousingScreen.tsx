@@ -127,7 +127,7 @@ export default function ManageHousingScreen() {
           <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('AdminEnquiry', { enquiryId: item.id })}>
             <View style={{ flex: 1 }}>
               <Text style={styles.rowTitle} numberOfLines={1}>
-                {item.user?.display_name ?? 'Student'} → {item.residence?.name ?? 'Residence'}
+                {item.user?.display_name ?? 'Deleted account'} → {item.residence?.name ?? 'Residence'}
               </Text>
               <Text style={styles.rowMeta} numberOfLines={1}>
                 {item.kind === 'viewing' ? 'Viewing' : 'Question'} · {formatMonth(item.move_in_month)} · {item.duration_months} mo · {timeAgo(item.created_at)}
