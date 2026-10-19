@@ -74,7 +74,7 @@ export default function MyEnquiriesScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.sm, flexGrow: 1 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
-          ListEmptyComponent={<EmptyState icon="clipboard" text="No enquiries yet. Find a place in Housing and ask a question or book a viewing." />}
+          ListEmptyComponent={<EmptyState icon="clipboard" text="No enquiries yet. Ask a residence a question or book a viewing from its page." action={{ label: 'Browse housing', onPress: () => navigation.navigate('MainTabs', { screen: 'Housing' }) }} />}
           renderItem={({ item, index }) => {
             const tone = statusTone(item.status);
             const photo = item.residence?.photo_urls?.[0];
@@ -117,10 +117,7 @@ function createStyles(colors: ColorTokens) {
     header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 12, paddingHorizontal: spacing.lg },
     back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
     title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
-    card: {
-      flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.white, borderWidth: 1,
-      borderColor: colors.line, borderRadius: radius.md, padding: 12, marginBottom: 10,
-    },
+    card: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
     thumb: { width: 60, height: 60, borderRadius: radius.sm },
     name: { fontSize: 14, fontWeight: '700', color: colors.ink },
     meta: { fontSize: 12, color: colors.inkSoft, marginTop: 2 },

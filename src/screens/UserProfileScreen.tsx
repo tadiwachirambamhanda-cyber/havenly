@@ -22,7 +22,6 @@ import { blockUser, submitReport } from '@/lib/safety';
 import { radius, spacing, tones } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
-import { interestIcon } from '@/constants/topicIcons';
 import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
 import VideoThumb from '@/components/VideoThumb';
@@ -305,7 +304,6 @@ export default function UserProfileScreen() {
               <View style={styles.chipRow}>
                 {interestChips.map((chip) => (
                   <View key={chip.key} style={styles.chip}>
-                    <Icon name={interestIcon(chip.key)} size={11} color={colors.coral} />
                     <Text style={styles.chipText}>{chip.label}</Text>
                   </View>
                 ))}

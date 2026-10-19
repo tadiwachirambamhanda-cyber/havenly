@@ -228,7 +228,7 @@ export default function CommunityDetailScreen() {
       </View>
 
       {posts.length === 0 ? (
-        <EmptyState icon="image" text={joined ? 'No posts yet. Start the first one.' : 'No posts yet in this community.'} />
+        <EmptyState icon="image" text={joined ? 'No posts yet.' : 'No posts yet in this community.'} action={joined ? { label: 'Write the first post', onPress: () => navigation.navigate('CreatePost', { communityId }) } : undefined} />
       ) : (
         posts.map((post) => {
           return (
@@ -312,10 +312,7 @@ function createStyles(colors: ColorTokens) {
   newPostBtn: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   newPostBtnText: { fontSize: 12.5, fontWeight: '700', color: colors.coral },
   emptyText: { color: colors.inkSoft, textAlign: 'center', marginTop: 24, paddingHorizontal: spacing.lg, fontSize: 13 },
-  postCard: {
-    flexDirection: 'row', gap: 12, marginHorizontal: spacing.lg, marginBottom: 12,
-    backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, padding: 10, overflow: 'hidden',
-  },
+  postCard: { flexDirection: 'row', gap: 12, marginHorizontal: spacing.lg, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   postImage: { width: 66, height: 66, borderRadius: radius.sm, overflow: 'hidden' },
   postTag: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 9, color: colors.teal, textTransform: 'uppercase', letterSpacing: 0.8 },
   postTitle: { fontSize: 13, fontWeight: '700', color: colors.ink, marginTop: 3, lineHeight: 17 },

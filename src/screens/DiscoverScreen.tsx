@@ -231,7 +231,7 @@ export default function DiscoverScreen() {
         </View>
       )}
 
-      {noResults && <EmptyState icon="search" text={`No results for "${query.trim()}"`} />}
+      {noResults && <EmptyState icon="search" text={`No results for "${query.trim()}"`} action={{ label: 'Clear search', onPress: () => setQuery('') }} />}
 
       {isSearching && matchedInterests.length > 0 && (
         <>

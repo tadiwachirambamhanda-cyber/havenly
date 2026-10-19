@@ -386,7 +386,6 @@ export default function FeedScreen() {
           <Text style={styles.cardTag}>{item.tag}{item.is_editorial && !hasMedia ? ' · Havenly Pick' : ''}</Text>
           {item.community?.name && (
             <View style={styles.communityBadge}>
-              <Icon name="users" size={9} color={colors.teal} />
               <Text style={styles.communityBadgeText} numberOfLines={1}>{item.community.name}</Text>
             </View>
           )}
@@ -527,7 +526,7 @@ export default function FeedScreen() {
           // sections existed. "Trending in X" / "New in your communities"
           // don't add anything once you've already filtered to one topic.
           posts.length === 0 ? (
-            <EmptyState icon="image" text={`No ${selectedInterest} posts yet.`} />
+            <EmptyState icon="image" text={`No ${selectedInterest} posts yet.`} action={{ label: 'Show all posts', onPress: () => setSelectedInterest(null) }} />
           ) : (
             <View style={styles.masonryRow}>
               {pickedColumns.map((col, i) => (
@@ -536,7 +535,7 @@ export default function FeedScreen() {
             </View>
           )
         ) : posts.length === 0 && trendingPosts.length === 0 && communityPosts.length === 0 ? (
-          <EmptyState icon="image" text="No posts here yet. Share a spot you like." />
+          <EmptyState icon="image" text="No posts here yet. Share a spot you like." action={{ label: 'Write a post', onPress: () => navigation.navigate('CreatePost') }} />
         ) : (
           <>
             {dailyPick && (

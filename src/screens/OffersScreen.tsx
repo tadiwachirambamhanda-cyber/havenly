@@ -173,7 +173,7 @@ function createStyles(colors: ColorTokens) {
   locationNoticeText: { flex: 1, fontSize: 11.5, color: colors.inkSoft },
   locationEnableBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.teal },
   locationEnableBtnText: { fontSize: 11, fontWeight: '700', color: colors.teal },
-  card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: radius.md, padding: 12, marginBottom: 10 },
+  card: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   cardImage: { width: 56, height: 56, borderRadius: radius.sm },
   cardBrand: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
   cardTitle: { fontSize: 13.5, fontWeight: '700', color: colors.ink, marginTop: 2, lineHeight: 17 },

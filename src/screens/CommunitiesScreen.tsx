@@ -168,7 +168,8 @@ function createStyles(colors: ColorTokens) {
   },
   sectionLabel: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft },
   sectionToggle: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.coral },
-  card: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginHorizontal: spacing.lg, marginBottom: spacing.sm, backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, padding: spacing.md },
+  // Plain rows with a divider, not a separate bordered box per community.
+  card: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginHorizontal: spacing.lg, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   iconChip: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },
   cardName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   cardMeta: { fontSize: 11, color: colors.inkSoft, marginTop: 2 },

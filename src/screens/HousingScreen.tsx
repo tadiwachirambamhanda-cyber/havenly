@@ -153,7 +153,8 @@ export default function HousingScreen() {
           ListEmptyComponent={
             <EmptyState
               icon={filtersActive ? 'filter' : 'home'}
-              text={filtersActive ? 'Nothing matches those filters. Try a wider price range.' : 'No residences listed yet. We’re adding partners near the main campuses.'}
+              text={filtersActive ? 'Nothing matches those filters.' : 'No residences listed yet. We’re adding partners near the main campuses.'}
+              action={filtersActive ? { label: 'Clear filters', onPress: () => { setSavedOnly(false); setNearMyUni(false); setBudget('any'); } } : undefined}
             />
           }
           renderItem={({ item, index }) => {

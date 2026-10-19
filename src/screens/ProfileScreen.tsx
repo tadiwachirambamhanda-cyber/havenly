@@ -23,7 +23,6 @@ import Skeleton from '@/components/Skeleton';
 import VideoThumb from '@/components/VideoThumb';
 import type { ColorTokens } from '@/theme/tokens';
 import { INTEREST_OPTIONS } from '@/constants/interests';
-import { interestIcon } from '@/constants/topicIcons';
 import type { Post, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -179,7 +178,8 @@ export default function ProfileScreen() {
       ListEmptyComponent={
         <EmptyState
           icon={activeTab === 'posts' ? 'grid' : activeTab === 'saved' ? 'bookmark' : 'tag'}
-          text={activeTab === 'posts' ? 'No posts yet.' : activeTab === 'saved' ? 'Nothing saved yet.' : 'No tagged posts yet.'}
+          text={activeTab === 'posts' ? 'No posts yet.' : activeTab === 'saved' ? 'Nothing saved yet. Tap the bookmark on a post to keep it here.' : 'No tagged posts yet.'}
+          action={activeTab === 'posts' ? { label: 'Write your first post', onPress: () => navigation.navigate('CreatePost') } : undefined}
         />
       }
       ListHeaderComponent={
@@ -243,7 +243,6 @@ export default function ProfileScreen() {
             <View style={styles.chipRow}>
               {interestChips.map((chip) => (
                 <View key={chip.key} style={styles.chip}>
-                  <Icon name={interestIcon(chip.key)} size={11} color={colors.coral} />
                   <Text style={styles.chipText}>{chip.label}</Text>
                 </View>
               ))}
