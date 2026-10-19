@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, RefreshControl, type ViewToken } from 'react-native';
+import { View, StyleSheet, FlatList, RefreshControl, type ViewToken } from 'react-native';
+import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
 import Animated, { FadeIn } from 'react-native-reanimated';

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';

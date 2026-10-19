@@ -6,8 +6,10 @@ import { useFonts } from 'expo-font';
 import { Fraunces_500Medium_Italic, Fraunces_600SemiBold, Fraunces_700Bold, Fraunces_700Bold_Italic } from '@expo-google-fonts/fraunces';
 import {
   PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
   PlusJakartaSans_600SemiBold,
   PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
 } from '@expo-google-fonts/plus-jakarta-sans';
 import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
 import { AuthProvider } from '@/lib/AuthContext';
@@ -43,8 +45,10 @@ export default function App() {
     Fraunces_700Bold,
     Fraunces_700Bold_Italic,
     PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium,
     PlusJakartaSans_600SemiBold,
     PlusJakartaSans_700Bold,
+    PlusJakartaSans_800ExtraBold,
     JetBrainsMono_500Medium,
   });
 

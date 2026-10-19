@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, ScrollView, ActivityIndicator, PanResponder } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator, PanResponder } from 'react-native';
+import { Text, TextInput } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';

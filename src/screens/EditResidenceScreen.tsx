@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, ScrollView, ActivityIndicator, Switch, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator, Switch, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, TextInput } from '@/components/Text';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';

@@ -1,19 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
+import { Text, TextInput } from '@/components/Text';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import InitialsAvatar from '@/components/InitialsAvatar';
 import Icon from '@/components/Icon';
-import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { haptics } from '@/lib/haptics';
 import { toggleInterest as togglePlaceInterest } from '@/lib/interests';
 import { formatCount } from '@/utils/formatCount';
-import { radius, spacing, gradients } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { communityIcon, interestIcon } from '@/constants/topicIcons';
 import { INTEREST_OPTIONS } from '@/constants/interests';
@@ -27,20 +27,10 @@ import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-// Spots are still static mock content — PROJECT_BRIEF.md section 2 designs
-// this to eventually pull from Google Places API for live data. Search
-// still filters them for real, since that's real (if mock) data actually
-// on screen, not faked. Events are real now (see `events` table) — only
-// profiles.is_admin accounts can create/delete them (Settings → Create
-// event), everyone else just views and marks interest.
-interface Spot { name: string; sub: string; }
-
-const SPOTS: Spot[] = [
-  { name: 'Nightjar Coffee', sub: 'Al Quoz · Café' },
-  { name: 'Sunset Padel Club', sub: 'JBR · Sports' },
-  { name: 'La Mer Beach', sub: 'Jumeirah · Beach' },
-  { name: 'Alserkal Studios', sub: 'Al Quoz · Art' },
-];
+// Events are real (see `events` table): only profiles.is_admin accounts
+// can create/delete them (Settings → Create event), everyone else just views
+// and marks interest. The old hard-coded "Trending spots near you" row was
+// removed: it wasn't trending or location-based, so it shouldn't say so.
 
 // "Sara is going" / "Sara and Amir are going" / "Sara, Amir and 3 others are going".
 function friendsGoingLabel(friends: Profile[]): string {
@@ -185,7 +175,6 @@ export default function DiscoverScreen() {
 
   const trimmed = query.trim().toLowerCase();
   const isSearching = trimmed.length > 0;
-  const filteredSpots = isSearching ? SPOTS.filter((s) => s.name.toLowerCase().includes(trimmed)) : SPOTS;
   const eventList = events ?? [];
   const filteredEvents = isSearching ? eventList.filter((e) => e.title.toLowerCase().includes(trimmed)) : eventList;
   const matchedInterests = isSearching ? INTEREST_OPTIONS.filter((opt) => opt.label.toLowerCase().includes(trimmed)) : [];
@@ -193,7 +182,7 @@ export default function DiscoverScreen() {
   // drops off this row on its own (profile.interests now includes it).
   const exploreInterests = INTEREST_OPTIONS.filter((opt) => !profile?.interests.includes(opt.key));
   const noResults = isSearching && posts !== null && communities !== null
-    && posts.length === 0 && communities.length === 0 && filteredSpots.length === 0 && filteredEvents.length === 0
+    && posts.length === 0 && communities.length === 0 && filteredEvents.length === 0
     && matchedInterests.length === 0;
 
   return (
@@ -223,40 +212,24 @@ export default function DiscoverScreen() {
       </View>
 
       {!isSearching && (
-        <Pressable
-          style={styles.perksPromo}
-          onPress={() => navigation.navigate('MainTabs', { screen: 'Housing' })}
-          accessibilityLabel="Find housing"
-        >
-          <View style={[styles.perksPromoIcon, { backgroundColor: `${colors.gold}26` }]}><Icon name="home" size={18} color={colors.gold} /></View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.perksPromoTitle}>Housing</Text>
-            <Text style={styles.perksPromoSub}>Student rooms near campus, checked by the Havenly team</Text>
-          </View>
-          <Icon name="chevron-right" size={16} color={colors.inkSoft} />
-        </Pressable>
-      )}
-
-      {!isSearching && (
-        <Pressable style={[styles.perksPromo, { marginTop: 10 }]} onPress={() => navigation.navigate('Offers')} accessibilityLabel="View perks">
-          <View style={styles.perksPromoIcon}><Icon name="gift" size={18} color={colors.coral} /></View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.perksPromoTitle}>Perks</Text>
-            <Text style={styles.perksPromoSub}>Unlock brand discounts with your streak</Text>
-          </View>
-          <Icon name="chevron-right" size={16} color={colors.inkSoft} />
-        </Pressable>
-      )}
-
-      {!isSearching && (
-        <Pressable style={[styles.perksPromo, { marginTop: 10 }]} onPress={() => navigation.navigate('Map')} accessibilityLabel="Open map">
-          <View style={[styles.perksPromoIcon, { backgroundColor: colors.tealSoft }]}><Icon name="map-pin" size={18} color={colors.teal} /></View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.perksPromoTitle}>Map</Text>
-            <Text style={styles.perksPromoSub}>See offers, events, housing, and who's checked in nearby</Text>
-          </View>
-          <Icon name="chevron-right" size={16} color={colors.inkSoft} />
-        </Pressable>
+        // One grouped list rather than three look-alike cards with a
+        // different colour circle each: these are just shortcuts.
+        <View style={styles.shortcuts}>
+          {([
+            { label: 'Housing', sub: 'Student rooms near campus, checked by the Havenly team', icon: 'home', onPress: () => navigation.navigate('MainTabs', { screen: 'Housing' }) },
+            { label: 'Perks', sub: 'Brand discounts that open up as your streak grows', icon: 'gift', onPress: () => navigation.navigate('Offers') },
+            { label: 'Map', sub: "Offers, events, housing and who's checked in nearby", icon: 'map-pin', onPress: () => navigation.navigate('Map') },
+          ] as const).map((item, i) => (
+            <Pressable key={item.label} style={[styles.shortcutRow, i > 0 && styles.shortcutDivider]} onPress={item.onPress} accessibilityLabel={item.label}>
+              <Icon name={item.icon} size={18} color={colors.ink} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.shortcutTitle}>{item.label}</Text>
+                <Text style={styles.shortcutSub}>{item.sub}</Text>
+              </View>
+              <Icon name="chevron-right" size={16} color={colors.inkSoft} />
+            </Pressable>
+          ))}
+        </View>
       )}
 
       {noResults && <EmptyState icon="search" text={`No results for "${query.trim()}"`} />}
@@ -347,25 +320,6 @@ export default function DiscoverScreen() {
         </>
       )}
 
-      {filteredSpots.length > 0 && (
-        <>
-          <Text style={styles.sectionLabel}>{isSearching ? 'Spots' : 'Trending spots near you'}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.spotScroll}>
-            {filteredSpots.map((spot, i) => {
-              const [from, to] = gradients[(i + 2) % gradients.length];
-              return (
-                <Animated.View key={spot.name} entering={FadeInRight.delay(Math.min(i, 6) * 60).duration(calmDuration).easing(calmEasing)} style={styles.spotCard}>
-                  <LinearGradient colors={[from, to]} style={styles.spotImage} />
-                  <View style={styles.spotInfo}>
-                    <Text style={styles.spotName}>{spot.name}</Text>
-                    <Text style={styles.spotSub}>{spot.sub}</Text>
-                  </View>
-                </Animated.View>
-              );
-            })}
-          </ScrollView>
-        </>
-      )}
 
       {filteredEvents.length > 0 && (
         <>
@@ -469,13 +423,14 @@ function createStyles(colors: ColorTokens) {
   },
   searchInput: { flex: 1, fontSize: 13, color: colors.ink, paddingVertical: 10 },
   clearBtn: { paddingHorizontal: 4 },
-  perksPromo: {
-    flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: spacing.lg, marginTop: 14,
-    backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: radius.md, padding: 14,
+  shortcuts: {
+    marginHorizontal: spacing.lg, marginTop: 14, backgroundColor: colors.white,
+    borderWidth: 1, borderColor: colors.line, borderRadius: radius.md, overflow: 'hidden',
   },
-  perksPromoIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.coralSoft, alignItems: 'center', justifyContent: 'center' },
-  perksPromoTitle: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
-  perksPromoSub: { fontSize: 11.5, color: colors.inkSoft, marginTop: 2 },
+  shortcutRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 13 },
+  shortcutDivider: { borderTopWidth: 1, borderTopColor: colors.line },
+  shortcutTitle: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
+  shortcutSub: { fontSize: 11.5, color: colors.inkSoft, marginTop: 2 },
   noResults: { color: colors.inkSoft, fontSize: 13, textAlign: 'center', marginTop: 24 },
   sectionLabel: {
     fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
@@ -501,12 +456,6 @@ function createStyles(colors: ColorTokens) {
     borderColor: colors.line, borderRadius: radius.pill, paddingVertical: 9, paddingHorizontal: 14,
   },
   exploreInterestChipText: { fontSize: 12.5, fontWeight: '600', color: colors.ink },
-  spotScroll: { gap: spacing.md, paddingHorizontal: spacing.lg, paddingBottom: 4 },
-  spotCard: { width: 150, borderRadius: radius.md, overflow: 'hidden', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
-  spotImage: { height: 100, width: '100%' },
-  spotInfo: { paddingHorizontal: 11, paddingTop: 9, paddingBottom: 11 },
-  spotName: { fontSize: 12.5, fontWeight: '700', color: colors.ink },
-  spotSub: { fontSize: 10.5, color: colors.inkSoft, marginTop: 2 },
   eventCard: {
     marginHorizontal: spacing.lg, marginBottom: 10,
     backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: radius.md, padding: spacing.md,

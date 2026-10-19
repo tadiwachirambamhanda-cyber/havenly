@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
+import { Modal, View, Pressable, StyleSheet } from 'react-native';
+import { Text } from '@/components/Text';
 import Animated, { SlideInDown } from 'react-native-reanimated';
 import { useTheme } from '@/lib/ThemeContext';
 import { radius, spacing } from '@/theme/tokens';

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import { Text } from '@/components/Text';
 import Animated from 'react-native-reanimated';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import BackButton from '@/components/BackButton';

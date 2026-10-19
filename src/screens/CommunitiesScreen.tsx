@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, SectionList, RefreshControl } from 'react-native';
+import { View, StyleSheet, SectionList, RefreshControl } from 'react-native';
+import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';

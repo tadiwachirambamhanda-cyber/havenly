@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Modal, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, FlatList, Modal, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, TextInput } from '@/components/Text';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';

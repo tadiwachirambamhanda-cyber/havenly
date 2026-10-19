@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
+import { Modal, View, Pressable, StyleSheet, ScrollView } from 'react-native';
+import { Text } from '@/components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from '@/components/Icon';
 import { useTheme } from '@/lib/ThemeContext';

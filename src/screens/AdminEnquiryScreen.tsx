@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, ActivityIndicator, Linking } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator, Linking } from 'react-native';
+import { Text, TextInput } from '@/components/Text';
 import { useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
 import * as Clipboard from 'expo-clipboard';
 import Icon from '@/components/Icon';

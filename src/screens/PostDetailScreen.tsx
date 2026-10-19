@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Animated, TextInput, KeyboardAvoidingView, Platform, Modal } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable, Animated, KeyboardAvoidingView, Platform, Modal } from 'react-native';
+import { Text, TextInput } from '@/components/Text';
 // Aliased — this file already uses the classic `Animated` API (react-native)
 // for the like-bounce/heart-pop effects; ReanimatedAnimated is only for the
 // new scroll-driven parallax hero, which needs a scroll handler that the

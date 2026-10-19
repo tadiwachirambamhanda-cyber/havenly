@@ -500,7 +500,8 @@ create policy "Users can join communities" on community_members for insert with 
 create policy "Users can leave communities" on community_members for delete using (auth.uid() = user_id);
 
 -- Keeps communities.member_count in sync with actual joins/leaves. Existing
--- seeded values are a starting size and grow/shrink from there.
+-- counts start from real joins (see 20261019120000_real_engagement_counts.sql,
+-- which replaced invented seed numbers) and grow/shrink from there.
 create or replace function public.sync_community_member_count()
 returns trigger
 language plpgsql

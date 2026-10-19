@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, TextInput, Keyboard } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Keyboard } from 'react-native';
+import { Text, TextInput } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
 import { WebView } from 'react-native-webview';
@@ -125,6 +126,7 @@ function buildMapHtml(params: {
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" />
   <style>
     html, body, #map { height: 100%; margin: 0; background: ${palette.land}; }
     .havenly-pin {
@@ -136,7 +138,7 @@ function buildMapHtml(params: {
     .cluster-pin {
       width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
       border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.35); cursor: pointer;
-      font-family: -apple-system, sans-serif; font-weight: 800; color: white; font-size: 14px;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; font-weight: 800; color: white; font-size: 14px;
     }
     .checkin-wrap { position: relative; width: 36px; height: 36px; cursor: pointer; }
     .checkin-pulse {
@@ -158,7 +160,7 @@ function buildMapHtml(params: {
     .user-dot { position: relative; width: 16px; height: 16px; }
     .user-dot-pulse { position: absolute; inset: -10px; border-radius: 50%; background: ${palette.teal}4d; animation: livePulse 2.6s ease-in-out infinite; }
     .user-dot-core { position: absolute; inset: 0; border-radius: 50%; background: ${palette.teal}; border: 3px solid white; box-shadow: 0 0 0 3px ${palette.teal}4d; }
-    .mapboxgl-popup-content { border-radius: 14px; padding: 12px 14px; font-family: -apple-system, sans-serif; }
+    .mapboxgl-popup-content { border-radius: 14px; padding: 12px 14px; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; }
     .popup-title { font-weight: 700; font-size: 13px; margin-bottom: 2px; color: #20261F; }
     .popup-sub { font-size: 11.5px; color: #5B6459; margin-bottom: 8px; }
     .popup-btn {
