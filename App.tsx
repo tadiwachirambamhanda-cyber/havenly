@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
@@ -14,18 +14,24 @@ import { AuthProvider } from '@/lib/AuthContext';
 import { ThemeProvider, useTheme } from '@/lib/ThemeContext';
 import { ToastProvider } from '@/lib/ToastContext';
 import RootNavigator from '@/navigation/RootNavigator';
-import LaunchAnimation from '@/components/LaunchAnimation';
+import AppErrorFallback from '@/components/AppErrorFallback';
+import { initCrashReporting } from '@/lib/crashReporting';
+import * as Sentry from '@sentry/react-native';
 
+initCrashReporting();
 SplashScreen.preventAutoHideAsync();
 
+// The launch animation lives in RootNavigator (it also covers the initial
+// auth check), so it isn't repeated here.
 function AppContent() {
-  const [showIntro, setShowIntro] = useState(true);
   const { scheme } = useTheme();
 
   return (
     <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-      {showIntro ? <LaunchAnimation onFinish={() => setShowIntro(false)} /> : <RootNavigator />}
+      <Sentry.ErrorBoundary fallback={({ resetError }) => <AppErrorFallback onRetry={resetError} />}>
+        <RootNavigator />
+      </Sentry.ErrorBoundary>
     </>
   );
 }

@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { setCrashReportingUser } from '@/lib/crashReporting';
 import type { Profile } from '@/types';
 
 interface AuthContextValue {
@@ -29,6 +30,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     setProfile((data as Profile) ?? null);
   }, []);
+
+  useEffect(() => { setCrashReportingUser(session?.user.id ?? null); }, [session?.user.id]);
 
   const refreshProfile = useCallback(async () => {
     if (session?.user) await loadProfile(session.user.id);
