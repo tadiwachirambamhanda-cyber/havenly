@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Havenly Technical Requirements</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=JetBrains+Mono:wght@500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a single readable document column with a sticky contents rail on wide screens; Havenly's app palette and type. */
+:root {
+  --bg: #FBF5EA; --surface: #FFFFFF; --deep: #F2E8D8; --fg: #20261F; --muted: #5B6459; --line: #E7DDC9;
+  --coral: #C8401F; --coral-soft: #FFE4DB; --teal: #0B6F68; --teal-soft: #DCF2EF; --gold: #8A5B12; --gold-soft: #FBEBCF;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #151310; --surface: #211D17; --deep: #1D1A15; --fg: #F3ECDC; --muted: #B7AC93; --line: #332D22;
+  --coral: #FF8A6E; --coral-soft: #3D2A22; --teal: #4FD1BE; --teal-soft: #173330; --gold: #E3B05A; --gold-soft: #3A2E18; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #151310; --surface: #211D17; --deep: #1D1A15; --fg: #F3ECDC; --muted: #B7AC93; --line: #332D22;
+  --coral: #FF8A6E; --coral-soft: #3D2A22; --teal: #4FD1BE; --teal-soft: #173330; --gold: #E3B05A; --gold-soft: #3A2E18; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 96px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 56px; align-items: start; }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+nav.toc .label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+nav.toc a { color: var(--muted); text-decoration: none; padding: 2px 0; }
+nav.toc a:hover, nav.toc a:focus-visible { color: var(--fg); }
+main { min-width: 0; max-width: 720px; }
+a:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 2px; }
+header.doc { display: flex; flex-direction: column; gap: 14px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--coral); }
+.brand-word { font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 22px; }
+h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 6vw, 44px); line-height: 1.1; margin: 0; letter-spacing: -0.5px; text-wrap: balance; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13px; color: var(--muted); }
+.meta b { color: var(--fg); font-weight: 600; }
+.pill { display: inline-block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; padding: 3px 9px; border-radius: 100px; font-weight: 500; white-space: nowrap; }
+.pill.draft { background: var(--gold-soft); color: var(--gold); }
+.pill.built { background: var(--teal-soft); color: var(--teal); }
+.pill.open { background: var(--coral-soft); color: var(--coral); }
+.pill.partial { background: var(--gold-soft); color: var(--gold); }
+section { padding-top: 40px; }
+h2 { font-family: var(--font-display); font-weight: 600; font-size: 26px; line-height: 1.2; margin: 0 0 14px; text-wrap: balance; scroll-margin-top: 24px; }
+h3 { font-size: 16px; font-weight: 700; margin: 24px 0 8px; }
+p { margin: 0 0 12px; text-wrap: pretty; }
+ul { margin: 0 0 12px; padding-left: 20px; }
+li { margin-bottom: 6px; }
+.lead { font-size: 18px; line-height: 1.55; }
+.muted { color: var(--muted); }
+.callout { background: var(--deep); border-radius: 12px; padding: 16px 18px; margin: 16px 0; font-size: 15px; }
+.callout b { font-weight: 700; }
+.table-wrap { overflow-x: auto; margin: 12px 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 520px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+tr:last-child td { border-bottom: none; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.req { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 16px 18px; margin: 12px 0; }
+.req-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; margin-bottom: 6px; }
+.req-id { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.req-title { font-weight: 700; font-size: 16px; }
+.req ul { margin-top: 8px; margin-bottom: 0; font-size: 14.5px; }
+.req .ac { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--muted); margin-top: 10px; }
+.persona { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 12px 0; }
+.persona div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 14.5px; }
+.persona b { display: block; font-family: var(--font-display); font-weight: 600; font-size: 17px; margin-bottom: 4px; }
+.story { font-size: 15px; }
+.story em { font-style: normal; font-weight: 700; }
+.blank { background: var(--gold-soft); color: var(--gold); border-radius: 4px; padding: 0 4px; font-weight: 600; white-space: nowrap; }
+.tag { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--teal); white-space: nowrap; }
+footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  nav.toc { position: static; flex-direction: row; flex-wrap: wrap; gap: 6px 14px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+  nav.toc .label { width: 100%; margin-bottom: 0; }
+}
+@media (max-width: 520px) { .persona { grid-template-columns: minmax(0, 1fr); } body { font-size: 15.5px; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html { scroll-behavior: smooth; }
+</style>
+<style>
+.arch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
+.arch .tier { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 14px; }
+.arch .tier b { display: block; font-family: var(--font-display); font-weight: 600; font-size: 17px; margin-bottom: 6px; }
+.arch .tier ul { padding-left: 18px; margin: 0; }
+.arch .tier li { margin-bottom: 3px; }
+.flow { counter-reset: step; list-style: none; padding-left: 0; }
+.flow li { counter-increment: step; position: relative; padding-left: 36px; margin-bottom: 10px; }
+.flow li::before { content: counter(step); position: absolute; left: 0; top: 1px; width: 24px; height: 24px; border-radius: 50%; background: var(--deep); font-family: var(--font-mono); font-size: 12px; display: flex; align-items: center; justify-content: center; }
+code { font-family: var(--font-mono); font-size: 0.86em; background: var(--deep); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.sev-critical { background: var(--coral-soft); color: var(--coral); }
+@media (max-width: 700px) { .arch { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="toc" aria-label="Contents">
+    <div class="label">Contents</div>
+    <a href="#overview">Overview</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#stack">Tech stack</a>
+    <a href="#app">App structure</a>
+    <a href="#data">Data model</a>
+    <a href="#security">Security</a>
+    <a href="#realtime">Real-time</a>
+    <a href="#flows">Key flows</a>
+    <a href="#map">Map</a>
+    <a href="#ops">Environments and deploys</a>
+    <a href="#nfr">Non-functional</a>
+    <a href="#testing">Testing</a>
+    <a href="#issues">Known issues</a>
+    <a href="#launch">Launch requirements</a>
+    <a href="#questions">Open questions</a>
+  </nav>
+
+  <main>
+    <header class="doc">
+      <div class="brand"><div class="brand-dot"></div><div class="brand-word">havenly.</div></div>
+      <h1>Havenly technical requirements</h1>
+      <div class="meta">
+        <span><span class="pill draft">Draft</span></span>
+        <span>Owner <b>[YOUR NAME]</b></span>
+        <span>Covers <b>v1 launch build</b></span>
+        <span>Updated <b>19 October 2026</b></span>
+      </div>
+    </header>
+
+    <section id="overview">
+      <h2>Overview</h2>
+      <p class="lead">This document describes how Havenly is built today and what has to change technically before the v1 launch. It is the companion to the launch PRD, which covers what the product does and why.</p>
+      <p>Havenly is a React Native app built with Expo, backed by Supabase (Postgres, authentication, file storage and real-time updates). There is no custom server: the app talks to Supabase directly, and every rule about who can read or change data is enforced in the database itself.</p>
+      <p class="muted">Codebase at the time of writing: 35 screens and about 12,700 lines of TypeScript, 43 database migrations.</p>
+    </section>
+
+    <section id="architecture">
+      <h2>Architecture</h2>
+      <div class="arch">
+        <div class="tier"><b>Mobile app</b>
+          <ul>
+            <li>Expo / React Native, iOS and Android</li>
+            <li>Web build used only for development preview</li>
+            <li>Session stored in the device keychain</li>
+          </ul>
+        </div>
+        <div class="tier"><b>Supabase</b>
+          <ul>
+            <li>Postgres with row-level security on every table</li>
+            <li>Auth (email and password)</li>
+            <li>Storage for photos and videos</li>
+            <li>Realtime for messages, map and notifications</li>
+            <li>Hosted in Mumbai (ap-south-1)</li>
+          </ul>
+        </div>
+        <div class="tier"><b>Third parties</b>
+          <ul>
+            <li>Mapbox GL JS, loaded in a WebView for the map</li>
+            <li>Google Fonts via Expo font packages, bundled</li>
+            <li>No analytics, ads or crash reporting</li>
+          </ul>
+        </div>
+      </div>
+      <h3>Design principles already in the code</h3>
+      <ul>
+        <li><b>The database is the security boundary.</b> The app holds only the public Supabase key; row-level security decides what each user can see or change.</li>
+        <li><b>Privileged actions go through server functions.</b> Anything involving eligibility, money or other users (claiming a perk, pinging someone, setting an enquiry status, saving a residence) runs as a database function that checks permissions itself.</li>
+        <li><b>Notifications are created by triggers</b>, never by the app, so they can't be faked.</li>
+        <li><b>Data is fetched per screen</b> when it comes into focus, with real-time updates where freshness matters. There is no global client store.</li>
+      </ul>
+    </section>
+
+    <section id="stack">
+      <h2>Tech stack</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Layer</th><th>Choice</th><th>Version</th></tr></thead>
+          <tbody>
+            <tr><td>Framework</td><td>Expo SDK</td><td class="num">57</td></tr>
+            <tr><td>UI runtime</td><td>React Native / React</td><td class="num">0.86.3 / 19.2.3</td></tr>
+            <tr><td>Language</td><td>TypeScript</td><td class="num">6.0</td></tr>
+            <tr><td>Navigation</td><td>React Navigation (native stack, bottom tabs)</td><td class="num">6.x</td></tr>
+            <tr><td>Animation</td><td>Reanimated with Worklets</td><td class="num">4.5.1 / 0.10.1</td></tr>
+            <tr><td>Backend client</td><td>supabase-js</td><td class="num">2.45+</td></tr>
+            <tr><td>Media</td><td>expo-image, expo-image-picker, expo-video, expo-video-thumbnails</td><td class="num">57.x</td></tr>
+            <tr><td>Device</td><td>expo-location (foreground only), expo-haptics, expo-clipboard, expo-secure-store</td><td class="num">57.x</td></tr>
+            <tr><td>Map</td><td>react-native-webview + Mapbox GL JS</td><td class="num">13.16.1 / 2.15.0</td></tr>
+            <tr><td>Fonts</td><td>Fraunces, Plus Jakarta Sans, JetBrains Mono</td><td class="num">bundled</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="app">
+      <h2>App structure</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Folder</th><th>Holds</th></tr></thead>
+          <tbody>
+            <tr><td><code>src/screens</code></td><td>One file per screen</td></tr>
+            <tr><td><code>src/components</code></td><td>Shared pieces: AnimatedPressable (press feedback), BackButton, Skeleton, SwipeToAction, BurstHeart, ActionSheet, ReportModal</td></tr>
+            <tr><td><code>src/lib</code></td><td>Supabase client, auth, theme and toast contexts, housing and conversation helpers, location, animations (including the shared parallax header)</td></tr>
+            <tr><td><code>src/navigation</code></td><td>Root stack and the custom tab bar</td></tr>
+            <tr><td><code>src/constants</code></td><td>Interests, universities, tags, the privacy policy and terms text</td></tr>
+            <tr><td><code>src/theme</code></td><td>Colour tokens for light and dark, spacing, radius, fonts</td></tr>
+            <tr><td><code>supabase/</code></td><td>Migrations, plus <code>schema.sql</code> kept in sync as a single readable copy</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Navigation</h3>
+      <p>The root stack picks one of three branches: signed out (log in, sign up, legal pages), signed in but not onboarded (onboarding), or the full app. The full app has five tabs (Feed, Discover, Housing, Inbox, Profile) and about thirty stack screens on top. Admin screens (Manage housing, enquiry pipeline, residence editor, brands, offers, events) sit in the same stack and are only linked from Settings for admin accounts; the database enforces admin-only access regardless.</p>
+      <h3>State</h3>
+      <p>Three React contexts: <code>AuthContext</code> (session and profile; signs out if the profile no longer exists), <code>ThemeContext</code> (system, light or dark) and <code>ToastContext</code>. Everything else is local screen state loaded on focus.</p>
+    </section>
+
+    <section id="data">
+      <h2>Data model</h2>
+      <p>26 tables, grouped by area. Every table references <code>profiles</code>, which is one-to-one with the auth user and deleted with it.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Area</th><th>Tables</th></tr></thead>
+          <tbody>
+            <tr><td>People</td><td><code>profiles</code>, <code>follows</code>, <code>blocked_users</code>, <code>reports</code></td></tr>
+            <tr><td>Content</td><td><code>posts</code>, <code>comments</code>, <code>post_likes</code>, <code>saved_posts</code></td></tr>
+            <tr><td>Communities</td><td><code>communities</code>, <code>community_members</code></td></tr>
+            <tr><td>Messaging</td><td><code>conversations</code> (1:1 and groups), <code>messages</code>, <code>conversation_reads</code>, <code>conversation_hidden_for</code></td></tr>
+            <tr><td>Places and events</td><td><code>events</code>, <code>check_ins</code>, <code>interests</code> ("down to go")</td></tr>
+            <tr><td>Perks</td><td><code>brands</code>, <code>offers</code>, <code>offer_claims</code></td></tr>
+            <tr><td>Housing</td><td><code>residences</code>, <code>room_types</code>, <code>residence_partner_terms</code>, <code>saved_residences</code>, <code>housing_enquiries</code></td></tr>
+            <tr><td>System</td><td><code>notifications</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Housing, in detail</h3>
+      <ul>
+        <li><code>residences</code>: name, operator, area, address, coordinates, photos, amenities, nearby universities (curated by the team, not computed), gender policy, and whether it's shown to students.</li>
+        <li><code>room_types</code>: name, price in AED, billing period (year, semester or month), occupancy, availability, order.</li>
+        <li><code>residence_partner_terms</code>: referral fee % and partner contacts. Kept in its own table so it can be admin-only while residences stay public.</li>
+        <li><code>housing_enquiries</code>: student, residence, room, question or viewing, move-in month, length of stay, budget, phone, message, viewing times, status (new, contacted, viewing booked, signed, lost), contract value, referral fee and when it was paid. The fee is saved at the moment a deal is signed, so later fee changes don't rewrite past deals.</li>
+      </ul>
+    </section>
+
+    <section id="security">
+      <h2>Security</h2>
+      <ul>
+        <li><b>Row-level security on every table.</b> Users read and write only what policies allow; for example, a student sees only their own enquiries, and only admins see partner terms.</li>
+        <li><b>Admin check:</b> <code>is_admin()</code>, a database function reading <code>profiles.is_admin</code>. Admin status can only be set in the database, not from the app.</li>
+        <li><b>Server functions for privileged actions</b>, each checking permissions itself: <code>claim_offer</code>, <code>send_ping</code>, <code>toggle_post_like</code>, <code>toggle_interest</code>, <code>set_enquiry_status</code>, <code>set_referral_fee_paid</code>, <code>save_residence</code> (one transaction for listing, rooms and terms), <code>delete_own_account</code>, <code>bump_streak</code>.</li>
+        <li><b>Who sees a check-in</b> is decided by <code>can_see_checkin()</code>: the person themselves, mutual follows, shared group chats or shared communities.</li>
+        <li><b>Blocking</b> is enforced in the database by <code>is_blocked_between()</code>, not only hidden in the app.</li>
+        <li><b>Storage:</b> six public-read buckets (avatars, covers, post images, post videos, group icons, residence photos). Uploads are limited by folder ownership; residence photos are admin-only.</li>
+        <li><b>Keys:</b> only the public Supabase key and the Mapbox token ship in the app, which is expected. The service-role key is never in the app.</li>
+        <li><b>Sessions</b> are stored in the iOS and Android keychain via expo-secure-store (AsyncStorage on the web preview).</li>
+        <li><b>The map page</b> escapes every name and title before inserting it into popups, so user-entered text can't run as code.</li>
+      </ul>
+    </section>
+
+    <section id="realtime">
+      <h2>Real-time</h2>
+      <p>Supabase Realtime publishes changes from six tables: <code>messages</code>, <code>conversations</code>, <code>conversation_reads</code>, <code>notifications</code>, <code>check_ins</code> and <code>interests</code>.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Channel</th><th>Screen</th><th>Listens for</th></tr></thead>
+          <tbody>
+            <tr><td><code>chat-&lt;id&gt;</code></td><td>Chat</td><td>New messages and conversation changes, filtered to that conversation</td></tr>
+            <tr><td><code>inbox-updates</code></td><td>Inbox</td><td>New messages and conversation updates; reloads only for the user's own conversations</td></tr>
+            <tr><td><code>unread-badge</code></td><td>Tab bar</td><td>Unread message dot</td></tr>
+            <tr><td><code>unread-notifications-badge</code></td><td>Feed header</td><td>Unread notifications, filtered to the user</td></tr>
+            <tr><td><code>map-live</code></td><td>Map</td><td>Check-ins appearing and disappearing, "down to go" counts</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="flows">
+      <h2>Key flows</h2>
+      <h3>Housing enquiry to referral fee</h3>
+      <ol class="flow">
+        <li>The student sends an enquiry. Row-level security only accepts it with status "new" and no money fields.</li>
+        <li>A trigger creates a notification for every admin; the bell updates live.</li>
+        <li>An admin opens the enquiry, copies the lead to the residence, and moves it to contacted or viewing booked through <code>set_enquiry_status</code>.</li>
+        <li>Each of those changes triggers a notification to the student.</li>
+        <li>When the student signs, the admin enters the contract value. The function looks up the residence's fee % and saves the fee on the enquiry.</li>
+        <li>When the residence pays, the admin marks it paid through <code>set_referral_fee_paid</code>. Manage housing totals fees owed and received.</li>
+      </ol>
+      <h3>Sign-up</h3>
+      <ol class="flow">
+        <li>Email and password sign-up through Supabase Auth.</li>
+        <li>A trigger (<code>handle_new_user</code>) creates the profile with a generated username.</li>
+        <li>The app shows onboarding until interests are chosen or skipped, then the main app.</li>
+      </ol>
+    </section>
+
+    <section id="map">
+      <h2>Map</h2>
+      <p>The map is a self-contained HTML page rendered in a WebView, using Mapbox GL JS restyled to Havenly's palette in both themes. The app builds the page with offers, events, residences and visible check-ins embedded as data; pins cluster on screen as you zoom out.</p>
+      <p>The page and the app talk through messages: the page sends <code>openOffer</code>, <code>openEvent</code>, <code>openResidence</code>, <code>ping</code> and <code>toggleInterest</code>; the app sends back small updates (a new check-in, a changed count, a category shown or hidden) so the map never reloads and loses your position.</p>
+      <p class="muted">Because it runs in a native WebView, the map can't be shown in the web development preview; it's tested on a device or by generating the page directly.</p>
+    </section>
+
+    <section id="ops">
+      <h2>Environments and deploys</h2>
+      <ul>
+        <li><b>One Supabase project</b> (free tier) serves both development and the future production app. Free projects pause after a period without use and must be restored.</li>
+        <li><b>Configuration</b> (Supabase URL, public key, Mapbox token) lives in <code>app.json</code> under <code>extra</code>.</li>
+        <li><b>Database changes</b> are new migration files in <code>supabase/migrations</code>, applied with <code>npx supabase db push --linked</code>. An applied migration is never edited; fixes go in a new one. <code>schema.sql</code> is updated in the same change.</li>
+        <li><b>The app</b> runs through Expo Go and the web preview. There is no EAS build configuration and no store build yet. Bundle identifier: <code>com.havenly.app</code> on both platforms.</li>
+        <li><b>Source control</b> is a local git repository with no remote.</li>
+      </ul>
+    </section>
+
+    <section id="nfr">
+      <h2>Non-functional requirements</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Area</th><th>Requirement</th></tr></thead>
+          <tbody>
+            <tr><td>Privacy</td><td>No analytics, ads or tracking SDKs. Location is requested only on screens that use it, foreground only. Check-ins expire after 4 hours.</td></tr>
+            <tr><td>Security</td><td>Every new table ships with row-level security in the same migration; privileged writes go through permission-checking functions.</td></tr>
+            <tr><td>Performance</td><td>Lists render skeletons while loading and animate in with a calm ease-out; images use expo-image with caching. Real-time channels are filtered to what each screen needs.</td></tr>
+            <tr><td>Accessibility</td><td>Labels on icon-only buttons, enlarged tap areas on back buttons, contrast checked in both themes, respect for the system's reduced-motion setting.</td></tr>
+            <tr><td>Reliability</td><td>Multi-table admin writes run in one transaction; optimistic UI rolls back with a message on failure.</td></tr>
+            <tr><td>Data location</td><td>Hosted in India (ap-south-1), disclosed in the privacy policy.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="testing">
+      <h2>Testing</h2>
+      <p>Today every change is type-checked (<code>tsc --noEmit</code>) and tested by hand in the web preview with throwaway accounts, which are deleted afterwards. Security rules are checked by running queries as an ordinary signed-in user and confirming they're refused.</p>
+      <p>There are no automated tests and no continuous integration. See launch requirements below.</p>
+    </section>
+
+    <section id="issues">
+      <h2>Known issues and technical debt</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Issue</th><th>Impact</th><th>Severity</th></tr></thead>
+          <tbody>
+            <tr><td>No git remote: the code exists only on one Mac</td><td>A lost or broken laptop loses the whole app</td><td><span class="pill sev-critical">Critical</span></td></tr>
+            <tr><td>One Supabase project for development and production, on the free tier</td><td>Test data and real users share a database; the project can pause</td><td><span class="pill open">High</span></td></tr>
+            <tr><td>Deleting an account deletes the student's signed enquiries</td><td>Lost referral fee records</td><td><span class="pill open">High</span></td></tr>
+            <tr><td>Uploaded photos and videos stay in storage after account deletion</td><td>Privacy policy has to carry a caveat</td><td><span class="pill partial">Medium</span></td></tr>
+            <tr><td><code>app.json</code> sets the interface style to light, while the app supports dark mode</td><td>Store builds may ignore the phone's dark mode setting; needs checking on a device</td><td><span class="pill partial">Medium</span></td></tr>
+            <tr><td>Sessions in expo-secure-store, which warns above 2 KB per value; Supabase sessions can exceed that</td><td>Possible login persistence problems on some devices; needs checking on a store build</td><td><span class="pill partial">Medium</span></td></tr>
+            <tr><td>Map and Inbox real-time listeners receive events for the whole app and filter on the device</td><td>Wasted traffic as the user base grows</td><td><span class="pill partial">Medium</span></td></tr>
+            <tr><td>No push notifications, crash reporting, automated tests or CI</td><td>Missed leads, invisible crashes, regressions caught late</td><td><span class="pill partial">Medium</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="launch">
+      <h2>Launch requirements</h2>
+      <div class="req">
+        <div class="req-head"><span class="req-id">T0-1</span><span class="req-title">Back up the code</span><span class="pill open">Open</span></div>
+        <ul><li>Private GitHub (or similar) repository with the full history pushed; pushed after every change.</li></ul>
+      </div>
+      <div class="req">
+        <div class="req-head"><span class="req-id">T0-2</span><span class="req-title">Separate production from development</span><span class="pill open">Open</span></div>
+        <ul>
+          <li>A production Supabase project on a paid plan (no auto-pause, daily backups), with all migrations applied.</li>
+          <li>The current project becomes development; build profiles point at the right one.</li>
+          <li>Decide the production region (see open questions).</li>
+        </ul>
+      </div>
+      <div class="req">
+        <div class="req-head"><span class="req-id">T0-3</span><span class="req-title">Store builds</span><span class="pill open">Open</span></div>
+        <ul>
+          <li>EAS build configuration with development, preview and production profiles; Apple Developer and Google Play accounts.</li>
+          <li>Tested on real iPhone and Android devices: photo upload, video, map, location prompt, dark mode, staying logged in.</li>
+          <li>Store privacy declarations matching the privacy policy.</li>
+        </ul>
+      </div>
+      <div class="req">
+        <div class="req-head"><span class="req-id">T0-4</span><span class="req-title">Account deletion fixes</span><span class="pill open">Open</span></div>
+        <ul><li>Signed referral records kept in anonymised form; uploaded files removed from storage. Both are already written up as follow-up tasks.</li></ul>
+      </div>
+      <div class="req">
+        <div class="req-head"><span class="req-id">T0-5</span><span class="req-title">Crash reporting</span><span class="pill open">Open</span></div>
+        <ul><li>A crash reporter (for example Sentry) with personal data scrubbed, disclosed in the privacy policy.</li></ul>
+      </div>
+      <h3>Soon after launch</h3>
+      <ul>
+        <li>Push notifications through Expo's push service, with device tokens stored per user and sent from a database trigger or edge function.</li>
+        <li>Basic automated checks in CI: type-check plus a few end-to-end tests of sign-up, enquiry and the admin pipeline.</li>
+        <li>Server-side filtering for map and inbox real-time events.</li>
+        <li>Privacy-respecting usage measurement for the PRD's metrics.</li>
+      </ul>
+    </section>
+
+    <section id="questions">
+      <h2>Open questions</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Question</th><th>Who answers</th></tr></thead>
+          <tbody>
+            <tr><td>Production database region: keep Mumbai, or move closer to the UAE (for example Frankfurt or a Gulf region if available)?</td><td>Legal, engineering</td></tr>
+            <tr><td>Which crash reporter fits the privacy policy's "no trackers" promise?</td><td>Engineering, legal</td></tr>
+            <tr><td>Who holds the Apple and Google developer accounts: the company or an individual?</td><td>Founder</td></tr>
+            <tr><td>Should residences eventually get their own logins, and does that need a separate admin web app?</td><td>Founder, engineering</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>Havenly · Technical requirements · Draft for internal use</footer>
+  </main>
+</div>
+
+</body>
+</html>

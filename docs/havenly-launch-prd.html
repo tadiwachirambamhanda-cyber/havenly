@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Havenly Launch PRD</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=JetBrains+Mono:wght@500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a single readable document column with a sticky contents rail on wide screens; Havenly's app palette and type. */
+:root {
+  --bg: #FBF5EA; --surface: #FFFFFF; --deep: #F2E8D8; --fg: #20261F; --muted: #5B6459; --line: #E7DDC9;
+  --coral: #C8401F; --coral-soft: #FFE4DB; --teal: #0B6F68; --teal-soft: #DCF2EF; --gold: #8A5B12; --gold-soft: #FBEBCF;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #151310; --surface: #211D17; --deep: #1D1A15; --fg: #F3ECDC; --muted: #B7AC93; --line: #332D22;
+  --coral: #FF8A6E; --coral-soft: #3D2A22; --teal: #4FD1BE; --teal-soft: #173330; --gold: #E3B05A; --gold-soft: #3A2E18; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #151310; --surface: #211D17; --deep: #1D1A15; --fg: #F3ECDC; --muted: #B7AC93; --line: #332D22;
+  --coral: #FF8A6E; --coral-soft: #3D2A22; --teal: #4FD1BE; --teal-soft: #173330; --gold: #E3B05A; --gold-soft: #3A2E18; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 96px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 56px; align-items: start; }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+nav.toc .label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+nav.toc a { color: var(--muted); text-decoration: none; padding: 2px 0; }
+nav.toc a:hover, nav.toc a:focus-visible { color: var(--fg); }
+main { min-width: 0; max-width: 720px; }
+a:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 2px; }
+header.doc { display: flex; flex-direction: column; gap: 14px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--coral); }
+.brand-word { font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 22px; }
+h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 6vw, 44px); line-height: 1.1; margin: 0; letter-spacing: -0.5px; text-wrap: balance; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13px; color: var(--muted); }
+.meta b { color: var(--fg); font-weight: 600; }
+.pill { display: inline-block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; padding: 3px 9px; border-radius: 100px; font-weight: 500; white-space: nowrap; }
+.pill.draft { background: var(--gold-soft); color: var(--gold); }
+.pill.built { background: var(--teal-soft); color: var(--teal); }
+.pill.open { background: var(--coral-soft); color: var(--coral); }
+.pill.partial { background: var(--gold-soft); color: var(--gold); }
+section { padding-top: 40px; }
+h2 { font-family: var(--font-display); font-weight: 600; font-size: 26px; line-height: 1.2; margin: 0 0 14px; text-wrap: balance; scroll-margin-top: 24px; }
+h3 { font-size: 16px; font-weight: 700; margin: 24px 0 8px; }
+p { margin: 0 0 12px; text-wrap: pretty; }
+ul { margin: 0 0 12px; padding-left: 20px; }
+li { margin-bottom: 6px; }
+.lead { font-size: 18px; line-height: 1.55; }
+.muted { color: var(--muted); }
+.callout { background: var(--deep); border-radius: 12px; padding: 16px 18px; margin: 16px 0; font-size: 15px; }
+.callout b { font-weight: 700; }
+.table-wrap { overflow-x: auto; margin: 12px 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 520px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+tr:last-child td { border-bottom: none; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.req { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 16px 18px; margin: 12px 0; }
+.req-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; margin-bottom: 6px; }
+.req-id { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.req-title { font-weight: 700; font-size: 16px; }
+.req ul { margin-top: 8px; margin-bottom: 0; font-size: 14.5px; }
+.req .ac { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--muted); margin-top: 10px; }
+.persona { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 12px 0; }
+.persona div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 14.5px; }
+.persona b { display: block; font-family: var(--font-display); font-weight: 600; font-size: 17px; margin-bottom: 4px; }
+.story { font-size: 15px; }
+.story em { font-style: normal; font-weight: 700; }
+.blank { background: var(--gold-soft); color: var(--gold); border-radius: 4px; padding: 0 4px; font-weight: 600; white-space: nowrap; }
+.tag { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--teal); white-space: nowrap; }
+footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  nav.toc { position: static; flex-direction: row; flex-wrap: wrap; gap: 6px 14px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+  nav.toc .label { width: 100%; margin-bottom: 0; }
+}
+@media (max-width: 520px) { .persona { grid-template-columns: minmax(0, 1fr); } body { font-size: 15.5px; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Contents">
+    <div class="label">Contents</div>
+    <a href="#summary">Summary</a>
+    <a href="#problem">Problem</a>
+    <a href="#users">Who it's for</a>
+    <a href="#goals">Goals</a>
+    <a href="#non-goals">Non-goals</a>
+    <a href="#status">What's built</a>
+    <a href="#stories">User stories</a>
+    <a href="#requirements">Requirements</a>
+    <a href="#metrics">Success metrics</a>
+    <a href="#risks">Risks</a>
+    <a href="#questions">Open questions</a>
+    <a href="#timeline">Timeline</a>
+  </nav>
+
+  <main>
+    <header class="doc">
+      <div class="brand"><div class="brand-dot"></div><div class="brand-word">havenly.</div></div>
+      <h1>Havenly launch PRD</h1>
+      <div class="meta">
+        <span><span class="pill draft">Draft</span></span>
+        <span>Owner <b>[YOUR NAME]</b></span>
+        <span>Scope <b>v1 launch, Dubai</b></span>
+        <span>Updated <b>19 October 2026</b></span>
+      </div>
+    </header>
+
+    <section id="summary">
+      <h2>Summary</h2>
+      <p class="lead">Havenly is a community app for university students in Dubai: a feed of places and events picked by students, interest and campus communities, messaging, a live map and brand perks. On top of that sits a housing section where students find student residences near their university and send an enquiry. Residences pay Havenly a referral fee for every student who signs. Students pay nothing.</p>
+      <p>The social side brings students in and keeps them coming back. Housing is how Havenly earns money. This document covers what has to be true for the first public launch, what's already built, and what's left.</p>
+    </section>
+
+    <section id="problem">
+      <h2>Problem</h2>
+      <p>Dubai's student population is mostly expats and new arrivals. They land with no local network, no feel for which areas are close to campus, and no trusted way to find somewhere to live. Housing search happens across agency listings, social media groups and word of mouth, where prices are unclear and it's hard to tell which places actually take students.</p>
+      <p>Student residences have the opposite problem: they need a steady flow of students who are ready to move in, at the start of each term, and today they reach them through agents and ads with no guarantee of a signed contract.</p>
+      <div class="callout"><b>If we don't solve it:</b> students keep finding housing through scattered, unverified channels, and Havenly is a pleasant social app with no revenue.</div>
+    </section>
+
+    <section id="users">
+      <h2>Who it's for</h2>
+      <div class="persona">
+        <div><b>New student</b>Just arrived or arriving next term. Needs friends, places to go and somewhere to live near campus. Price-sensitive and moves around term dates.</div>
+        <div><b>Returning student</b>Already settled. Uses the feed, communities and perks; may switch residence between years.</div>
+        <div><b>Partner residence</b>A student residence operator or licensed agency. Wants qualified enquiries, booked viewings and signed students, and only wants to pay for results.</div>
+        <div><b>Havenly team</b>Adds listings, passes enquiries to residences, tracks each deal through to a signed contract, and invoices the referral fee.</div>
+      </div>
+      <p class="muted">Brands offering perks are a secondary audience and are not the focus of this release.</p>
+    </section>
+
+    <section id="goals">
+      <h2>Goals</h2>
+      <h3>For students</h3>
+      <ul>
+        <li>A new student can find residences near their university, see real room prices, and send an enquiry in under 2 minutes.</li>
+        <li>Every enquiry gets a response from the residence within 24 hours.</li>
+        <li>Students feel part of a community in their first weeks, through campus and interest communities.</li>
+      </ul>
+      <h3>For the business</h3>
+      <ul>
+        <li>Sign <span class="blank">[N]</span> founding residences before launch, each listed with photos, room prices and map location.</li>
+        <li>Turn enquiries into signed students, and invoice the referral fee on every signed deal.</li>
+        <li>Grow a student audience large enough that housing enquiries come from inside the app, not paid ads.</li>
+      </ul>
+    </section>
+
+    <section id="non-goals">
+      <h2>Non-goals for v1</h2>
+      <ul>
+        <li><b>No in-app contracts, deposits or rent payments.</b> Handling money or signing tenancies would make Havenly a party to the deal and add regulatory and refund risk. Residences contract directly with students.</li>
+        <li><b>No self-listing by residences.</b> The Havenly team adds every listing, which keeps quality high while there are only a handful of partners.</li>
+        <li><b>No roommate matching.</b> Useful later, once there are enough listings and students to match.</li>
+        <li><b>No other cities or emirates.</b> Dubai only, so the team can know every residence personally.</li>
+        <li><b>No automated fee invoicing.</b> Fees are tracked in the app and invoiced manually until deal volume justifies building it.</li>
+      </ul>
+    </section>
+
+    <section id="status">
+      <h2>What's built</h2>
+      <p>Status of each area in the current app build.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Area</th><th>What it does</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Accounts and onboarding</td><td>Email sign-up, interest picker grouped into categories, university on profile</td><td><span class="pill built">Built</span></td></tr>
+            <tr><td>Feed</td><td>Personalised two-column feed, daily pick, editorial "Havenly Picks", interest filters, streaks</td><td><span class="pill built">Built</span></td></tr>
+            <tr><td>Communities</td><td>Interest and campus communities; campus ones restricted to that university's students</td><td><span class="pill built">Built</span></td></tr>
+            <tr><td>Messaging</td><td>Direct and group chats in real time, message requests, swipe to delete, block and report</td><td><span class="pill built">Built</span></td></tr>
+            <tr><td>Discover, events, map</td><td>Search, events with "down to go", live map with check-ins that expire after 4 hours</td><td><span class="pill built">Built</span></td></tr>
+            <tr><td>Perks</td><td>Brand offers unlocked by activity streaks, with redemption codes</td><td><span class="pill built">Built</span></td></tr>
+            <tr><td>Housing for students</td><td>Housing tab with filters, residence pages, enquiries and viewing requests, saved places, my enquiries</td><td><span class="pill built">Built</span></td></tr>
+            <tr><td>Housing across the app</td><td>Map pins, feed card, Discover row, nearby residences on campus communities</td><td><span class="pill built">Built</span></td></tr>
+            <tr><td>Team tools</td><td>Add and edit residences, private fee terms, enquiry pipeline, fee owed and received</td><td><span class="pill built">Built</span></td></tr>
+            <tr><td>Notifications</td><td>In-app alerts for new enquiries (team) and status changes (students)</td><td><span class="pill partial">In-app only</span></td></tr>
+            <tr><td>Privacy policy and terms</td><td>Written and in the app, with blanks and pending legal review</td><td><span class="pill partial">Draft</span></td></tr>
+            <tr><td>Push notifications</td><td>Alerts on a locked phone</td><td><span class="pill open">Not started</span></td></tr>
+            <tr><td>App store builds</td><td>Production iOS and Android builds and store listings</td><td><span class="pill open">Not started</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="stories">
+      <h2>User stories</h2>
+      <h3>New student</h3>
+      <ul class="story">
+        <li>As a new student, I want to <em>see residences close to my university</em> so that I don't waste time on places with a long commute.</li>
+        <li>As a new student, I want to <em>see real room prices per year, semester or month</em> so that I can tell what fits my budget before I contact anyone.</li>
+        <li>As a new student, I want to <em>ask a question or book a viewing in one form</em> so that I don't have to chase residences on WhatsApp.</li>
+        <li>As a new student, I want to <em>know when a residence has replied or booked my viewing</em> so that I'm not left wondering.</li>
+        <li>As a new student, I want to <em>save places to compare later</em> so that I can decide with my family.</li>
+        <li>As a new student, I want to <em>know Havenly is free for me and that I sign directly with the residence</em> so that I trust the process.</li>
+      </ul>
+      <h3>Partner residence</h3>
+      <ul class="story">
+        <li>As a residence, I want <em>each enquiry to include move-in month, length of stay, room, budget and a phone number</em> so that my team can follow up without back-and-forth.</li>
+        <li>As a residence, I want to <em>pay only for students who sign</em> so that listing on Havenly carries no upfront risk.</li>
+        <li>As a residence, I want to <em>appear for the universities I'm actually close to</em> so that I reach students who will realistically live with me.</li>
+      </ul>
+      <h3>Havenly team</h3>
+      <ul class="story">
+        <li>As a team member, I want to <em>be alerted the moment an enquiry comes in</em> so that no lead waits overnight.</li>
+        <li>As a team member, I want to <em>move each enquiry through contacted, viewing booked, signed or lost</em> so that I know where every deal stands.</li>
+        <li>As a team member, I want the <em>referral fee calculated when I record a signed contract</em> so that invoicing is accurate.</li>
+        <li>As a team member, I want to <em>see fees owed and fees received</em> so that I can chase unpaid invoices.</li>
+      </ul>
+    </section>
+
+    <section id="requirements">
+      <h2>Requirements</h2>
+      <h3>Must have for launch (P0)</h3>
+
+      <div class="req">
+        <div class="req-head"><span class="req-id">P0-1</span><span class="req-title">Housing search and enquiry</span><span class="pill built">Built</span></div>
+        <p>Students can browse active residences, filter by their university, budget and saved, open a residence, and send a question or viewing request.</p>
+        <div class="ac">Acceptance criteria</div>
+        <ul>
+          <li>Only residences marked "show to students" appear.</li>
+          <li>The listing card shows the cheapest available room and its billing period; a residence with no available rooms shows "Currently full" and can't take viewing requests.</li>
+          <li>An enquiry can't be sent without a valid phone or WhatsApp number, and a question can't be sent without a message.</li>
+          <li>The form tells the student which details will be shared with the residence before they send.</li>
+          <li>A student can never change an enquiry's status or the money fields.</li>
+        </ul>
+      </div>
+
+      <div class="req">
+        <div class="req-head"><span class="req-id">P0-2</span><span class="req-title">Enquiry pipeline and fee tracking</span><span class="pill built">Built</span></div>
+        <p>The Havenly team sees every enquiry, contacts the student and the residence, moves it through the pipeline, and records signed contracts.</p>
+        <div class="ac">Acceptance criteria</div>
+        <ul>
+          <li>Marking an enquiry signed requires the contract value; the fee is calculated from that residence's fee % and saved at that moment, so later changes to the % don't alter it.</li>
+          <li>Moving an enquiry off "signed" clears its contract value and fee.</li>
+          <li>Fee terms and partner contacts are only visible to admins.</li>
+          <li>Saving a residence, its rooms and its terms either all succeeds or all fails.</li>
+        </ul>
+      </div>
+
+      <div class="req">
+        <div class="req-head"><span class="req-id">P0-3</span><span class="req-title">Lead response within 24 hours</span><span class="pill partial">In-app only</span></div>
+        <p>Every new enquiry reaches the team immediately and is passed to the residence the same day.</p>
+        <div class="ac">Acceptance criteria</div>
+        <ul>
+          <li>Every admin gets a notification when an enquiry is sent; tapping it opens that enquiry.</li>
+          <li>The student is notified when their enquiry moves to contacted, viewing booked or signed.</li>
+          <li>Until push notifications exist, a named team member checks Manage housing at least twice a day.</li>
+        </ul>
+      </div>
+
+      <div class="req">
+        <div class="req-head"><span class="req-id">P0-4</span><span class="req-title">Legal and compliance</span><span class="pill open">Open</span></div>
+        <ul>
+          <li>Company name and privacy contact email filled into the privacy policy and terms.</li>
+          <li>A UAE lawyer has reviewed the policies, the minimum age, and whether the referral-fee model needs a RERA licence.</li>
+          <li>The policies are hosted at a public web address for the app stores.</li>
+          <li>A written partner agreement covering the fee, when it's due, and how a signed student is attributed to Havenly.</li>
+        </ul>
+      </div>
+
+      <div class="req">
+        <div class="req-head"><span class="req-id">P0-5</span><span class="req-title">Account deletion keeps records correct</span><span class="pill open">Open</span></div>
+        <ul>
+          <li>When a student deletes their account, signed referral records stay (without their personal details) so the fee can still be invoiced.</li>
+          <li>Their uploaded photos and videos are deleted from storage, not only their database records.</li>
+        </ul>
+      </div>
+
+      <div class="req">
+        <div class="req-head"><span class="req-id">P0-6</span><span class="req-title">Store-ready builds</span><span class="pill open">Open</span></div>
+        <ul>
+          <li>Production iOS and Android builds, tested on real devices, including photo upload and the map.</li>
+          <li>Store listings with screenshots, and data-collection declarations that match the privacy policy.</li>
+        </ul>
+      </div>
+
+      <div class="req">
+        <div class="req-head"><span class="req-id">P0-7</span><span class="req-title">Founding residences live</span><span class="pill open">Open</span></div>
+        <ul>
+          <li>At least <span class="blank">[N]</span> residences listed, each with photos, room types and prices, nearby universities, map coordinates and fee terms.</li>
+        </ul>
+      </div>
+
+      <h3>Should have soon after launch (P1)</h3>
+      <ul>
+        <li><b>Push notifications</b> for new enquiries and status changes, so leads aren't missed when the app is closed. Needs a development build and an Apple Developer account.</li>
+        <li><b>Usage measurement.</b> Track Housing tab views and residence page views, so the enquiry rate can be measured. The app has no analytics today.</li>
+        <li><b>Response-time view</b> in Manage housing: how long each enquiry has waited, with overdue ones highlighted.</li>
+        <li><b>Residence notifications by email or WhatsApp</b>, so leads reach the residence without the team copying them across.</li>
+      </ul>
+
+      <h3>Later (P2)</h3>
+      <ul>
+        <li>Residence self-service: their own login to update rooms, prices and availability.</li>
+        <li>Roommate matching for shared rooms, using students' interests.</li>
+        <li>Student reviews of residences after move-in.</li>
+        <li>Automated invoicing of referral fees.</li>
+        <li>Other emirates, starting with Sharjah's university cluster.</li>
+      </ul>
+      <p class="muted">Design choices today should not block these: residences, rooms and terms are already separate records, and enquiries already carry a status history.</p>
+    </section>
+
+    <section id="metrics">
+      <h2>Success metrics</h2>
+      <p>Measured from the app's own database unless noted. Volume targets are set once the launch date and partner count are known.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Metric</th><th>Type</th><th>Target</th><th>How it's measured</th></tr></thead>
+          <tbody>
+            <tr><td>Time from enquiry to first contact</td><td><span class="tag">Leading</span></td><td class="num">90% within 24h</td><td>Enquiry sent vs. moved to contacted</td></tr>
+            <tr><td>Enquiries per week</td><td><span class="tag">Leading</span></td><td class="num"><span class="blank">[set]</span></td><td>New enquiries</td></tr>
+            <tr><td>Enquiry rate</td><td><span class="tag">Leading</span></td><td class="num"><span class="blank">[set]</span></td><td>Enquiries ÷ students who viewed Housing (needs P1 measurement)</td></tr>
+            <tr><td>New sign-ups completing onboarding</td><td><span class="tag">Leading</span></td><td class="num"><span class="blank">[set]</span></td><td>Accounts with onboarding finished</td></tr>
+            <tr><td>Enquiry to signed conversion</td><td><span class="tag">Lagging</span></td><td class="num"><span class="blank">[set]</span></td><td>Signed ÷ all enquiries, per term</td></tr>
+            <tr><td>Signed students per term</td><td><span class="tag">Lagging</span></td><td class="num"><span class="blank">[set]</span></td><td>Enquiries marked signed</td></tr>
+            <tr><td>Fees invoiced on time</td><td><span class="tag">Lagging</span></td><td class="num">100% within 14 days</td><td>Signed deals vs. invoice records (outside the app)</td></tr>
+            <tr><td>Fees collected</td><td><span class="tag">Lagging</span></td><td class="num"><span class="blank">[set]</span> AED/term</td><td>Fees marked paid</td></tr>
+            <tr><td>30-day student retention</td><td><span class="tag">Lagging</span></td><td class="num"><span class="blank">[set]</span></td><td>Students active on day 30 (activity streak dates)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">Review two weeks after launch, then at the end of the first term.</p>
+    </section>
+
+    <section id="risks">
+      <h2>Risks</h2>
+      <ul>
+        <li><b>Brokerage regulation.</b> Taking a fee on Dubai rentals may count as brokerage and need a RERA licence. Mitigation: legal review before the first partner signs; keep Havenly out of contracts and payments.</li>
+        <li><b>Residences bypassing Havenly.</b> A residence could sign a student we introduced without reporting it. Mitigation: an attribution clause in the partner agreement, the enquiry record as evidence, and asking students to confirm when they sign.</li>
+        <li><b>Empty housing tab at launch.</b> Students lose trust if there's nothing listed. Mitigation: housing surfaces only appear once residences are live; sign founding partners first.</li>
+        <li><b>Slow lead handling.</b> Without push notifications, leads can wait overnight. Mitigation: a daily owner for the pipeline until push ships.</li>
+        <li><b>Data stored outside the UAE.</b> The database is hosted in India. Mitigation: disclosed in the privacy policy; confirm with the lawyer whether this is acceptable.</li>
+      </ul>
+    </section>
+
+    <section id="questions">
+      <h2>Open questions</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Question</th><th>Who answers</th><th>Blocking?</th></tr></thead>
+          <tbody>
+            <tr><td>Does the referral-fee model need a RERA licence, and how should the partner agreement be worded?</td><td>Legal</td><td>Yes</td></tr>
+            <tr><td>Minimum age: 18, or 21 given the UAE age of majority for contracts?</td><td>Legal</td><td>Yes</td></tr>
+            <tr><td>What fee % will we offer residences, and when is it due after signing?</td><td>Founder</td><td>Yes</td></tr>
+            <tr><td>Which term do we launch for, and which residences are the founding partners?</td><td>Founder</td><td>Yes</td></tr>
+            <tr><td>Who owns the enquiry pipeline day to day?</td><td>Founder</td><td>Yes</td></tr>
+            <tr><td>Is hosting data in India acceptable, or should we move the database region?</td><td>Legal, engineering</td><td>No</td></tr>
+            <tr><td>Which analytics tool, if any, fits the privacy policy's "no trackers" promise?</td><td>Engineering</td><td>No</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="timeline">
+      <h2>Timeline</h2>
+      <h3>Now: pre-launch</h3>
+      <ul>
+        <li>Domain and business email; fill in the legal blanks.</li>
+        <li>Lawyer review; partner agreement.</li>
+        <li>Sign founding residences using the partner one-pager; add their listings.</li>
+        <li>Fix account-deletion records (P0-5).</li>
+      </ul>
+      <h3>Launch: <span class="blank">[LAUNCH TERM]</span></h3>
+      <ul>
+        <li>Store builds approved; policies hosted.</li>
+        <li>Housing live with founding partners; team checking the pipeline daily.</li>
+      </ul>
+      <h3>After launch</h3>
+      <ul>
+        <li>Push notifications and usage measurement (P1).</li>
+        <li>Review metrics after two weeks and at the end of term; decide on residence self-service.</li>
+      </ul>
+      <p class="muted">Hard date: listings need to be live a few weeks before students look for housing for the launch term, which is earlier than the term itself.</p>
+    </section>
+
+    <footer>Havenly · Product requirements · Draft for internal use</footer>
+  </main>
+</div>
+
+</body>
+</html>
