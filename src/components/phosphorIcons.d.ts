@@ -32,6 +32,7 @@ export declare const ICONS: {
   readonly 'graduation-cap': PhosphorIcon;
   readonly 'grid': PhosphorIcon;
   readonly 'flame': PhosphorIcon;
+  readonly 'hair-dryer': PhosphorIcon;
   readonly 'hand-waving': PhosphorIcon;
   readonly 'heart': PhosphorIcon;
   readonly 'home': PhosphorIcon;
@@ -60,7 +61,6 @@ export declare const ICONS: {
   readonly 'smartphone': PhosphorIcon;
   readonly 'sneaker': PhosphorIcon;
   readonly 'soccer-ball': PhosphorIcon;
-  readonly 'sparkle': PhosphorIcon;
   readonly 'sun': PhosphorIcon;
   readonly 'swimming-pool': PhosphorIcon;
   readonly 'tag': PhosphorIcon;

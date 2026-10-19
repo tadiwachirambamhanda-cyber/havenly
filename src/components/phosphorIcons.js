@@ -38,6 +38,7 @@ import { GearIcon } from 'phosphor-react-native/src/icons/Gear';
 import { GiftIcon } from 'phosphor-react-native/src/icons/Gift';
 import { GraduationCapIcon } from 'phosphor-react-native/src/icons/GraduationCap';
 import { FlameIcon } from 'phosphor-react-native/src/icons/Flame';
+import { HairDryerIcon } from 'phosphor-react-native/src/icons/HairDryer';
 import { HandWavingIcon } from 'phosphor-react-native/src/icons/HandWaving';
 import { HeartIcon } from 'phosphor-react-native/src/icons/Heart';
 import { HouseIcon } from 'phosphor-react-native/src/icons/House';
@@ -60,7 +61,6 @@ import { ShieldCheckIcon } from 'phosphor-react-native/src/icons/ShieldCheck';
 import { ShoppingBagIcon } from 'phosphor-react-native/src/icons/ShoppingBag';
 import { SneakerMoveIcon } from 'phosphor-react-native/src/icons/SneakerMove';
 import { SoccerBallIcon } from 'phosphor-react-native/src/icons/SoccerBall';
-import { SparkleIcon } from 'phosphor-react-native/src/icons/Sparkle';
 import { SpeakerHighIcon } from 'phosphor-react-native/src/icons/SpeakerHigh';
 import { SpeakerSlashIcon } from 'phosphor-react-native/src/icons/SpeakerSlash';
 import { SquaresFourIcon } from 'phosphor-react-native/src/icons/SquaresFour';
@@ -113,6 +113,7 @@ export const ICONS = {
   'graduation-cap': GraduationCapIcon,
   'grid': SquaresFourIcon,
   'flame': FlameIcon,
+  'hair-dryer': HairDryerIcon,
   'hand-waving': HandWavingIcon,
   'heart': HeartIcon,
   'home': HouseIcon,
@@ -141,7 +142,6 @@ export const ICONS = {
   'smartphone': DeviceMobileIcon,
   'sneaker': SneakerMoveIcon,
   'soccer-ball': SoccerBallIcon,
-  'sparkle': SparkleIcon,
   'sun': SunIcon,
   'swimming-pool': SwimmingPoolIcon,
   'tag': TagIcon,

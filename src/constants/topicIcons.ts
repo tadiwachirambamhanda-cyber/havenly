@@ -5,7 +5,7 @@ import type { Community, Interest } from '@/types';
 const INTEREST_ICONS: Record<Interest, IconName> = {
   cafes: 'coffee', fashion: 'shopping-bag', nightlife: 'martini', fitness: 'barbell',
   beach: 'waves', study: 'book-open', travel: 'airplane', events: 'confetti',
-  padel: 'tennis-ball', beauty: 'sparkle',
+  padel: 'tennis-ball', beauty: 'hair-dryer',
   football: 'soccer-ball', running: 'sneaker', art: 'palette', gaming: 'game-controller',
 };
 
