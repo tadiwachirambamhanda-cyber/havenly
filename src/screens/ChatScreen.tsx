@@ -250,7 +250,7 @@ export default function ChatScreen() {
           </AnimatedPressable>
           <View style={{ flex: 1 }} />
           {!isGroup && (
-            <AnimatedPressable style={styles.overflow} onPress={openOptions} accessibilityLabel="More options">
+            <AnimatedPressable hitSlop={8} style={styles.overflow} onPress={openOptions} accessibilityLabel="More options">
               <Icon name="more-horizontal" size={18} color={colors.ink} />
             </AnimatedPressable>
           )}
@@ -356,7 +356,7 @@ export default function ChatScreen() {
         <AnimatedPressable style={styles.membersBackdrop} onPress={() => setMembersModalVisible(false)}>
           <AnimatedPressable style={[styles.membersCard, { paddingBottom: insets.bottom + spacing.md }]} onPress={(e) => e.stopPropagation()}>
             <View style={styles.membersHandle} />
-            <AnimatedPressable style={styles.groupIconEdit} onPress={pickGroupIcon} accessibilityLabel="Change group photo">
+            <AnimatedPressable hitSlop={8} style={styles.groupIconEdit} onPress={pickGroupIcon} accessibilityLabel="Change group photo">
               {conversation?.icon_url ? (
                 <Image source={{ uri: conversation.icon_url }} style={styles.groupIconEditImg} transition={200} />
               ) : (

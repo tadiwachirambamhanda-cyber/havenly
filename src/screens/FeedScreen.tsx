@@ -278,8 +278,8 @@ export default function FeedScreen() {
     setSelectedInterest((prev) => (prev === label ? null : label));
   }, []);
 
-  // Selected is a flat coral fill: no gradient or glow, so it reads as a
-  // state rather than decoration.
+  // Selected is a flat ink fill, the same as selected chips everywhere else
+  // in the app, so coral stays reserved for the main action.
   const renderInterestChip = (key: string, label: string, isSelected: boolean, onPress: () => void) =>
     isSelected ? (
       <AnimatedPressable key={key} style={styles.interestChipSelected} onPress={onPress}>
@@ -467,15 +467,15 @@ export default function FeedScreen() {
                 onPress={() => { haptics.tap(); navigation.navigate('Offers'); }}
                 accessibilityLabel={`${profile.current_streak}-day streak. View perks`}
               >
-                <Icon name="flame" size={15} color="white" weight="fill" />
+                <Icon name="flame" size={15} color={colors.coral} weight="fill" />
                 <Text style={styles.streakBadgeText}>{profile.current_streak}</Text>
               </AnimatedPressable>
           )}
-          <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Notifications')} accessibilityLabel="Notifications">
+          <Pressable hitSlop={8} style={styles.iconBtn} onPress={() => navigation.navigate('Notifications')} accessibilityLabel="Notifications">
             <Icon name="bell" size={17} color={colors.ink} />
             {hasUnreadNotifications && <View style={styles.iconBtnDot} />}
           </Pressable>
-          <Pressable style={styles.iconBtn} onPress={() => navigation.navigate('Communities')} accessibilityLabel="Communities">
+          <Pressable hitSlop={8} style={styles.iconBtn} onPress={() => navigation.navigate('Communities')} accessibilityLabel="Communities">
             <Icon name="users" size={17} color={colors.ink} />
           </Pressable>
         </View>
@@ -601,19 +601,21 @@ function createStyles(colors: ColorTokens) {
   topBarActions: { flexDirection: 'row', gap: spacing.sm },
   iconBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
   iconBtnDot: { position: 'absolute', top: 6, right: 7, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral, borderWidth: 1.5, borderColor: colors.white },
-  streakBadge: { height: 36, paddingHorizontal: 12, borderRadius: 18, flexDirection: 'row', gap: 4, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.coral },
-  streakBadgeText: { fontSize: 13.5, fontWeight: '800', color: 'white', letterSpacing: 0.1 },
+  // Neutral like the bell and communities buttons beside it; only the
+  // flame is coral, so the badge doesn't compete with the + button.
+  streakBadge: { height: 36, paddingHorizontal: 12, borderRadius: 18, flexDirection: 'row', gap: 4, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
+  streakBadgeText: { fontSize: 13.5, fontWeight: '800', color: colors.ink, letterSpacing: 0.1 },
   interestRow: { flexDirection: 'row', gap: 8, paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
   interestChip: {
     backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line,
     borderRadius: radius.pill, paddingVertical: 7, paddingHorizontal: 14,
   },
   interestChipSelected: {
-    backgroundColor: colors.coral, borderWidth: 1.5, borderColor: colors.coral,
+    backgroundColor: colors.ink, borderWidth: 1.5, borderColor: colors.ink,
     borderRadius: radius.pill, paddingVertical: 7, paddingHorizontal: 14, alignItems: 'center', justifyContent: 'center',
   },
   interestChipText: { fontSize: 11.5, fontWeight: '700', color: colors.ink },
-  interestChipTextSelected: { fontSize: 11.5, fontWeight: '800', color: 'white' },
+  interestChipTextSelected: { fontSize: 11.5, fontWeight: '800', color: colors.sand },
   myCommunitiesRow: { flexDirection: 'row', gap: 8, paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
   myCommunityChip: {
     flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.white, borderWidth: 1,

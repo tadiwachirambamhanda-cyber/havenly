@@ -163,7 +163,7 @@ export default function InboxScreen() {
     <View style={styles.container}>
       <View style={styles.titleRow}>
         <Text style={styles.title}>Messages</Text>
-        <AnimatedPressable style={styles.newGroupBtn} onPress={() => navigation.navigate('NewGroup')} accessibilityLabel="New group">
+        <AnimatedPressable hitSlop={8} style={styles.newGroupBtn} onPress={() => navigation.navigate('NewGroup')} accessibilityLabel="New group">
           <Icon name="user-plus" size={16} color={colors.ink} />
         </AnimatedPressable>
       </View>

@@ -189,7 +189,7 @@ export default function ProfileScreen() {
           ) : (
             <LinearGradient colors={[...tones.coral]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cover} />
           )}
-          <Pressable
+          <Pressable hitSlop={8}
             style={[styles.settingsBtn, { top: insets.top + 12 }]}
             onPress={() => navigation.navigate('Settings')}
             accessibilityLabel="Settings"

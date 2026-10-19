@@ -68,7 +68,7 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
           }
         }}
       >
-        <Icon name={config.icon} size={19} color={isFocused ? 'white' : INACTIVE_COLOR} weight={isFocused ? 'fill' : 'bold'} />
+        <Icon name={config.icon} size={19} color={isFocused ? colors.ink : INACTIVE_COLOR} weight={isFocused ? 'fill' : 'bold'} />
         {route.name === 'Inbox' && hasUnread && <View style={styles.unreadDot} />}
       </AnimatedPressable>
     );
@@ -116,7 +116,10 @@ function createStyles(colors: ColorTokens) {
   // indicatorStyle, not a fixed offset, so it lines up exactly with icons
   // regardless of the pill's own padding/gap.
   indicator: {
-    position: 'absolute', top: 6, bottom: 6, left: 0, borderRadius: 20, backgroundColor: colors.coral,
+    // Sand, not coral: the + button is the one coral thing in the bar, so
+    // it's the one that stands out (Von Restorff). Sand/ink flip together
+    // with the pill in dark mode, so contrast holds both ways.
+    position: 'absolute', top: 6, bottom: 6, left: 0, borderRadius: 20, backgroundColor: colors.sand,
   },
   pillItem: { flex: 1, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   // colors.sand, not literal white — this dot sits on the ink-colored pill,

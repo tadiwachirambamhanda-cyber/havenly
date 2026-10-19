@@ -567,7 +567,7 @@ export default function PostDetailScreen() {
         <BackButton style={[styles.back, !hasMedia && styles.bareBtn, { top: insets.top + 12 }]}>
           <Icon name="arrow-left" size={16} color={hasMedia ? '#20261F' : colors.ink} />
         </BackButton>
-        <Pressable
+        <Pressable hitSlop={8}
           style={[styles.overflow, !hasMedia && styles.bareBtn, { top: insets.top + 12 }]}
           onPress={openOptions}
           accessibilityLabel="More options"
@@ -598,7 +598,7 @@ export default function PostDetailScreen() {
           </Pressable>
           {!isOwnPost && (
             <View style={{ flexDirection: 'row', gap: 8 }}>
-              <AnimatedPressable style={styles.messageBtn} onPress={onMessage} accessibilityLabel="Message this user">
+              <AnimatedPressable hitSlop={8} style={styles.messageBtn} onPress={onMessage} accessibilityLabel="Message this user">
                 <Icon name="message-circle" size={14} color={colors.ink} />
               </AnimatedPressable>
               <AnimatedPressable

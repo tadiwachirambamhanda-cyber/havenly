@@ -120,7 +120,7 @@ export default function HousingScreen() {
           <Text style={styles.title}>Housing</Text>
           <Text style={styles.subtitle}>Student rooms, checked by the Havenly team</Text>
         </View>
-        <AnimatedPressable style={styles.iconBtn} onPress={() => navigation.navigate('MyEnquiries')} accessibilityLabel="My enquiries">
+        <AnimatedPressable hitSlop={8} style={styles.iconBtn} onPress={() => navigation.navigate('MyEnquiries')} accessibilityLabel="My enquiries">
           <Icon name="clipboard" size={16} color={colors.ink} />
         </AnimatedPressable>
       </View>
@@ -170,7 +170,7 @@ export default function HousingScreen() {
                     ) : (
                       <PhotoPlaceholder icon="home" style={StyleSheet.absoluteFill} />
                     )}
-                    <AnimatedPressable style={styles.saveBtn} scaleTo={0.92} onPress={() => toggleSaved(item)} accessibilityLabel={isSaved ? 'Remove from saved' : 'Save residence'}>
+                    <AnimatedPressable hitSlop={8} style={styles.saveBtn} scaleTo={0.92} onPress={() => toggleSaved(item)} accessibilityLabel={isSaved ? 'Remove from saved' : 'Save residence'}>
                       <BurstHeart active={isSaved} size={16} color="#20261F" activeColor="#FF5A3C" />
                     </AnimatedPressable>
                     {nearMine && (

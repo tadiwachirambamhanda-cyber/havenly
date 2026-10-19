@@ -247,7 +247,7 @@ export default function ResidenceDetailScreen() {
       <BackButton style={[styles.back, { top: insets.top + 12 }]}>
         <Icon name="arrow-left" size={17} color="#20261F" />
       </BackButton>
-      <AnimatedPressable
+      <AnimatedPressable hitSlop={8}
         style={[styles.saveBtn, { top: insets.top + 12 }]}
         scaleTo={0.92}
         onPress={toggleSaved}

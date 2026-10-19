@@ -159,7 +159,7 @@ export default function EventDetailScreen() {
         <Icon name="arrow-left" size={17} color={colors.ink} />
       </BackButton>
       {profile?.is_admin && (
-        <Pressable style={styles.overflow} onPress={() => setDeleteConfirmVisible(true)} accessibilityLabel="More options">
+        <Pressable hitSlop={8} style={styles.overflow} onPress={() => setDeleteConfirmVisible(true)} accessibilityLabel="More options">
           <Icon name="more-horizontal" size={17} color={colors.ink} />
         </Pressable>
       )}

@@ -257,7 +257,7 @@ export default function UserProfileScreen() {
               )}
               {!isMe && (
                 <View style={styles.actionRow}>
-                  <AnimatedPressable style={styles.messageBtn} onPress={onMessage} disabled={messaging} accessibilityLabel="Message">
+                  <AnimatedPressable hitSlop={8} style={styles.messageBtn} onPress={onMessage} disabled={messaging} accessibilityLabel="Message">
                     <Icon name="message-circle" size={15} color={colors.ink} />
                   </AnimatedPressable>
                   <AnimatedPressable

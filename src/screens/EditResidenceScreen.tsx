@@ -265,7 +265,7 @@ export default function EditResidenceScreen() {
           {photos.map((url, i) => (
             <View key={url} style={styles.photo}>
               <Image source={{ uri: url }} style={StyleSheet.absoluteFill} contentFit="cover" />
-              <AnimatedPressable
+              <AnimatedPressable hitSlop={8}
                 style={styles.photoRemove}
                 onPress={() => { setPhotos((prev) => prev.filter((p) => p !== url)); setDirty(true); }}
                 accessibilityLabel="Remove photo"
