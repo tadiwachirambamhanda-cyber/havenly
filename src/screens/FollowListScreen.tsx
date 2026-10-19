@@ -167,7 +167,7 @@ function createStyles(colors: ColorTokens) {
   rowAuthorTap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },
   avatar: { width: 44, height: 44, borderRadius: 22 },
   name: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
-  handle: { fontSize: 11.5, color: colors.inkSoft, fontFamily: 'JetBrainsMono_500Medium', marginTop: 2 },
+  handle: { fontSize: 11.5, color: colors.inkSoft, marginTop: 2 },
   followBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: radius.button, backgroundColor: colors.ink },
   followBtnActive: { backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line },
   followBtnText: { fontSize: 12, fontWeight: '700', color: colors.sand },

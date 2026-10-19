@@ -308,7 +308,7 @@ function createStyles(colors: ColorTokens) {
     paddingHorizontal: spacing.lg, marginTop: 8, marginBottom: 10,
   },
   feedLabel: {
-    fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft, fontWeight: '600',
+    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft,
   },
   newPostBtn: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   newPostBtnText: { fontSize: 12.5, fontWeight: '700', color: colors.coral },
@@ -318,7 +318,7 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: colors.white, borderRadius: 16, borderWidth: 1, borderColor: colors.line, padding: 10, overflow: 'hidden',
   },
   postImage: { width: 66, height: 66, borderRadius: 12, overflow: 'hidden' },
-  postTag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 9, color: colors.teal, textTransform: 'uppercase' },
+  postTag: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 9, color: colors.teal, textTransform: 'uppercase', letterSpacing: 0.8 },
   postTitle: { fontSize: 13, fontWeight: '700', color: colors.ink, marginTop: 3, lineHeight: 17 },
   postMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 },
   postUserTap: { flex: 1 },

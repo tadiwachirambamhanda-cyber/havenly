@@ -284,7 +284,7 @@ function createStyles(colors: ColorTokens) {
       borderColor: colors.line, borderRadius: radius.md, padding: 14,
     },
     cardLabel: {
-      fontFamily: 'JetBrainsMono_500Medium', fontSize: 10.5, textTransform: 'uppercase', color: colors.inkSoft, marginBottom: 8,
+      fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginBottom: 8,
     },
     bigName: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
     phone: { fontSize: 16, fontWeight: '700', color: colors.ink, marginTop: 10, fontVariant: ['tabular-nums'] },

@@ -616,8 +616,7 @@ function createStyles(colors: ColorTokens) {
   communityBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
   communityBadgeText: { fontSize: 9.5, fontWeight: '700', color: colors.teal },
   sectionLabel: {
-    fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
-    fontWeight: '600', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
+    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
   },
   housingCard: {
     flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: spacing.lg, marginTop: spacing.sm,
@@ -626,7 +625,7 @@ function createStyles(colors: ColorTokens) {
   },
   housingPhoto: { width: 64, height: 64, borderRadius: 12 },
   housingPhotoEmpty: { backgroundColor: `${colors.gold}26`, alignItems: 'center', justifyContent: 'center' },
-  housingEyebrow: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 10, textTransform: 'uppercase', color: colors.teal, fontWeight: '700' },
+  housingEyebrow: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
   housingTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 15.5, color: colors.ink, marginTop: 2, lineHeight: 20 },
   housingSub: { fontSize: 12, color: colors.inkSoft, marginTop: 3 },
   dailyPickCard: {
@@ -637,7 +636,7 @@ function createStyles(colors: ColorTokens) {
   // Literal white/gold regardless of theme — this card is always a photo or
   // gradient with a dark overlay gradient under it, same reasoning as the
   // full-screen video layout's own white text.
-  dailyPickEyebrow: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 10.5, color: colors.gold, textTransform: 'uppercase', fontWeight: '700', marginBottom: 6 },
+  dailyPickEyebrow: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10.5, color: colors.gold, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 },
   dailyPickTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: 'white', lineHeight: 24 },
   dailyPickMeta: { fontSize: 11.5, color: 'rgba(255,255,255,0.8)', fontWeight: '600', marginTop: 6 },
   masonryRow: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.lg },
@@ -650,7 +649,7 @@ function createStyles(colors: ColorTokens) {
   editorialBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: '#20261F', paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.tag },
   editorialBadgeText: { color: colors.gold, fontSize: 9, fontWeight: '700' },
   cardBody: { padding: 11 },
-  cardTag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 9.5, color: colors.teal, textTransform: 'uppercase' },
+  cardTag: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 9.5, color: colors.teal, textTransform: 'uppercase', letterSpacing: 0.8 },
   cardTitle: { fontSize: 13.5, fontWeight: '700', marginTop: 5, color: colors.ink, lineHeight: 18 },
   cardMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 9 },
   cardUserTap: { flex: 1 },

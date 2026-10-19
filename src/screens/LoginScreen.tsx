@@ -107,11 +107,11 @@ function createStyles(colors: ColorTokens) {
   masthead: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   brandDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral },
   brandWordmark: { fontFamily: 'Fraunces_700Bold_Italic', fontSize: 20, color: colors.ink },
-  eyebrow: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, color: colors.inkSoft, textTransform: 'uppercase', marginTop: 44 },
+  eyebrow: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, color: colors.inkSoft, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 44 },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 40, color: colors.ink, marginTop: 10, lineHeight: 44 },
   rule: { height: 1, backgroundColor: colors.line, marginTop: 28, marginBottom: 26 },
   field: { marginBottom: 22 },
-  label: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, color: colors.inkSoft, textTransform: 'uppercase', marginBottom: 8 },
+  label: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, color: colors.inkSoft, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 },
   input: {
     borderBottomWidth: 1.5, borderBottomColor: colors.line, paddingVertical: 9, fontSize: 16.5, color: colors.ink,
     // react-native-web-only: suppresses the browser's default focus ring so

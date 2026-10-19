@@ -195,8 +195,7 @@ function createStyles(colors: ColorTokens) {
     borderColor: colors.line, borderRadius: radius.sm, padding: 14, fontSize: 14, color: colors.ink, textAlignVertical: 'top',
   },
   sectionLabel: {
-    fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
-    fontWeight: '600', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
+    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
   },
   hint: { fontSize: 11.5, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: -4 },
   dateRow: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.lg },

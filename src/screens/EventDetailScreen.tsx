@@ -311,7 +311,7 @@ function createStyles(colors: ColorTokens) {
   },
   hero: { height: 200, overflow: 'hidden' },
   body: { padding: spacing.lg },
-  tag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.teal },
+  tag: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 22, color: colors.ink, marginTop: 6 },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10 },
   metaText: { fontSize: 13, color: colors.inkSoft, fontWeight: '600' },
@@ -336,8 +336,7 @@ function createStyles(colors: ColorTokens) {
   checkInBtnTextActive: { color: colors.teal },
   checkInList: { marginTop: 18 },
   checkInListLabel: {
-    fontFamily: 'JetBrainsMono_500Medium', fontSize: 10.5, textTransform: 'uppercase', color: colors.inkSoft,
-    fontWeight: '600', marginBottom: 10,
+    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginBottom: 10,
   },
   checkInRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
   checkInAvatar: { width: 32, height: 32, borderRadius: 16 },

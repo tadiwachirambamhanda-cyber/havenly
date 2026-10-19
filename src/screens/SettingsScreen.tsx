@@ -164,8 +164,7 @@ function createStyles(colors: ColorTokens) {
     back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
     title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
     sectionLabel: {
-      fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
-      fontWeight: '600', paddingHorizontal: spacing.lg, marginBottom: 10,
+      fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginBottom: 10,
     },
     segmentRow: {
       flexDirection: 'row', gap: 6, marginHorizontal: spacing.lg, backgroundColor: colors.sandDeep,

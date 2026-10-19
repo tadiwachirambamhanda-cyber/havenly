@@ -413,7 +413,7 @@ function createStyles(colors: ColorTokens) {
   bubbleShared: { padding: 8 },
   sharedPostRow: { flexDirection: 'row', alignItems: 'center', gap: 10, minWidth: 190 },
   sharedPostThumb: { width: 46, height: 46, borderRadius: 10 },
-  sharedPostTag: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 9, textTransform: 'uppercase', opacity: 0.7 },
+  sharedPostTag: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 9, textTransform: 'uppercase', letterSpacing: 0.8, opacity: 0.7 },
   sharedPostTitle: { fontSize: 12.5, fontWeight: '700', marginTop: 2, lineHeight: 16 },
   inputRow: { padding: spacing.md, borderTopWidth: 1, borderColor: colors.line },
   inputInner: { flexDirection: 'row', gap: 9, alignItems: 'center' },
@@ -445,6 +445,6 @@ function createStyles(colors: ColorTokens) {
   memberRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 9 },
   memberAvatar: { width: 42, height: 42, borderRadius: 21 },
   memberName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
-  memberHandle: { fontSize: 11, color: colors.inkSoft, fontFamily: 'JetBrainsMono_500Medium', marginTop: 1 },
+  memberHandle: { fontSize: 11, color: colors.inkSoft, marginTop: 1 },
   });
 }

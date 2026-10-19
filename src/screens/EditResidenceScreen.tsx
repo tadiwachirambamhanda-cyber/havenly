@@ -388,8 +388,7 @@ function createStyles(colors: ColorTokens) {
     headerBtn: { fontSize: 14, fontWeight: '600', color: colors.inkSoft },
     saveBtn: { color: colors.coral, fontWeight: '700' },
     sectionLabel: {
-      fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
-      fontWeight: '600', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
+      fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
     },
     titleInput: {
       marginHorizontal: spacing.lg, backgroundColor: colors.white, borderWidth: 1,

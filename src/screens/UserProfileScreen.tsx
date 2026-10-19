@@ -363,7 +363,7 @@ function createStyles(colors: ColorTokens) {
   followBtnText: { fontSize: 12.5, fontWeight: '700', color: colors.sand },
   followBtnTextActive: { color: colors.ink },
   name: { fontFamily: 'Fraunces_600SemiBold', fontSize: 20, color: colors.ink, paddingHorizontal: spacing.lg, paddingTop: 12 },
-  handle: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 12.5, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 2 },
+  handle: { fontSize: 12.5, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 2 },
   bio: { fontSize: 13, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 10, lineHeight: 20 },
   statsRow: { flexDirection: 'row', gap: 22, paddingHorizontal: spacing.lg, paddingTop: 16, paddingBottom: 6 },
   statNum: { fontSize: 16, fontWeight: '800', color: colors.ink },
@@ -373,8 +373,7 @@ function createStyles(colors: ColorTokens) {
   chip: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.tag, backgroundColor: colors.coralSoft },
   chipText: { fontSize: 11, fontWeight: '700', color: colors.coral },
   sectionLabel: {
-    fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
-    fontWeight: '600', paddingHorizontal: spacing.lg, marginTop: 6, marginBottom: 10,
+    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 6, marginBottom: 10,
   },
   gridCell: { flex: 1, aspectRatio: 1 / 1.15, overflow: 'hidden', marginBottom: 2 },
   });

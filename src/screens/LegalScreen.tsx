@@ -61,7 +61,7 @@ function createStyles(colors: ColorTokens) {
     header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingBottom: 12, paddingHorizontal: spacing.lg },
     back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
     title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
-    updated: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft, marginTop: 4 },
+    updated: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginTop: 4 },
     draftNote: {
       flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 12,
       backgroundColor: colors.sandDeep, borderRadius: radius.sm,

@@ -433,8 +433,7 @@ function createStyles(colors: ColorTokens) {
   shortcutSub: { fontSize: 11.5, color: colors.inkSoft, marginTop: 2 },
   noResults: { color: colors.inkSoft, fontSize: 13, textAlign: 'center', marginTop: 24 },
   sectionLabel: {
-    fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
-    fontWeight: '600', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
+    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
   },
   resultRow: {
     flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginHorizontal: spacing.lg, marginBottom: spacing.sm,

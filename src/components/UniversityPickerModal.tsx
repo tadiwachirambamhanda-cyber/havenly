@@ -63,8 +63,7 @@ function createStyles(colors: ColorTokens) {
   headerTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 17, color: colors.ink },
   headerBtn: { fontSize: 14, fontWeight: '600', color: colors.inkSoft, width: 50 },
   groupLabel: {
-    fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
-    fontWeight: '600', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 8,
+    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 8,
   },
   row: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',

@@ -309,7 +309,7 @@ function createStyles(colors: ColorTokens) {
     thumb: { width: 64, height: 48, borderRadius: 8, overflow: 'hidden', borderWidth: 2, borderColor: 'transparent', backgroundColor: colors.sandDeep },
     thumbActive: { borderColor: colors.coral },
     body: { padding: spacing.lg },
-    area: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.teal },
+    area: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
     name: { fontFamily: 'Fraunces_600SemiBold', fontSize: 25, color: colors.ink, marginTop: 6 },
     provider: { fontSize: 13, color: colors.inkSoft, marginTop: 4 },
     factRow: { flexDirection: 'row', gap: 8, marginTop: 14, flexWrap: 'wrap' },
@@ -319,8 +319,7 @@ function createStyles(colors: ColorTokens) {
     },
     factText: { fontSize: 12, fontWeight: '600', color: colors.ink },
     sectionLabel: {
-      fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
-      fontWeight: '600', marginTop: 26, marginBottom: 10,
+      fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginTop: 26, marginBottom: 10,
     },
     muted: { fontSize: 13, color: colors.inkSoft },
     roomRow: {

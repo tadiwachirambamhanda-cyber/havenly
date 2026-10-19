@@ -25,6 +25,9 @@ export const colors = lightColors;
 // (status, amenities, badges) use tag, so shape alone says "tappable" or not.
 export const radius = { lg: 26, md: 16, sm: 10, button: 14, tag: 6, pill: 100 };
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 20, xl: 28 };
+// Small uppercase labels use bodyBold with ~0.8 letter spacing. mono is only
+// for things that must be read character by character (a perk's redeem
+// code), not for labels or handles.
 export const fonts = {
   display: 'Fraunces_600SemiBold', displayItalic: 'Fraunces_500Medium_Italic',
   body: 'PlusJakartaSans_400Regular', bodySemiBold: 'PlusJakartaSans_600SemiBold',

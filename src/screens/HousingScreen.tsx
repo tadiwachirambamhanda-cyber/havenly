@@ -242,7 +242,7 @@ function createStyles(colors: ColorTokens) {
     },
     nearBadgeText: { color: 'white', fontSize: 11, fontWeight: '700' },
     cardBody: { padding: 14 },
-    cardArea: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 10, textTransform: 'uppercase', color: colors.teal },
+    cardArea: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
     cardName: { fontFamily: 'Fraunces_600SemiBold', fontSize: 18, color: colors.ink, marginTop: 3 },
     cardMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
     cardPrice: { fontSize: 12.5, color: colors.inkSoft },

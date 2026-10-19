@@ -240,8 +240,7 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: 'rgba(0,0,0,0.55)', borderWidth: 2, borderColor: colors.sand, alignItems: 'center', justifyContent: 'center',
   },
   label: {
-    fontFamily: 'JetBrainsMono_500Medium', fontSize: 11, textTransform: 'uppercase', color: colors.inkSoft,
-    fontWeight: '600', paddingHorizontal: spacing.lg, marginTop: spacing.md, marginBottom: 6,
+    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: spacing.md, marginBottom: 6,
   },
   input: {
     marginHorizontal: spacing.lg, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,

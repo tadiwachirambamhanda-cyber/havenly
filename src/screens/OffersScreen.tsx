@@ -175,7 +175,7 @@ function createStyles(colors: ColorTokens) {
   locationEnableBtnText: { fontSize: 11, fontWeight: '700', color: colors.teal },
   card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: radius.md, padding: 12, marginBottom: 10 },
   cardImage: { width: 56, height: 56, borderRadius: 12 },
-  cardBrand: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 10, textTransform: 'uppercase', color: colors.teal },
+  cardBrand: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
   cardTitle: { fontSize: 13.5, fontWeight: '700', color: colors.ink, marginTop: 2, lineHeight: 17 },
   cardMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 3 },
   cardDiscount: { fontSize: 12, color: colors.coral, fontWeight: '700' },
