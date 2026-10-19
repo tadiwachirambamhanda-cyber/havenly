@@ -1,0 +1,11 @@
+-- The seeded "Havenly Editorial" posts were invented demo content written
+-- as genuine reviews, several naming real Dubai businesses with specific
+-- claims nobody verified. Removed before launch. Likes, comments, saves and
+-- notifications on them cascade; shared-post messages keep the message and
+-- lose the link (on delete set null).
+--
+-- Nothing replaces them: the editorial UI (Havenly Pick label, gold card
+-- border) only appears when an is_editorial post exists, and those can only
+-- be inserted directly in the database, so the feed shows student posts
+-- alone until real editorial posts are written and added.
+delete from posts where is_editorial;

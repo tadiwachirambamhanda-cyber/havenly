@@ -531,7 +531,9 @@ alter table posts add column community_id uuid references communities(id) on del
 create index posts_community_idx on posts (community_id, created_at);
 
 -- is_editorial = false because editorial posts are only ever inserted
--- directly in the database (see 20260912160509_seed_editorial_posts.sql),
+-- directly in the database (the original demo set from
+-- 20260912160509_seed_editorial_posts.sql was removed in
+-- 20261019140000_remove_demo_editorial_posts.sql),
 -- never through the app — this closes the self-publish-as-editorial gap the
 -- original comment on the first version of this policy above flagged as a
 -- TODO but never enforced.

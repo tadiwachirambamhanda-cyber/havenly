@@ -339,12 +339,13 @@ export default function FeedScreen() {
   const trendingColumns = useMemo(() => balanceColumns(trendingPosts), [trendingPosts]);
   const communityColumns = useMemo(() => balanceColumns(communityPosts), [communityPosts]);
 
-  // Prefers the trending pool (already popularity-sorted within the
-  // viewer's top interest) over the blended "Picked for you" ranking, so
-  // the daily pick skews toward what they actually care about rather than
-  // whatever the recency/popularity blend happens to surface.
+  // Today's pick is an editorial slot: only Havenly Editorial posts qualify,
+  // so it stays hidden until real ones are published rather than promoting
+  // an ordinary student post. Prefers the trending pool (popularity-sorted
+  // within the viewer's top interest) so it skews toward what they care about.
   const dailyPick = useMemo(() => {
-    const candidates = trendingPosts.length > 0 ? trendingPosts : posts;
+    const trendingEditorial = trendingPosts.filter((p) => p.is_editorial);
+    const candidates = trendingEditorial.length > 0 ? trendingEditorial : posts.filter((p) => p.is_editorial);
     const daySeed = new Date().toISOString().slice(0, 10);
     return pickDailyPost(candidates, `${daySeed}:${session?.user.id ?? 'anon'}`);
   }, [trendingPosts, posts, session]);
