@@ -45,8 +45,10 @@ export const AMENITIES: { key: string; icon: IconName }[] = [
   { key: 'Parking', icon: 'car' },
 ];
 
-export function amenityIcon(key: string): IconName {
-  return AMENITIES.find((a) => a.key === key)?.icon ?? 'check';
+// null for an amenity outside the list: it shows as a plain label rather
+// than getting a generic check-mark bullet.
+export function amenityIcon(key: string): IconName | null {
+  return AMENITIES.find((a) => a.key === key)?.icon ?? null;
 }
 
 export function formatAed(amount: number): string {

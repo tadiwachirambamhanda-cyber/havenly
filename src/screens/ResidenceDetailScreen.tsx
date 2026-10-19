@@ -199,7 +199,7 @@ export default function ResidenceDetailScreen() {
               <View style={styles.amenityGrid}>
                 {residence.amenities.map((a) => (
                   <View key={a} style={styles.amenity}>
-                    <Icon name={amenityIcon(a)} size={13} color={colors.teal} />
+                    {amenityIcon(a) && <Icon name={amenityIcon(a)!} size={13} color={colors.teal} />}
                     <Text style={styles.amenityText}>{a}</Text>
                   </View>
                 ))}
