@@ -640,7 +640,9 @@ function createStyles(colors: ColorTokens) {
     height: 190, borderRadius: radius.lg, overflow: 'hidden', justifyContent: 'flex-end',
   },
   // No photo: a plain dark card sized to its text, not a gradient poster.
-  dailyPickTextOnly: { height: undefined, backgroundColor: '#20261F' },
+  // Border keeps the card's edge visible in dark mode, where the page
+  // background is nearly as dark as the card.
+  dailyPickTextOnly: { height: undefined, backgroundColor: '#20261F', borderWidth: 1, borderColor: colors.line },
   dailyPickBody: { padding: spacing.lg },
   // Literal white/gold regardless of theme — this card is always a photo or
   // gradient with a dark overlay gradient under it, same reasoning as the
