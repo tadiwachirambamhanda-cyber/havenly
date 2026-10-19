@@ -15,6 +15,7 @@ import { useToast } from '@/lib/ToastContext';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
+import PersonRowSkeleton from '@/components/PersonRowSkeleton';
 import SwipeToAction from '@/components/SwipeToAction';
 import { calmDuration, calmEasing } from '@/lib/animations';
 import { hideConversation } from '@/lib/conversations';
@@ -37,6 +38,9 @@ export default function InboxScreen() {
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [rows, setRows] = useState<Row[]>([]);
+  // Until the first load finishes, show placeholder rows rather than the
+  // "No conversations yet" empty state flashing up for someone who has some.
+  const [loaded, setLoaded] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState('');
   const myId = session?.user.id;
@@ -57,7 +61,7 @@ export default function InboxScreen() {
       supabase.from('conversation_reads').select('conversation_id, last_read_at').eq('user_id', myId),
       supabase.from('conversation_hidden_for').select('conversation_id, hidden_at').eq('user_id', myId),
     ]);
-    if (!conversations) return;
+    if (!conversations) { setLoaded(true); return; }
     myConversationIdsRef.current = new Set(conversations.map((c) => c.id));
 
     const readAtByConversation = new Map((reads ?? []).map((r) => [r.conversation_id, r.last_read_at]));
@@ -90,6 +94,7 @@ export default function InboxScreen() {
         .filter((p): p is Profile => !!p);
       return { ...(c as Conversation), otherUser: members[0], members, unread };
     }));
+    setLoaded(true);
   }, [myId]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
@@ -178,7 +183,9 @@ export default function InboxScreen() {
           </AnimatedPressable>
         )}
       </View>
-      {requests.length === 0 && messages.length === 0 ? (
+      {!loaded ? (
+        <PersonRowSkeleton count={7} />
+      ) : requests.length === 0 && messages.length === 0 ? (
         <EmptyState
           icon={trimmed ? 'search' : 'mail'}
           text={trimmed ? `No conversations matching "${query.trim()}"` : 'No conversations yet.'}

@@ -13,6 +13,7 @@ import { Image } from 'expo-image';
 import * as Clipboard from 'expo-clipboard';
 import InitialsAvatar from '@/components/InitialsAvatar';
 import Icon from '@/components/Icon';
+import Skeleton from '@/components/Skeleton';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -291,7 +292,24 @@ export default function PostDetailScreen() {
         </BackButton>
         <Text style={styles.notFoundText}>This post isn't available.</Text>
       </View>
-    ) : null;
+    ) : (
+      // Same order as the loaded page (tag, title, author, body) so nothing
+      // jumps when the post arrives.
+      <View style={[styles.container, { paddingTop: insets.top + 58 }]}>
+        <View style={[styles.body, { gap: 10 }]}>
+          <Skeleton style={{ height: 11, width: 70 }} />
+          <Skeleton style={{ height: 24, width: '90%' }} />
+          <Skeleton style={{ height: 24, width: '60%' }} />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 6 }}>
+            <Skeleton style={{ width: 32, height: 32, borderRadius: 16 }} />
+            <Skeleton style={{ height: 12, width: 120 }} />
+          </View>
+          <Skeleton style={{ height: 13, width: '100%', marginTop: 6 }} />
+          <Skeleton style={{ height: 13, width: '95%' }} />
+          <Skeleton style={{ height: 13, width: '70%' }} />
+        </View>
+      </View>
+    );
   }
 
   const isOwnPost = post.author_id === session?.user.id;

@@ -14,6 +14,7 @@ import { timeAgo } from '@/utils/timeAgo';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
 import EmptyState from '@/components/EmptyState';
+import PersonRowSkeleton from '@/components/PersonRowSkeleton';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { EnquiryStatus, HousingEnquiry, Residence, ResidencePartnerTerms } from '@/types';
@@ -121,7 +122,7 @@ export default function ManageHousingScreen() {
           </ScrollView>
         </>
       }
-      ListEmptyComponent={loaded ? <EmptyState icon="inbox" text="No enquiries here yet." /> : null}
+      ListEmptyComponent={loaded ? <EmptyState icon="inbox" text="No enquiries here yet." /> : <PersonRowSkeleton count={5} />}
       renderItem={({ item }) => {
         const t = tone(item.status);
         return (
@@ -160,7 +161,7 @@ export default function ManageHousingScreen() {
           <Text style={styles.addBtnText}>Add residence</Text>
         </AnimatedPressable>
       }
-      ListEmptyComponent={loaded ? <EmptyState icon="home" text="No residences yet. Add your first partner." /> : null}
+      ListEmptyComponent={loaded ? <EmptyState icon="home" text="No residences yet. Add your first partner." /> : <PersonRowSkeleton count={4} thumb="square" />}
       renderItem={({ item }) => {
         const terms = termsByResidence.get(item.id);
         return (

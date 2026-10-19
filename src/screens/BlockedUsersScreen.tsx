@@ -14,6 +14,7 @@ import { haptics } from '@/lib/haptics';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
+import PersonRowSkeleton from '@/components/PersonRowSkeleton';
 import SwipeToAction from '@/components/SwipeToAction';
 import type { Profile } from '@/types';
 
@@ -22,15 +23,17 @@ export default function BlockedUsersScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [blocked, setBlocked] = useState<Profile[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
   const load = useCallback(async () => {
     const myId = session?.user.id;
     if (!myId) return;
     const { data: blocks } = await supabase.from('blocked_users').select('blocked_id').eq('blocker_id', myId);
     const blockedIds = (blocks ?? []).map((b) => b.blocked_id);
-    if (!blockedIds.length) { setBlocked([]); return; }
+    if (!blockedIds.length) { setBlocked([]); setLoaded(true); return; }
     const { data: profiles } = await supabase.from('profiles').select('*').in('id', blockedIds);
     setBlocked((profiles as Profile[]) ?? []);
+    setLoaded(true);
   }, [session]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
@@ -73,7 +76,7 @@ export default function BlockedUsersScreen() {
             </View>
           </SwipeToAction>
         )}
-        ListEmptyComponent={<EmptyState icon="shield-check" text="You haven't blocked anyone." />}
+        ListEmptyComponent={loaded ? <EmptyState icon="shield-check" text="You haven't blocked anyone." /> : <PersonRowSkeleton count={3} />}
       />
     </View>
   );

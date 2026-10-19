@@ -17,6 +17,7 @@ import { calmDuration, calmEasing } from '@/lib/animations';
 import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
+import PersonRowSkeleton from '@/components/PersonRowSkeleton';
 import { timeAgo } from '@/utils/timeAgo';
 import type { EnquiryStatus, Notification } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -137,7 +138,7 @@ export default function NotificationsScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
-        ListEmptyComponent={loaded ? <EmptyState icon="bell" text="No notifications yet." /> : null}
+        ListEmptyComponent={loaded ? <EmptyState icon="bell" text="No notifications yet." /> : <PersonRowSkeleton count={8} />}
         renderItem={({ item, index }) => (
           <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(calmDuration).easing(calmEasing)}>
           <AnimatedPressable
