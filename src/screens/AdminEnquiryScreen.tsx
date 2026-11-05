@@ -10,6 +10,7 @@ import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { ADMIN_STATUS_LABEL, ENQUIRY_STATUSES, formatAed, formatMonth, PERIOD_LABEL } from '@/lib/housing';
 import { timeAgo } from '@/utils/timeAgo';
+import ActionSheet from '@/components/ActionSheet';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
 import Skeleton from '@/components/Skeleton';
@@ -33,6 +34,7 @@ export default function AdminEnquiryScreen() {
   const [pendingStatus, setPendingStatus] = useState<EnquiryStatus | null>(null);
   const [contractValue, setContractValue] = useState('');
   const [saving, setSaving] = useState(false);
+  const [leaveSignedVisible, setLeaveSignedVisible] = useState(false);
 
   const load = useCallback(async () => {
     const { data } = await supabase.from('housing_enquiries')
@@ -56,12 +58,23 @@ export default function AdminEnquiryScreen() {
     ? (parsedContract * Number(terms.referral_fee_percent)) / 100
     : null;
 
-  const saveStatus = async () => {
+  const saveStatus = () => {
     if (!enquiry) return;
     if (selectedStatus === 'signed' && !(parsedContract > 0)) {
       showToast('Enter the contract value first', 'error');
       return;
     }
+    // Moving a signed deal to another status deletes its contract value
+    // and fee, so ask first.
+    if (enquiry.status === 'signed' && selectedStatus !== 'signed') {
+      setLeaveSignedVisible(true);
+      return;
+    }
+    void applyStatus();
+  };
+
+  const applyStatus = async () => {
+    if (!enquiry) return;
     setSaving(true);
     const { data, error } = await supabase.rpc('set_enquiry_status', {
       enquiry_id_input: enquiry.id,
@@ -266,6 +279,14 @@ export default function AdminEnquiryScreen() {
           </View>
         )}
       </View>
+
+      <ActionSheet
+        visible={leaveSignedVisible}
+        onClose={() => setLeaveSignedVisible(false)}
+        title="Change a signed deal?"
+        message={`Marking this as ${ADMIN_STATUS_LABEL[selectedStatus].toLowerCase()} deletes its contract value and referral fee. This can't be undone.`}
+        actions={[{ label: `Mark as ${ADMIN_STATUS_LABEL[selectedStatus].toLowerCase()}`, destructive: true, onPress: () => { void applyStatus(); } }]}
+      />
     </ScrollView>
   );
 }

@@ -1323,6 +1323,7 @@ create index housing_enquiries_status_idx on housing_enquiries (status);
 -- Moves an enquiry through the pipeline. Marking it signed requires the
 -- contract value and computes the referral fee from the residence's
 -- current terms; moving it off 'signed' clears both so the totals stay true.
+-- Signed deals keep their money record: see 20261106140000_protect_signed_deal_money.sql.
 create or replace function public.set_enquiry_status(
   enquiry_id_input uuid,
   status_input text,
@@ -1335,6 +1336,7 @@ as $$
 declare
   enquiry housing_enquiries%rowtype;
   fee_percent numeric;
+  new_fee numeric;
 begin
   if not public.is_admin() then
     raise exception 'Only the Havenly team can update enquiries.';
@@ -1352,18 +1354,37 @@ begin
     if contract_value_input is null or contract_value_input <= 0 then
       raise exception 'Enter the contract value to mark this as signed.';
     end if;
-    select referral_fee_percent into fee_percent from residence_partner_terms where residence_id = enquiry.residence_id;
-    if fee_percent is null then
-      raise exception 'Set this residence''s referral fee percentage first.';
+
+    if enquiry.status = 'signed' and enquiry.referral_fee_aed is not null and enquiry.contract_value_aed is not null then
+      -- Already signed: keep the fee as snapshotted unless the contract
+      -- value itself changed, and then only at the rate it was signed at.
+      if contract_value_input = enquiry.contract_value_aed then
+        new_fee := enquiry.referral_fee_aed;
+      else
+        if enquiry.fee_paid_at is not null then
+          raise exception 'This deal''s fee is marked as paid, so its contract value can''t be changed. Mark the fee as unpaid first.';
+        end if;
+        new_fee := round(contract_value_input * enquiry.referral_fee_aed / enquiry.contract_value_aed, 2);
+      end if;
+    else
+      select referral_fee_percent into fee_percent from residence_partner_terms where residence_id = enquiry.residence_id;
+      if fee_percent is null then
+        raise exception 'Set this residence''s referral fee percentage first.';
+      end if;
+      new_fee := round(contract_value_input * fee_percent / 100, 2);
     end if;
+
     update housing_enquiries set
       status = 'signed',
       contract_value_aed = contract_value_input,
-      referral_fee_aed = round(contract_value_input * fee_percent / 100, 2),
+      referral_fee_aed = new_fee,
       status_updated_at = now()
     where id = enquiry_id_input
     returning * into enquiry;
   else
+    if enquiry.status = 'signed' and enquiry.fee_paid_at is not null then
+      raise exception 'This deal is signed and its fee is marked as paid. Mark the fee as unpaid before changing the status.';
+    end if;
     update housing_enquiries set
       status = status_input,
       contract_value_aed = null,
