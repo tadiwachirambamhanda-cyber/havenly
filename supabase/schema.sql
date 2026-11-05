@@ -29,6 +29,12 @@ create table profiles (
 alter table profiles enable row level security;
 create policy "Profiles are viewable by everyone" on profiles for select using (true);
 create policy "Users can update their own profile" on profiles for update using (auth.uid() = id);
+-- Row policy alone lets a user edit every column of their own row (including
+-- is_admin and streaks), so updates are limited to editable columns and
+-- direct inserts are closed (see 20261106100000_lock_down_profile_columns.sql).
+revoke update on profiles from authenticated, anon;
+grant update (username, display_name, bio, avatar_url, cover_url, university, interests, has_completed_onboarding) on profiles to authenticated;
+revoke insert on profiles from authenticated, anon;
 create policy "Users can insert their own profile" on profiles for insert with check (auth.uid() = id);
 
 -- Called once per app session (see RootNavigator). security definer so a
