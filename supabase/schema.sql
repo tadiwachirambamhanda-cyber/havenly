@@ -1621,3 +1621,23 @@ begin
   return new;
 end;
 $$;
+
+-- A residence with signed deals can't be deleted (they're the only record of
+-- what it owes); set it inactive instead. See
+-- 20261106130000_protect_signed_deals_from_residence_delete.sql.
+create or replace function public.block_delete_residence_with_signed_deals()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  if exists (select 1 from housing_enquiries where residence_id = old.id and status = 'signed') then
+    raise exception 'This residence has signed deals, so it can''t be deleted. Set it to inactive instead.';
+  end if;
+  return old;
+end;
+$$;
+
+create trigger block_delete_residence_with_signed_deals
+  before delete on residences
+  for each row execute procedure public.block_delete_residence_with_signed_deals();
