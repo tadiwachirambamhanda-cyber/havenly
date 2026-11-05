@@ -584,9 +584,22 @@ create table conversations (
 );
 alter table conversations enable row level security;
 create policy "Users can view their own conversations" on conversations for select using (auth.uid() = any(participant_ids));
+-- Tightened in 20261106110000_harden_conversation_creation.sql: must be a
+-- non-group, 'pending', exactly two distinct real people, no block, and no
+-- existing 1:1 between them (a declined request can't be restarted).
 create policy "Users can create conversations they're part of" on conversations for insert with check (
-  auth.uid() = any(participant_ids) and auth.uid() = initiator_id
+  not is_group
+  and status = 'pending'
+  and auth.uid() = initiator_id
+  and array_length(participant_ids, 1) = 2
+  and auth.uid() = any(participant_ids)
+  and participant_ids[1] <> participant_ids[2]
+  and (select count(*) from profiles p where p.id = any(participant_ids)) = 2
   and not public.is_blocked_between(participant_ids[1], participant_ids[2])
+  and not exists (
+    select 1 from conversations c
+    where not c.is_group and c.participant_ids @> participant_ids and c.participant_ids <@ participant_ids
+  )
 );
 -- Additive, not a replacement for the policy above: its is_blocked_between
 -- check only makes sense for a 2-person DM and would misfire against
