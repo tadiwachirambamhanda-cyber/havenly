@@ -252,8 +252,10 @@ create table post_likes (
 );
 alter table post_likes enable row level security;
 create policy "Likes are viewable by everyone" on post_likes for select using (true);
-create policy "Users can like posts" on post_likes for insert with check (auth.uid() = user_id);
-create policy "Users can unlike posts" on post_likes for delete using (auth.uid() = user_id);
+-- No client insert/delete policies: likes are written only by
+-- toggle_post_like, and posts.like_count is kept by a trigger on this table
+-- (see 20261106120000_like_count_by_trigger.sql).
+revoke insert, update, delete on post_likes from authenticated, anon;
 
 -- Atomically toggles a like: inserts/deletes the post_likes row and keeps
 -- posts.like_count in sync in one transaction. security definer because the
@@ -276,10 +278,8 @@ begin
 
   if already_liked then
     delete from post_likes where post_id = post_id_input and user_id = uid;
-    update posts set like_count = greatest(posts.like_count - 1, 0) where id = post_id_input;
   else
     insert into post_likes (post_id, user_id) values (post_id_input, uid);
-    update posts set like_count = posts.like_count + 1 where id = post_id_input;
   end if;
 
   return query select not already_liked, posts.like_count from posts where posts.id = post_id_input;
@@ -287,6 +287,27 @@ end;
 $$;
 
 grant execute on function public.toggle_post_like(uuid) to authenticated;
+
+-- posts.like_count follows the post_likes rows by trigger, so cascades
+-- (account deletion) and every other write adjust it exactly once.
+create or replace function public.sync_post_like_count()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  if tg_op = 'INSERT' then
+    update posts set like_count = like_count + 1 where id = new.post_id;
+  else
+    update posts set like_count = greatest(like_count - 1, 0) where id = old.post_id;
+  end if;
+  return null;
+end;
+$$;
+
+create trigger sync_post_like_count
+  after insert or delete on post_likes
+  for each row execute procedure public.sync_post_like_count();
 
 -- ==================== COMMENTS ====================
 create table comments (
