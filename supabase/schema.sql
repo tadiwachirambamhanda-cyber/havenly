@@ -126,6 +126,11 @@ create trigger on_auth_user_created
 -- Storage files (avatar, post images/videos) aren't touched by cascade —
 -- the client removes those first, while its session can still write to
 -- storage, before calling this.
+-- Also clears the user's chat traces (messages, group membership, last_message):
+-- see 20261106170000_account_deletion_cleans_chats.sql.
+-- Also clears the user's chat traces (messages, group membership, last_message):
+-- see 20261106170000_account_deletion_cleans_chats.sql and
+-- 20261106180000_account_deletion_group_preview.sql.
 create or replace function public.delete_own_account()
 returns void
 language plpgsql
@@ -133,14 +138,34 @@ security definer set search_path = public
 as $$
 declare
   uid uuid := auth.uid();
+  affected uuid[];
 begin
   if uid is null then
     raise exception 'Not authenticated';
   end if;
+
+  affected := array(select id from conversations where uid = any(participant_ids) or initiator_id = uid);
+
+  delete from messages where sender_id = uid;
+
+  update conversations
+    set participant_ids = array_remove(participant_ids, uid),
+        initiator_id = case when initiator_id = uid then null else initiator_id end
+    where is_group and uid = any(participant_ids);
+  delete from conversations where is_group and coalesce(array_length(participant_ids, 1), 0) < 2;
+
+  update conversations c set
+    last_message = (select m.body from messages m where m.conversation_id = c.id order by m.created_at desc limit 1),
+    last_message_at = (select m.created_at from messages m where m.conversation_id = c.id order by m.created_at desc limit 1)
+  where c.id = any(affected);
+
+  delete from conversations c
+    where not c.is_group and c.id = any(affected)
+      and not exists (select 1 from messages m where m.conversation_id = c.id);
+
   delete from auth.users where id = uid;
 end;
 $$;
-
 grant execute on function public.delete_own_account() to authenticated;
 
 -- ==================== SAFETY: BLOCKING ====================
@@ -1685,3 +1710,40 @@ $$;
 create trigger block_delete_residence_with_signed_deals
   before delete on residences
   for each row execute procedure public.block_delete_residence_with_signed_deals();
+
+-- A member can leave a group (20261106160000_leave_group.sql). Their earlier
+-- messages stay; fewer than two members left deletes the group.
+create or replace function public.leave_group(conversation_id_input uuid)
+returns void
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  convo conversations%rowtype;
+  remaining uuid[];
+begin
+  if uid is null then
+    raise exception 'Not authenticated';
+  end if;
+
+  select * into convo from conversations where id = conversation_id_input;
+  if convo.id is null or not convo.is_group or not (uid = any(convo.participant_ids)) then
+    raise exception 'You''re not in this group.';
+  end if;
+
+  remaining := array_remove(convo.participant_ids, uid);
+  delete from conversation_reads where conversation_id = convo.id and user_id = uid;
+  delete from conversation_hidden_for where conversation_id = convo.id and user_id = uid;
+
+  if coalesce(array_length(remaining, 1), 0) < 2 then
+    delete from conversations where id = convo.id;
+  else
+    update conversations set
+      participant_ids = remaining,
+      initiator_id = case when initiator_id = uid then null else initiator_id end
+    where id = convo.id;
+  end if;
+end;
+$$;
+grant execute on function public.leave_group(uuid) to authenticated;
