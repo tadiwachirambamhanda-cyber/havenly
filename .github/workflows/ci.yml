@@ -1,0 +1,60 @@
+# Checks for every pull request in an Expo (mobile) app. Copy to .github/workflows/ci.yml
+# (the /pr skill picks this file instead of ci.yml when the root package.json lists "expo").
+# For a repo with a web/ app and a mobile/ app, use ci-web-mobile.yml instead.
+#
+# It runs two package.json scripts, and each one must exist:
+#   "typecheck": "tsc --noEmit"
+#   "lint": "expo lint"       (the Expo template already has this one)
+# Then two Expo checks that need no Xcode or Android tools:
+#   npx expo-doctor            project health: package versions match the Expo SDK
+#   npx expo export            bundles the app for iOS, Android and web, like a real build
+#
+# Tested on 2026-09-29 against a new app from
+# npx create-expo-app@latest --template default@sdk-57 (Expo 57.0.26), Node 22.22:
+#   - The first `npx expo lint` installs ESLint and writes eslint.config.js. Run it once on
+#     your laptop and commit package.json, package-lock.json and eslint.config.js.
+#   - The new template fails its first lint in src/hooks/use-color-scheme.web.ts
+#     (react-hooks/set-state-in-effect). Fix the code; do not switch the rule off.
+#   - tsc needs expo-env.d.ts, which `npx expo start` writes and .gitignore leaves out.
+#     The "Expo types" step below writes the same one line, so typecheck passes on GitHub.
+#   - expo-doctor: 21 of 21 checks passed. expo export: finished in about 30 seconds.
+# If expo-doctor says a package does not match the SDK, run `npx expo install --fix`
+# on your laptop and commit, rather than removing the step.
+# Never paste a key or secret into this file.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Expo types
+        run: echo '/// <reference types="expo/types" />' > expo-env.d.ts
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Expo doctor
+        run: npx expo-doctor
+
+      - name: Bundle
+        run: npx expo export --platform all --output-dir dist
