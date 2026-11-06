@@ -629,9 +629,32 @@ create policy "Users can create conversations they're part of" on conversations 
 -- isn't enforced for groups at all here — same as most chat apps, being
 -- blocked by someone doesn't remove you from a group you're both in, it
 -- only affects 1:1 DMs and post/comment visibility.
+-- Consent: you can only add people you follow and who follow you back, and
+-- neither side may have blocked the other (20261106150000_group_chat_consent.sql).
+create or replace function public.can_add_to_group(adder uuid, member uuid)
+returns boolean
+language sql
+security definer set search_path = public
+stable
+as $$
+  select not public.is_blocked_between(adder, member)
+    and exists (select 1 from follows where follower_id = adder and following_id = member)
+    and exists (select 1 from follows where follower_id = member and following_id = adder);
+$$;
+grant execute on function public.can_add_to_group(uuid, uuid) to authenticated;
+
 create policy "Users can create groups they're part of" on conversations for insert with check (
-  is_group and auth.uid() = any(participant_ids) and auth.uid() = initiator_id and status = 'accepted'
+  is_group
+  and auth.uid() = any(participant_ids)
+  and auth.uid() = initiator_id
+  and status = 'accepted'
   and array_length(participant_ids, 1) >= 3
+  and (select count(distinct m) from unnest(participant_ids) m) = array_length(participant_ids, 1)
+  and (select count(*) from profiles p where p.id = any(participant_ids)) = array_length(participant_ids, 1)
+  and not exists (
+    select 1 from unnest(participant_ids) m
+    where m <> auth.uid() and not public.can_add_to_group(auth.uid(), m)
+  )
 );
 -- Column-scoped: ChatScreen only ever updates status, last_message and
 -- last_message_at, never participant_ids or initiator_id. Without this
