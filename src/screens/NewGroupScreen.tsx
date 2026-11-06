@@ -51,14 +51,19 @@ export default function NewGroupScreen() {
   useEffect(() => {
     if (!myId) return;
     (async () => {
-      const [{ data: followRows }, { data: blockedRows }] = await Promise.all([
+      // Only people you follow AND who follow you back can be added: it's
+      // how someone agrees to be put in a group with you, and the database
+      // enforces the same rule (can_add_to_group), so it can't be skipped.
+      const [{ data: followRows }, { data: followerRows }, { data: blockedRows }] = await Promise.all([
         supabase.from('follows').select('profile:profiles!follows_following_id_fkey(*)').eq('follower_id', myId),
+        supabase.from('follows').select('follower_id').eq('following_id', myId),
         supabase.from('blocked_users').select('blocked_id').eq('blocker_id', myId),
       ]);
       const blockedIds = new Set((blockedRows ?? []).map((b) => b.blocked_id));
+      const followsMe = new Set((followerRows ?? []).map((r) => r.follower_id));
       const profiles = ((followRows ?? []) as unknown as { profile: Profile }[])
         .map((r) => r.profile)
-        .filter((p) => p && !blockedIds.has(p.id));
+        .filter((p) => p && !blockedIds.has(p.id) && followsMe.has(p.id));
       setFollowing(profiles);
       setLoaded(true);
     })();
@@ -92,8 +97,9 @@ export default function NewGroupScreen() {
         try { await uploadGroupIcon(conversationId, iconUri); } catch { /* non-fatal */ }
       }
       navigation.replace('Chat', { conversationId });
-    } catch {
-      showToast('Couldn’t create the group. Try again.', 'error');
+    } catch (e) {
+      const refused = (e as { code?: string } | null)?.code === '42501';
+      showToast(refused ? 'You can only add people who follow you back.' : 'Couldn’t create the group. Try again.', 'error');
       setCreating(false);
     }
   };
@@ -130,7 +136,7 @@ export default function NewGroupScreen() {
         <Icon name="search" size={14} color={colors.inkSoft} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search people you follow…"
+          placeholder="Search people who follow you back…"
           placeholderTextColor={colors.inkSoft}
           value={query}
           onChangeText={setQuery}
@@ -147,7 +153,7 @@ export default function NewGroupScreen() {
           ListEmptyComponent={
             <EmptyState
               icon="users"
-              text={following.length === 0 ? 'You’re not following anyone yet.' : `No one matching "${query.trim()}"`}
+              text={following.length === 0 ? 'You can add people you follow who also follow you back. None yet.' : `No one matching "${query.trim()}"`}
             />
           }
           renderItem={({ item }) => {
