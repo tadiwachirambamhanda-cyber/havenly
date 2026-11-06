@@ -29,6 +29,12 @@ create table profiles (
 alter table profiles enable row level security;
 create policy "Profiles are viewable by everyone" on profiles for select using (true);
 create policy "Users can update their own profile" on profiles for update using (auth.uid() = id);
+-- Row policy alone lets a user edit every column of their own row (including
+-- is_admin and streaks), so updates are limited to editable columns and
+-- direct inserts are closed (see 20261106100000_lock_down_profile_columns.sql).
+revoke update on profiles from authenticated, anon;
+grant update (username, display_name, bio, avatar_url, cover_url, university, interests, has_completed_onboarding) on profiles to authenticated;
+revoke insert on profiles from authenticated, anon;
 create policy "Users can insert their own profile" on profiles for insert with check (auth.uid() = id);
 
 -- Called once per app session (see RootNavigator). security definer so a
@@ -246,8 +252,10 @@ create table post_likes (
 );
 alter table post_likes enable row level security;
 create policy "Likes are viewable by everyone" on post_likes for select using (true);
-create policy "Users can like posts" on post_likes for insert with check (auth.uid() = user_id);
-create policy "Users can unlike posts" on post_likes for delete using (auth.uid() = user_id);
+-- No client insert/delete policies: likes are written only by
+-- toggle_post_like, and posts.like_count is kept by a trigger on this table
+-- (see 20261106120000_like_count_by_trigger.sql).
+revoke insert, update, delete on post_likes from authenticated, anon;
 
 -- Atomically toggles a like: inserts/deletes the post_likes row and keeps
 -- posts.like_count in sync in one transaction. security definer because the
@@ -270,10 +278,8 @@ begin
 
   if already_liked then
     delete from post_likes where post_id = post_id_input and user_id = uid;
-    update posts set like_count = greatest(posts.like_count - 1, 0) where id = post_id_input;
   else
     insert into post_likes (post_id, user_id) values (post_id_input, uid);
-    update posts set like_count = posts.like_count + 1 where id = post_id_input;
   end if;
 
   return query select not already_liked, posts.like_count from posts where posts.id = post_id_input;
@@ -281,6 +287,27 @@ end;
 $$;
 
 grant execute on function public.toggle_post_like(uuid) to authenticated;
+
+-- posts.like_count follows the post_likes rows by trigger, so cascades
+-- (account deletion) and every other write adjust it exactly once.
+create or replace function public.sync_post_like_count()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  if tg_op = 'INSERT' then
+    update posts set like_count = like_count + 1 where id = new.post_id;
+  else
+    update posts set like_count = greatest(like_count - 1, 0) where id = old.post_id;
+  end if;
+  return null;
+end;
+$$;
+
+create trigger sync_post_like_count
+  after insert or delete on post_likes
+  for each row execute procedure public.sync_post_like_count();
 
 -- ==================== COMMENTS ====================
 create table comments (
@@ -578,9 +605,22 @@ create table conversations (
 );
 alter table conversations enable row level security;
 create policy "Users can view their own conversations" on conversations for select using (auth.uid() = any(participant_ids));
+-- Tightened in 20261106110000_harden_conversation_creation.sql: must be a
+-- non-group, 'pending', exactly two distinct real people, no block, and no
+-- existing 1:1 between them (a declined request can't be restarted).
 create policy "Users can create conversations they're part of" on conversations for insert with check (
-  auth.uid() = any(participant_ids) and auth.uid() = initiator_id
+  not is_group
+  and status = 'pending'
+  and auth.uid() = initiator_id
+  and array_length(participant_ids, 1) = 2
+  and auth.uid() = any(participant_ids)
+  and participant_ids[1] <> participant_ids[2]
+  and (select count(*) from profiles p where p.id = any(participant_ids)) = 2
   and not public.is_blocked_between(participant_ids[1], participant_ids[2])
+  and not exists (
+    select 1 from conversations c
+    where not c.is_group and c.participant_ids @> participant_ids and c.participant_ids <@ participant_ids
+  )
 );
 -- Additive, not a replacement for the policy above: its is_blocked_between
 -- check only makes sense for a 2-person DM and would misfire against
@@ -1283,6 +1323,7 @@ create index housing_enquiries_status_idx on housing_enquiries (status);
 -- Moves an enquiry through the pipeline. Marking it signed requires the
 -- contract value and computes the referral fee from the residence's
 -- current terms; moving it off 'signed' clears both so the totals stay true.
+-- Signed deals keep their money record: see 20261106140000_protect_signed_deal_money.sql.
 create or replace function public.set_enquiry_status(
   enquiry_id_input uuid,
   status_input text,
@@ -1295,6 +1336,7 @@ as $$
 declare
   enquiry housing_enquiries%rowtype;
   fee_percent numeric;
+  new_fee numeric;
 begin
   if not public.is_admin() then
     raise exception 'Only the Havenly team can update enquiries.';
@@ -1312,18 +1354,37 @@ begin
     if contract_value_input is null or contract_value_input <= 0 then
       raise exception 'Enter the contract value to mark this as signed.';
     end if;
-    select referral_fee_percent into fee_percent from residence_partner_terms where residence_id = enquiry.residence_id;
-    if fee_percent is null then
-      raise exception 'Set this residence''s referral fee percentage first.';
+
+    if enquiry.status = 'signed' and enquiry.referral_fee_aed is not null and enquiry.contract_value_aed is not null then
+      -- Already signed: keep the fee as snapshotted unless the contract
+      -- value itself changed, and then only at the rate it was signed at.
+      if contract_value_input = enquiry.contract_value_aed then
+        new_fee := enquiry.referral_fee_aed;
+      else
+        if enquiry.fee_paid_at is not null then
+          raise exception 'This deal''s fee is marked as paid, so its contract value can''t be changed. Mark the fee as unpaid first.';
+        end if;
+        new_fee := round(contract_value_input * enquiry.referral_fee_aed / enquiry.contract_value_aed, 2);
+      end if;
+    else
+      select referral_fee_percent into fee_percent from residence_partner_terms where residence_id = enquiry.residence_id;
+      if fee_percent is null then
+        raise exception 'Set this residence''s referral fee percentage first.';
+      end if;
+      new_fee := round(contract_value_input * fee_percent / 100, 2);
     end if;
+
     update housing_enquiries set
       status = 'signed',
       contract_value_aed = contract_value_input,
-      referral_fee_aed = round(contract_value_input * fee_percent / 100, 2),
+      referral_fee_aed = new_fee,
       status_updated_at = now()
     where id = enquiry_id_input
     returning * into enquiry;
   else
+    if enquiry.status = 'signed' and enquiry.fee_paid_at is not null then
+      raise exception 'This deal is signed and its fee is marked as paid. Mark the fee as unpaid before changing the status.';
+    end if;
     update housing_enquiries set
       status = status_input,
       contract_value_aed = null,
@@ -1581,3 +1642,23 @@ begin
   return new;
 end;
 $$;
+
+-- A residence with signed deals can't be deleted (they're the only record of
+-- what it owes); set it inactive instead. See
+-- 20261106130000_protect_signed_deals_from_residence_delete.sql.
+create or replace function public.block_delete_residence_with_signed_deals()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  if exists (select 1 from housing_enquiries where residence_id = old.id and status = 'signed') then
+    raise exception 'This residence has signed deals, so it can''t be deleted. Set it to inactive instead.';
+  end if;
+  return old;
+end;
+$$;
+
+create trigger block_delete_residence_with_signed_deals
+  before delete on residences
+  for each row execute procedure public.block_delete_residence_with_signed_deals();

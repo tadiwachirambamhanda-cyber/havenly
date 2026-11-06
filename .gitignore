@@ -12,3 +12,9 @@ web-build/
 *.orig.*
 .vscode/
 .idea/
+
+# secrets and local review notes
+.env*
+!.env.example
+.review/
+expo-env.d.ts
