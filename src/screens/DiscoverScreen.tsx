@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, ScrollView, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import InitialsAvatar from '@/components/InitialsAvatar';
@@ -48,6 +48,12 @@ export default function DiscoverScreen() {
   const [query, setQuery] = useState('');
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [communities, setCommunities] = useState<Community[] | null>(null);
+  // Emptying the box also drops the previous results here, in the event
+  // handler, rather than from an effect watching `query`.
+  const updateQuery = useCallback((text: string) => {
+    setQuery(text);
+    if (!text.trim()) { setPosts(null); setCommunities(null); }
+  }, []);
   const [events, setEvents] = useState<HavenlyEvent[] | null>(null);
   const [myInterestIds, setMyInterestIds] = useState<Set<string>>(new Set());
   const [interestCounts, setInterestCounts] = useState<Map<string, number>>(new Map());
@@ -109,7 +115,7 @@ export default function DiscoverScreen() {
     setFriendsGoing(grouped);
   }, [session]);
 
-  useEffect(() => { loadEvents(); }, [loadEvents]);
+  useFocusEffect(useCallback(() => { loadEvents(); }, [loadEvents]));
 
   const toggleInterest = useCallback(async (eventId: string) => {
     if (!session?.user.id) return;
@@ -160,7 +166,7 @@ export default function DiscoverScreen() {
 
   useEffect(() => {
     const trimmed = query.trim();
-    if (!trimmed) { setPosts(null); setCommunities(null); return; }
+    if (!trimmed) return;
     const timeout = setTimeout(() => runSearch(trimmed), 300);
     return () => clearTimeout(timeout);
   }, [query, runSearch]);
@@ -201,10 +207,10 @@ export default function DiscoverScreen() {
           placeholder="Search interests, posts, communities, events…"
           placeholderTextColor={colors.inkSoft}
           value={query}
-          onChangeText={setQuery}
+          onChangeText={updateQuery}
         />
         {isSearching && (
-          <Pressable style={styles.clearBtn} onPress={() => setQuery('')} accessibilityLabel="Clear search">
+          <Pressable style={styles.clearBtn} onPress={() => updateQuery('')} accessibilityLabel="Clear search">
             <Icon name="x" size={14} color={colors.inkSoft} />
           </Pressable>
         )}
@@ -231,7 +237,7 @@ export default function DiscoverScreen() {
         </View>
       )}
 
-      {noResults && <EmptyState icon="search" text={`No results for "${query.trim()}"`} action={{ label: 'Clear search', onPress: () => setQuery('') }} />}
+      {noResults && <EmptyState icon="search" text={`No results for "${query.trim()}"`} action={{ label: 'Clear search', onPress: () => updateQuery('') }} />}
 
       {isSearching && matchedInterests.length > 0 && (
         <>

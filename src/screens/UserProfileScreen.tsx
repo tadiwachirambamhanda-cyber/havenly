@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl, type ViewToken } from 'react-native';
 import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
@@ -31,6 +31,8 @@ import type { Post, Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
+
+const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
 type Rt = RouteProp<RootStackParamList, 'UserProfile'>;
 
 // Read-only counterpart to ProfileScreen — same cover/avatar/stats/grid
@@ -72,10 +74,11 @@ export default function UserProfileScreen() {
   const [blockConfirmVisible, setBlockConfirmVisible] = useState(false);
   const [reportModalVisible, setReportModalVisible] = useState(false);
 
-  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+  // Both must stay stable across renders or FlatList warns/ignores them:
+  // the callback only uses a state setter, and the config is a module constant.
+  const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken[] }) => {
     setVisibleVideoIds(new Set(viewableItems.map((vi) => vi.item.id)));
-  }).current;
-  const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 }).current;
+  }, []);
 
   const load = useCallback(async () => {
     const [{ data: profileData }, { count: postCount }, { count: followerCount }, { count: followingCount }, { data: postData }, { data: followRow }] =

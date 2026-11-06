@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator, Keyboard } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';

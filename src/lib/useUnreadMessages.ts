@@ -9,32 +9,37 @@ export function useUnreadMessages(): boolean {
   const myId = session?.user.id;
   const [hasUnread, setHasUnread] = useState(false);
 
-  const check = useCallback(async () => {
-    if (!myId) { setHasUnread(false); return; }
+  // Returns the answer instead of setting state itself, so the effect below
+  // is the only place state changes (inside the promise callback).
+  const fetchHasUnread = useCallback(async (): Promise<boolean> => {
+    if (!myId) return false;
     const [{ data: conversations }, { data: reads }] = await Promise.all([
       supabase.from('conversations').select('id, last_message_at')
         .contains('participant_ids', [myId]).neq('status', 'declined'),
       supabase.from('conversation_reads').select('conversation_id, last_read_at').eq('user_id', myId),
     ]);
-    if (!conversations) { setHasUnread(false); return; }
+    if (!conversations) return false;
     const readAtByConversation = new Map((reads ?? []).map((r) => [r.conversation_id, r.last_read_at]));
-    setHasUnread(conversations.some((c) => {
+    return conversations.some((c) => {
       if (!c.last_message_at) return false;
       const readAt = readAtByConversation.get(c.id);
       return !readAt || new Date(readAt) < new Date(c.last_message_at);
-    }));
+    });
   }, [myId]);
 
   useEffect(() => {
-    check();
     if (!myId) return;
+    let active = true;
+    const refresh = () => { fetchHasUnread().then((value) => { if (active) setHasUnread(value); }); };
+    refresh();
     const channel = supabase.channel('unread-badge')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => check())
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations' }, () => check())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'conversation_reads', filter: `user_id=eq.${myId}` }, () => check())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, refresh)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations' }, refresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'conversation_reads', filter: `user_id=eq.${myId}` }, refresh)
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [myId, check]);
+    return () => { active = false; supabase.removeChannel(channel); };
+  }, [myId, fetchHasUnread]);
 
-  return hasUnread;
+  // Signed out means nothing unread, whatever the last signed-in value was.
+  return myId ? hasUnread : false;
 }

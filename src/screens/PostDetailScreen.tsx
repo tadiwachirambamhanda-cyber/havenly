@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, ScrollView, Pressable, Animated, KeyboardAvoidingView, Platform, Modal } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 // Aliased — this file already uses the classic `Animated` API (react-native)
@@ -6,7 +6,7 @@ import { Text, TextInput } from '@/components/Text';
 // new scroll-driven parallax hero, which needs a scroll handler that the
 // classic API can't do without a separate native listener.
 import ReanimatedAnimated from 'react-native-reanimated';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -53,9 +53,9 @@ export default function PostDetailScreen() {
   // fixed in place as siblings outside the animated wrapper.
   const { onScroll, heroAnimatedStyle, heroDimStyle } = useParallaxHero(HERO_HEIGHT);
   const lastTapRef = useRef(0);
-  const heartPopScale = useRef(new Animated.Value(0.5)).current;
-  const heartPopOpacity = useRef(new Animated.Value(0)).current;
-  const likeIconScale = useRef(new Animated.Value(1)).current;
+  const [heartPopScale] = useState(() => new Animated.Value(0.5));
+  const [heartPopOpacity] = useState(() => new Animated.Value(0));
+  const [likeIconScale] = useState(() => new Animated.Value(1));
   const videoPlayerRef = useRef<PostVideoPlayerHandle>(null);
   const [videoMuted, setVideoMuted] = useState(true);
   const [post, setPost] = useState<Post | null>(null);
@@ -104,7 +104,7 @@ export default function PostDetailScreen() {
     setSaved(!!savedRow);
   }, [route.params.postId, session, loadComments]);
 
-  useEffect(() => { load(); }, [load]);
+  useFocusEffect(useCallback(() => { load(); }, [load]));
 
   const playLikeBounce = () => {
     likeIconScale.setValue(1);
@@ -319,7 +319,7 @@ export default function PostDetailScreen() {
         <BackButton style={[styles.back, { top: insets.top + 12 }]}>
           <Icon name="arrow-left" size={16} color="#20261F" />
         </BackButton>
-        <Text style={styles.notFoundText}>This post isn't available.</Text>
+        <Text style={styles.notFoundText}>This post isn&apos;t available.</Text>
       </View>
     ) : (
       // Same order as the loaded page (tag, title, author, body) so nothing

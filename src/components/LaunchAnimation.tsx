@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
 import { Text } from '@/components/Text';
 import { useTheme } from '@/lib/ThemeContext';
@@ -10,10 +10,10 @@ import type { ColorTokens } from '@/theme/tokens';
 export default function LaunchAnimation({ onFinish }: { onFinish: () => void }) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const hScale = useRef(new Animated.Value(0)).current;
-  const hOpacity = useRef(new Animated.Value(1)).current;
-  const wordmarkOpacity = useRef(new Animated.Value(0)).current;
-  const wordmarkScale = useRef(new Animated.Value(0.85)).current;
+  const [hScale] = useState(() => new Animated.Value(0));
+  const [hOpacity] = useState(() => new Animated.Value(1));
+  const [wordmarkOpacity] = useState(() => new Animated.Value(0));
+  const [wordmarkScale] = useState(() => new Animated.Value(0.85));
 
   useEffect(() => {
     Animated.sequence([

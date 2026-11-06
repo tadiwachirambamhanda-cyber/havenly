@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { Animated, PanResponder, Platform, Pressable, StyleSheet, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Animated, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/Text';
 import { useTheme } from '@/lib/ThemeContext';
 import type { ColorTokens } from '@/theme/tokens';
@@ -12,13 +12,13 @@ interface Props {
 
 const ACTION_WIDTH = 88;
 
-// Plain PanResponder rather than react-native-gesture-handler — avoids
+// Plain responder events rather than react-native-gesture-handler — avoids
 // adding a new native dependency (and the GestureHandlerRootView wiring
 // that comes with it) for what's a small, self-contained gesture.
 export default function SwipeToAction({ children, actionLabel, onAction }: Props) {
   const { colors } = useTheme();
   const styles = createStyles(colors);
-  const translateX = useRef(new Animated.Value(0)).current;
+  const [translateX] = useState(() => new Animated.Value(0));
   const offset = useRef(0);
 
   const close = () => {
@@ -26,20 +26,19 @@ export default function SwipeToAction({ children, actionLabel, onAction }: Props
     Animated.spring(translateX, { toValue: 0, useNativeDriver: true, friction: 8 }).start();
   };
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dx) > 8 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.5,
-      onPanResponderMove: (_, gesture) => {
-        const next = Math.min(0, Math.max(-ACTION_WIDTH, offset.current + gesture.dx));
-        translateX.setValue(next);
-      },
-      onPanResponderRelease: (_, gesture) => {
-        const next = offset.current + gesture.dx;
-        offset.current = next < -ACTION_WIDTH / 2 ? -ACTION_WIDTH : 0;
-        Animated.spring(translateX, { toValue: offset.current, useNativeDriver: true, friction: 8 }).start();
-      },
-    })
-  ).current;
+  // Where this touch started, and how far it has moved since the swipe was
+  // claimed. Plain responder events (as JSX props below) do the job a
+  // PanResponder did; they are handlers, so reading refs in them is fine.
+  const touchStart = useRef({ x: 0, y: 0 });
+  const grantX = useRef(0);
+  const lastDx = useRef(0);
+
+  const settle = () => {
+    const next = offset.current + lastDx.current;
+    offset.current = next < -ACTION_WIDTH / 2 ? -ACTION_WIDTH : 0;
+    lastDx.current = 0;
+    Animated.spring(translateX, { toValue: offset.current, useNativeDriver: true, friction: 8 }).start();
+  };
 
   return (
     <View style={styles.container}>
@@ -48,7 +47,27 @@ export default function SwipeToAction({ children, actionLabel, onAction }: Props
           <Text style={styles.actionText}>{actionLabel}</Text>
         </Pressable>
       </View>
-      <Animated.View style={[styles.foreground, { transform: [{ translateX }] }]} {...panResponder.panHandlers}>
+      <Animated.View
+        style={[styles.foreground, { transform: [{ translateX }] }]}
+        // Capture phase only to note where the touch began (works for mouse
+        // drags on web too); it never claims the touch itself.
+        onStartShouldSetResponderCapture={(e) => {
+          touchStart.current = { x: e.nativeEvent.pageX, y: e.nativeEvent.pageY };
+          return false;
+        }}
+        onMoveShouldSetResponder={(e) => {
+          const dx = e.nativeEvent.pageX - touchStart.current.x;
+          const dy = e.nativeEvent.pageY - touchStart.current.y;
+          return Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.5;
+        }}
+        onResponderGrant={(e) => { grantX.current = e.nativeEvent.pageX; lastDx.current = 0; }}
+        onResponderMove={(e) => {
+          lastDx.current = e.nativeEvent.pageX - grantX.current;
+          translateX.setValue(Math.min(0, Math.max(-ACTION_WIDTH, offset.current + lastDx.current)));
+        }}
+        onResponderRelease={settle}
+        onResponderTerminate={settle}
+      >
         {children}
       </Animated.View>
     </View>
@@ -61,7 +80,7 @@ function createStyles(colors: ColorTokens) {
     foreground: {
       width: '100%', backgroundColor: colors.sand,
       // Web-only: without this, a mouse drag on the row selects its text
-      // instead of the PanResponder ever seeing the gesture.
+      // instead of the responder ever seeing the gesture.
       ...(Platform.OS === 'web' ? { userSelect: 'none' as const } : null),
     },
     actionBackdrop: {

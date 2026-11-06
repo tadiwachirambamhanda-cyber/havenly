@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet, ScrollView, Pressable, RefreshControl, useWindowDimensions, type NativeSyntheticEvent, type NativeScrollEvent } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable, RefreshControl, useWindowDimensions, type NativeSyntheticEvent, type NativeScrollEvent, type StyleProp, type ViewStyle, type TextStyle } from 'react-native';
 import { Text } from '@/components/Text';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -109,6 +109,19 @@ function balanceColumns(items: Post[]): Post[][] {
     colHeights[shortest] += estimateCardHeight(post, 110 + (hashString(post.id) % 60));
   }
   return cols;
+}
+
+// Selected is a flat ink fill, the same as selected chips everywhere else in
+// the app, so coral stays reserved for the main action. A component (rather
+// than a render helper) so the press handler is just a prop.
+function InterestChip({ label, onPress, style, textStyle }: {
+  label: string; onPress: () => void; style: StyleProp<ViewStyle>; textStyle: StyleProp<TextStyle>;
+}) {
+  return (
+    <AnimatedPressable style={style} onPress={onPress}>
+      <Text style={textStyle}>{label}</Text>
+    </AnimatedPressable>
+  );
 }
 
 export default function FeedScreen() {
@@ -278,19 +291,6 @@ export default function FeedScreen() {
     setSelectedInterest((prev) => (prev === label ? null : label));
   }, []);
 
-  // Selected is a flat ink fill, the same as selected chips everywhere else
-  // in the app, so coral stays reserved for the main action.
-  const renderInterestChip = (key: string, label: string, isSelected: boolean, onPress: () => void) =>
-    isSelected ? (
-      <AnimatedPressable key={key} style={styles.interestChipSelected} onPress={onPress}>
-        <Text style={styles.interestChipTextSelected}>{label}</Text>
-      </AnimatedPressable>
-    ) : (
-      <AnimatedPressable key={key} style={styles.interestChip} onPress={onPress}>
-        <Text style={styles.interestChipText}>{label}</Text>
-      </AnimatedPressable>
-    );
-
   // The masonry layout is a plain ScrollView (FlatList's numColumns forces
   // equal-height rows, which is exactly what breaks true masonry — see the
   // comment below), so there's no built-in onViewableItemsChanged to lean
@@ -321,6 +321,14 @@ export default function FeedScreen() {
       return next;
     });
   }, [posts, trendingPosts, communityPosts, windowHeight]);
+
+  // Named handler (not an inline closure passed into renderInterestChip) so the
+  // scroll ref is only touched when the chip is pressed.
+  const showAllPosts = useCallback(() => {
+    haptics.tap();
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+    setSelectedInterest(null);
+  }, []);
 
   const onScroll = useCallback((_e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const now = Date.now();
@@ -495,12 +503,20 @@ export default function FeedScreen() {
           style={{ flexGrow: 0, flexShrink: 0 }}
           contentContainerStyle={styles.interestRow}
         >
-          {renderInterestChip('all', 'All', !selectedInterest, () => {
-            haptics.tap(); scrollRef.current?.scrollTo({ y: 0, animated: true }); setSelectedInterest(null);
-          })}
+          <InterestChip
+            label="All" onPress={showAllPosts}
+            style={!selectedInterest ? styles.interestChipSelected : styles.interestChip}
+            textStyle={!selectedInterest ? styles.interestChipTextSelected : styles.interestChipText}
+          />
           {interestChips.map((opt) => {
             const isSelected = selectedInterest === opt.label;
-            return renderInterestChip(opt.key, opt.label, isSelected, () => toggleInterestFilter(opt.label));
+            return (
+              <InterestChip
+                key={opt.key} label={opt.label} onPress={() => toggleInterestFilter(opt.label)}
+                style={isSelected ? styles.interestChipSelected : styles.interestChip}
+                textStyle={isSelected ? styles.interestChipTextSelected : styles.interestChipText}
+              />
+            );
           })}
         </ScrollView>
       )}
@@ -550,7 +566,7 @@ export default function FeedScreen() {
                   </>
                 )}
                 <View style={styles.dailyPickBody}>
-                  <Text style={styles.dailyPickEyebrow}>Today's pick</Text>
+                  <Text style={styles.dailyPickEyebrow}>Today&apos;s pick</Text>
                   <Text style={styles.dailyPickTitle} numberOfLines={2}>{dailyPick.title}</Text>
                   {!dailyPick.image_url && !!dailyPick.body && <Text style={styles.dailyPickExcerpt} numberOfLines={2}>{dailyPick.body}</Text>}
                   <Text style={styles.dailyPickMeta}>
