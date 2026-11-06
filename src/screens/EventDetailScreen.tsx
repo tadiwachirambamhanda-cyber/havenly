@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { Text } from '@/components/Text';
 import BackButton from '@/components/BackButton';
 import Animated from 'react-native-reanimated';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import InitialsAvatar from '@/components/InitialsAvatar';
@@ -61,7 +61,7 @@ export default function EventDetailScreen() {
     setLoaded(true);
   }, [eventId]);
 
-  useEffect(() => { load(); }, [load]);
+  useFocusEffect(useCallback(() => { load(); }, [load]));
 
   const myCheckIn = checkIns.find((c) => c.user_id === profile?.id) ?? null;
   const myInterest = interests.find((i) => i.user_id === profile?.id) ?? null;

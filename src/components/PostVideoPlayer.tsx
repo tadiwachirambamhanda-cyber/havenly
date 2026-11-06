@@ -44,7 +44,8 @@ const PostVideoPlayer = forwardRef<PostVideoPlayerHandle, {
   // of a double-tap just toggles it back a moment later, a harmless flicker
   // in exchange for not slowing down normal single taps.
   const handlePress = () => {
-    isPlaying ? player.pause() : player.play();
+    if (isPlaying) player.pause();
+    else player.play();
     const now = Date.now();
     if (onDoubleTap && now - lastTapRef.current < 300) onDoubleTap();
     lastTapRef.current = now;

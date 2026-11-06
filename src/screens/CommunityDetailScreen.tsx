@@ -131,7 +131,7 @@ export default function CommunityDetailScreen() {
         <BackButton style={styles.back}>
           <Icon name="arrow-left" size={17} color={colors.ink} />
         </BackButton>
-        <Text style={styles.notFoundText}>This community isn't available.</Text>
+        <Text style={styles.notFoundText}>This community isn&apos;t available.</Text>
       </View>
     );
   }

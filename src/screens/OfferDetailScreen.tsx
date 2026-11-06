@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { Text } from '@/components/Text';
 import Animated from 'react-native-reanimated';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import { useFocusEffect, useRoute, RouteProp } from '@react-navigation/native';
 import BackButton from '@/components/BackButton';
 import { Image } from 'expo-image';
 import InitialsAvatar from '@/components/InitialsAvatar';
@@ -67,7 +67,7 @@ export default function OfferDetailScreen() {
     setLoaded(true);
   }, [offerId, profile]);
 
-  useEffect(() => { load(); }, [load]);
+  useFocusEffect(useCallback(() => { load(); }, [load]));
 
   const myCheckIn = checkIns.find((c) => c.user_id === profile?.id) ?? null;
   const myInterest = interests.find((i) => i.user_id === profile?.id) ?? null;

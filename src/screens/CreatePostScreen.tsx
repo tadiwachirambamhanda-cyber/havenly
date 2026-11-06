@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, PanResponder } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import * as ImagePicker from 'expo-image-picker';
@@ -51,26 +51,25 @@ function CoverScrubber({
   const [trackWidth, setTrackWidth] = useState(1);
   const [fraction, setFraction] = useState(initialFraction);
   const fractionRef = useRef(initialFraction);
-  const startFractionRef = useRef(initialFraction);
+  const dragStart = useRef({ x: 0, fraction: initialFraction });
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => { startFractionRef.current = fractionRef.current; },
-      onPanResponderMove: (_, gesture) => {
-        const next = Math.min(1, Math.max(0, startFractionRef.current + gesture.dx / trackWidth));
-        fractionRef.current = next;
-        setFraction(next);
-      },
-      onPanResponderRelease: () => onSeek(Math.round(fractionRef.current * durationMs)),
-    })
-  ).current;
-
+  // The responder handlers below are JSX props (event handlers), re-created
+  // each render, so they always see the current track width. They do what
+  // PanResponder did: claim the touch and read the finger's drag distance.
   return (
     <View
       style={styles.track}
       onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
-      {...panResponder.panHandlers}
+      onStartShouldSetResponder={() => true}
+      onResponderTerminationRequest={() => false}
+      onResponderGrant={(e) => { dragStart.current = { x: e.nativeEvent.pageX, fraction: fractionRef.current }; }}
+      onResponderMove={(e) => {
+        const dx = e.nativeEvent.pageX - dragStart.current.x;
+        const next = Math.min(1, Math.max(0, dragStart.current.fraction + dx / trackWidth));
+        fractionRef.current = next;
+        setFraction(next);
+      }}
+      onResponderRelease={() => onSeek(Math.round(fractionRef.current * durationMs))}
     >
       <View style={styles.trackBg} />
       <View style={[styles.trackFill, { width: `${fraction * 100}%` }]} />

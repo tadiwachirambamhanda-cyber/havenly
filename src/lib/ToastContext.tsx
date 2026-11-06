@@ -20,8 +20,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [toast, setToast] = useState<ToastState | null>(null);
-  const translateY = useRef(new Animated.Value(-80)).current;
-  const opacity = useRef(new Animated.Value(0)).current;
+  const [translateY] = useState(() => new Animated.Value(-80));
+  const [opacity] = useState(() => new Animated.Value(0));
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showToast = useCallback((message: string, type: ToastType = 'success') => {

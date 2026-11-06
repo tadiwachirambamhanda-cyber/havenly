@@ -37,8 +37,10 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 // back) naturally stops replaying it once the timestamp ages out.
 // _key stays the same when a pending message is swapped for the saved row,
 // so the bubble doesn't remount (or re-animate) when the server replies.
-type ChatMessage = Message & { _localInsertedAt?: number; _pending?: boolean; _key?: string };
-const asFresh = (message: Message): ChatMessage => ({ ...message, _localInsertedAt: Date.now() });
+// _fresh marks a message that just arrived so its bubble animates in; a
+// timer in the screen clears it a few seconds later (see the effect below).
+type ChatMessage = Message & { _fresh?: boolean; _pending?: boolean; _key?: string };
+const asFresh = (message: Message): ChatMessage => ({ ...message, _fresh: true });
 
 export default function ChatScreen() {
   const navigation = useNavigation<Nav>();
@@ -93,6 +95,17 @@ export default function ChatScreen() {
     }
   };
 
+  // Clears the "just arrived" flag a few seconds after the latest message so
+  // the entrance animation only ever plays for new bubbles, never when an
+  // old one is re-created as the list scrolls.
+  useEffect(() => {
+    if (!messages.some((m) => m._fresh)) return;
+    const timer = setTimeout(() => {
+      setMessages((prev) => prev.map((m) => (m._fresh ? { ...m, _fresh: false } : m)));
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [messages]);
+
   useEffect(() => {
     (async () => {
       const { data: conv } = await supabase.from('conversations').select('*').eq('id', conversationId).single();
@@ -137,7 +150,7 @@ export default function ChatScreen() {
             const pendingIndex = prev.findIndex((m) => m._pending && m.sender_id === incoming.sender_id && m.body === incoming.body);
             if (pendingIndex >= 0) {
               const next = [...prev];
-              next[pendingIndex] = { ...incoming, _localInsertedAt: prev[pendingIndex]._localInsertedAt, _key: prev[pendingIndex]._key };
+              next[pendingIndex] = { ...incoming, _fresh: true, _key: prev[pendingIndex]._key };
               return next;
             }
             return [...prev, asFresh(incoming)];
@@ -159,7 +172,7 @@ export default function ChatScreen() {
     const tempId = `pending-${Date.now()}`;
     const pending: ChatMessage = {
       id: tempId, _key: tempId, conversation_id: conversationId, sender_id: myId, body,
-      created_at: new Date().toISOString(), shared_post_id: null, _localInsertedAt: Date.now(), _pending: true,
+      created_at: new Date().toISOString(), shared_post_id: null, _fresh: true, _pending: true,
     };
     setMessages((prev) => [...prev, pending]);
     const { data: inserted, error } = await supabase.from('messages')
@@ -175,7 +188,7 @@ export default function ChatScreen() {
     haptics.confirm();
     setMessages((prev) => (prev.some((m) => m.id === inserted.id)
       ? prev.filter((m) => m.id !== tempId)
-      : prev.map((m) => (m.id === tempId ? { ...(inserted as Message), _localInsertedAt: pending._localInsertedAt, _key: tempId } : m))));
+      : prev.map((m) => (m.id === tempId ? { ...(inserted as Message), _fresh: true, _key: tempId } : m))));
     await supabase.from('conversations').update({ last_message: body, last_message_at: new Date().toISOString() }).eq('id', conversationId);
     await markConversationRead(conversationId, myId);
   };
@@ -266,7 +279,7 @@ export default function ChatScreen() {
             const mine = item.sender_id === myId;
             const textStyle = mine ? styles.bubbleTextMe : styles.bubbleTextThem;
             const senderName = isGroup && !mine ? memberById.get(item.sender_id)?.display_name : null;
-            const isFresh = !!item._localInsertedAt && Date.now() - item._localInsertedAt < 4000;
+            const isFresh = !!item._fresh;
             return (
               // ItemSeparatorComponent here, not `gap` on the FlatList's
               // contentContainerStyle — gap inside a FlatList content container is

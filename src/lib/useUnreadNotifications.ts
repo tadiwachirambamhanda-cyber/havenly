@@ -9,21 +9,26 @@ export function useUnreadNotifications(): boolean {
   const myId = session?.user.id;
   const [hasUnread, setHasUnread] = useState(false);
 
-  const check = useCallback(async () => {
-    if (!myId) { setHasUnread(false); return; }
+  // Returns the answer instead of setting state itself, so the effect below
+  // is the only place state changes (inside the promise callback).
+  const fetchHasUnread = useCallback(async (): Promise<boolean> => {
+    if (!myId) return false;
     const { count } = await supabase.from('notifications')
       .select('*', { count: 'exact', head: true }).eq('recipient_id', myId).eq('is_read', false);
-    setHasUnread(!!count && count > 0);
+    return !!count && count > 0;
   }, [myId]);
 
   useEffect(() => {
-    check();
     if (!myId) return;
+    let active = true;
+    const refresh = () => { fetchHasUnread().then((value) => { if (active) setHasUnread(value); }); };
+    refresh();
     const channel = supabase.channel('unread-notifications-badge')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${myId}` }, () => check())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${myId}` }, refresh)
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [myId, check]);
+    return () => { active = false; supabase.removeChannel(channel); };
+  }, [myId, fetchHasUnread]);
 
-  return hasUnread;
+  // Signed out means nothing unread, whatever the last signed-in value was.
+  return myId ? hasUnread : false;
 }

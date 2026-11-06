@@ -22,11 +22,11 @@ export default function AnimatedPressable({ style, scaleTo = 0.97, onPressIn, on
     <Base
       style={[style, animatedStyle]}
       onPressIn={(e) => {
-        scale.value = withSpring(scaleTo, { damping: 16, stiffness: 400 });
+        scale.set(withSpring(scaleTo, { damping: 16, stiffness: 400 }));
         onPressIn?.(e);
       }}
       onPressOut={(e) => {
-        scale.value = withSpring(1, { damping: 16, stiffness: 400 });
+        scale.set(withSpring(1, { damping: 16, stiffness: 400 }));
         onPressOut?.(e);
       }}
       {...rest}

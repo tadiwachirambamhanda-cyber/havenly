@@ -72,7 +72,8 @@ export default function FollowListScreen() {
     const isFollowing = myFollowingIds.has(targetId);
     setMyFollowingIds((prev) => {
       const next = new Set(prev);
-      isFollowing ? next.delete(targetId) : next.add(targetId);
+      if (isFollowing) next.delete(targetId);
+      else next.add(targetId);
       return next;
     });
     const { error } = isFollowing
@@ -82,7 +83,8 @@ export default function FollowListScreen() {
       // Put the button back the way it was if the write failed.
       setMyFollowingIds((prev) => {
         const next = new Set(prev);
-        isFollowing ? next.add(targetId) : next.delete(targetId);
+        if (isFollowing) next.add(targetId);
+        else next.delete(targetId);
         return next;
       });
     }

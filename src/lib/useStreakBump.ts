@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useToast } from '@/lib/ToastContext';
@@ -19,9 +19,13 @@ export function useStreakBump() {
   const { showToast } = useToast();
   const userId = session?.user.id;
   const onboarded = profile?.has_completed_onboarding;
+  // The effect lists every dependency honestly; this ref is what keeps it to
+  // one bump per signed-in user, even if refreshProfile/showToast change.
+  const bumpedFor = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!userId || !onboarded) return;
+    if (!userId || !onboarded || bumpedFor.current === userId) return;
+    bumpedFor.current = userId;
     supabase.rpc('bump_streak').then(async ({ data, error }) => {
       if (error || !data?.[0]) return;
       const { current_streak, is_new_day } = data[0];
@@ -32,7 +36,5 @@ export function useStreakBump() {
         showToast(`${current_streak}-day streak`);
       }
     });
-    // Deliberately keyed on just these two — refreshProfile/showToast come
-    // from context and don't need to retrigger this on their own.
-  }, [userId, onboarded]);
+  }, [userId, onboarded, refreshProfile, showToast]);
 }

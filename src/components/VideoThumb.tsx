@@ -17,6 +17,12 @@ import Icon from '@/components/Icon';
 // itself, since it has no way to know where it sits on screen. Defaults to
 // true for screens that don't track visibility, so it just autoplays as
 // before there.
+// Outside the component so the player (owned by expo-video) is mutated as a
+// plain argument, which is how its API is meant to be used.
+function toggleMuted(player: ReturnType<typeof useVideoPlayer>) {
+  player.muted = !player.muted;
+}
+
 export default function VideoThumb({
   uri, style, isVisible = true,
 }: {
@@ -43,7 +49,7 @@ export default function VideoThumb({
       />
       <Pressable
         style={styles.muteBtn}
-        onPress={() => { player.muted = !player.muted; }}
+        onPress={() => toggleMuted(player)}
         hitSlop={10}
         accessibilityLabel={muted ? 'Unmute' : 'Mute'}
       >
