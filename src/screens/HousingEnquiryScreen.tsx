@@ -2,10 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
-import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { useConfirmDiscard } from '@/lib/useConfirmDiscard';
 import { formatAed, formatMonth, PERIOD_LABEL, upcomingMonths } from '@/lib/housing';
@@ -22,12 +22,11 @@ const VIEWING_TIMES = ['Weekday mornings', 'Weekday evenings', 'Weekends', 'Any 
 const PHONE_RE = /^\+?[\d\s()-]{8,20}$/;
 
 export default function HousingEnquiryScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<Route>();
   const { residenceId } = route.params;
   const { session } = useAuth();
   const { colors } = useTheme();
-  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
   const months = useMemo(() => upcomingMonths(9), []);
@@ -98,8 +97,9 @@ export default function HousingEnquiryScreen() {
     haptics.success();
     setSent(true);
     allowLeave();
-    showToast(kind === 'viewing' ? 'Viewing request sent' : 'Question sent', 'success');
-    navigation.goBack();
+    // Replaces this form with a confirmation that says what happens next;
+    // going back from there returns to the residence.
+    navigation.replace('HousingEnquirySent', { residenceName: residence?.name ?? 'the residence', kind, moveIn });
   };
 
   const chip = (key: string, label: string, selected: boolean, onPress: () => void) => (
