@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator, type TextInput as RNTextInput } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import * as ImagePicker from 'expo-image-picker';
@@ -111,6 +111,10 @@ export default function CreatePostScreen() {
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  // A missing title is shown right under the title box (not as a message at
+  // the bottom of a long form, where it can't be seen from the Post button).
+  const [titleMissing, setTitleMissing] = useState(false);
+  const titleRef = useRef<RNTextInput>(null);
   const [posted, setPosted] = useState(false);
   const [mediaPickerVisible, setMediaPickerVisible] = useState(false);
 
@@ -197,7 +201,7 @@ export default function CreatePostScreen() {
   const publish = async () => {
     setError(null);
     if (!session?.user) return;
-    if (!title.trim()) { setError('Give your post a title.'); return; }
+    if (!title.trim()) { setTitleMissing(true); titleRef.current?.focus(); return; }
 
     setPublishing(true);
     try {
@@ -250,6 +254,7 @@ export default function CreatePostScreen() {
           {publishing ? <ActivityIndicator color={colors.coral} /> : <Text style={[styles.headerBtn, styles.postBtn]}>Post</Text>}
         </AnimatedPressable>
       </View>
+      {error ? <Text style={styles.error}>{error}</Text> : null}
       {uploadStatus && (
         <View style={styles.progressWrap}>
           <Text style={styles.uploadStatus}>{uploadStatus} {Math.round(uploadProgress * 100)}%</Text>
@@ -288,13 +293,15 @@ export default function CreatePostScreen() {
       )}
 
       <TextInput
-        style={styles.titleInput}
+        ref={titleRef}
+        style={[styles.titleInput, titleMissing && styles.titleInputMissing]}
         placeholder="Give it a title…"
         placeholderTextColor={colors.inkSoft}
         value={title}
-        onChangeText={setTitle}
+        onChangeText={(text) => { setTitle(text); if (text.trim()) setTitleMissing(false); }}
         maxLength={120}
       />
+      {titleMissing && <Text style={styles.fieldError}>Give your post a title.</Text>}
       <TextInput
         style={styles.bodyInput}
         placeholder="Say more (optional)…"
@@ -341,7 +348,6 @@ export default function CreatePostScreen() {
         </>
       )}
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
     </ScrollView>
     <ActionSheet
       visible={mediaPickerVisible}
@@ -388,6 +394,7 @@ function createStyles(colors: ColorTokens) {
     marginHorizontal: spacing.lg, marginTop: spacing.md, backgroundColor: colors.white, borderWidth: 1,
     borderColor: colors.line, borderRadius: radius.sm, padding: 14, fontSize: 15, fontWeight: '600', color: colors.ink,
   },
+  titleInputMissing: { borderColor: colors.coral, borderWidth: 1.5 },
   bodyInput: {
     marginHorizontal: spacing.lg, marginTop: spacing.sm, minHeight: 90, backgroundColor: colors.white, borderWidth: 1,
     borderColor: colors.line, borderRadius: radius.sm, padding: 14, fontSize: 14, color: colors.ink, textAlignVertical: 'top',
@@ -402,6 +409,7 @@ function createStyles(colors: ColorTokens) {
   chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
   chipText: { fontSize: 12.5, fontWeight: '600', color: colors.ink },
   chipTextSelected: { color: colors.sand },
-  error: { color: colors.coral, fontSize: 13, marginTop: 16, marginHorizontal: spacing.lg },
+  error: { color: colors.coral, fontSize: 13, marginBottom: 8, marginHorizontal: spacing.lg },
+  fieldError: { color: colors.coral, fontSize: 12.5, fontWeight: '600', marginTop: 6, marginHorizontal: spacing.lg },
   });
 }
