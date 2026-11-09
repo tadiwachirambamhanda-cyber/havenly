@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
@@ -63,6 +63,7 @@ export default function SettingsScreen() {
         <Text style={styles.title}>Settings</Text>
       </View>
 
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
       <Text style={styles.sectionLabel}>Appearance</Text>
       <View style={styles.segmentRow}>
         {MODE_OPTIONS.map((opt) => {
@@ -138,6 +139,7 @@ export default function SettingsScreen() {
         <Text style={[styles.rowText, styles.deleteText]}>Delete account</Text>
         {deleting && <ActivityIndicator color={colors.coral} size="small" />}
       </AnimatedPressable>
+      </ScrollView>
 
       <ActionSheet
         visible={logoutConfirmVisible}
