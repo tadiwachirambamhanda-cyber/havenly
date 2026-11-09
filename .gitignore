@@ -18,3 +18,6 @@ web-build/
 !.env.example
 .review/
 expo-env.d.ts
+
+# Vercel project link (local)
+.vercel
