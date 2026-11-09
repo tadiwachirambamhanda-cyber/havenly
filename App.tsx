@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Platform, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
@@ -26,15 +27,26 @@ SplashScreen.preventAutoHideAsync();
 // The launch animation lives in RootNavigator (it also covers the initial
 // auth check), so it isn't repeated here.
 function AppContent() {
-  const { scheme } = useTheme();
+  const { scheme, colors } = useTheme();
 
-  return (
+  const app = (
     <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <Sentry.ErrorBoundary fallback={({ resetError }) => <AppErrorFallback onRetry={resetError} />}>
         <RootNavigator />
       </Sentry.ErrorBoundary>
     </>
+  );
+
+  // Havenly is a phone layout. On the website, keep it a phone-width column
+  // in the middle of a large screen instead of stretching it across the page.
+  if (Platform.OS !== 'web') return app;
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.sandDeep, alignItems: 'center' }}>
+      <View style={{ flex: 1, width: '100%', maxWidth: 480, backgroundColor: colors.sand, overflow: 'hidden' }}>
+        {app}
+      </View>
+    </View>
   );
 }
 
