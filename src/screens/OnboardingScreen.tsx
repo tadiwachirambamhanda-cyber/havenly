@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -20,6 +21,7 @@ export default function OnboardingScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [selected, setSelected] = useState<Set<Interest>>(new Set());
   const [saving, setSaving] = useState(false);
+  const insets = useSafeAreaInsets();
 
   const toggle = (key: Interest) => {
     setSelected((prev) => {
@@ -46,7 +48,8 @@ export default function OnboardingScreen() {
   const handleSkip = () => finishOnboarding([]);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+    <View style={styles.container}>
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 0 }}>
       <View style={styles.hero}>
         <Text style={styles.eyebrow}>Set up your feed</Text>
         <Text style={styles.title}>Start with what you like.</Text>
@@ -72,10 +75,19 @@ export default function OnboardingScreen() {
             </View>
           </View>
         ))}
-        <AnimatedPressable style={styles.btnPrimary} onPress={handleContinue} disabled={saving}><Text style={styles.btnPrimaryText}>{saving ? 'Saving…' : 'Continue'}</Text></AnimatedPressable>
-        <AnimatedPressable onPress={handleSkip} disabled={saving}><Text style={styles.skip}>Skip for now</Text></AnimatedPressable>
       </View>
     </ScrollView>
+    {/* Stays on screen so the next step is always in reach (not hidden below
+        14 options), and shows how many have been picked. */}
+    <View style={[styles.bar, { paddingBottom: insets.bottom + 12 }]}>
+      <AnimatedPressable style={styles.btnPrimary} onPress={handleContinue} disabled={saving}>
+        <Text style={styles.btnPrimaryText}>
+          {saving ? 'Saving…' : selected.size > 0 ? `Continue (${selected.size} picked)` : 'Continue'}
+        </Text>
+      </AnimatedPressable>
+      <AnimatedPressable onPress={handleSkip} disabled={saving}><Text style={styles.skip}>Skip for now</Text></AnimatedPressable>
+    </View>
+    </View>
   );
 }
 
@@ -84,11 +96,11 @@ function createStyles(colors: ColorTokens) {
   // Fixed dark hero regardless of app theme (same as Login/SignUp), so its
   // text stays literal cream rather than colors.sand.
   container: { flex: 1, backgroundColor: '#2A2118' },
-  hero: { paddingHorizontal: spacing.xl, paddingTop: 60, paddingBottom: 20 },
+  hero: { paddingHorizontal: spacing.xl, paddingTop: 52, paddingBottom: 12 },
   eyebrow: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, color: '#F0C79A', textTransform: 'uppercase', letterSpacing: 0.8 },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 38, color: '#FBF5EA', marginTop: 14, lineHeight: 42 },
-  sub: { fontSize: 14.5, color: '#E7D9C8', marginTop: 14, lineHeight: 21, maxWidth: 280 },
-  panel: { backgroundColor: colors.sand, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, marginTop: 20 },
+  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 32, color: '#FBF5EA', marginTop: 10, lineHeight: 36 },
+  sub: { fontSize: 14, color: '#E7D9C8', marginTop: 10, lineHeight: 20, maxWidth: 300 },
+  panel: { backgroundColor: colors.sand, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, paddingBottom: 12, marginTop: 14 },
   question: { fontFamily: 'Fraunces_600SemiBold', fontSize: 22, color: colors.ink },
   questionHint: { fontSize: 12.5, color: colors.inkSoft, marginTop: 4, marginBottom: 20 },
   categoryGroup: { marginBottom: 18 },
@@ -100,6 +112,7 @@ function createStyles(colors: ColorTokens) {
   chipTextSelected: { color: colors.sand },
   btnPrimary: { backgroundColor: colors.coral, paddingVertical: 16, borderRadius: radius.button, alignItems: 'center' },
   btnPrimaryText: { color: 'white', fontWeight: '700', fontSize: 15 },
+  bar: { backgroundColor: colors.sand, paddingHorizontal: 24, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.line },
   skip: { textAlign: 'center', marginTop: 12, fontSize: 12.5, color: colors.inkSoft, fontWeight: '600' },
   });
 }

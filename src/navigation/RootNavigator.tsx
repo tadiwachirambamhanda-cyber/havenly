@@ -40,6 +40,7 @@ import EventDetailScreen from '@/screens/EventDetailScreen';
 import HousingScreen from '@/screens/HousingScreen';
 import ResidenceDetailScreen from '@/screens/ResidenceDetailScreen';
 import HousingEnquiryScreen from '@/screens/HousingEnquiryScreen';
+import HousingEnquirySentScreen from '@/screens/HousingEnquirySentScreen';
 import MyEnquiriesScreen from '@/screens/MyEnquiriesScreen';
 import ManageHousingScreen from '@/screens/ManageHousingScreen';
 import AdminEnquiryScreen from '@/screens/AdminEnquiryScreen';
@@ -73,6 +74,7 @@ export type RootStackParamList = {
   EventDetail: { eventId: string };
   ResidenceDetail: { residenceId: string };
   HousingEnquiry: { residenceId: string; kind: 'question' | 'viewing' };
+  HousingEnquirySent: { residenceName: string; kind: 'question' | 'viewing'; moveIn: string };
   MyEnquiries: undefined;
   ManageHousing: undefined;
   AdminEnquiry: { enquiryId: string };
@@ -181,6 +183,7 @@ export default function RootNavigator() {
             <Stack.Screen name="EventDetail" component={EventDetailScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="ResidenceDetail" component={ResidenceDetailScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="HousingEnquiry" component={HousingEnquiryScreen} options={{ presentation: 'modal' }} />
+            <Stack.Screen name="HousingEnquirySent" component={HousingEnquirySentScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="MyEnquiries" component={MyEnquiriesScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="ManageHousing" component={ManageHousingScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="AdminEnquiry" component={AdminEnquiryScreen} options={{ presentation: 'card' }} />
