@@ -30,10 +30,10 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
 
-type GridTab = 'posts' | 'saved' | 'tagged';
+type GridTab = 'posts' | 'saved';
 
 const GRID_TABS: { key: GridTab; label: string }[] = [
-  { key: 'posts', label: 'Posts' }, { key: 'saved', label: 'Saved' }, { key: 'tagged', label: 'Tagged' },
+  { key: 'posts', label: 'Posts' }, { key: 'saved', label: 'Saved' },
 ];
 
 export default function ProfileScreen() {
@@ -148,7 +148,7 @@ export default function ProfileScreen() {
   return (
     <FlatList
       style={styles.container}
-      data={activeTab === 'posts' ? posts : activeTab === 'saved' ? savedPosts : []}
+      data={activeTab === 'posts' ? posts : savedPosts}
       keyExtractor={(item) => item.id}
       numColumns={3}
       columnWrapperStyle={{ gap: 2 }}
@@ -179,8 +179,8 @@ export default function ProfileScreen() {
       }}
       ListEmptyComponent={
         <EmptyState
-          icon={activeTab === 'posts' ? 'grid' : activeTab === 'saved' ? 'bookmark' : 'tag'}
-          text={activeTab === 'posts' ? 'No posts yet.' : activeTab === 'saved' ? 'Nothing saved yet. Tap the bookmark on a post to keep it here.' : 'No tagged posts yet.'}
+          icon={activeTab === 'posts' ? 'grid' : 'bookmark'}
+          text={activeTab === 'posts' ? 'No posts yet.' : 'Nothing saved yet. Tap the bookmark on a post to keep it here.'}
           action={activeTab === 'posts' ? { label: 'Write your first post', onPress: () => navigation.navigate('CreatePost') } : undefined}
         />
       }
