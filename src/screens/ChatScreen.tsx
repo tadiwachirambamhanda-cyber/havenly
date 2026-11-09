@@ -61,6 +61,7 @@ export default function ChatScreen() {
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [optionsVisible, setOptionsVisible] = useState(false);
   const [blockConfirmVisible, setBlockConfirmVisible] = useState(false);
+  const [leaveConfirmVisible, setLeaveConfirmVisible] = useState(false);
   const [membersModalVisible, setMembersModalVisible] = useState(false);
   const [groupNameDraft, setGroupNameDraft] = useState('');
   const [savingIcon, setSavingIcon] = useState(false);
@@ -202,6 +203,14 @@ export default function ChatScreen() {
 
   const handleBlock = () => setBlockConfirmVisible(true);
 
+  const confirmLeaveGroup = async () => {
+    const { error } = await supabase.rpc('leave_group', { conversation_id_input: conversationId });
+    if (error) { showToast('Couldn’t leave the group. Try again.', 'error'); return; }
+    haptics.success();
+    showToast('You left the group');
+    navigation.goBack();
+  };
+
   const confirmBlock = async () => {
     if (!myId || !otherUserId) return;
     try {
@@ -262,11 +271,9 @@ export default function ChatScreen() {
             </View>
           </AnimatedPressable>
           <View style={{ flex: 1 }} />
-          {!isGroup && (
-            <AnimatedPressable hitSlop={8} style={styles.overflow} onPress={openOptions} accessibilityLabel="More options">
-              <Icon name="more-horizontal" size={18} color={colors.ink} />
-            </AnimatedPressable>
-          )}
+          <AnimatedPressable hitSlop={8} style={styles.overflow} onPress={openOptions} accessibilityLabel="More options">
+            <Icon name="more-horizontal" size={18} color={colors.ink} />
+          </AnimatedPressable>
         </View>
 
         <FlatList
@@ -353,10 +360,19 @@ export default function ChatScreen() {
       <ActionSheet
         visible={optionsVisible}
         onClose={() => setOptionsVisible(false)}
-        actions={[
-          { label: 'Report user', onPress: () => setReportModalVisible(true) },
-          { label: `Block @${otherUser?.username ?? 'user'}`, destructive: true, onPress: handleBlock },
-        ]}
+        actions={isGroup
+          ? [{ label: 'Leave group', destructive: true, onPress: () => setLeaveConfirmVisible(true) }]
+          : [
+            { label: 'Report user', onPress: () => setReportModalVisible(true) },
+            { label: `Block @${otherUser?.username ?? 'user'}`, destructive: true, onPress: handleBlock },
+          ]}
+      />
+      <ActionSheet
+        visible={leaveConfirmVisible}
+        onClose={() => setLeaveConfirmVisible(false)}
+        title="Leave this group?"
+        message="You'll stop getting its messages. Your earlier messages stay in the chat, and you can only rejoin if someone adds you again."
+        actions={[{ label: 'Leave group', destructive: true, onPress: confirmLeaveGroup }]}
       />
       <ActionSheet
         visible={blockConfirmVisible}
