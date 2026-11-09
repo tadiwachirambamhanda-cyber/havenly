@@ -66,3 +66,22 @@ npm install
    `saved_posts`, both respecting the blocking rules. PostDetail has a
    real comment thread + input bar and a working Save toggle; Profile's
    Saved tab shows real data and grid cells are tappable now.
+
+## Putting the website online (Vercel)
+
+The app also runs as a website. The Vercel project is `havenly-app`
+(public address: https://havenly-app-zeta.vercel.app). It is deployed by
+hand, from a local build:
+
+```bash
+npm run build:web                       # builds dist/ and fixes the font/icon paths
+cd dist
+vercel link --yes --project havenly-app # first time and after each rebuild
+printf '.env*\n.vercel\n' > .vercelignore
+vercel deploy --prod --yes
+```
+
+Why `build:web` and not plain `expo export`: Vercel skips folders named
+`node_modules`, which is where Expo puts the fonts and icons, so
+`scripts/fix-web-assets.mjs` moves them to `assets/vendor`. The map only
+works in the phone app; the website shows a short notice instead.
