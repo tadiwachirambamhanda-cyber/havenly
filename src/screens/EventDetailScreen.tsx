@@ -7,6 +7,7 @@ import { useFocusEffect, useNavigation, useRoute, RouteProp } from '@react-navig
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import InitialsAvatar from '@/components/InitialsAvatar';
+import { openInMaps } from '@/lib/maps';
 import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -179,10 +180,11 @@ export default function EventDetailScreen() {
           <Icon name="calendar" size={13} color={colors.teal} />
           <Text style={styles.metaText}>{dateLabel} · {timeLabel}</Text>
         </View>
-        <View style={styles.metaRow}>
+        <AnimatedPressable style={styles.metaRow} onPress={() => openInMaps({ label: event.location, latitude: event.latitude, longitude: event.longitude })} accessibilityRole="link" accessibilityLabel={`Open ${event.location} in Maps`}>
           <Icon name="map-pin" size={13} color={colors.teal} />
-          <Text style={styles.metaText}>{event.location}</Text>
-        </View>
+          <Text style={[styles.metaText, { textDecorationLine: 'underline' }]}>{event.location}</Text>
+          <Text style={{ fontSize: 12.5, fontWeight: '700', color: colors.teal }}>Open in Maps</Text>
+        </AnimatedPressable>
 
         {event.description ? <Text style={styles.description}>{event.description}</Text> : null}
 

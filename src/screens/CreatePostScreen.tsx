@@ -99,6 +99,7 @@ export default function CreatePostScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const [location, setLocation] = useState('');
   const [tag, setTag] = useState(TAG_OPTIONS[0]);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [videoUri, setVideoUri] = useState<string | null>(null);
@@ -223,6 +224,7 @@ export default function CreatePostScreen() {
         author_id: session.user.id,
         title: title.trim(),
         body: body.trim() || null,
+        location: location.trim() || null,
         tag,
         image_url: imageUrl,
         video_url: videoUrl,
@@ -310,6 +312,18 @@ export default function CreatePostScreen() {
         onChangeText={setBody}
         multiline
       />
+      <View style={styles.locationRow}>
+        <Icon name="map-pin" size={15} color={colors.inkSoft} />
+        <TextInput
+          style={styles.locationInput}
+          placeholder="Where is it? A place or address (optional)"
+          placeholderTextColor={colors.inkSoft}
+          value={location}
+          onChangeText={setLocation}
+          maxLength={120}
+          autoCapitalize="words"
+        />
+      </View>
 
       <Text style={styles.sectionLabel}>Topic</Text>
       {TAG_GROUPS.map((group) => (
@@ -395,6 +409,8 @@ function createStyles(colors: ColorTokens) {
     borderColor: colors.line, borderRadius: radius.sm, padding: 14, fontSize: 15, fontWeight: '600', color: colors.ink,
   },
   titleInputMissing: { borderColor: colors.coral, borderWidth: 1.5 },
+  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10, paddingVertical: 4 },
+  locationInput: { flex: 1, fontSize: 14.5, color: colors.ink, paddingVertical: 8 },
   bodyInput: {
     marginHorizontal: spacing.lg, marginTop: spacing.sm, minHeight: 90, backgroundColor: colors.white, borderWidth: 1,
     borderColor: colors.line, borderRadius: radius.sm, padding: 14, fontSize: 14, color: colors.ink, textAlignVertical: 'top',
