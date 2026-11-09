@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useMemo, useRef, useState } from 'react';
+import { View, StyleSheet, ScrollView, Pressable, ActivityIndicator, KeyboardAvoidingView, Platform, TextInput as RNTextInput } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation } from '@react-navigation/native';
@@ -22,6 +22,8 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const passwordRef = useRef<RNTextInput>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,20 +73,30 @@ export default function LoginScreen() {
             onChangeText={setEmail}
             onFocus={() => setEmailFocused(true)}
             onBlur={() => setEmailFocused(false)}
+            returnKeyType="next"
+            onSubmitEditing={() => passwordRef.current?.focus()}
           />
         </View>
         <View style={styles.field}>
-          <Text style={styles.label}>Password</Text>
+          <View style={styles.labelRow}>
+            <Text style={[styles.label, { marginBottom: 0 }]}>Password</Text>
+            <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={10} accessibilityRole="button" accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}>
+              <Text style={styles.showToggle}>{showPassword ? 'Hide' : 'Show'}</Text>
+            </Pressable>
+          </View>
           <TextInput
+            ref={passwordRef}
             style={[styles.input, passwordFocused && styles.inputFocused]}
             placeholder="••••••••"
             placeholderTextColor={colors.inkSoft}
-            secureTextEntry
+            secureTextEntry={!showPassword}
             textContentType="password"
             value={password}
             onChangeText={setPassword}
             onFocus={() => setPasswordFocused(true)}
             onBlur={() => setPasswordFocused(false)}
+            returnKeyType="go"
+            onSubmitEditing={handleLogin}
           />
         </View>
 
@@ -111,6 +123,8 @@ function createStyles(colors: ColorTokens) {
   title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 40, color: colors.ink, marginTop: 10, lineHeight: 44 },
   rule: { height: 1, backgroundColor: colors.line, marginTop: 28, marginBottom: 26 },
   field: { marginBottom: 22 },
+  labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  showToggle: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 12, color: colors.inkSoft },
   label: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, color: colors.inkSoft, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 },
   input: {
     borderBottomWidth: 1.5, borderBottomColor: colors.line, paddingVertical: 9, fontSize: 16.5, color: colors.ink,

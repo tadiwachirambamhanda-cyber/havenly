@@ -145,7 +145,7 @@ export default function OffersScreen() {
               ) : (
                 <View style={styles.lockBadge}>
                   <Icon name="lock" size={11} color={colors.inkSoft} />
-                  <Text style={styles.lockBadgeText}>{item.min_streak}d</Text>
+                  <Text style={styles.lockBadgeText}>{item.min_streak - myStreak} more day{item.min_streak - myStreak === 1 ? '' : 's'}</Text>
                 </View>
               )}
             </AnimatedPressable>

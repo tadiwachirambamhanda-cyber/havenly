@@ -476,7 +476,7 @@ export default function FeedScreen() {
                 accessibilityLabel={`${profile.current_streak}-day streak. View perks`}
               >
                 <Icon name="flame" size={15} color={colors.coral} weight="fill" />
-                <Text style={styles.streakBadgeText}>{profile.current_streak}</Text>
+                <Text style={styles.streakBadgeText}>{profile.current_streak} day{profile.current_streak === 1 ? '' : 's'}</Text>
               </AnimatedPressable>
           )}
           <Pressable hitSlop={8} style={styles.iconBtn} onPress={() => navigation.navigate('Notifications')} accessibilityLabel="Notifications">

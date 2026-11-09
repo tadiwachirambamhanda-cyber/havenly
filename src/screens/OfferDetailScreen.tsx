@@ -200,7 +200,12 @@ export default function OfferDetailScreen() {
         ) : (
           <View style={styles.lockedBox}>
             <Icon name="lock" size={14} color={colors.inkSoft} />
-            <Text style={styles.lockedText}>Keep your streak going to unlock this.</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.lockedText}>{offer.min_streak - myStreak} more day{offer.min_streak - myStreak === 1 ? '' : 's'} of your streak to unlock this.</Text>
+              <View style={styles.progressTrack}>
+                <View style={[styles.progressFill, { width: `${Math.min(100, Math.round((myStreak / offer.min_streak) * 100))}%` }]} />
+              </View>
+            </View>
           </View>
         )}
 
@@ -319,7 +324,9 @@ function createStyles(colors: ColorTokens) {
     flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 20, backgroundColor: colors.sandDeep,
     paddingVertical: 13, paddingHorizontal: 16, borderRadius: radius.button,
   },
-  lockedText: { flex: 1, color: colors.inkSoft, fontSize: 12.5, fontWeight: '600' },
+  progressTrack: { height: 6, borderRadius: 3, backgroundColor: colors.sandDeep, marginTop: 8, overflow: 'hidden' },
+  progressFill: { height: 6, borderRadius: 3, backgroundColor: colors.teal },
+  lockedText: { color: colors.inkSoft, fontSize: 12.5, fontWeight: '600' },
   codeCard: {
     marginTop: 20, backgroundColor: colors.ink, borderRadius: radius.md, paddingVertical: 20, alignItems: 'center',
   },
