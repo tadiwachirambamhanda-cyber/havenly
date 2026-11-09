@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, Keyboard } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Keyboard, Platform } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
@@ -777,6 +777,28 @@ export default function MapScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [center, offers, events, residences, checkIns, myId, colors]);
 
+  // The map is drawn inside a native web view, which a browser can't host.
+  // Say so plainly on the website instead of showing a library error.
+  if (Platform.OS === 'web') {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <BackButton style={styles.back}>
+            <Icon name="arrow-left" size={17} color={colors.ink} />
+          </BackButton>
+          <Text style={styles.title}>Map</Text>
+        </View>
+        <View style={styles.centered}>
+          <Icon name="map-pin" size={22} color={colors.inkSoft} />
+          <Text style={styles.webNoticeTitle}>The map lives in the phone app</Text>
+          <Text style={styles.webNoticeText}>
+            Open Havenly on your phone to see offers, events, housing and who’s checked in nearby.
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -897,6 +919,8 @@ function createStyles(colors: ColorTokens) {
   container: { flex: 1, backgroundColor: colors.sand },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
   missingTokenText: { fontSize: 13, color: colors.inkSoft },
+  webNoticeTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 18, color: colors.ink, marginTop: 4 },
+  webNoticeText: { fontSize: 13.5, lineHeight: 20, color: colors.inkSoft, textAlign: 'center', maxWidth: 280 },
   header: {
     flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 12,
     paddingHorizontal: spacing.lg, backgroundColor: colors.sand, zIndex: 1,
