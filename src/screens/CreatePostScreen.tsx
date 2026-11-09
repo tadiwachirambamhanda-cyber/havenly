@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, type TextInput as RNTextInput } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator, Platform, type TextInput as RNTextInput } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import * as ImagePicker from 'expo-image-picker';
@@ -409,8 +409,8 @@ function createStyles(colors: ColorTokens) {
     borderColor: colors.line, borderRadius: radius.sm, padding: 14, fontSize: 15, fontWeight: '600', color: colors.ink,
   },
   titleInputMissing: { borderColor: colors.coral, borderWidth: 1.5 },
-  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10, paddingVertical: 4 },
-  locationInput: { flex: 1, fontSize: 14.5, color: colors.ink, paddingVertical: 8 },
+  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10, marginHorizontal: spacing.lg, paddingHorizontal: 14, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: radius.sm },
+  locationInput: { flex: 1, fontSize: 14.5, color: colors.ink, paddingVertical: 12, ...((Platform.OS === 'web' ? { outlineStyle: 'none' } : {}) as object) },
   bodyInput: {
     marginHorizontal: spacing.lg, marginTop: spacing.sm, minHeight: 90, backgroundColor: colors.white, borderWidth: 1,
     borderColor: colors.line, borderRadius: radius.sm, padding: 14, fontSize: 14, color: colors.ink, textAlignVertical: 'top',
