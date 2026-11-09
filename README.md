@@ -70,13 +70,19 @@ npm install
 ## Putting the website online (Vercel)
 
 The app also runs as a website. The Vercel project is `havenly-app`
-(public address: https://havenly-app-zeta.vercel.app). It is deployed by
-hand, from a local build:
+(public address: https://havenly-app-zeta.vercel.app).
+
+**Automatic:** once the project is connected to this GitHub repo, every
+change merged into `main` is built and published by Vercel using the
+settings in `vercel.json` (`npm ci`, then `npm run build:web`, output in
+`dist`). Pull requests get a private preview link.
+
+**By hand (fallback):**
 
 ```bash
 npm run build:web                       # builds dist/ and fixes the font/icon paths
 cd dist
-vercel link --yes --project havenly-app # first time and after each rebuild
+vercel link --yes --project havenly-app
 printf '.env*\n.vercel\n' > .vercelignore
 vercel deploy --prod --yes
 ```
