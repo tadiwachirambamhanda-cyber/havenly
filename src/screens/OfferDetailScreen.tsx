@@ -7,6 +7,7 @@ import BackButton from '@/components/BackButton';
 import { Image } from 'expo-image';
 import InitialsAvatar from '@/components/InitialsAvatar';
 import PhotoPlaceholder from '@/components/PhotoPlaceholder';
+import { openInMaps } from '@/lib/maps';
 import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -179,6 +180,14 @@ export default function OfferDetailScreen() {
         <Text style={styles.title}>{offer.title}</Text>
         <Text style={styles.discount}>{offer.discount_label}</Text>
         {offer.description ? <Text style={styles.description}>{offer.description}</Text> : null}
+
+        {(offer.address || (offer.latitude != null && offer.longitude != null)) && (
+          <AnimatedPressable style={styles.streakRow} onPress={() => openInMaps({ label: offer.address, latitude: offer.latitude, longitude: offer.longitude })} accessibilityRole="link">
+            <Icon name="map-pin" size={13} color={colors.teal} />
+            <Text style={[styles.streakRowText, { textDecorationLine: 'underline' }]}>{offer.address ?? 'See where this is'}</Text>
+            <Text style={{ fontSize: 12.5, fontWeight: '700', color: colors.teal }}>Open in Maps</Text>
+          </AnimatedPressable>
+        )}
 
         {offer.min_streak > 0 && (
           <View style={styles.streakRow}>

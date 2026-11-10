@@ -31,6 +31,7 @@ import PostVideoPlayer, { type PostVideoPlayerHandle } from '@/components/PostVi
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import { timeAgo } from '@/utils/timeAgo';
+import { openInMaps } from '@/lib/maps';
 import type { Comment, Post } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -616,6 +617,14 @@ export default function PostDetailScreen() {
 
         {post.body ? <Text style={styles.text}>{post.body}</Text> : null}
 
+        {post.location ? (
+          <AnimatedPressable style={styles.locationLink} onPress={() => openInMaps({ label: post.location })} accessibilityRole="link" accessibilityLabel={`Open ${post.location} in Maps`}>
+            <Icon name="map-pin" size={15} color={colors.teal} />
+            <Text style={styles.locationLinkText} numberOfLines={2}>{post.location}</Text>
+            <Text style={styles.locationLinkCta}>Open in Maps</Text>
+          </AnimatedPressable>
+        ) : null}
+
         <View style={styles.actionBar}>
           <AnimatedPressable style={styles.actionItem} onPress={toggleLike} accessibilityLabel={liked ? 'Unlike' : 'Like'}>
             <Animated.View style={{ transform: [{ scale: likeIconScale }] }}>
@@ -735,6 +744,9 @@ function createStyles(colors: ColorTokens) {
   followBtnActive: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   followBtnText: { fontSize: 11.5, fontWeight: '700', color: colors.sand },
   followBtnTextActive: { color: colors.ink },
+  locationLink: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 14, paddingVertical: 12, paddingHorizontal: 14, borderRadius: radius.md, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
+  locationLinkText: { flex: 1, fontSize: 13.5, fontWeight: '600', color: colors.ink },
+  locationLinkCta: { fontSize: 12.5, fontWeight: '700', color: colors.teal },
   text: { fontSize: 13.5, lineHeight: 22, color: colors.inkSoft },
   actionBar: { flexDirection: 'row', gap: 18, marginTop: 20, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.line },
   actionItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },

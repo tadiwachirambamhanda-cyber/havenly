@@ -580,6 +580,9 @@ create trigger on_community_member_change
 -- rather than just in the UI. (Column added here, after communities exists,
 -- even though posts itself is defined earlier in this file.)
 alter table posts add column community_id uuid references communities(id) on delete set null;
+
+-- Optional place a post is about; the app links it to Maps (see 20261110100000_post_location.sql).
+alter table posts add column location text check (location is null or char_length(location) <= 120);
 create index posts_community_idx on posts (community_id, created_at);
 
 -- is_editorial = false because editorial posts are only ever inserted
