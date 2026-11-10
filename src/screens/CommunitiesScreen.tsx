@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, SectionList, RefreshControl } from 'react-native';
 import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
+import BackButton from '@/components/BackButton';
 import Animated from 'react-native-reanimated';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -98,7 +99,12 @@ export default function CommunitiesScreen() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Communities</Text>
+        <View style={styles.header}>
+          <BackButton style={styles.back}>
+            <Icon name="arrow-left" size={17} color={colors.ink} />
+          </BackButton>
+          <Text style={styles.title}>Communities</Text>
+        </View>
         <Text style={styles.sub}>Join groups around your interests or campus.</Text>
         <Skeleton style={{ height: 11, width: 140, marginHorizontal: spacing.lg, marginTop: spacing.lg, marginBottom: 10 }} />
         {[0, 1, 2, 3].map((i) => (
@@ -116,7 +122,12 @@ export default function CommunitiesScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Communities</Text>
+      <View style={styles.header}>
+        <BackButton style={styles.back}>
+          <Icon name="arrow-left" size={17} color={colors.ink} />
+        </BackButton>
+        <Text style={styles.title}>Communities</Text>
+      </View>
       <Text style={styles.sub}>Join groups around your interests or campus.</Text>
       <SectionList
         sections={sections} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 40 }}
@@ -160,7 +171,9 @@ export default function CommunitiesScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand, paddingTop: 60 },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 26, color: colors.ink, paddingHorizontal: spacing.lg },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: spacing.lg },
+  back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 26, color: colors.ink },
   sub: { color: colors.inkSoft, fontSize: 12.5, paddingHorizontal: spacing.lg, marginTop: 4, marginBottom: 8 },
   sectionHeaderRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
