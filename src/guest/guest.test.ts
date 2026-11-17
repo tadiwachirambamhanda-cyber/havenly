@@ -110,12 +110,13 @@ describe('demo client reads', () => {
   });
 });
 
+function expectBlocked(result: any) {
+  expect(result.data).toBeNull();
+  expect(result.error?.code).toBe(GUEST_BLOCKED_CODE);
+  expect(result.error?.message).toBe(GUEST_BLOCKED_MESSAGE);
+}
+
 describe('demo client refuses every write', () => {
-  function expectBlocked(result: any) {
-    expect(result.data).toBeNull();
-    expect(result.error?.code).toBe(GUEST_BLOCKED_CODE);
-    expect(result.error?.message).toBe(GUEST_BLOCKED_MESSAGE);
-  }
 
   it('blocks insert, update, upsert and delete, including chained calls', async () => {
     const client = createDemoClient();
@@ -165,6 +166,9 @@ describe('demo client refuses every write', () => {
     expect(blocked).toBe(0);
     await client.from('posts').insert({ title: 'x' });
     await client.rpc('toggle_post_like', {});
+    expect(blocked).toBe(2);
+    // The streak counter runs by itself on load: refused, but silent.
+    expectBlocked(await client.rpc('bump_streak'));
     expect(blocked).toBe(2);
     off();
   });
