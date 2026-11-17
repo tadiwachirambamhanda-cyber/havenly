@@ -74,4 +74,5 @@ The founder has not given an out-of-scope list, so this is a proposal for the fo
 6. **Browse without an account:** OK to show full listings and the provider name to people who have not signed up?
 7. **Decided 2026-11-18:** the Havenly Housing WhatsApp and Google Form business (rooms R01 to R03) stays separate for now and does not become listings in the app.
 8. **Phone vs web for v1:** is web enough for the first friends and students, with the phone app waiting for the developer accounts?
-9. **Name of the social part:** keep "Feed, Discover, Inbox, Profile" as they are, or group them under one "Community" tab?
+9. **Guest mode already exists** (merged 2026-11-17): "Explore without signing up" opens a read-only demo that runs only on bundled sample content and is forbidden from touching the database (`docs/guest-mode-brief.md`). To show real listings to signed-out visitors (F6), we need a separate, read-only public housing view that reads only active listings, or we change the guest-mode rules. Which do you prefer? (This PRD assumes the separate public housing view, so the demo keeps its safety rules.)
+10. **Name of the social part:** keep "Feed, Discover, Inbox, Profile" as they are, or group them under one "Community" tab?

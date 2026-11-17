@@ -2,6 +2,22 @@
 
 A Lemon8-style lifestyle community app for students & young adults in Dubai.
 
+![Havenly screens: feed, post detail, Discover, profile](docs/screenshots/havenly-screens.png)
+
+*Feed, post detail, Discover and profile from the web build running locally. The posts shown are labelled sample posts; no real members' content appears.*
+
+## What it does
+- **Feed** of visual posts with editorial "Havenly Picks", **Discover** (trending spots, campus events) and a map.
+- **Communities** by interest and by university, with join and leave.
+- **Real-time direct messages** and group chats (Supabase Realtime), with block and report tools.
+- **Student housing:** listings, enquiries, admin notifications and a referral pipeline.
+- **Safety and trust:** account deletion that removes chat traces and uploads, draft privacy policy and terms, crash reporting, and an adversarial review that closed five security holes.
+
+## By the numbers
+About 13,900 lines of TypeScript, 162 commits, a Supabase back end with 58 migrations, 28 tables and 122 row-level security policies. iOS, Android and web from one codebase.
+
+Note: `app.json` holds the Supabase **anon** key and a Mapbox **public** token. Both are meant to ship inside the app; data access is protected by row-level security, never by hiding these keys.
+
 ## Stack
 - React Native + Expo (iOS + Android from one codebase)
 - Supabase — Postgres, Auth, Storage, Realtime (powers DMs)
