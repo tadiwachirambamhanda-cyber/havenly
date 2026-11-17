@@ -46,3 +46,17 @@ The riskiest step is replacing `save_residence`: if it is wrong, no listing can 
 - The first database check caught that a whole home with no bedroom count was accepted (an SQL check that evaluates to "unknown" passes). The rule now says `bedrooms is not null` and was re-tested in the live database.
 - The live database already had `is_admin` moved to a private schema (applied by hand on 2026-11-17), so my first `save_residence` (which called `public.is_admin()`) failed with "function public.is_admin() does not exist" on the first real save. Fixed live with `private.is_admin()` and the migration file now uses it. `supabase/schema.sql` keeps `public.is_admin()` to match the rest of that file, which has not been updated for the move yet.
 - The migration was applied through the SQL tool rather than `supabase db push`: the CLI shows 20261117000000 and 20261117010000 as not applied and two remote versions with no local file, so `db push` would have run those two reviewed-but-unapproved migrations as well. I recorded mine with `supabase migration repair`.
+
+## Ideas for later
+- The admin form shows validation errors at the very bottom of a long form, out of sight when you press Save at the top. Show the error near the Save button or scroll to it.
+- The Manage housing screen still says "Residences", "Add residence" and "No residences yet"; rename to "Listings" with F2.
+- `supabase/schema.sql` still uses `public.is_admin()` everywhere; refresh it once the 2026-11-17 security migrations are properly recorded.
+- The migration history is out of step (two local migrations are not recorded remotely, and two remote versions have no local file), so `supabase db push` is unsafe until that is tidied.
+
+## Verification
+1. `npm run typecheck`, `npm run lint` and `npm test` pass (27 tests, 5 of them new for the listing fields). `npx expo export --platform web` passes.
+2. Live database after the migration: the 7 new columns exist; a whole home with no bedrooms, 0 or 4 bedrooms, a studio with 2 bedrooms and a negative deposit are all refused; an old-style insert and a valid 3-bedroom home both work (tested inside a rolled-back block). The first run of this test found the NULL bug listed above.
+3. Permissions: the listing policies are unchanged (anyone can read active listings, only admins can create, update or delete). `save_residence` is executable by signed-in users only, and a non-admin call is refused with "Only the Havenly team can edit residences."
+4. In the running web app, as a throwaway admin: a whole home with no bedrooms is refused with "Pick how many bedrooms the home has (1 to 3)."; a deposit of 1000.50 is refused; a whole 3 bedroom home with deposit 1,000, fees 500, Verified on and a permit saved, and reopening the form showed every value. I then changed the kind to Private room and saved: the bedroom count cleared itself and the deposit, fees, Verified mark and permit stayed. This is the feature's done check.
+5. An old-style save (no new fields) on an existing listing keeps every new value; turning Verified off clears the verified time.
+6. The first real save failed because of the `is_admin` move described under "Changes from the plan"; it was fixed live and re-tested. The throwaway admin account and test listing were deleted: 0 listings, 0 test accounts, 1 admin (the owner) remain.

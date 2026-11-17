@@ -285,7 +285,7 @@ export default function EditResidenceScreen() {
           <TextInput style={[styles.fieldInput, styles.half]} placeholder="Latitude (optional)" placeholderTextColor={colors.inkSoft} value={latitude} onChangeText={edit(setLatitude)} keyboardType="numbers-and-punctuation" />
           <TextInput style={[styles.fieldInput, styles.half]} placeholder="Longitude (optional)" placeholderTextColor={colors.inkSoft} value={longitude} onChangeText={edit(setLongitude)} keyboardType="numbers-and-punctuation" />
         </View>
-        <TextInput style={styles.bodyInput} placeholder="About the residence (optional)…" placeholderTextColor={colors.inkSoft} value={description} onChangeText={edit(setDescription)} multiline />
+        <TextInput style={styles.bodyInput} placeholder="About this place (optional)…" placeholderTextColor={colors.inkSoft} value={description} onChangeText={edit(setDescription)} multiline />
 
         <View style={styles.switchRow}>
           <View style={{ flex: 1 }}>
