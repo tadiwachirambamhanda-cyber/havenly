@@ -22,6 +22,11 @@ describe('checkListingFields', () => {
   it('reads whole AED amounts, with commas, and treats empty as none', () => {
     const res = checkListingFields({ ...base, deposit: '1,000', moveInFee: '' });
     expect(res.ok && res.value.deposit_aed).toBe(1000);
+    const plain = checkListingFields({ ...base, deposit: '12500', moveInFee: '12,500' });
+    expect(plain.ok && plain.value.deposit_aed).toBe(12500);
+    expect(plain.ok && plain.value.move_in_fee_aed).toBe(12500);
+    const padded = checkListingFields({ ...base, deposit: '  1,000  ' });
+    expect(padded.ok && padded.value.deposit_aed).toBe(1000);
     expect(res.ok && res.value.move_in_fee_aed).toBe(null);
     const zero = checkListingFields({ ...base, deposit: '0' });
     expect(zero.ok && zero.value.deposit_aed).toBe(0);
@@ -29,6 +34,12 @@ describe('checkListingFields', () => {
 
   it('refuses negative, fractional, non-numeric and typo-sized amounts', () => {
     for (const deposit of ['-500', '1000.50', '1,000.5', 'abc', '1e3', '999999']) {
+      expect(checkListingFields({ ...base, deposit }).ok).toBe(false);
+    }
+  });
+
+  it('refuses badly placed commas and spaces inside an amount', () => {
+    for (const deposit of ['1,,0', '1 0 0 0', '1,00', '10,00', ',100', '100,', '1,0000', '1, 000']) {
       expect(checkListingFields({ ...base, deposit }).ok).toBe(false);
     }
     expect(checkListingFields({ ...base, moveInFee: '-1' }).ok).toBe(false);

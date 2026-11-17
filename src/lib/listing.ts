@@ -40,13 +40,17 @@ export interface ListingFields {
 
 export type ListingFieldsResult = { ok: true; value: ListingFields } | { ok: false; error: string };
 
-// Whole AED only. Commas and spaces are fine ("1,000"); a decimal point,
-// a minus sign or letters are not, so "1,000.50" can't turn into 100050.
+// Whole AED only: plain digits ("1000") or properly grouped thousands
+// ("1,000" or "12,500"). Decimals, minus signs, letters, spaces and badly
+// placed commas ("1,,0", "1,00") are refused, so a typo can't turn into a
+// different amount.
+const AMOUNT_PATTERN = /^(\d+|\d{1,3}(,\d{3})+)$/;
+
 function parseAmount(raw: string, label: string): { ok: true; value: number | null } | { ok: false; error: string } {
   const text = raw.trim();
   if (!text) return { ok: true, value: null };
-  if (!/^[\d,\s]+$/.test(text)) return { ok: false, error: `${label} must be a whole amount in AED, like 1000.` };
-  const value = Number(text.replace(/[,\s]/g, ''));
+  if (!AMOUNT_PATTERN.test(text)) return { ok: false, error: `${label} must be a whole amount in AED, like 1000 or 1,000.` };
+  const value = Number(text.replace(/,/g, ''));
   if (!Number.isInteger(value)) return { ok: false, error: `${label} must be a whole amount in AED, like 1000.` };
   if (value > MAX_EXTRA_COST_AED) return { ok: false, error: `${label} of ${value.toLocaleString('en-US')} AED looks like a typo.` };
   return { ok: true, value };
