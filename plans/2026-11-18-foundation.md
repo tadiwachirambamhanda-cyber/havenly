@@ -46,3 +46,14 @@ Round 1: VERDICT FINDINGS(7).
 5. MINOR, `ranking.ts`: NaN, infinite, zero and negative prices. **Fixed:** they count as unknown and sort last; a zero or negative student rate is not a deal; tests added.
 6. MINOR, `Text.tsx`: the helper still matched the old font prefix, so nested text with its own weight would have stopped switching weight. **Fixed:** it matches `HankenGrotesk_`, comments updated.
 7. MINOR, hard-coded old colours on listing controls. **Fixed** for the saved-heart colour in `HousingScreen.tsx` and `ResidenceDetailScreen.tsx`. Left as is, on purpose: the video progress bar in `PostVideoPlayer.tsx` (over dark video, social part) and the native-only map pin popup in `MapScreen.tsx`.
+
+Round 2: VERDICT PASS (no findings).
+
+## Verification
+1. `npm run typecheck`, `npm run lint`, `npm test` (50 tests, 25 of them new for the rent split, move-in total and ranking, including the design's example of AED 3,150 to 3,233 each), `npx expo-doctor` (21 of 21) and `npx expo export --platform all` all pass.
+2. In the web app (demo mode, light theme): the Housing tab is now first and opens first, the feed, Housing list and sign-in screen show the new colours and fonts with nothing cut off, and the demo banner is readable. With `PUBLIC_BROWSING` off a signed-out visitor still sees the login screen.
+3. The migration `20261118200000_housing_foundation_fields.sql` is written and reviewed but **not yet applied to the live database**; it waits for the owner's yes. A NULL-element check was run against the live database by a read-only query.
+4. The dark theme keeps its previous accent; it was not part of the redesign.
+
+## Changes from the plan
+- Added a small fix to `GuestBanner.tsx` (its "Create account" link was oxblood on a dark strip) and updated `app.json`'s splash background to the new ground colour. The icon artwork and splash image were not regenerated.
