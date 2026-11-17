@@ -52,7 +52,7 @@ Round 2: VERDICT PASS (no findings).
 ## Verification
 1. `npm run typecheck`, `npm run lint`, `npm test` (50 tests, 25 of them new for the rent split, move-in total and ranking, including the design's example of AED 3,150 to 3,233 each), `npx expo-doctor` (21 of 21) and `npx expo export --platform all` all pass.
 2. In the web app (demo mode, light theme): the Housing tab is now first and opens first, the feed, Housing list and sign-in screen show the new colours and fonts with nothing cut off, and the demo banner is readable. With `PUBLIC_BROWSING` off a signed-out visitor still sees the login screen.
-3. The migration `20261118200000_housing_foundation_fields.sql` is written and reviewed but **not yet applied to the live database**; it waits for the owner's yes. A NULL-element check was run against the live database by a read-only query.
+3. The migration `20261118200000_housing_foundation_fields.sql` was applied to the live database on 2026-11-18 with the owner's yes (applied as SQL and recorded with `supabase migration repair`). Checked inside a rolled-back block: a bills estimate with only one end, a top below the bottom, a bogus deal type, a student rate of 0, 11 housemates and a commutes object are all refused; a new save stores every new field; an older-style save that omits them keeps them. `save_residence` still runs only for signed-in users and uses `private.is_admin()`. 0 listings remain.
 4. The dark theme keeps its previous accent; it was not part of the redesign.
 
 ## Changes from the plan
