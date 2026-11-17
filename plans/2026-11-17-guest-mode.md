@@ -26,3 +26,7 @@ Screens call `supabase` directly in about 50 places, so rewriting them is risky.
 
 ## AI and sending
 No AI. Nothing is sent anywhere in guest mode.
+
+## Codex review
+Round 1: VERDICT: PASS, no findings. Codex read the guest files, the auth and client wiring, and the migration.
+Own check on the migration: no row-level policy and no other function references the 24 functions it restricts (read-only query), so applying it should not break the signed-in app. Not applied: needs the owner's approval.
