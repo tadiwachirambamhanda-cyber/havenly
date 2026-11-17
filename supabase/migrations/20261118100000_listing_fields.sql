@@ -16,7 +16,7 @@ alter table public.residences
 -- Only a whole home has a bedroom count (1 to 3); every other kind has none.
 alter table public.residences
   add constraint residences_bedrooms_match_type check (
-    (listing_type = 'home' and bedrooms between 1 and 3)
+    (listing_type = 'home' and bedrooms is not null and bedrooms between 1 and 3)
     or (listing_type <> 'home' and bedrooms is null)
   );
 

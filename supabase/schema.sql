@@ -1292,7 +1292,7 @@ create table residences (
   verified_at timestamptz,
   permit_number text check (permit_number is null or char_length(permit_number) <= 40),
   constraint residences_bedrooms_match_type check (
-    (listing_type = 'home' and bedrooms between 1 and 3)
+    (listing_type = 'home' and bedrooms is not null and bedrooms between 1 and 3)
     or (listing_type <> 'home' and bedrooms is null)
   )
 );
