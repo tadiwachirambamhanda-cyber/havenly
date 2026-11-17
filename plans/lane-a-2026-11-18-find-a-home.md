@@ -32,3 +32,19 @@ Map view, dark theme redesign, price gauge, Arabic, admin screens, flipping `PUB
 
 ## Ideas for later
 Persist the compare list; send the split to flatmates; uneven splits.
+
+## Codex review
+Round 1: FINDINGS(2).
+1. MINOR, compare list stays in memory across accounts on a shared device. **Fixed:** it starts empty when a different account (or nobody) is signed in; test added.
+2. MINOR, enquiry budget had every non-digit stripped, so "-5000" became 5000. **Fixed:** only whole AED (digits or comma groups) is accepted, anything else shows the error.
+
+Round 2: FINDINGS(4).
+1. MAJOR, a listing with no room records stays enquirable and the enquiry form does not block on a failed load. **Dismissed:** that is the existing behaviour and what the design asks for ("Send an enquiry and the Havenly team will confirm the price"); the database policy and the signed-in check protect the write, and a failed load shows an error note but the enquiry still goes to a real listing id the server validates.
+2. MINOR, the "Not yet checked by Havenly" tag on unverified listings. **Dismissed:** the design (States, student deal and not-yet-verified variant) shows exactly this wording, and there is no Verified mark on those listings.
+3. MINOR, budget could exceed the database column. **Fixed:** above AED 10,000,000 is refused.
+4. MINOR, My enquiries keeps old rows if the session vanishes. **Dismissed:** the screen only exists in the signed-in navigator, which unmounts it on sign-out.
+
+Stopped here: only dismissed findings remain.
+
+## Verification
+typecheck, lint, 65 tests, expo-doctor (21 of 21) and the web export pass. In demo mode at about 390 wide: Housing (search, filters, cards), a listing (cost box, rooms, commute, Add to compare), Compare (chosen column, Enquire) and the enquiry form render in the new look. Not seen in the browser (needs a whole home or `PUBLIC_BROWSING`): the split sheet, the Verified badge, the student deal tag, the sign-in sheet. These are covered by unit tests of the numbers and filters (including AED 3,150 to 3,233 for the 9,000 home, the 3 place limit, deal ranking).
