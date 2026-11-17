@@ -2,9 +2,9 @@
 
 A Lemon8-style lifestyle community app for students & young adults in Dubai.
 
-![Havenly sign-in and sign-up screens](docs/screenshots/havenly-screens.png)
+![Havenly screens: feed, post detail, Discover, profile](docs/screenshots/havenly-screens.png)
 
-*Sign-in and sign-up screens from the web build running locally. The signed-in app holds real members' content, so it is not shown.*
+*Feed, post detail, Discover and profile from the web build running locally. The posts shown are labelled sample posts; no real members' content appears.*
 
 ## What it does
 - **Feed** of visual posts with editorial "Havenly Picks", **Discover** (trending spots, campus events) and a map.
