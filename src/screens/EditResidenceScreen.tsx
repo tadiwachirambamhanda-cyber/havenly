@@ -11,11 +11,12 @@ import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { useConfirmDiscard } from '@/lib/useConfirmDiscard';
 import { AMENITIES, GENDER_POLICY_LABEL, PERIOD_LABEL, uploadResidencePhoto } from '@/lib/housing';
+import { BEDROOM_OPTIONS, LISTING_TYPES, checkListingFields } from '@/lib/listing';
 import { UNIVERSITIES } from '@/constants/universities';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
-import type { BillingPeriod, GenderPolicy, Residence, ResidencePartnerTerms, RoomType } from '@/types';
+import type { BillingPeriod, GenderPolicy, ListingType, Residence, ResidencePartnerTerms, RoomType } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Route = RouteProp<RootStackParamList, 'EditResidence'>;
@@ -42,9 +43,10 @@ const newRoom = (): RoomDraft => ({
   key: `new-${draftCounter++}`, name: '', price: '', period: 'year', occupancy: 1, isAvailable: true,
 });
 
-// Admin-only. Residences are added by the Havenly team for now (no
-// provider logins), so this one screen covers the listing, its rooms, and
-// the private commercial terms students never see.
+// Admin-only. Listings are added by the Havenly team for now (no provider
+// logins), so this one screen covers the listing, its rooms, and the
+// private commercial terms students never see. (The table and file are
+// still called "residence"; a listing can be any kind of place.)
 export default function EditResidenceScreen() {
   const navigation = useNavigation();
   const route = useRoute<Route>();
@@ -62,6 +64,12 @@ export default function EditResidenceScreen() {
   const [longitude, setLongitude] = useState('');
   const [description, setDescription] = useState('');
   const [genderPolicy, setGenderPolicy] = useState<GenderPolicy>('mixed');
+  const [listingType, setListingType] = useState<ListingType>('residence');
+  const [bedrooms, setBedrooms] = useState<number | null>(null);
+  const [deposit, setDeposit] = useState('');
+  const [moveInFee, setMoveInFee] = useState('');
+  const [isVerified, setIsVerified] = useState(false);
+  const [permit, setPermit] = useState('');
   const [amenities, setAmenities] = useState<string[]>([]);
   const [universities, setUniversities] = useState<string[]>([]);
   const [uniQuery, setUniQuery] = useState('');
@@ -101,6 +109,12 @@ export default function EditResidenceScreen() {
         setLongitude(r.longitude != null ? String(r.longitude) : '');
         setDescription(r.description ?? '');
         setGenderPolicy(r.gender_policy);
+        setListingType(r.listing_type ?? 'residence');
+        setBedrooms(r.bedrooms ?? null);
+        setDeposit(r.deposit_aed != null ? String(r.deposit_aed) : '');
+        setMoveInFee(r.move_in_fee_aed != null ? String(r.move_in_fee_aed) : '');
+        setIsVerified(r.is_verified ?? false);
+        setPermit(r.permit_number ?? '');
         setAmenities(r.amenities);
         setUniversities(r.nearby_universities);
         setPhotos(r.photo_urls);
@@ -154,9 +168,11 @@ export default function EditResidenceScreen() {
 
   const save = async () => {
     setError(null);
-    if (!name.trim()) return setError('Add the residence’s name.');
+    if (!name.trim()) return setError('Add the listing’s name.');
     if (!providerName.trim()) return setError('Add who runs it: the operator or agency students sign with.');
     if (!area.trim()) return setError('Add the area, e.g. Dubai International Academic City.');
+    const listing = checkListingFields({ type: listingType, bedrooms, deposit, moveInFee, permit });
+    if (!listing.ok) return setError(listing.error);
     const fee = Number(feePercent);
     if (!feePercent.trim() || !Number.isFinite(fee) || fee < 0 || fee > 100) return setError('Set the referral fee as a % between 0 and 100.');
     let lat: number | null = null;
@@ -190,6 +206,12 @@ export default function EditResidenceScreen() {
         nearby_universities: universities,
         photo_urls: photos,
         is_active: isActive,
+        listing_type: listing.value.listing_type,
+        bedrooms: listing.value.bedrooms,
+        deposit_aed: listing.value.deposit_aed,
+        move_in_fee_aed: listing.value.move_in_fee_aed,
+        is_verified: isVerified,
+        permit_number: listing.value.permit_number,
       },
       rooms: filledRooms.map((r) => ({
         id: r.id ?? null,
@@ -210,13 +232,13 @@ export default function EditResidenceScreen() {
     setSaving(false);
     if (saveError) {
       console.error('save_residence failed:', saveError.message);
-      setError('Couldn’t save the residence, so nothing was changed. Check your connection and try again.');
+      setError('Couldn’t save the listing, so nothing was changed. Check your connection and try again.');
       return;
     }
     setSaved(true);
     allowLeave();
     haptics.success();
-    showToast(residenceId ? 'Residence updated' : 'Residence added', 'success');
+    showToast(residenceId ? 'Listing updated' : 'Listing added', 'success');
     navigation.goBack();
   };
 
@@ -235,14 +257,27 @@ export default function EditResidenceScreen() {
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 80 }} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <AnimatedPressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></AnimatedPressable>
-          <Text style={styles.headerTitle}>{residenceId ? 'Edit residence' : 'New residence'}</Text>
-          <AnimatedPressable onPress={save} disabled={saving || uploading} accessibilityLabel="Save residence">
+          <Text style={styles.headerTitle}>{residenceId ? 'Edit listing' : 'New listing'}</Text>
+          <AnimatedPressable onPress={save} disabled={saving || uploading} accessibilityLabel="Save listing">
             {saving ? <ActivityIndicator color={colors.coral} /> : <Text style={[styles.headerBtn, styles.saveBtn]}>Save</Text>}
           </AnimatedPressable>
         </View>
 
+        <Text style={styles.sectionLabel}>Kind of place</Text>
+        <View style={styles.chipGrid}>
+          {LISTING_TYPES.map((t) => chip(t.key, t.label, listingType === t.key, () => { setListingType(t.key); if (t.key !== 'home') setBedrooms(null); }))}
+        </View>
+        {listingType === 'home' && (
+          <>
+            <Text style={styles.sectionLabel}>Bedrooms</Text>
+            <View style={styles.chipGrid}>
+              {BEDROOM_OPTIONS.map((n) => chip(`bed-${n}`, `${n} bedroom${n === 1 ? '' : 's'}`, bedrooms === n, () => setBedrooms(n)))}
+            </View>
+          </>
+        )}
+
         <Text style={styles.sectionLabel}>Listing</Text>
-        <TextInput style={styles.titleInput} placeholder="Residence name…" placeholderTextColor={colors.inkSoft} value={name} onChangeText={edit(setName)} maxLength={80} />
+        <TextInput style={styles.titleInput} placeholder="Listing name…" placeholderTextColor={colors.inkSoft} value={name} onChangeText={edit(setName)} maxLength={80} />
         <TextInput style={styles.fieldInput} placeholder="Run by (operator or agency)…" placeholderTextColor={colors.inkSoft} value={providerName} onChangeText={edit(setProviderName)} maxLength={80} />
         <TextInput style={styles.fieldInput} placeholder="Area, e.g. Dubai International Academic City…" placeholderTextColor={colors.inkSoft} value={area} onChangeText={edit(setArea)} maxLength={80} />
         <TextInput style={styles.fieldInput} placeholder="Address (optional)…" placeholderTextColor={colors.inkSoft} value={address} onChangeText={edit(setAddress)} />
@@ -259,6 +294,22 @@ export default function EditResidenceScreen() {
           </View>
           <Switch value={isActive} onValueChange={edit(setIsActive)} trackColor={{ true: colors.teal, false: colors.line }} />
         </View>
+
+        <Text style={styles.sectionLabel}>On top of rent (optional)</Text>
+        <View style={styles.row2}>
+          <TextInput style={[styles.fieldInput, styles.half]} placeholder="Deposit AED" placeholderTextColor={colors.inkSoft} value={deposit} onChangeText={edit(setDeposit)} keyboardType="number-pad" />
+          <TextInput style={[styles.fieldInput, styles.half]} placeholder="One-time fees AED" placeholderTextColor={colors.inkSoft} value={moveInFee} onChangeText={edit(setMoveInFee)} keyboardType="number-pad" />
+        </View>
+        <Text style={[styles.hint, { marginHorizontal: spacing.lg, marginTop: 6 }]}>One-time fees are things like an agency or admin fee. Leave empty if there are none.</Text>
+
+        <View style={styles.switchRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.switchTitle}>Verified by Havenly</Text>
+            <Text style={styles.hint}>Turn on only after the team has checked this place.</Text>
+          </View>
+          <Switch value={isVerified} onValueChange={edit(setIsVerified)} trackColor={{ true: colors.teal, false: colors.line }} />
+        </View>
+        <TextInput style={styles.fieldInput} placeholder="Advert permit number (optional)…" placeholderTextColor={colors.inkSoft} value={permit} onChangeText={edit(setPermit)} maxLength={40} autoCapitalize="characters" />
 
         <Text style={styles.sectionLabel}>Photos (the first one is the cover)</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.photoRow}>
