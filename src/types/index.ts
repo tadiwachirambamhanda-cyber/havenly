@@ -91,6 +91,9 @@ export interface PlaceInterest {
 export type BillingPeriod = 'year' | 'semester' | 'month';
 export type GenderPolicy = 'mixed' | 'female_only' | 'male_only';
 export type ListingType = 'residence' | 'shared_room' | 'private_room' | 'studio' | 'home';
+export type StudentDealType = 'student_rate' | 'deposit_waived' | 'fees_waived' | 'free_first_month' | 'group_discount';
+export type CommuteMode = 'bus' | 'metro' | 'walk' | 'taxi' | 'shuttle';
+export interface ResidenceCommute { university: string; minutes: number; mode: CommuteMode }
 
 export interface RoomType {
   id: string; residence_id: string; name: string; price_aed: number; billing_period: BillingPeriod;
@@ -103,6 +106,10 @@ export interface Residence {
   nearby_universities: string[]; gender_policy: GenderPolicy; is_active: boolean; created_at: string;
   listing_type: ListingType; bedrooms: number | null; deposit_aed: number | null; move_in_fee_aed: number | null;
   is_verified: boolean; verified_at: string | null; permit_number: string | null;
+  bills_included: boolean | null; bills_min_aed: number | null; bills_max_aed: number | null;
+  // student_rate_aed is a discounted rent per month.
+  student_deal_types: StudentDealType[]; student_rate_aed: number | null; housemates: number | null;
+  commutes: ResidenceCommute[];
   room_types?: RoomType[];
 }
 

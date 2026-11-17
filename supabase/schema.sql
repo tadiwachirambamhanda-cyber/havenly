@@ -1291,6 +1291,22 @@ create table residences (
   is_verified boolean not null default false,
   verified_at timestamptz,
   permit_number text check (permit_number is null or char_length(permit_number) <= 40),
+  -- Bills: true = in the rent, false = not, null = not stated. The estimate is monthly, for the whole listing.
+  bills_included boolean,
+  bills_min_aed int check (bills_min_aed is null or bills_min_aed >= 0),
+  bills_max_aed int check (bills_max_aed is null or bills_max_aed >= 0),
+  -- Student offers on the listing; student_rate_aed is the discounted rent per MONTH.
+  student_deal_types text[] not null default '{}'
+    check (student_deal_types <@ array['student_rate', 'deposit_waived', 'fees_waived', 'free_first_month', 'group_discount']::text[]),
+  student_rate_aed int check (student_rate_aed is null or student_rate_aed > 0),
+  -- Other students already living there (rooms); null when unknown.
+  housemates int check (housemates is null or housemates between 0 and 10),
+  -- [{"university": "...", "minutes": 18, "mode": "bus"}], curated by the team.
+  commutes jsonb not null default '[]'::jsonb check (jsonb_typeof(commutes) = 'array'),
+  constraint residences_bills_range check (
+    (bills_min_aed is null) = (bills_max_aed is null)
+    and (bills_min_aed is null or bills_max_aed >= bills_min_aed)
+  ),
   constraint residences_bedrooms_match_type check (
     (listing_type = 'home' and bedrooms is not null and bedrooms between 1 and 3)
     or (listing_type <> 'home' and bedrooms is null)
@@ -1530,7 +1546,8 @@ begin
     insert into residences (
       name, provider_name, area, address, latitude, longitude, description,
       gender_policy, amenities, nearby_universities, photo_urls, is_active,
-      listing_type, bedrooms, deposit_aed, move_in_fee_aed, is_verified, verified_at, permit_number
+      listing_type, bedrooms, deposit_aed, move_in_fee_aed, is_verified, verified_at, permit_number,
+      bills_included, bills_min_aed, bills_max_aed, student_deal_types, student_rate_aed, housemates, commutes
     ) values (
       residence->>'name', residence->>'provider_name', residence->>'area', residence->>'address',
       (residence->>'latitude')::double precision, (residence->>'longitude')::double precision,
@@ -1545,7 +1562,14 @@ begin
       (residence->>'move_in_fee_aed')::int,
       coalesce((residence->>'is_verified')::boolean, false),
       case when coalesce((residence->>'is_verified')::boolean, false) then now() else null end,
-      nullif(trim(residence->>'permit_number'), '')
+      nullif(trim(residence->>'permit_number'), ''),
+      (residence->>'bills_included')::boolean,
+      (residence->>'bills_min_aed')::int,
+      (residence->>'bills_max_aed')::int,
+      array(select jsonb_array_elements_text(coalesce(residence->'student_deal_types', '[]'::jsonb))),
+      (residence->>'student_rate_aed')::int,
+      (residence->>'housemates')::int,
+      coalesce(residence->'commutes', '[]'::jsonb)
     )
     returning id into rid;
   else
@@ -1567,6 +1591,15 @@ begin
       deposit_aed = case when residence ? 'deposit_aed' then (residence->>'deposit_aed')::int else deposit_aed end,
       move_in_fee_aed = case when residence ? 'move_in_fee_aed' then (residence->>'move_in_fee_aed')::int else move_in_fee_aed end,
       permit_number = case when residence ? 'permit_number' then nullif(trim(residence->>'permit_number'), '') else permit_number end,
+      bills_included = case when residence ? 'bills_included' then (residence->>'bills_included')::boolean else bills_included end,
+      bills_min_aed = case when residence ? 'bills_min_aed' then (residence->>'bills_min_aed')::int else bills_min_aed end,
+      bills_max_aed = case when residence ? 'bills_max_aed' then (residence->>'bills_max_aed')::int else bills_max_aed end,
+      student_deal_types = case when residence ? 'student_deal_types'
+        then array(select jsonb_array_elements_text(coalesce(residence->'student_deal_types', '[]'::jsonb)))
+        else student_deal_types end,
+      student_rate_aed = case when residence ? 'student_rate_aed' then (residence->>'student_rate_aed')::int else student_rate_aed end,
+      housemates = case when residence ? 'housemates' then (residence->>'housemates')::int else housemates end,
+      commutes = case when residence ? 'commutes' then coalesce(residence->'commutes', '[]'::jsonb) else commutes end,
       -- Stamp the time the first time it becomes verified; clear it when it stops.
       is_verified = coalesce((residence->>'is_verified')::boolean, is_verified),
       verified_at = case
