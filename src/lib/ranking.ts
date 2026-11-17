@@ -16,8 +16,12 @@ export interface RankInput {
 
 export type SortKey = 'recommended' | 'price_low' | 'price_high';
 
+// A usable price is a finite number above zero. NaN, Infinity, zero and negatives count as
+// unknown, so a bad value can never rank as the cheapest listing or break the sort.
+const cleanPrice = (n: number | null): number | null => (typeof n === 'number' && Number.isFinite(n) && n > 0 ? n : null);
+
 export const hasStudentDeal = (l: Pick<RankInput, 'studentDealTypes' | 'studentRateAed'>): boolean =>
-  l.studentDealTypes.length > 0 || l.studentRateAed != null;
+  l.studentDealTypes.length > 0 || cleanPrice(l.studentRateAed) != null;
 
 // The "Student-friendly" badge: bills are in the rent, or the listing has a student deal.
 export const isStudentFriendly = (l: Pick<RankInput, 'billsIncluded' | 'studentDealTypes' | 'studentRateAed'>): boolean =>
@@ -25,9 +29,11 @@ export const isStudentFriendly = (l: Pick<RankInput, 'billsIncluded' | 'studentD
 
 // What a student actually pays a month: the student rate when it is lower.
 export function effectiveMonthlyAed(monthlyAed: number | null, studentRateAed: number | null): number | null {
-  if (studentRateAed == null) return monthlyAed;
-  if (monthlyAed == null) return studentRateAed;
-  return Math.min(monthlyAed, studentRateAed);
+  const monthly = cleanPrice(monthlyAed);
+  const rate = cleanPrice(studentRateAed);
+  if (rate == null) return monthly;
+  if (monthly == null) return rate;
+  return Math.min(monthly, rate);
 }
 
 const priceOf = (l: RankInput) => effectiveMonthlyAed(l.monthlyAed, l.studentRateAed);

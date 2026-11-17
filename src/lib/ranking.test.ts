@@ -30,6 +30,25 @@ describe('effectiveMonthlyAed', () => {
   });
 });
 
+describe('bad prices', () => {
+  it('treats NaN, Infinity, zero and negative prices as unknown', () => {
+    expect(effectiveMonthlyAed(Number.NaN, null)).toBeNull();
+    expect(effectiveMonthlyAed(Infinity, null)).toBeNull();
+    expect(effectiveMonthlyAed(0, null)).toBeNull();
+    expect(effectiveMonthlyAed(-500, 2400)).toBe(2400);
+    expect(effectiveMonthlyAed(3000, -1)).toBe(3000);
+  });
+  it('a zero or negative student rate is not a deal', () => {
+    expect(hasStudentDeal({ studentDealTypes: [], studentRateAed: 0 })).toBe(false);
+    expect(hasStudentDeal({ studentDealTypes: [], studentRateAed: -5 })).toBe(false);
+  });
+  it('sorts bad prices last and keeps the order of the rest', () => {
+    const items = [make('nan', { monthlyAed: Number.NaN }), make('neg', { monthlyAed: -10 }), make('ok-high', { monthlyAed: 4000 }), make('ok-low', { monthlyAed: 2000 }), make('inf', { monthlyAed: Infinity })];
+    expect(sortForSearch(items, 'price_low').map((l) => l.id)).toEqual(['ok-low', 'ok-high', 'inf', 'nan', 'neg']);
+    expect(sortForSearch(items, 'price_high').map((l) => l.id)).toEqual(['ok-high', 'ok-low', 'inf', 'nan', 'neg']);
+  });
+});
+
 describe('sortForSearch', () => {
   it('puts a student-friendly listing above an identical one with no deal', () => {
     const plain = make('a', { monthlyAed: 2500 });
