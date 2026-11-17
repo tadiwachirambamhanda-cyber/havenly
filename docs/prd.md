@@ -25,7 +25,10 @@ Students who move to Dubai for university search for a place to live across Prop
 5. A listing page gives the full picture: photo gallery, price and what the student pays on top (deposit, fees), and for a whole home the rent split per person (for example AED 9,000 for 3 bedrooms is about AED 3,000 each), what is included, how far it is from each nearby university, and a "Verified by Havenly" mark only when the team has checked the listing.
 6. A student can send an enquiry or ask for a viewing, and follow its status. (Built already.)
 7. A student can save listings and compare up to three side by side.
-8. The Havenly team can add and edit every listing, including the new fields, and track the pipeline and referral fees. (Built already; extended.)
+8. Every listing says whether bills are included, and if not, shows an estimated monthly range. Bills included is a filter and a badge, because Havenly wants to make paying for housing simple for students.
+9. For a whole home, a student can see how many people share and what each person pays a month: their share of rent, of bills (or the range) and of the deposit.
+10. Student deals: the team can attach a student offer to a listing (student rate, waived deposit or fees, free first month, group discount). Listings that offer a student deal or include bills get a "Student-friendly" badge and rank higher in search. This is Havenly's leverage when onboarding agents and residences.
+11. The Havenly team can add and edit every listing, including the new fields, and track the pipeline and referral fees. (Built already; extended.)
 
 ## How the client will judge it
 
@@ -74,5 +77,6 @@ The founder has not given an out-of-scope list, so this is a proposal for the fo
 6. **Browse without an account:** OK to show full listings and the provider name to people who have not signed up?
 7. **Decided 2026-11-18:** the Havenly Housing WhatsApp and Google Form business (rooms R01 to R03) stays separate for now and does not become listings in the app.
 8. **Phone vs web for v1:** is web enough for the first friends and students, with the phone app waiting for the developer accounts?
-9. **Guest mode already exists** (merged 2026-11-17): "Explore without signing up" opens a read-only demo that runs only on bundled sample content and is forbidden from touching the database (`docs/guest-mode-brief.md`). To show real listings to signed-out visitors (F6), we need a separate, read-only public housing view that reads only active listings, or we change the guest-mode rules. Which do you prefer? (This PRD assumes the separate public housing view, so the demo keeps its safety rules.)
-10. **Name of the social part:** keep "Feed, Discover, Inbox, Profile" as they are, or group them under one "Community" tab?
+9. **Student discounts (decided 2026-11-18 that we need them):** who funds them? This PRD assumes the provider gives the deal (a student rate, waived fees, free first month, bills included, group discount) in exchange for ranking, a badge and a lower listing fee later, not Havenly out of its own fee. How does a student prove they are a student (v1 assumes the provider checks the student ID at signing)? Is giving back part of Havenly's fee as move-in credit allowed? (Lawyer.)
+10. **Guest mode already exists** (merged 2026-11-17): "Explore without signing up" opens a read-only demo that runs only on bundled sample content and is forbidden from touching the database (`docs/guest-mode-brief.md`). To show real listings to signed-out visitors (F6), we need a separate, read-only public housing view that reads only active listings, or we change the guest-mode rules. Which do you prefer? (This PRD assumes the separate public housing view, so the demo keeps its safety rules.)
+11. **Name of the social part:** keep "Feed, Discover, Inbox, Profile" as they are, or group them under one "Community" tab?

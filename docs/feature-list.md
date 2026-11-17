@@ -11,6 +11,9 @@ Source: `docs/prd.md`. One row per feature, in build order: data first, then the
 | F3 | A listing page shows the full picture: photo gallery, price plus deposit and fees, what is included, commute to each nearby university, a "Verified by Havenly" mark only when verified, and Open in Maps. | I open a verified listing and see the gallery, the real total cost to move in, the commute to each nearby university and the Verified mark. I open an unverified one and there is no mark. | v1 | not started |
 | F4 | Housing is the first tab and the screen the app opens on, with the social features behind it. | I log in and the first screen is student housing search, not the feed. The feed, Discover, Inbox and Profile are still one tap away. | v1 | not started |
 | F5 | Search and filters: area, nearby university, price range, type of place, bedrooms (1, 2, 3), mixed / female only / male only, amenities, and sort by price or by newest. | I choose "Private room", under AED 3,000 a month and "Female only". I then choose "2 bedroom home" and see only 2 bedroom homes. Only matching listings stay. I sort by price low to high and the cheapest is first. I clear the filters and everything returns. | v1 | not started |
+| F11 | Bills on every listing: included or not, and when not, an estimated monthly range (for example AED 450 to 700 for the whole home). A "Bills included" badge and filter. | I open a listing with bills excluded and see the estimated range. I switch the filter to "Bills included" and only listings with bills included remain. | v1 | not started |
+| F12 | Rent split for a whole home: the student picks how many people share (up to the bedrooms or more) and sees each person's monthly share of rent, bills (or the bills range) and deposit. | On a AED 9,000, 3 bedroom home with bills estimated at AED 450 to 700, I choose 3 people and see about AED 3,150 to 3,233 each per month. I change to 2 people and the numbers update. | v1 | not started |
+| F13 | Student deals: the team can add a student offer to a listing (student rate, waived deposit or fees, free first month, group discount), shown as a "Student deal" tag. Listings that include bills or have a student deal get a "Student-friendly" badge and rank higher in search. | As admin I add a student rate to a listing. A student sees "Student rate AED 3,200, normal AED 3,500" and the badge, and that listing sits above an identical one with no deal. | v1 | not started |
 | F6 | Anyone can browse and open the real listings without an account, separate from the sample-only demo mode that already exists ("Explore without signing up", which never touches the database). Sign-in is asked for only when they save or send an enquiry. | In a fresh private window I open the site, see the listings, open one, then tap Enquire and am asked to sign in. After signing in I land back on the same listing. | v1 | not started |
 | F7 | Save listings and compare up to three side by side (price, type, area, commute, included items, verified). | I save 3 listings, choose Compare, and see them in three columns. I try to add a fourth and am told the limit is three. | v1 | not started |
 | F8 | Send an enquiry or ask for a viewing, and follow its status. | I send an enquiry on a listing. It shows as Sent in My enquiries. The admin marks it "Contacted" and I see "Residence in touch". | v1 | done (merged 2026-10-14) |
@@ -19,6 +22,7 @@ Source: `docs/prd.md`. One row per feature, in build order: data first, then the
 
 Rules:
 
+- F11 to F13 were added 2026-11-18 (bills, rent split and student deals). Build them after F1 to F5; F12 needs F11.
 - v1 is what the idea needs to be a housing-first platform, and nothing else.
 - Status is one of: not started, in progress, done (merged to main).
 
@@ -34,4 +38,8 @@ Rules:
 - Virtual tours and video walkthroughs per listing.
 - Arabic.
 - Payments, deposits and contract signing in the app.
+- Havenly gives back part of its referral fee to the student as move-in credit (check the rules with the lawyer first).
+- Uneven splits (a bigger room pays more) and sending the split to flatmates.
+- Checking student status automatically (v1: the provider checks the student ID).
+- A one-page pitch for agents and residences (a document, not an app feature).
 - A "Community" tab that groups Feed, Discover, Inbox and Profile.
