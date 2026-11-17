@@ -90,6 +90,7 @@ export interface PlaceInterest {
 
 export type BillingPeriod = 'year' | 'semester' | 'month';
 export type GenderPolicy = 'mixed' | 'female_only' | 'male_only';
+export type ListingType = 'residence' | 'shared_room' | 'private_room' | 'studio' | 'home';
 
 export interface RoomType {
   id: string; residence_id: string; name: string; price_aed: number; billing_period: BillingPeriod;
@@ -100,6 +101,8 @@ export interface Residence {
   id: string; name: string; provider_name: string; description: string | null; area: string; address: string | null;
   latitude: number | null; longitude: number | null; photo_urls: string[]; amenities: string[];
   nearby_universities: string[]; gender_policy: GenderPolicy; is_active: boolean; created_at: string;
+  listing_type: ListingType; bedrooms: number | null; deposit_aed: number | null; move_in_fee_aed: number | null;
+  is_verified: boolean; verified_at: string | null; permit_number: string | null;
   room_types?: RoomType[];
 }
 
