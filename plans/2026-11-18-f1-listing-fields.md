@@ -48,10 +48,17 @@ The riskiest step is replacing `save_residence`: if it is wrong, no listing can 
 - The migration was applied through the SQL tool rather than `supabase db push`: the CLI shows 20261117000000 and 20261117010000 as not applied and two remote versions with no local file, so `db push` would have run those two reviewed-but-unapproved migrations as well. I recorded mine with `supabase migration repair`.
 
 ## Ideas for later
+- Latitude and longitude on the admin form are not range-checked (latitude -90 to 90, longitude -180 to 180). Found by Codex round 1; existed before F1.
 - The admin form shows validation errors at the very bottom of a long form, out of sight when you press Save at the top. Show the error near the Save button or scroll to it.
 - The Manage housing screen still says "Residences", "Add residence" and "No residences yet"; rename to "Listings" with F2.
 - `supabase/schema.sql` still uses `public.is_admin()` everywhere; refresh it once the 2026-11-17 security migrations are properly recorded.
 - The migration history is out of step (two local migrations are not recorded remotely, and two remote versions have no local file), so `supabase db push` is unsafe until that is tidied.
+
+## Codex review
+Round 1: VERDICT FINDINGS(3). No findings on the database migration, the save function, permissions or the guest-mode fixtures.
+1. MINOR, `src/lib/listing.ts`: the amount parser stripped every comma and space without checking where they sit (`1,,0` became 10, `1 0 0 0` became 1000). **Fixed**: only plain digits or properly grouped thousands are accepted.
+2. MINOR, `src/lib/listing.test.ts`: no tests for malformed grouping. **Fixed**: added the cases.
+3. MAJOR, `src/screens/EditResidenceScreen.tsx:169`: latitude and longitude are only checked to be numbers, so a typo like 250 would be saved. **Dismissed for this change**: true, but it is behaviour that existed before F1, only the Havenly team can enter it, and the plan says to build nothing outside F1. Added to "Ideas for later".
 
 ## Verification
 1. `npm run typecheck`, `npm run lint` and `npm test` pass (27 tests, 5 of them new for the listing fields). `npx expo export --platform web` passes.
