@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
+import { PASSWORD_HINT, passwordProblem } from '@/lib/passwordRules';
 import { useTheme } from '@/lib/ThemeContext';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
@@ -35,8 +36,9 @@ export default function SignUpScreen() {
       setError('Enter an email and password.');
       return;
     }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+    const problem = passwordProblem(password);
+    if (problem) {
+      setError(problem);
       return;
     }
     setLoading(true);
@@ -102,7 +104,7 @@ export default function SignUpScreen() {
           <TextInput
             ref={passwordRef}
             style={[styles.input, passwordFocused && styles.inputFocused]}
-            placeholder="At least 6 characters"
+            placeholder={PASSWORD_HINT}
             placeholderTextColor={colors.inkSoft}
             secureTextEntry={!showPassword}
             textContentType="newPassword"
