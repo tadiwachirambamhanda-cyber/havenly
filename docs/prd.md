@@ -48,7 +48,7 @@ Students who move to Dubai for university search for a place to live across Prop
 
 The founder has not given an out-of-scope list, so this is a proposal for the founder to confirm. Claude must not build any of it in v1:
 
-- Landlords, agents or residences adding their own listings (the team adds them).
+- Agents and residences adding their own listings and paying to do so. This is the planned next stage (see "Later" in the feature list); in v1 only the Havenly team adds listings. The data should be built so a listing can later belong to an agent or residence account.
 - Taking rent, deposits or any payment in the app.
 - Generating, signing or storing tenancy contracts. Contracts stay offline with the provider.
 - Taking a cut of rent as a broker. The referral fee from the provider stays the model.
@@ -65,10 +65,10 @@ The founder has not given an out-of-scope list, so this is a proposal for the fo
 
 ## Open questions
 
-1. **Who lists?** Team only for v1, or do residences and agents get their own log-in to add listings soon? (Decides the whole next stage.)
+1. **Decided 2026-11-18:** only the Havenly team adds listings in v1. Later, agents and residences add their own for a fee. Still open: how the fee works (per listing, monthly subscription, per featured listing), the amount, how they pay, and whether the referral fee per signed student stays alongside it.
 2. **Regulation (lawyer, before public launch):** as far as we know, property adverts in Dubai need a permit number from the regulator (Trakheesi) and renting out shared or partitioned rooms is restricted. Does Havenly need a brokerage licence, or is "provider pays a referral fee, contract is offline" enough? Which listing types are legal to show?
 3. **Which kinds of place go in v1:** residences only, or also shared-apartment rooms, private rooms and studios? This PRD assumes all four; confirm.
-4. **Who pays?** Today only residences pay a referral fee. Do private landlords or agents pay too? Is it ever free for the provider and paid by the student?
+4. **Who pays?** Decided: students use it free; agents and residences pay to list. Still open: do private landlords (not agents) list at all, and does a listing fee replace or sit on top of today's referral fee per signed student?
 5. **Which areas and universities first?** (Dubai International Academic City, Knowledge Village, Silicon Oasis, Marina and JLT, others.)
 6. **Browse without an account:** OK to show full listings and the provider name to people who have not signed up?
 7. **The Havenly Housing WhatsApp and Google Form business:** does it move into the app (rooms R01 to R03 become listings, the form is replaced by the enquiry), or run in parallel?

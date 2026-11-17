@@ -25,7 +25,8 @@ Rules:
 ## Later
 
 - Map search with pins on a real map (native phone only today; web needs a different map).
-- Landlords, agents and residences log in and add their own listings.
+- Agents and residences get their own login, add and manage their own listings, and pay a listing fee (model and amount to be decided). This is the next stage after v1; v1 keeps each listing tied to a provider so it can slot in.
+- A provider dashboard: their enquiries, views and what they owe Havenly.
 - Email or WhatsApp alert to the provider when an enquiry arrives.
 - New-listing alerts for students; push notifications (needs a development build).
 - Student reviews and ratings of places.
