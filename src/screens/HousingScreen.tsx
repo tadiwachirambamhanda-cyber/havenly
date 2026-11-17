@@ -171,7 +171,7 @@ export default function HousingScreen() {
                       <PhotoPlaceholder icon="home" style={StyleSheet.absoluteFill} />
                     )}
                     <AnimatedPressable hitSlop={8} style={styles.saveBtn} scaleTo={0.92} onPress={() => toggleSaved(item)} accessibilityLabel={isSaved ? 'Remove from saved' : 'Save residence'}>
-                      <BurstHeart active={isSaved} size={16} color="#1F1B16" activeColor="#FF5A3C" />
+                      <BurstHeart active={isSaved} size={16} color="#1F1B16" activeColor="#7A2433" />
                     </AnimatedPressable>
                     {nearMine && (
                       <View style={styles.nearBadge}>

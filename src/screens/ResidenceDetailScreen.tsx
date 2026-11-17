@@ -253,7 +253,7 @@ export default function ResidenceDetailScreen() {
         onPress={toggleSaved}
         accessibilityLabel={saved ? 'Remove from saved' : 'Save residence'}
       >
-        <BurstHeart active={saved} size={16} color="#1F1B16" activeColor="#FF5A3C" />
+        <BurstHeart active={saved} size={16} color="#1F1B16" activeColor="#7A2433" />
       </AnimatedPressable>
 
       <View style={[styles.ctaBar, { paddingBottom: insets.bottom + 14 }]}>
