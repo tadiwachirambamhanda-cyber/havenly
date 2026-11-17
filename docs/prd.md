@@ -19,7 +19,7 @@ Students who move to Dubai for university search for a place to live across Prop
 ## What it must do
 
 1. Housing is the first thing a person sees and the main reason to open the app. The social features stay, but sit behind it.
-2. Anyone can browse and open listings without making an account. An account is asked for only when they save or send an enquiry.
+2. Anyone can browse and open listings without making an account. An account is asked for only when they save a listing, send an enquiry or use the social features that write (post, comment, message). Decided 2026-11-18.
 3. A student can search and narrow listings by area, university, price, room type, number of bedrooms, who it is for (mixed, female only, male only) and amenities, and sort the results.
 4. Listings cover more than one kind of place: student residence, room in a shared apartment, private room, studio, and a whole 1, 2 or 3 bedroom home that students rent together.
 5. A listing page gives the full picture: photo gallery, price and what the student pays on top (deposit, fees), and for a whole home the rent split per person (for example AED 9,000 for 3 bedrooms is about AED 3,000 each), what is included, how far it is from each nearby university, and a "Verified by Havenly" mark only when the team has checked the listing.
@@ -74,7 +74,7 @@ The founder has not given an out-of-scope list, so this is a proposal for the fo
 3. **Decided 2026-11-18:** these kinds of place go in v1: student residence, room in a shared apartment, private room, studio, and whole 1, 2 and 3 bedroom homes that students share and split. Villas are not listed. For a whole home, the enquiry and contract go with one student (the one who enquires); the enquiry form stays as it is, with no group of names. Decided 2026-11-18.
 4. **Who pays?** Decided: students use it free; agents and residences pay to list. Still open: do private landlords (not agents) list at all, and does a listing fee replace or sit on top of today's referral fee per signed student?
 5. **Which areas and universities first?** (Dubai International Academic City, Knowledge Village, Silicon Oasis, Marina and JLT, others.)
-6. **Browse without an account:** OK to show full listings and the provider name to people who have not signed up?
+6. **Decided 2026-11-18:** yes, signed-out visitors see the full real listings. Sign-in is asked for only when someone wants to save or enquire (and for writing in the social part).
 7. **Decided 2026-11-18:** the Havenly Housing WhatsApp and Google Form business (rooms R01 to R03) stays separate for now and does not become listings in the app.
 8. **Phone vs web for v1:** is web enough for the first friends and students, with the phone app waiting for the developer accounts?
 9. **Student discounts (decided 2026-11-18 that we need them):** who funds them? This PRD assumes the provider gives the deal (a student rate, waived fees, free first month, bills included, group discount) in exchange for ranking, a badge and a lower listing fee later, not Havenly out of its own fee. How does a student prove they are a student (v1 assumes the provider checks the student ID at signing)? Is giving back part of Havenly's fee as move-in credit allowed? (Lawyer.)
