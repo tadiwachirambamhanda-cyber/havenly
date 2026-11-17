@@ -216,7 +216,7 @@ function createStyles(colors: ColorTokens) {
     container: { flex: 1, backgroundColor: colors.sand },
     header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 12, paddingHorizontal: spacing.lg },
     back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-    title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
+    title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
     segment: {
       flexDirection: 'row', marginHorizontal: spacing.lg, marginBottom: spacing.md, padding: 4,
       backgroundColor: colors.sandDeep, borderRadius: radius.pill,

@@ -70,7 +70,7 @@ function createStyles(colors: ColorTokens) {
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   card: { backgroundColor: colors.sand, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, padding: spacing.lg, paddingBottom: 36 },
   header: { marginBottom: 14 },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 17, color: colors.ink },
+  title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 17, color: colors.ink },
   message: { fontSize: 13, color: colors.inkSoft, marginTop: 4, lineHeight: 19 },
   option: { paddingVertical: 14, borderTopWidth: 1, borderTopColor: colors.line },
   optionText: { fontSize: 14, color: colors.ink, fontWeight: '600' },

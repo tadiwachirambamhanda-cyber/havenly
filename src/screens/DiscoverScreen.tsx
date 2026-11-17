@@ -419,7 +419,7 @@ export default function DiscoverScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 26, color: colors.ink, paddingHorizontal: spacing.lg, paddingTop: 60 },
+  title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 26, color: colors.ink, paddingHorizontal: spacing.lg, paddingTop: 60 },
   searchBar: {
     flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: spacing.lg, marginTop: 14,
     paddingHorizontal: 16, paddingVertical: 4, backgroundColor: colors.white, borderWidth: 1.5,
@@ -437,7 +437,7 @@ function createStyles(colors: ColorTokens) {
   shortcutSub: { fontSize: 11.5, color: colors.inkSoft, marginTop: 2 },
   noResults: { color: colors.inkSoft, fontSize: 13, textAlign: 'center', marginTop: 24 },
   sectionLabel: {
-    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
+    fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
   },
   resultRow: {
     flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginHorizontal: spacing.lg, marginBottom: spacing.sm,

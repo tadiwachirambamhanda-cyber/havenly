@@ -171,7 +171,7 @@ export default function HousingScreen() {
                       <PhotoPlaceholder icon="home" style={StyleSheet.absoluteFill} />
                     )}
                     <AnimatedPressable hitSlop={8} style={styles.saveBtn} scaleTo={0.92} onPress={() => toggleSaved(item)} accessibilityLabel={isSaved ? 'Remove from saved' : 'Save residence'}>
-                      <BurstHeart active={isSaved} size={16} color="#20261F" activeColor="#FF5A3C" />
+                      <BurstHeart active={isSaved} size={16} color="#1F1B16" activeColor="#7A2433" />
                     </AnimatedPressable>
                     {nearMine && (
                       <View style={styles.nearBadge}>
@@ -212,7 +212,7 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand },
     titleRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: spacing.lg, paddingTop: 60 },
-    title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 26, color: colors.ink },
+    title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 26, color: colors.ink },
     subtitle: { fontSize: 12, color: colors.inkSoft, marginTop: 2 },
     iconBtn: {
       width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,
@@ -242,8 +242,8 @@ function createStyles(colors: ColorTokens) {
     },
     nearBadgeText: { color: 'white', fontSize: 11, fontWeight: '700' },
     cardBody: { padding: 14 },
-    cardArea: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
-    cardName: { fontFamily: 'Fraunces_600SemiBold', fontSize: 18, color: colors.ink, marginTop: 3 },
+    cardArea: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
+    cardName: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 18, color: colors.ink, marginTop: 3 },
     cardMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
     cardPrice: { fontSize: 12.5, color: colors.inkSoft },
     cardPriceStrong: { fontWeight: '800', color: colors.ink },

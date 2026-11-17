@@ -239,7 +239,7 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingTop: 60 },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 26, color: colors.ink },
+  title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 26, color: colors.ink },
   newGroupBtn: {
     width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,
     alignItems: 'center', justifyContent: 'center',
@@ -253,7 +253,7 @@ function createStyles(colors: ColorTokens) {
   searchInput: { flex: 1, fontSize: 13, color: colors.ink },
   clearBtn: { paddingHorizontal: 4 },
   sectionLabel: {
-    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 8,
+    fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 8,
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: spacing.lg, paddingVertical: 10 },
   avatar: { width: 50, height: 50, borderRadius: 25 },

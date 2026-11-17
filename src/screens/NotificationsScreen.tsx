@@ -176,7 +176,7 @@ function createStyles(colors: ColorTokens) {
   container: { flex: 1, backgroundColor: colors.sand },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 16, paddingHorizontal: spacing.lg },
   back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
+  title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: spacing.lg, paddingVertical: 12 },
   rowUnread: { backgroundColor: colors.sandDeep },
   iconChip: {
@@ -188,6 +188,6 @@ function createStyles(colors: ColorTokens) {
   time: { fontSize: 11, color: colors.inkSoft, marginTop: 2 },
   postThumb: { width: 40, height: 40, borderRadius: 8 },
   brandAvatar: { backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center' },
-  brandMark: { fontFamily: 'Fraunces_700Bold_Italic', fontSize: 20, color: 'white', marginTop: -2 },
+  brandMark: { fontFamily: 'SchibstedGrotesk_700Bold_Italic', fontSize: 20, color: 'white', marginTop: -2 },
   });
 }

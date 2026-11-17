@@ -10,6 +10,7 @@ import { useStreakBump } from '@/lib/useStreakBump';
 import TabBar from '@/navigation/TabBar';
 import LaunchAnimation from '@/components/LaunchAnimation';
 import GuestBanner from '@/components/GuestBanner';
+import { PUBLIC_BROWSING } from '@/config/features';
 
 import LoginScreen from '@/screens/LoginScreen';
 import SignUpScreen from '@/screens/SignUpScreen';
@@ -46,7 +47,13 @@ import MyEnquiriesScreen from '@/screens/MyEnquiriesScreen';
 import ManageHousingScreen from '@/screens/ManageHousingScreen';
 import AdminEnquiryScreen from '@/screens/AdminEnquiryScreen';
 import EditResidenceScreen from '@/screens/EditResidenceScreen';
+import SplitRentScreen from '@/screens/SplitRentScreen';
+import CompareScreen from '@/screens/CompareScreen';
+import SignInToContinueScreen from '@/screens/SignInToContinueScreen';
 import LegalScreen from '@/screens/LegalScreen';
+
+// Why a signed-out visitor is being asked to make an account (shown in SignInToContinue).
+export type AccountReason = 'save' | 'enquire' | 'compare';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -73,7 +80,11 @@ export type RootStackParamList = {
   CreateOffer: undefined;
   Map: undefined;
   EventDetail: { eventId: string };
+  PublicHousing: undefined;
   ResidenceDetail: { residenceId: string };
+  SplitRent: { residenceId: string };
+  Compare: undefined;
+  SignInToContinue: { reason: AccountReason; residenceId?: string };
   HousingEnquiry: { residenceId: string; kind: 'question' | 'viewing' };
   HousingEnquirySent: { residenceName: string; kind: 'question' | 'viewing'; moveIn: string };
   MyEnquiries: undefined;
@@ -84,9 +95,9 @@ export type RootStackParamList = {
 };
 
 export type MainTabParamList = {
-  Feed: undefined;
-  Discover: undefined;
   Housing: undefined;
+  Discover: undefined;
+  Feed: undefined;
   Inbox: undefined;
   Profile: undefined;
 };
@@ -96,10 +107,10 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 
 function MainTabs() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
-      <Tab.Screen name="Feed" component={FeedScreen} />
-      <Tab.Screen name="Discover" component={DiscoverScreen} />
+    <Tab.Navigator initialRouteName="Housing" screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
       <Tab.Screen name="Housing" component={HousingScreen} />
+      <Tab.Screen name="Discover" component={DiscoverScreen} />
+      <Tab.Screen name="Feed" component={FeedScreen} />
       <Tab.Screen name="Inbox" component={InboxScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
@@ -150,7 +161,20 @@ export default function RootNavigator() {
     {isGuest ? <GuestBanner /> : null}
     <NavigationContainer theme={navTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!session ? (
+        {!session && PUBLIC_BROWSING ? (
+          // Signed out, public browsing on: the real Housing screen first, a listing and
+          // the rent split without an account. Saving, enquiring and comparing open
+          // SignInToContinue (useRequireAccount); Login and SignUp stay reachable.
+          <>
+            <Stack.Screen name="PublicHousing" component={HousingScreen} />
+            <Stack.Screen name="ResidenceDetail" component={ResidenceDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="SplitRent" component={SplitRentScreen} options={{ presentation: 'modal' }} />
+            <Stack.Screen name="SignInToContinue" component={SignInToContinueScreen} options={{ presentation: 'modal' }} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="SignUp" component={SignUpScreen} />
+            <Stack.Screen name="Legal" component={LegalScreen} options={{ presentation: 'card' }} />
+          </>
+        ) : !session ? (
           // Signed out — auth flow only.
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
@@ -185,6 +209,8 @@ export default function RootNavigator() {
             <Stack.Screen name="Map" component={MapScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="EventDetail" component={EventDetailScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="ResidenceDetail" component={ResidenceDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="SplitRent" component={SplitRentScreen} options={{ presentation: 'modal' }} />
+            <Stack.Screen name="Compare" component={CompareScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="HousingEnquiry" component={HousingEnquiryScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="HousingEnquirySent" component={HousingEnquirySentScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="MyEnquiries" component={MyEnquiriesScreen} options={{ presentation: 'card' }} />

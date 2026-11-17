@@ -613,7 +613,7 @@ function createStyles(colors: ColorTokens) {
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingTop: 60, paddingBottom: spacing.md },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   brandDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral },
-  brand: { fontFamily: 'Fraunces_700Bold_Italic', fontSize: 24, color: colors.ink },
+  brand: { fontFamily: 'SchibstedGrotesk_700Bold_Italic', fontSize: 24, color: colors.ink },
   topBarActions: { flexDirection: 'row', gap: spacing.sm },
   iconBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
   iconBtnDot: { position: 'absolute', top: 6, right: 7, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral, borderWidth: 1.5, borderColor: colors.white },
@@ -641,7 +641,7 @@ function createStyles(colors: ColorTokens) {
   communityBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
   communityBadgeText: { fontSize: 9.5, fontWeight: '700', color: colors.teal },
   sectionLabel: {
-    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
+    fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
   },
   housingCard: {
     flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: spacing.lg, marginTop: spacing.sm,
@@ -650,8 +650,8 @@ function createStyles(colors: ColorTokens) {
   },
   housingPhoto: { width: 64, height: 64, borderRadius: radius.sm },
   housingPhotoEmpty: { backgroundColor: `${colors.gold}26`, alignItems: 'center', justifyContent: 'center' },
-  housingEyebrow: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
-  housingTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 15.5, color: colors.ink, marginTop: 2, lineHeight: 20 },
+  housingEyebrow: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
+  housingTitle: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 15.5, color: colors.ink, marginTop: 2, lineHeight: 20 },
   housingSub: { fontSize: 12, color: colors.inkSoft, marginTop: 3 },
   dailyPickCard: {
     marginHorizontal: spacing.lg, marginTop: spacing.sm, marginBottom: spacing.md,
@@ -660,13 +660,13 @@ function createStyles(colors: ColorTokens) {
   // No photo: a plain dark card sized to its text, not a gradient poster.
   // Border keeps the card's edge visible in dark mode, where the page
   // background is nearly as dark as the card.
-  dailyPickTextOnly: { height: undefined, backgroundColor: '#20261F', borderWidth: 1, borderColor: colors.line },
+  dailyPickTextOnly: { height: undefined, backgroundColor: '#1F1B16', borderWidth: 1, borderColor: colors.line },
   dailyPickBody: { padding: spacing.lg },
   // Literal white/gold regardless of theme — this card is always a photo or
   // gradient with a dark overlay gradient under it, same reasoning as the
   // full-screen video layout's own white text.
-  dailyPickEyebrow: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10.5, color: colors.gold, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 },
-  dailyPickTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: 'white', lineHeight: 24 },
+  dailyPickEyebrow: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10.5, color: colors.gold, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 },
+  dailyPickTitle: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: 'white', lineHeight: 24 },
   dailyPickExcerpt: { fontSize: 12.5, color: 'rgba(255,255,255,0.75)', lineHeight: 18, marginTop: 6 },
   dailyPickMeta: { fontSize: 11.5, color: 'rgba(255,255,255,0.8)', fontWeight: '600', marginTop: 6 },
   masonryRow: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.lg },
@@ -676,10 +676,10 @@ function createStyles(colors: ColorTokens) {
   cardImage: { justifyContent: 'flex-start', backgroundColor: colors.sandDeep },
   // Fixed dark plaque regardless of theme — colors.ink would flip to cream in
   // dark mode and break the gold text's contrast, so this one stays literal.
-  editorialBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: '#20261F', paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.tag },
+  editorialBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: '#1F1B16', paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.tag },
   editorialBadgeText: { color: colors.gold, fontSize: 9, fontWeight: '700' },
   cardBody: { padding: 11 },
-  cardTag: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 9.5, color: colors.teal, textTransform: 'uppercase', letterSpacing: 0.8 },
+  cardTag: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 9.5, color: colors.teal, textTransform: 'uppercase', letterSpacing: 0.8 },
   cardTitle: { fontSize: 13.5, fontWeight: '700', marginTop: 5, color: colors.ink, lineHeight: 18 },
   cardExcerpt: { fontSize: 12, color: colors.inkSoft, marginTop: 5, lineHeight: 17 },
   cardMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 9 },

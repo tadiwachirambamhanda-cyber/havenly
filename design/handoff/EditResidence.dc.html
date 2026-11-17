@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Edit listing, team</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Schibsted+Grotesk:wght@500;600;700&display=swap">
+<style>
+body{margin:0;background:#F3F0EA;font-family:'Hanken Grotesk',system-ui,sans-serif;color:#1F1B16}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #7A2433;outline-offset:2px}
+.sec{font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#5A544B;padding:24px 16px 10px}
+.f{display:block;width:calc(100% - 32px);margin:0 16px 8px;height:48px;box-sizing:border-box;border:1px solid #8B8477;border-radius:10px;background:#FFFFFF;padding:0 14px;font-family:inherit;font-size:16px;color:#1F1B16}
+.f::placeholder{color:#6B655A}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:0 16px 8px}
+.two .f{width:100%;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px}
+.chip{height:40px;padding:0 14px;border-radius:999px;border:1px solid #8B8477;background:#FFFFFF;color:#1F1B16;font-size:14px;font-weight:500}
+.chip.on{background:#1F1B16;border-color:#1F1B16;color:#FFFFFF;font-weight:600}
+.sw{display:flex;align-items:center;gap:12px;margin:0 16px 8px;padding:12px 14px;background:#FFFFFF;border:1px solid #E2DDD2;border-radius:12px}
+.sw .t{flex:1;display:flex;flex-direction:column;gap:2px;font-size:15px;font-weight:600}
+.sw .t span{font-size:13px;font-weight:400;color:#5A544B}
+.tg{flex:none;position:relative;width:52px;height:32px;border-radius:999px;border:0;background:#BDB6A8;padding:0}
+.tg::after{content:'';position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:999px;background:#FFFFFF}
+.tg.on{background:#7A2433}
+.tg.on::after{left:23px}
+.hint{font-size:13px;color:#5A544B;padding:0 16px 8px}
+.card{margin:0 16px 10px;background:#FFFFFF;border:1px solid #E2DDD2;border-radius:12px;padding:12px 0 14px}
+.card .f{width:100%;margin:0}
+.card .two{padding-bottom:10px}
+.card .chips{padding-bottom:10px}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 2500px; box-sizing: border-box; background: #F3F0EA; display: flex; flex-direction: column">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 16px 8px">
+    <button type="button" style="height: 44px; padding: 0 4px; border: 0; background: none; font-size: 15px; font-weight: 600; color: #5A544B">Cancel</button>
+    <h1 style="margin: 0; font-family: 'Schibsted Grotesk', sans-serif; font-weight: 700; font-size: 18px">New listing</h1>
+    <button type="button" style="height: 44px; padding: 0 18px; border: 0; border-radius: 12px; background: {{accent}}; color: #FFFFFF; font-size: 15px; font-weight: 700">Save</button>
+  </div>
+
+  <div class="sec">Kind of place</div>
+  <div class="chips">
+    <button type="button" class="chip">Student residence</button>
+    <button type="button" class="chip">Room in a shared apartment</button>
+    <button type="button" class="chip">Private room</button>
+    <button type="button" class="chip">Studio</button>
+    <button type="button" class="chip on" aria-pressed="true">Whole home</button>
+  </div>
+  <div class="sec">Bedrooms</div>
+  <div class="chips">
+    <button type="button" class="chip">1 bedroom</button>
+    <button type="button" class="chip">2 bedrooms</button>
+    <button type="button" class="chip on" aria-pressed="true">3 bedrooms</button>
+  </div>
+
+  <div class="sec">Listing</div>
+  <input class="f" id="name" aria-label="Listing name" placeholder="Listing name" value="Whole 3 bedroom home, JLT">
+  <input class="f" id="provider" aria-label="Run by" placeholder="Run by (operator or agency)" value="Sample Housing Partner">
+  <input class="f" id="area" aria-label="Area" placeholder="Area, for example Dubai International Academic City" value="Jumeirah Lake Towers">
+  <input class="f" id="address" aria-label="Address" placeholder="Address (optional)">
+  <div class="two">
+    <input class="f" id="lat" aria-label="Latitude" placeholder="Latitude (optional)">
+    <input class="f" id="lng" aria-label="Longitude" placeholder="Longitude (optional)">
+  </div>
+  <textarea class="f" id="about" aria-label="About this place" placeholder="About this place (optional)" style="height: 96px; padding-top: 12px; resize: none"></textarea>
+  <div class="sw">
+    <div class="t">Show to students<span>Turn off to hide it without losing its enquiries.</span></div>
+    <button type="button" role="switch" aria-checked="true" aria-label="Show to students" class="tg on"></button>
+  </div>
+
+  <div class="sec">On top of rent (optional)</div>
+  <div class="two">
+    <input class="f" id="deposit" aria-label="Deposit AED" placeholder="Deposit AED" value="4,500">
+    <input class="f" id="fees" aria-label="One-time fees AED" placeholder="One-time fees AED" value="500">
+  </div>
+  <div class="hint">One-time fees are things like an agency or admin fee. Leave empty if there are none.</div>
+
+  <div class="sec">Bills</div>
+  <div class="sw">
+    <div class="t">Bills are included in the rent<span>Turn off to show students an estimate instead.</span></div>
+    <button type="button" role="switch" aria-checked="false" aria-label="Bills are included in the rent" class="tg"></button>
+  </div>
+  <div class="two">
+    <input class="f" id="billmin" aria-label="Estimated bills from AED a month" placeholder="From AED a month" value="450">
+    <input class="f" id="billmax" aria-label="Estimated bills up to AED a month" placeholder="Up to AED a month" value="700">
+  </div>
+  <div class="hint">For a whole home, enter the bills for the home. Students see them split per person.</div>
+
+  <div class="sec">Student deal</div>
+  <div class="sw">
+    <div class="t">Offer a student deal<span>Shown as a Student deal tag and helps the listing rank higher.</span></div>
+    <button type="button" role="switch" aria-checked="false" aria-label="Offer a student deal" class="tg"></button>
+  </div>
+  <div class="chips" style="padding-bottom: 8px">
+    <button type="button" class="chip">Student rate</button>
+    <button type="button" class="chip">Deposit waived</button>
+    <button type="button" class="chip">Fees waived</button>
+    <button type="button" class="chip">Free first month</button>
+    <button type="button" class="chip">Group discount</button>
+  </div>
+  <input class="f" id="deal" aria-label="Student rate AED a month" placeholder="Student rate AED a month (if a lower rent)">
+
+  <div class="sec">Checked by the team</div>
+  <div class="sw">
+    <div class="t">Verified by Havenly<span>Turn on only after the team has checked this place.</span></div>
+    <button type="button" role="switch" aria-checked="false" aria-label="Verified by Havenly" class="tg"></button>
+  </div>
+  <input class="f" id="permit" aria-label="Advert permit number" placeholder="Advert permit number (optional)">
+
+  <div class="sec">Photos (the first one is the cover)</div>
+  <div style="display: flex; gap: 10px; padding: 0 16px; overflow-x: auto">
+    <div style="flex: none; width: 96px; height: 72px; border-radius: 10px; background: #DDD7CB"></div>
+    <div style="flex: none; width: 96px; height: 72px; border-radius: 10px; background: #DDD7CB"></div>
+    <button type="button" aria-label="Add photos" style="flex: none; width: 96px; height: 72px; border-radius: 10px; border: 1.5px dashed #A39C8E; background: none; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5A544B" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </div>
+
+  <div class="sec">Room types</div>
+  <div class="card">
+    <div class="two">
+      <input class="f" id="rname" aria-label="Room type name" placeholder="Name" value="Whole 3 bedroom home">
+      <input class="f" id="rprice" aria-label="Price AED" placeholder="Price AED" value="9,000">
+    </div>
+    <div class="chips">
+      <button type="button" class="chip">per year</button>
+      <button type="button" class="chip">per semester</button>
+      <button type="button" class="chip on" aria-pressed="true">per month</button>
+    </div>
+    <div class="chips">
+      <button type="button" class="chip on" aria-pressed="true">Private</button>
+      <button type="button" class="chip">2 sharing</button>
+      <button type="button" class="chip">3 sharing</button>
+      <button type="button" class="chip">4 sharing</button>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 16px">
+      <div style="display: flex; align-items: center; gap: 10px"><button type="button" role="switch" aria-checked="true" aria-label="Available" class="tg on"></button><span style="font-size: 13px; color: #5A544B">Available</span></div>
+      <button type="button" style="height: 44px; border: 0; background: none; font-size: 14px; font-weight: 700; color: #B3261E">Remove</button>
+    </div>
+  </div>
+  <div style="padding: 0 16px"><button type="button" style="width: 100%; height: 48px; border-radius: 12px; border: 1.5px solid #8B8477; background: none; font-size: 14px; font-weight: 700; color: #1F1B16">Add room type</button></div>
+
+  <div class="sec">Who it is for</div>
+  <div class="chips">
+    <button type="button" class="chip on" aria-pressed="true">Mixed</button>
+    <button type="button" class="chip">Female only</button>
+    <button type="button" class="chip">Male only</button>
+  </div>
+
+  <div class="sec">What is included</div>
+  <div class="chips">
+    <button type="button" class="chip on" aria-pressed="true">Furnished</button>
+    <button type="button" class="chip on" aria-pressed="true">Wi-Fi</button>
+    <button type="button" class="chip">Bills included</button>
+    <button type="button" class="chip">Campus shuttle</button>
+    <button type="button" class="chip">Gym</button>
+    <button type="button" class="chip">Pool</button>
+    <button type="button" class="chip">Laundry</button>
+    <button type="button" class="chip">Cleaning</button>
+    <button type="button" class="chip">24/7 security</button>
+    <button type="button" class="chip">Parking</button>
+  </div>
+
+  <div class="sec">Close to</div>
+  <div class="chips" style="padding-bottom: 10px">
+    <button type="button" class="chip on" aria-pressed="true">Heriot-Watt University Dubai  ×</button>
+  </div>
+  <input class="f" id="uni" aria-label="Search universities" placeholder="Search universities">
+
+  <div class="sec">Partner terms (private, never shown to students)</div>
+  <input class="f" id="fee" aria-label="Referral fee percent" placeholder="Referral fee % of contract value, for example 8">
+  <input class="f" id="cname" aria-label="Contact name" placeholder="Contact name">
+  <input class="f" id="cmail" aria-label="Contact email" placeholder="Contact email">
+  <input class="f" id="cphone" aria-label="Contact phone" placeholder="Contact phone">
+  <textarea class="f" id="notes" aria-label="Notes" placeholder="Notes, for example invoice terms (optional)" style="height: 96px; padding-top: 12px; resize: none"></textarea>
+
+  <div style="flex-grow: 1"></div>
+  <div style="padding: 24px 16px 28px"><button type="button" style="width: 100%; height: 52px; border: 0; border-radius: 12px; background: {{accent}}; color: #FFFFFF; font-size: 16px; font-weight: 700">Save listing</button></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#7A2433","options":["#7A2433","#1F5FA8","#7A3E9D","#B4471B"]},"$preview":{"width":390,"height":2500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#7A2433' };
+  }
+}
+</script>
+</body>
+</html>

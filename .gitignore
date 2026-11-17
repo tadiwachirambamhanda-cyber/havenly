@@ -17,6 +17,7 @@ web-build/
 .env*
 !.env.example
 .review/
+.claude/worktrees/
 expo-env.d.ts
 
 # Vercel project link (local)

@@ -173,14 +173,14 @@ function createStyles(colors: ColorTokens) {
   container: { flex: 1, backgroundColor: colors.sand, paddingTop: 60 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: spacing.lg },
   back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 26, color: colors.ink },
+  title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 26, color: colors.ink },
   sub: { color: colors.inkSoft, fontSize: 12.5, paddingHorizontal: spacing.lg, marginTop: 4, marginBottom: 8 },
   sectionHeaderRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: spacing.lg, paddingVertical: 10,
   },
-  sectionLabel: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft },
-  sectionToggle: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.coral },
+  sectionLabel: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft },
+  sectionToggle: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.coral },
   // Plain rows with a divider, not a separate bordered box per community.
   card: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginHorizontal: spacing.lg, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   iconChip: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },

@@ -296,7 +296,7 @@ function createStyles(colors: ColorTokens) {
     container: { flex: 1, backgroundColor: colors.sand },
     header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 12, paddingHorizontal: spacing.lg },
     back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-    title: { flex: 1, fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
+    title: { flex: 1, fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
     headerTime: { fontSize: 12, color: colors.inkSoft },
     muted: { color: colors.inkSoft, textAlign: 'center', marginTop: 80 },
     muted2: { fontSize: 12, color: colors.inkSoft, marginTop: 2 },
@@ -305,9 +305,9 @@ function createStyles(colors: ColorTokens) {
       borderColor: colors.line, borderRadius: radius.md, padding: 14,
     },
     cardLabel: {
-      fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginBottom: 8,
+      fontFamily: 'HankenGrotesk_700Bold', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginBottom: 8,
     },
-    bigName: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
+    bigName: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
     phone: { fontSize: 16, fontWeight: '700', color: colors.ink, marginTop: 10, fontVariant: ['tabular-nums'] },
     actionRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
     actionBtn: {

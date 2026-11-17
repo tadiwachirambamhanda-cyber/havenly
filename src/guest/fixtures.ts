@@ -118,6 +118,8 @@ const residences: Row[] = [
     gender_policy: 'mixed', is_active: true, created_at: daysAgo(20),
     listing_type: 'residence', bedrooms: null, deposit_aed: null, move_in_fee_aed: null,
     is_verified: false, verified_at: null, permit_number: null,
+    bills_included: true, bills_min_aed: null, bills_max_aed: null, student_deal_types: [], student_rate_aed: null, housemates: null,
+    commutes: [{ university: 'Heriot-Watt University Dubai', minutes: 12, mode: 'shuttle' }, { university: 'Murdoch University Dubai', minutes: 15, mode: 'shuttle' }],
   },
   {
     id: 'residence-2', name: 'Sample Residence, Academic City', provider_name: 'Sample Housing Partner', area: 'Dubai Academic City',
@@ -127,6 +129,8 @@ const residences: Row[] = [
     gender_policy: 'female_only', is_active: true, created_at: daysAgo(18),
     listing_type: 'residence', bedrooms: null, deposit_aed: null, move_in_fee_aed: null,
     is_verified: false, verified_at: null, permit_number: null,
+    bills_included: false, bills_min_aed: 300, bills_max_aed: 450, student_deal_types: ['deposit_waived'], student_rate_aed: null, housemates: 2,
+    commutes: [{ university: 'University of Wollongong in Dubai', minutes: 9, mode: 'shuttle' }],
   },
   {
     id: 'residence-3', name: 'Sample Residence, Al Barsha', provider_name: 'Sample Housing Partner', area: 'Al Barsha',
@@ -136,6 +140,8 @@ const residences: Row[] = [
     gender_policy: 'mixed', is_active: true, created_at: daysAgo(15),
     listing_type: 'residence', bedrooms: null, deposit_aed: null, move_in_fee_aed: null,
     is_verified: false, verified_at: null, permit_number: null,
+    bills_included: null, bills_min_aed: null, bills_max_aed: null, student_deal_types: ['student_rate'], student_rate_aed: 3100, housemates: null,
+    commutes: [{ university: 'American University in Dubai', minutes: 14, mode: 'metro' }],
   },
 ];
 

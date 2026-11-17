@@ -94,7 +94,7 @@ export default function ResidenceDetailScreen() {
     return (
       <View style={styles.container}>
         <BackButton style={[styles.back, { top: insets.top + 12 }]}>
-          <Icon name="arrow-left" size={17} color="#20261F" />
+          <Icon name="arrow-left" size={17} color="#1F1B16" />
         </BackButton>
         <Skeleton style={{ height: HERO_HEIGHT, borderRadius: 0 }} />
         <View style={styles.body}>
@@ -112,7 +112,7 @@ export default function ResidenceDetailScreen() {
     return (
       <View style={styles.notFound}>
         <BackButton style={[styles.back, { top: insets.top + 12 }]}>
-          <Icon name="arrow-left" size={17} color="#20261F" />
+          <Icon name="arrow-left" size={17} color="#1F1B16" />
         </BackButton>
         <Text style={styles.notFoundText}>This residence isn’t listed anymore.</Text>
       </View>
@@ -245,7 +245,7 @@ export default function ResidenceDetailScreen() {
         <Text style={styles.compactTitle} numberOfLines={1}>{residence.name}</Text>
       </Animated.View>
       <BackButton style={[styles.back, { top: insets.top + 12 }]}>
-        <Icon name="arrow-left" size={17} color="#20261F" />
+        <Icon name="arrow-left" size={17} color="#1F1B16" />
       </BackButton>
       <AnimatedPressable hitSlop={8}
         style={[styles.saveBtn, { top: insets.top + 12 }]}
@@ -253,7 +253,7 @@ export default function ResidenceDetailScreen() {
         onPress={toggleSaved}
         accessibilityLabel={saved ? 'Remove from saved' : 'Save residence'}
       >
-        <BurstHeart active={saved} size={16} color="#20261F" activeColor="#FF5A3C" />
+        <BurstHeart active={saved} size={16} color="#1F1B16" activeColor="#7A2433" />
       </AnimatedPressable>
 
       <View style={[styles.ctaBar, { paddingBottom: insets.bottom + 14 }]}>
@@ -304,13 +304,13 @@ function createStyles(colors: ColorTokens) {
       position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1, backgroundColor: colors.sand,
       borderBottomWidth: 1, borderColor: colors.line, paddingHorizontal: 64, alignItems: 'center',
     },
-    compactTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 15, color: colors.ink, lineHeight: 34 },
+    compactTitle: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 15, color: colors.ink, lineHeight: 34 },
     thumbRow: { gap: 8, paddingHorizontal: spacing.lg, paddingTop: 12 },
     thumb: { width: 64, height: 48, borderRadius: 8, overflow: 'hidden', borderWidth: 2, borderColor: 'transparent', backgroundColor: colors.sandDeep },
     thumbActive: { borderColor: colors.coral },
     body: { padding: spacing.lg },
-    area: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
-    name: { fontFamily: 'Fraunces_600SemiBold', fontSize: 25, color: colors.ink, marginTop: 6 },
+    area: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
+    name: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 25, color: colors.ink, marginTop: 6 },
     provider: { fontSize: 13, color: colors.inkSoft, marginTop: 4 },
     factRow: { flexDirection: 'row', gap: 8, marginTop: 14, flexWrap: 'wrap' },
     fact: {
@@ -319,7 +319,7 @@ function createStyles(colors: ColorTokens) {
     },
     factText: { fontSize: 12, fontWeight: '600', color: colors.ink },
     sectionLabel: {
-      fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginTop: 26, marginBottom: 10,
+      fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginTop: 26, marginBottom: 10,
     },
     muted: { fontSize: 13, color: colors.inkSoft },
     roomRow: {

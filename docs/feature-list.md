@@ -6,7 +6,7 @@ Source: `docs/prd.md`. One row per feature, in build order: data first, then the
 
 | ID | Feature (what a person can do or see) | Done check (an action and what they see) | Version | Status |
 |---|---|---|---|---|
-| F1 | Listings record the kind of place (student residence, room in a shared apartment, private room, studio, or a whole 1, 2 or 3 bedroom home), the number of bedrooms, the extra costs (deposit, fees), a "Verified by Havenly" flag and an optional permit number. The team can set all of these. | As admin I open Manage housing, edit a listing, set the type to "Private room", add a deposit of AED 1,000 and tick Verified. I save, reopen it, and all three are still there. | v1 | not started |
+| F1 | Listings record the kind of place (student residence, room in a shared apartment, private room, studio, or a whole 1, 2 or 3 bedroom home), the number of bedrooms, the extra costs (deposit, fees), a "Verified by Havenly" flag and an optional permit number. The team can set all of these. | As admin I open Manage housing, edit a listing, set the type to "Private room", add a deposit of AED 1,000 and tick Verified. I save, reopen it, and all three are still there. | v1 | done (merged 2026-11-18) |
 | F2 | The team can add a listing of any of the five kinds, with photos, price, area, nearby universities and amenities. | As admin I add a "Studio" with 3 photos and a monthly price. It appears in the Housing list and opens with all 3 photos. I add a 3 bedroom home at AED 9,000 a month and its page shows about AED 3,000 each. | v1 | not started |
 | F3 | A listing page shows the full picture: photo gallery, price plus deposit and fees, what is included, commute to each nearby university, a "Verified by Havenly" mark only when verified, and Open in Maps. | I open a verified listing and see the gallery, the real total cost to move in, the commute to each nearby university and the Verified mark. I open an unverified one and there is no mark. | v1 | not started |
 | F4 | Housing is the first tab and the screen the app opens on, with the social features behind it. | I log in and the first screen is student housing search, not the feed. The feed, Discover, Inbox and Profile are still one tap away. | v1 | not started |
@@ -25,6 +25,15 @@ Rules:
 - F11 to F13 were added 2026-11-18 (bills, rent split and student deals). Build them after F1 to F5; F12 needs F11.
 - v1 is what the idea needs to be a housing-first platform, and nothing else.
 - Status is one of: not started, in progress, done (merged to main).
+
+## Lanes
+
+| Lane | Features | Notes |
+|---|---|---|
+| Chief Architect (foundation) | F4 (Housing first tab, done), the data and calculations behind F11 to F13, the new look, F6 switch (`PUBLIC_BROWSING`) | Merged first; see `plans/2026-11-18-foundation.md` |
+| Lane A: find a home | F3, F5, F6 (screens), F7, F8 (restyle), F11 (display and filter), F12, F13 (display and ranking) | `docs/lanes/lane-a.md` |
+| Lane B: listings and deals (team side) | F2, F11 (admin fields), F13 (admin fields), the admin screens restyled | `docs/lanes/lane-b.md` |
+| The founder | F10 (real listings: photos, prices, providers) | Content, not code. Lane B's form is how it gets entered |
 
 ## Later
 

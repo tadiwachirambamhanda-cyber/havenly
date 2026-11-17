@@ -60,10 +60,10 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand, paddingHorizontal: spacing.lg },
     body: { flex: 1, alignItems: 'flex-start' },
-    title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 28, color: colors.ink, marginTop: 18 },
+    title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 28, color: colors.ink, marginTop: 18 },
     summary: { fontSize: 14.5, fontWeight: '600', color: colors.inkSoft, marginTop: 6 },
     nextLabel: {
-      fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8,
+      fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8,
       color: colors.inkSoft, marginTop: 36,
     },
     steps: { gap: 10, marginTop: 12 },

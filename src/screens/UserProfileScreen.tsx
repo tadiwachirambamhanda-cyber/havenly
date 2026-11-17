@@ -182,7 +182,7 @@ export default function UserProfileScreen() {
       <View style={styles.container}>
         <Skeleton style={{ height: 110, borderRadius: 0 }} />
         <BackButton style={[styles.back, styles.backOverlay, { top: insets.top + 12 }]}>
-          <Icon name="arrow-left" size={17} color="#20261F" />
+          <Icon name="arrow-left" size={17} color="#1F1B16" />
         </BackButton>
         <View style={[styles.avatarRow, { marginTop: avatarMarginTop }]}>
           <Skeleton style={{ width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand }} />
@@ -241,7 +241,7 @@ export default function UserProfileScreen() {
               <LinearGradient colors={[...tones.coral]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cover} />
             )}
             <BackButton style={[styles.back, styles.backOverlay, { top: insets.top + 12 }]}>
-              <Icon name="arrow-left" size={17} color="#20261F" />
+              <Icon name="arrow-left" size={17} color="#1F1B16" />
             </BackButton>
             {!isMe && (
               <AnimatedPressable
@@ -249,7 +249,7 @@ export default function UserProfileScreen() {
                 onPress={() => setOptionsVisible(true)}
                 accessibilityLabel="More options"
               >
-                <Icon name="more-horizontal" size={17} color="#20261F" />
+                <Icon name="more-horizontal" size={17} color="#1F1B16" />
               </AnimatedPressable>
             )}
             <View style={[styles.avatarRow, { marginTop: avatarMarginTop }]}>
@@ -363,7 +363,7 @@ function createStyles(colors: ColorTokens) {
   followBtnActive: { backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line },
   followBtnText: { fontSize: 12.5, fontWeight: '700', color: colors.sand },
   followBtnTextActive: { color: colors.ink },
-  name: { fontFamily: 'Fraunces_600SemiBold', fontSize: 20, color: colors.ink, paddingHorizontal: spacing.lg, paddingTop: 12 },
+  name: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 20, color: colors.ink, paddingHorizontal: spacing.lg, paddingTop: 12 },
   handle: { fontSize: 12.5, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 2 },
   bio: { fontSize: 13, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 10, lineHeight: 20 },
   statsRow: { flexDirection: 'row', gap: 22, paddingHorizontal: spacing.lg, paddingTop: 16, paddingBottom: 6 },
@@ -374,7 +374,7 @@ function createStyles(colors: ColorTokens) {
   chip: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.tag, backgroundColor: colors.sandDeep },
   chipText: { fontSize: 11, fontWeight: '700', color: colors.ink },
   sectionLabel: {
-    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 6, marginBottom: 10,
+    fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 6, marginBottom: 10,
   },
   gridCell: { flex: 1, aspectRatio: 1 / 1.15, overflow: 'hidden', marginBottom: 2 },
   // Text-only post in the grid: its title on a quiet tile, not a colour block.
