@@ -9,6 +9,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { useStreakBump } from '@/lib/useStreakBump';
 import TabBar from '@/navigation/TabBar';
 import LaunchAnimation from '@/components/LaunchAnimation';
+import GuestBanner from '@/components/GuestBanner';
 
 import LoginScreen from '@/screens/LoginScreen';
 import SignUpScreen from '@/screens/SignUpScreen';
@@ -114,7 +115,7 @@ function SplashLoading({ colors }: { colors: ColorTokens }) {
 }
 
 export default function RootNavigator() {
-  const { session, profile, loading } = useAuth();
+  const { session, profile, loading, isGuest } = useAuth();
   const { colors, scheme } = useTheme();
   useStreakBump();
   // Plays exactly once per app process (not on every subsequent sign-in) —
@@ -145,6 +146,8 @@ export default function RootNavigator() {
   if (session && !profile) return <SplashLoading colors={colors} />;
 
   return (
+    <View style={{ flex: 1 }}>
+    {isGuest ? <GuestBanner /> : null}
     <NavigationContainer theme={navTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!session ? (
@@ -193,6 +196,7 @@ export default function RootNavigator() {
         )}
       </Stack.Navigator>
     </NavigationContainer>
+    </View>
   );
 }
 

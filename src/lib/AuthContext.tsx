@@ -2,6 +2,8 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { setCrashReportingUser } from '@/lib/crashReporting';
+import { enterGuestMode, exitGuestMode, isGuestMode, subscribeGuestMode } from '@/guest/guestState';
+import { GUEST_PROFILE, GUEST_SESSION } from '@/guest/fixtures';
 import type { Profile } from '@/types';
 
 interface AuthContextValue {
@@ -9,6 +11,10 @@ interface AuthContextValue {
   profile: Profile | null;
   loading: boolean;
   refreshProfile: () => Promise<void>;
+  // Guest mode: a read-only demo on sample content, with no real session.
+  isGuest: boolean;
+  enterGuest: () => void;
+  exitGuest: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -17,6 +23,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isGuest, setIsGuest] = useState(isGuestMode());
+
+  // The guest flag lives outside React so the Supabase switch can read it on every
+  // call; this keeps the screens in step with it.
+  useEffect(() => subscribeGuestMode(() => setIsGuest(isGuestMode())), []);
 
   const loadProfile = useCallback(async (userId: string) => {
     const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
@@ -34,8 +45,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { setCrashReportingUser(session?.user.id ?? null); }, [session?.user.id]);
 
   const refreshProfile = useCallback(async () => {
-    if (session?.user) await loadProfile(session.user.id);
-  }, [session, loadProfile]);
+    if (session?.user && !isGuest) await loadProfile(session.user.id);
+  }, [session, isGuest, loadProfile]);
 
   useEffect(() => {
     let mounted = true;
@@ -64,8 +75,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [loadProfile]);
 
+  // In guest mode the screens see a stand-in session and profile. The real session
+  // state above is left untouched, and crash reporting keeps using the real one.
+  const value: AuthContextValue = isGuest
+    ? { session: GUEST_SESSION, profile: GUEST_PROFILE, loading: false, refreshProfile, isGuest, enterGuest: enterGuestMode, exitGuest: exitGuestMode }
+    : { session, profile, loading, refreshProfile, isGuest, enterGuest: enterGuestMode, exitGuest: exitGuestMode };
+
   return (
-    <AuthContext.Provider value={{ session, profile, loading, refreshProfile }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
