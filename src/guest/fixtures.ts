@@ -116,6 +116,8 @@ const residences: Row[] = [
     address: 'Dubai Knowledge Park, Dubai', latitude: 25.1015, longitude: 55.1648, photo_urls: [],
     amenities: ['Wi-Fi', 'Study lounge', 'Gym', 'Laundry'], nearby_universities: ['Murdoch University Dubai', 'Heriot-Watt University Dubai'],
     gender_policy: 'mixed', is_active: true, created_at: daysAgo(20),
+    listing_type: 'residence', bedrooms: null, deposit_aed: null, move_in_fee_aed: null,
+    is_verified: false, verified_at: null, permit_number: null,
   },
   {
     id: 'residence-2', name: 'Sample Residence, Academic City', provider_name: 'Sample Housing Partner', area: 'Dubai Academic City',
@@ -123,6 +125,8 @@ const residences: Row[] = [
     address: 'Dubai Academic City, Dubai', latitude: 25.1214, longitude: 55.4146, photo_urls: [],
     amenities: ['Wi-Fi', 'Shared kitchen', 'Rooftop', 'Bike storage'], nearby_universities: ['University of Wollongong in Dubai'],
     gender_policy: 'female_only', is_active: true, created_at: daysAgo(18),
+    listing_type: 'residence', bedrooms: null, deposit_aed: null, move_in_fee_aed: null,
+    is_verified: false, verified_at: null, permit_number: null,
   },
   {
     id: 'residence-3', name: 'Sample Residence, Al Barsha', provider_name: 'Sample Housing Partner', area: 'Al Barsha',
@@ -130,6 +134,8 @@ const residences: Row[] = [
     address: 'Al Barsha, Dubai', latitude: 25.1124, longitude: 55.2007, photo_urls: [],
     amenities: ['Wi-Fi', 'Metro nearby', 'Gym'], nearby_universities: ['American University in Dubai'],
     gender_policy: 'mixed', is_active: true, created_at: daysAgo(15),
+    listing_type: 'residence', bedrooms: null, deposit_aed: null, move_in_fee_aed: null,
+    is_verified: false, verified_at: null, permit_number: null,
   },
 ];
 

@@ -1279,7 +1279,22 @@ create table residences (
   nearby_universities text[] not null default '{}',
   gender_policy text not null default 'mixed' check (gender_policy in ('mixed', 'female_only', 'male_only')),
   is_active boolean not null default true,
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+  -- What kind of place this is. Only a whole home has a bedroom count (1 to 3).
+  listing_type text not null default 'residence'
+    check (listing_type in ('residence', 'shared_room', 'private_room', 'studio', 'home')),
+  bedrooms int,
+  -- Costs on top of rent, whole AED. Null means none.
+  deposit_aed int check (deposit_aed is null or deposit_aed >= 0),
+  move_in_fee_aed int check (move_in_fee_aed is null or move_in_fee_aed >= 0),
+  -- Set by the Havenly team after checking the place.
+  is_verified boolean not null default false,
+  verified_at timestamptz,
+  permit_number text check (permit_number is null or char_length(permit_number) <= 40),
+  constraint residences_bedrooms_match_type check (
+    (listing_type = 'home' and bedrooms is not null and bedrooms between 1 and 3)
+    or (listing_type <> 'home' and bedrooms is null)
+  )
 );
 alter table residences enable row level security;
 create policy "Active residences are viewable by everyone" on residences for select using (is_active or public.is_admin());
@@ -1514,7 +1529,8 @@ begin
   if rid is null then
     insert into residences (
       name, provider_name, area, address, latitude, longitude, description,
-      gender_policy, amenities, nearby_universities, photo_urls, is_active
+      gender_policy, amenities, nearby_universities, photo_urls, is_active,
+      listing_type, bedrooms, deposit_aed, move_in_fee_aed, is_verified, verified_at, permit_number
     ) values (
       residence->>'name', residence->>'provider_name', residence->>'area', residence->>'address',
       (residence->>'latitude')::double precision, (residence->>'longitude')::double precision,
@@ -1522,7 +1538,14 @@ begin
       array(select jsonb_array_elements_text(coalesce(residence->'amenities', '[]'::jsonb))),
       array(select jsonb_array_elements_text(coalesce(residence->'nearby_universities', '[]'::jsonb))),
       array(select jsonb_array_elements_text(coalesce(residence->'photo_urls', '[]'::jsonb))),
-      coalesce((residence->>'is_active')::boolean, true)
+      coalesce((residence->>'is_active')::boolean, true),
+      coalesce(residence->>'listing_type', 'residence'),
+      (residence->>'bedrooms')::int,
+      (residence->>'deposit_aed')::int,
+      (residence->>'move_in_fee_aed')::int,
+      coalesce((residence->>'is_verified')::boolean, false),
+      case when coalesce((residence->>'is_verified')::boolean, false) then now() else null end,
+      nullif(trim(residence->>'permit_number'), '')
     )
     returning id into rid;
   else
@@ -1538,7 +1561,19 @@ begin
       amenities = array(select jsonb_array_elements_text(coalesce(residence->'amenities', '[]'::jsonb))),
       nearby_universities = array(select jsonb_array_elements_text(coalesce(residence->'nearby_universities', '[]'::jsonb))),
       photo_urls = array(select jsonb_array_elements_text(coalesce(residence->'photo_urls', '[]'::jsonb))),
-      is_active = coalesce((residence->>'is_active')::boolean, true)
+      is_active = coalesce((residence->>'is_active')::boolean, true),
+      listing_type = coalesce(residence->>'listing_type', listing_type),
+      bedrooms = case when residence ? 'bedrooms' then (residence->>'bedrooms')::int else bedrooms end,
+      deposit_aed = case when residence ? 'deposit_aed' then (residence->>'deposit_aed')::int else deposit_aed end,
+      move_in_fee_aed = case when residence ? 'move_in_fee_aed' then (residence->>'move_in_fee_aed')::int else move_in_fee_aed end,
+      permit_number = case when residence ? 'permit_number' then nullif(trim(residence->>'permit_number'), '') else permit_number end,
+      -- Stamp the time the first time it becomes verified; clear it when it stops.
+      is_verified = coalesce((residence->>'is_verified')::boolean, is_verified),
+      verified_at = case
+        when coalesce((residence->>'is_verified')::boolean, is_verified)
+          then coalesce(verified_at, now())
+        else null
+      end
     where id = rid;
     if not found then
       raise exception 'This residence no longer exists.';
@@ -1586,6 +1621,7 @@ begin
   return rid;
 end;
 $$;
+revoke execute on function public.save_residence(uuid, jsonb, jsonb, jsonb) from public, anon;
 grant execute on function public.save_residence(uuid, jsonb, jsonb, jsonb) to authenticated;
 
 -- ==================== HOUSING NOTIFICATIONS ====================
