@@ -65,7 +65,6 @@ interface FieldProps extends TextInputProps {
   label: string;
   invalid?: boolean;
   multiline?: boolean;
-  style?: StyleProp<ViewStyle>;
 }
 
 // `label` is the accessible name (the placeholder is only a hint).
@@ -76,7 +75,7 @@ export function Field({ label, invalid, multiline, style, ...rest }: FieldProps)
       accessibilityLabel={label}
       placeholderTextColor="#6B655A"
       multiline={multiline}
-      style={[styles.field, multiline && styles.fieldMulti, invalid && styles.fieldBad, style as never]}
+      style={[styles.field, multiline && styles.fieldMulti, invalid && styles.fieldBad, style]}
       selectionColor={colors.coral}
       {...rest}
     />
