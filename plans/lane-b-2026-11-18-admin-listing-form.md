@@ -34,4 +34,15 @@ The Havenly team can add and edit a listing of any kind with everything students
 ## Ideas for later
 - Latitude and longitude range checks (-90 to 90, -180 to 180).
 - A picker of universities for each commute row, fed by the "Close to" list, instead of typing the name.
+- (Added at the end) The commute row already offers the "Close to" universities as quick picks; a full picker is still open.
+
+## Codex review
+Round 1: VERDICT FINDINGS(1).
+1. MAJOR, `EditResidenceScreen.tsx`: if loading an existing listing failed, the form still opened with empty values and treated every new-field group as changed, so a save could blank stored bills, deals, housemates and commutes. **Fixed**: a failed load now shows an error with a Go back button and no form.
+
+Round 2: VERDICT PASS.
+
+## Verification
+- `npm run typecheck`, `npm run lint`, `npm test` (68 tests, 18 new for the listing checks), `npx expo-doctor` (21/21) and `npx expo export --platform web` pass.
+- The app bundle starts on port 8083 and the login screen renders without console errors. The admin form is not reachable in demo mode, so its look and the real save were not checked in a browser; the real save needs the live database (Chief Architect).
 - The dark theme version of the admin screens once the oxblood dark palette is designed.
