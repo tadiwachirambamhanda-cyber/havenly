@@ -162,7 +162,7 @@ function createStyles(colors: ColorTokens) {
   container: { flex: 1, backgroundColor: colors.sand },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 12, paddingHorizontal: spacing.lg },
   back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
+  title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
   streakBanner: { marginHorizontal: spacing.lg, marginBottom: 6, paddingVertical: 10, paddingHorizontal: 14, borderRadius: radius.button, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center' },
   streakBannerText: { fontSize: 12.5, fontWeight: '700', color: colors.ink },
   locationNotice: {
@@ -175,7 +175,7 @@ function createStyles(colors: ColorTokens) {
   locationEnableBtnText: { fontSize: 11, fontWeight: '700', color: colors.teal },
   card: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   cardImage: { width: 56, height: 56, borderRadius: radius.sm },
-  cardBrand: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
+  cardBrand: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
   cardTitle: { fontSize: 13.5, fontWeight: '700', color: colors.ink, marginTop: 2, lineHeight: 17 },
   cardMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 3 },
   cardDiscount: { fontSize: 12, color: colors.coral, fontWeight: '700' },

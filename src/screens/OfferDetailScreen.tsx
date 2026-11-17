@@ -321,8 +321,8 @@ function createStyles(colors: ColorTokens) {
   },
   hero: { height: 220, overflow: 'hidden' },
   body: { padding: spacing.lg },
-  brand: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 22, color: colors.ink, marginTop: 6 },
+  brand: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
+  title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 22, color: colors.ink, marginTop: 6 },
   discount: { fontSize: 15, fontWeight: '700', color: colors.coral, marginTop: 6 },
   description: { fontSize: 13.5, color: colors.inkSoft, lineHeight: 20, marginTop: 12 },
   streakRow: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 16 },
@@ -339,7 +339,7 @@ function createStyles(colors: ColorTokens) {
   codeCard: {
     marginTop: 20, backgroundColor: colors.ink, borderRadius: radius.md, paddingVertical: 20, alignItems: 'center',
   },
-  codeLabel: { fontSize: 11.5, color: colors.sand, opacity: 0.7, textTransform: 'uppercase', letterSpacing: 0.8, fontFamily: 'PlusJakartaSans_700Bold' },
+  codeLabel: { fontSize: 11.5, color: colors.sand, opacity: 0.7, textTransform: 'uppercase', letterSpacing: 0.8, fontFamily: 'HankenGrotesk_700Bold' },
   code: { fontFamily: 'JetBrainsMono_500Medium', fontSize: 30, fontWeight: '700', color: colors.sand, letterSpacing: 6, marginTop: 8 },
   checkInSection: { marginTop: 24, paddingTop: 20, borderTopWidth: 1, borderColor: colors.line },
   goingBtn: {
@@ -361,7 +361,7 @@ function createStyles(colors: ColorTokens) {
   checkInBtnTextActive: { color: colors.teal },
   checkInList: { marginTop: 18 },
   checkInListLabel: {
-    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginBottom: 10,
+    fontFamily: 'HankenGrotesk_700Bold', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginBottom: 10,
   },
   checkInRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
   checkInAvatar: { width: 32, height: 32, borderRadius: 16 },

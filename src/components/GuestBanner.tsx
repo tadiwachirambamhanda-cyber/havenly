@@ -30,7 +30,7 @@ export default function GuestBanner() {
         {flash ? 'Create an account to do this.' : 'Demo mode · sample content only'}
       </Text>
       <Pressable onPress={exitGuest} hitSlop={8} accessibilityRole="button" accessibilityLabel="Leave the demo and create an account">
-        <Text style={[styles.cta, { color: flash ? colors.ink : colors.coral }]}>Create account</Text>
+        <Text style={[styles.cta, { color: flash ? colors.ink : colors.sand, textDecorationLine: 'underline' }]}>Create account</Text>
       </Pressable>
     </View>
   );
@@ -38,6 +38,6 @@ export default function GuestBanner() {
 
 const styles = StyleSheet.create({
   bar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 8, gap: 12 },
-  text: { fontFamily: 'PlusJakartaSans_600SemiBold', fontSize: 12.5, flexShrink: 1 },
-  cta: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 12.5 },
+  text: { fontFamily: 'HankenGrotesk_600SemiBold', fontSize: 12.5, flexShrink: 1 },
+  cta: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 12.5 },
 });

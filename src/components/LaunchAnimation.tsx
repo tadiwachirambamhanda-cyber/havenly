@@ -42,9 +42,9 @@ export default function LaunchAnimation({ onFinish }: { onFinish: () => void }) 
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand, alignItems: 'center', justifyContent: 'center' },
-    h: { position: 'absolute', fontFamily: 'Fraunces_700Bold_Italic', fontSize: 96, color: colors.ink },
+    h: { position: 'absolute', fontFamily: 'SchibstedGrotesk_700Bold_Italic', fontSize: 96, color: colors.ink },
     wordmarkRow: { position: 'absolute', flexDirection: 'row', alignItems: 'center', gap: 6 },
     dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral },
-    wordmark: { fontFamily: 'Fraunces_700Bold_Italic', fontSize: 24, color: colors.ink },
+    wordmark: { fontFamily: 'SchibstedGrotesk_700Bold_Italic', fontSize: 24, color: colors.ink },
   });
 }

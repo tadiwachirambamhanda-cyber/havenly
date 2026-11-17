@@ -231,7 +231,7 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
-  headerTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 17, color: colors.ink },
+  headerTitle: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 17, color: colors.ink },
   headerBtn: { fontSize: 14, fontWeight: '600', color: colors.inkSoft },
   saveBtn: { color: colors.coral, fontWeight: '700' },
   cover: { height: 110 },
@@ -247,7 +247,7 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: 'rgba(0,0,0,0.55)', borderWidth: 2, borderColor: colors.sand, alignItems: 'center', justifyContent: 'center',
   },
   label: {
-    fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: spacing.md, marginBottom: 6,
+    fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: spacing.md, marginBottom: 6,
   },
   input: {
     marginHorizontal: spacing.lg, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,
@@ -256,7 +256,7 @@ function createStyles(colors: ColorTokens) {
   bioInput: { minHeight: 80, textAlignVertical: 'top' },
   universityValue: { fontSize: 14, color: colors.ink },
   universityPlaceholder: { fontSize: 14, color: colors.inkSoft },
-  groupLabel: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 10, marginBottom: 6 },
+  groupLabel: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 10, marginBottom: 6 },
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 9, paddingHorizontal: spacing.lg },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: 9, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
   chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },

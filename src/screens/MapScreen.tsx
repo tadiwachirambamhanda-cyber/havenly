@@ -161,7 +161,7 @@ function buildMapHtml(params: {
     .user-dot-pulse { position: absolute; inset: -10px; border-radius: 50%; background: ${palette.teal}4d; animation: livePulse 2.6s ease-in-out infinite; }
     .user-dot-core { position: absolute; inset: 0; border-radius: 50%; background: ${palette.teal}; border: 3px solid white; box-shadow: 0 0 0 3px ${palette.teal}4d; }
     .mapboxgl-popup-content { border-radius: 14px; padding: 12px 14px; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; }
-    .popup-title { font-weight: 700; font-size: 13px; margin-bottom: 2px; color: #20261F; }
+    .popup-title { font-weight: 700; font-size: 13px; margin-bottom: 2px; color: #1F1B16; }
     .popup-sub { font-size: 11.5px; color: #5B6459; margin-bottom: 8px; }
     .popup-btn {
       display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: white;
@@ -169,7 +169,7 @@ function buildMapHtml(params: {
     }
     .popup-row { display: flex; gap: 6px; align-items: center; }
     .interest-btn {
-      display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; color: #20261F;
+      display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; color: #1F1B16;
       background: #EDEAE2; border: 1.5px solid #E7DDC9; border-radius: 100px; padding: 6px 12px; cursor: pointer;
     }
     .interest-btn-active { color: #B8791E; background: #FBEBCF; border-color: #E3A23A; }
@@ -919,14 +919,14 @@ function createStyles(colors: ColorTokens) {
   container: { flex: 1, backgroundColor: colors.sand },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
   missingTokenText: { fontSize: 13, color: colors.inkSoft },
-  webNoticeTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 18, color: colors.ink, marginTop: 4 },
+  webNoticeTitle: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 18, color: colors.ink, marginTop: 4 },
   webNoticeText: { fontSize: 13.5, lineHeight: 20, color: colors.inkSoft, textAlign: 'center', maxWidth: 280 },
   header: {
     flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 12,
     paddingHorizontal: spacing.lg, backgroundColor: colors.sand, zIndex: 1,
   },
   back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
+  title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
   locationNotice: {
     flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: spacing.lg, paddingBottom: 10,
     backgroundColor: colors.sand,

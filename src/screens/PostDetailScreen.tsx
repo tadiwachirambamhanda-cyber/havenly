@@ -318,7 +318,7 @@ export default function PostDetailScreen() {
     return loaded ? (
       <View style={styles.notFound}>
         <BackButton style={[styles.back, { top: insets.top + 12 }]}>
-          <Icon name="arrow-left" size={16} color="#20261F" />
+          <Icon name="arrow-left" size={16} color="#1F1B16" />
         </BackButton>
         <Text style={styles.notFoundText}>This post isn&apos;t available.</Text>
       </View>
@@ -566,14 +566,14 @@ export default function PostDetailScreen() {
         </>
         )}
         <BackButton style={[styles.back, !hasMedia && styles.bareBtn, { top: insets.top + 12 }]}>
-          <Icon name="arrow-left" size={16} color={hasMedia ? '#20261F' : colors.ink} />
+          <Icon name="arrow-left" size={16} color={hasMedia ? '#1F1B16' : colors.ink} />
         </BackButton>
         <Pressable hitSlop={8}
           style={[styles.overflow, !hasMedia && styles.bareBtn, { top: insets.top + 12 }]}
           onPress={openOptions}
           accessibilityLabel="More options"
         >
-          <Icon name="more-horizontal" size={17} color={hasMedia ? '#20261F' : colors.ink} />
+          <Icon name="more-horizontal" size={17} color={hasMedia ? '#1F1B16' : colors.ink} />
         </Pressable>
       </View>
       <View style={styles.body}>
@@ -732,8 +732,8 @@ function createStyles(colors: ColorTokens) {
   notFound: { flex: 1, backgroundColor: colors.sand, paddingTop: 60, paddingHorizontal: spacing.lg },
   notFoundText: { color: colors.inkSoft, textAlign: 'center', marginTop: 100 },
   body: { padding: spacing.lg },
-  tag: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10.5, color: colors.teal, textTransform: 'uppercase', letterSpacing: 0.8 },
-  title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 22, color: colors.ink, marginTop: 8, lineHeight: 28 },
+  tag: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10.5, color: colors.teal, textTransform: 'uppercase', letterSpacing: 0.8 },
+  title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 22, color: colors.ink, marginTop: 8, lineHeight: 28 },
   userRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginVertical: 14 },
   authorTap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
   avatar: { width: 32, height: 32, borderRadius: 16 },
@@ -753,7 +753,7 @@ function createStyles(colors: ColorTokens) {
   actionText: { fontSize: 12.5, fontWeight: '700', color: colors.inkSoft },
   actionTextActive: { color: colors.coral },
   commentsSection: { marginTop: 20, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.line },
-  commentsLabel: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginBottom: 12 },
+  commentsLabel: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginBottom: 12 },
   commentRow: { flexDirection: 'row', gap: 10, marginBottom: 14 },
   commentAvatar: { width: 28, height: 28, borderRadius: 14 },
   commentMeta: { fontSize: 11, color: colors.inkSoft },
@@ -789,8 +789,8 @@ function createStyles(colors: ColorTokens) {
   videoFollowBtnActive: { backgroundColor: 'rgba(255,255,255,0.25)' },
   videoFollowBtnText: { fontSize: 11, fontWeight: '700', color: 'white' },
   videoFollowBtnTextActive: { color: 'white' },
-  videoTag: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10, color: colors.gold, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 },
-  videoTitle: { fontFamily: 'Fraunces_600SemiBold', fontSize: 17, color: 'white', lineHeight: 21 },
+  videoTag: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10, color: colors.gold, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 },
+  videoTitle: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 17, color: 'white', lineHeight: 21 },
   videoBody: { fontSize: 12.5, color: 'rgba(255,255,255,0.85)', marginTop: 4, lineHeight: 18 },
   videoRail: { alignItems: 'center', gap: 18, paddingBottom: 4 },
   railItem: { alignItems: 'center', gap: 4 },

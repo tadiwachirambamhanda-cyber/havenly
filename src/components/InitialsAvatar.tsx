@@ -26,7 +26,7 @@ export default function InitialsAvatar({ name, style }: Props) {
   return (
     <View style={[{ backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }, style]}>
       <Text
-        style={{ color: colors.inkSoft, fontFamily: 'PlusJakartaSans_700Bold', fontSize: Math.max(9, Math.round(size * 0.38)), letterSpacing: 0.3 }}
+        style={{ color: colors.inkSoft, fontFamily: 'HankenGrotesk_700Bold', fontSize: Math.max(9, Math.round(size * 0.38)), letterSpacing: 0.3 }}
         numberOfLines={1}
         allowFontScaling={false}
       >

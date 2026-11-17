@@ -19,17 +19,17 @@ import {
 // is translated to the matching family and reset to normal (otherwise
 // Android ignores the family and web fakes a heavier bold on top).
 const JAKARTA_BY_WEIGHT: Record<string, string> = {
-  '100': 'PlusJakartaSans_400Regular',
-  '200': 'PlusJakartaSans_400Regular',
-  '300': 'PlusJakartaSans_400Regular',
-  '400': 'PlusJakartaSans_400Regular',
-  normal: 'PlusJakartaSans_400Regular',
-  '500': 'PlusJakartaSans_500Medium',
-  '600': 'PlusJakartaSans_600SemiBold',
-  '700': 'PlusJakartaSans_700Bold',
-  bold: 'PlusJakartaSans_700Bold',
-  '800': 'PlusJakartaSans_800ExtraBold',
-  '900': 'PlusJakartaSans_800ExtraBold',
+  '100': 'HankenGrotesk_400Regular',
+  '200': 'HankenGrotesk_400Regular',
+  '300': 'HankenGrotesk_400Regular',
+  '400': 'HankenGrotesk_400Regular',
+  normal: 'HankenGrotesk_400Regular',
+  '500': 'HankenGrotesk_500Medium',
+  '600': 'HankenGrotesk_600SemiBold',
+  '700': 'HankenGrotesk_700Bold',
+  bold: 'HankenGrotesk_700Bold',
+  '800': 'HankenGrotesk_800ExtraBold',
+  '900': 'HankenGrotesk_800ExtraBold',
 };
 
 function isJakarta(family: string | undefined): boolean {

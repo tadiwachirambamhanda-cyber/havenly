@@ -163,9 +163,9 @@ function createStyles(colors: ColorTokens) {
     container: { flex: 1, backgroundColor: colors.sand },
     header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingBottom: 16, paddingHorizontal: spacing.lg },
     back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-    title: { fontFamily: 'Fraunces_600SemiBold', fontSize: 19, color: colors.ink },
+    title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
     sectionLabel: {
-      fontFamily: 'PlusJakartaSans_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: spacing.lg, marginBottom: 4,
+      fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: spacing.lg, marginBottom: 4,
     },
     segmentRow: {
       flexDirection: 'row', gap: 6, marginHorizontal: spacing.lg, marginTop: 6, backgroundColor: colors.sandDeep,
