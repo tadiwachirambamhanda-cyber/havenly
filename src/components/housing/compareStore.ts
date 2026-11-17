@@ -29,6 +29,15 @@ export function clearCompare(): void {
   emit();
 }
 
+// The list belongs to whoever is signed in. When a different person (or nobody) is signed in,
+// it starts empty, so one account never sees another's choices on a shared device.
+let owner: string | null = null;
+export function setCompareOwner(userId: string | null): void {
+  if (owner === userId) return;
+  owner = userId;
+  clearCompare();
+}
+
 export const getCompareIds = () => ids;
 
 const subscribe = (l: () => void) => {

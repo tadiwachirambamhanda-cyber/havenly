@@ -19,7 +19,7 @@ import AnimatedPressable from '@/components/AnimatedPressable';
 import BurstHeart from '@/components/BurstHeart';
 import Skeleton from '@/components/Skeleton';
 import { BillsTag, DealTag, StateBlock, VerifiedBadge } from '@/components/housing/parts';
-import { useCompareIds } from '@/components/housing/compareStore';
+import { setCompareOwner, useCompareIds } from '@/components/housing/compareStore';
 import { takePendingReturn } from '@/components/housing/pendingReturn';
 import {
   EMPTY_FILTERS, PRICE_CAPS, SORT_LABEL, billsLine, commuteText, eachPersonLine, filterAndSort, filtersActive, housematesLine,
@@ -70,6 +70,9 @@ export default function HousingScreen() {
     }
     setLoaded(true);
   }, [myId]);
+
+  // The compare list belongs to whoever is signed in: start empty for a visitor.
+  React.useEffect(() => { setCompareOwner(myId ?? null); }, [myId]);
 
   useFocusEffect(useCallback(() => {
     load();
