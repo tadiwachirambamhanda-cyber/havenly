@@ -7,6 +7,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/lib/ThemeContext';
+import { useAuth } from '@/lib/AuthContext';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -14,6 +15,7 @@ import type { RootStackParamList } from '@/navigation/RootNavigator';
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function LoginScreen() {
+  const { enterGuest } = useAuth();
   const navigation = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
@@ -108,6 +110,10 @@ export default function LoginScreen() {
         <AnimatedPressable onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.switchLink}>New to Havenly? <Text style={styles.switchLinkBold}>Create an account</Text></Text>
         </AnimatedPressable>
+        <AnimatedPressable style={styles.btnGhost} onPress={enterGuest} accessibilityRole="button" accessibilityLabel="Explore Havenly without signing up">
+          <Text style={styles.btnGhostText}>Explore without signing up</Text>
+          <Text style={styles.btnGhostHint}>A read-only demo with sample content</Text>
+        </AnimatedPressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -138,5 +144,8 @@ function createStyles(colors: ColorTokens) {
   btnPrimaryText: { color: 'white', fontWeight: '700', fontSize: 15 },
   switchLink: { textAlign: 'center', marginTop: 18, fontSize: 13.5, color: colors.inkSoft },
   switchLinkBold: { color: colors.teal, fontWeight: '700' },
+  btnGhost: { borderWidth: 1.5, borderColor: colors.line, paddingVertical: 14, borderRadius: radius.button, alignItems: 'center', marginTop: 26 },
+  btnGhostText: { color: colors.ink, fontWeight: '700', fontSize: 15 },
+  btnGhostHint: { color: colors.inkSoft, fontSize: 12.5, marginTop: 3 },
   });
 }
