@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { createDemoClient, GUEST_BLOCKED_CODE, GUEST_BLOCKED_MESSAGE } from './demoClient';
 import { createSwitchingClient } from './clientSwitch';
 import { createFixtures, SAMPLE_IMAGE_BASE, GUEST_USER_ID } from './fixtures';
-import { enterGuestMode, exitGuestMode, isGuestMode, subscribeGuestMode } from './guestState';
+import { enterGuestMode, exitGuestMode, isGuestMode, subscribeGuestBlocked, subscribeGuestMode } from './guestState';
 
 afterEach(() => exitGuestMode());
 
@@ -155,6 +155,18 @@ describe('demo client refuses every write', () => {
     const channel = client.channel('x').on('postgres_changes', {}, () => {}).subscribe();
     expect(typeof channel.unsubscribe).toBe('function');
     await expect(client.removeChannel(channel)).resolves.toBeDefined();
+  });
+
+  it('tells the banner whenever a change is refused, and not on plain reads', async () => {
+    const client = createDemoClient();
+    let blocked = 0;
+    const off = subscribeGuestBlocked(() => blocked++);
+    await client.from('posts').select('*');
+    expect(blocked).toBe(0);
+    await client.from('posts').insert({ title: 'x' });
+    await client.rpc('toggle_post_like', {});
+    expect(blocked).toBe(2);
+    off();
   });
 
   it('lets a guest leave the demo through signOut', async () => {

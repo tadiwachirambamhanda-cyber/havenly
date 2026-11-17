@@ -32,3 +32,18 @@ export function subscribeGuestMode(listener: Listener): () => void {
     listeners.delete(listener);
   };
 }
+
+// A separate signal for "the visitor tried to change something". The banner uses
+// it to say so on any screen, whatever error text that screen shows itself.
+const blockedListeners = new Set<Listener>();
+
+export function notifyGuestBlocked(): void {
+  blockedListeners.forEach((l) => l());
+}
+
+export function subscribeGuestBlocked(listener: Listener): () => void {
+  blockedListeners.add(listener);
+  return () => {
+    blockedListeners.delete(listener);
+  };
+}

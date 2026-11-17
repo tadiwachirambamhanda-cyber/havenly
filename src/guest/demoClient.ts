@@ -2,7 +2,7 @@
 // answers reads from the sample fixtures and refuses every write. It never makes
 // a network request.
 import { createFixtures, type FixtureTables } from './fixtures';
-import { exitGuestMode } from './guestState';
+import { exitGuestMode, notifyGuestBlocked } from './guestState';
 
 export const GUEST_BLOCKED_MESSAGE = 'Create an account to do this.';
 export const GUEST_BLOCKED_CODE = 'GUEST_READ_ONLY';
@@ -10,6 +10,7 @@ export const GUEST_BLOCKED_CODE = 'GUEST_READ_ONLY';
 type Row = Record<string, any>;
 
 function blockedResult() {
+  notifyGuestBlocked();
   return { data: null, count: null, status: 403, statusText: 'Forbidden', error: { message: GUEST_BLOCKED_MESSAGE, code: GUEST_BLOCKED_CODE, details: '', hint: '' } };
 }
 
