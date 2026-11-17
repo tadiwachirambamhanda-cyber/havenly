@@ -24,6 +24,7 @@ Written by the Chief Architect. Merged to main before the lane starts.
 - [ ] **F13:** a listing with a student deal shows the Student deal tag and the old price struck through, and "Student-friendly" listings sit above an identical listing with no deal in the default order.
 - [ ] **F7:** I save 3 listings and Compare shows them in three columns with the right rows; choosing one then Enquire works; trying to add a 4th is refused with the limit message.
 - [ ] **F6:** (ask the Chief Architect to set `PUBLIC_BROWSING` to true once your screens are safe for visitors) in a private window I see the Housing list, open a listing and the split sheet without signing in; tapping Save or Enquire opens "Make a free account to send your enquiry"; after creating an account I am back on the same listing.
+- [ ] With public browsing on, Save, Enquire and Compare each call `useRequireAccount()` before they do anything, and nothing a signed-out visitor can tap navigates to a screen that is missing from the signed-out navigator (`HousingEnquiry`, `Compare`, `MyEnquiries`) or writes to the database. Listings are read through the existing policy that shows active listings only.
 - [ ] **F8:** sending an enquiry and following its status work as before, in the new look.
 - [ ] Every screen has the empty, loading and error states from `design/handoff/States.dc.html`.
 - [ ] Each screen matches the screenshots in `design/handoff/screenshots/` at 390 wide and at a laptop width, with no sideways scroll.

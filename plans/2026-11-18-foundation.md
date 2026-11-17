@@ -36,3 +36,13 @@ The font and colour swap touches almost every screen: text could be wider or tal
 
 ## Questions
 1. May I apply the new database migration to the live project when it is ready (step 2)? It only adds columns and replaces `save_residence`, as in F1.
+
+## Codex review
+Round 1: VERDICT FINDINGS(7).
+1. MAJOR, `src/lib/requireAccount.ts` and `RootNavigator.tsx`: with `PUBLIC_BROWSING` on, Save and Enquire would navigate to screens missing from the signed-out navigator or write without a session. **Dismissed for the foundation, made explicit for Lane A:** the switch is off, so nothing changes for a signed-out visitor today; the lane brief gives Lane A the work of routing Save, Enquire and Compare through `useRequireAccount` and now lists it as a done check, and the switch is only flipped by the Chief Architect after that. Visitors only read listings through the existing policy that shows active listings.
+2. MAJOR, `save_residence`: an older request that omits old fields (name, amenities, photos) would blank them. **Dismissed:** that is how the function has always worked (a full-form save) and every client sends all of those fields; only the new fields were made tolerant of omission, so an older app does not wipe them. Making every field optional is outside this plan.
+3. MAJOR, `student_deal_types` CHECK passes NULL elements. **Dismissed, with evidence:** run against the live database, `array[null]::text[] <@ array['student_rate', ...]` returns false, so a NULL element is rejected, as is a bogus value; a valid array and an empty array pass.
+4. MAJOR, `rentSplit.ts`: huge or unsafe integers lose precision; `moveInTotal` did no validation. **Fixed:** amounts must be safe whole AED up to 10,000,000, and `moveInTotal` returns null for a bad amount; tests added.
+5. MINOR, `ranking.ts`: NaN, infinite, zero and negative prices. **Fixed:** they count as unknown and sort last; a zero or negative student rate is not a deal; tests added.
+6. MINOR, `Text.tsx`: the helper still matched the old font prefix, so nested text with its own weight would have stopped switching weight. **Fixed:** it matches `HankenGrotesk_`, comments updated.
+7. MINOR, hard-coded old colours on listing controls. **Fixed** for the saved-heart colour in `HousingScreen.tsx` and `ResidenceDetailScreen.tsx`. Left as is, on purpose: the video progress bar in `PostVideoPlayer.tsx` (over dark video, social part) and the native-only map pin popup in `MapScreen.tsx`.
