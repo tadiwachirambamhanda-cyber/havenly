@@ -41,3 +41,8 @@ The riskiest step is replacing `save_residence`: if it is wrong, no listing can 
 1. **Database change on the live project:** the migration only adds columns with safe defaults, and the live app keeps working while it runs. OK to apply it to the live Supabase project when we reach step 6?
 2. **Names of the five kinds:** Student residence, Room in a shared apartment, Private room, Studio, Whole home. Change any?
 3. **Extra costs:** I plan two amounts on top of rent, Deposit and One-time fees (agency or admin fee). Is that enough for now, or do you also want a separate field for something else (for example a commission)?
+
+## Changes from the plan
+- The first database check caught that a whole home with no bedroom count was accepted (an SQL check that evaluates to "unknown" passes). The rule now says `bedrooms is not null` and was re-tested in the live database.
+- The live database already had `is_admin` moved to a private schema (applied by hand on 2026-11-17), so my first `save_residence` (which called `public.is_admin()`) failed with "function public.is_admin() does not exist" on the first real save. Fixed live with `private.is_admin()` and the migration file now uses it. `supabase/schema.sql` keeps `public.is_admin()` to match the rest of that file, which has not been updated for the move yet.
+- The migration was applied through the SQL tool rather than `supabase db push`: the CLI shows 20261117000000 and 20261117010000 as not applied and two remote versions with no local file, so `db push` would have run those two reviewed-but-unapproved migrations as well. I recorded mine with `supabase migration repair`.

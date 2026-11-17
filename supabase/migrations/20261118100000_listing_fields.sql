@@ -20,7 +20,9 @@ alter table public.residences
     or (listing_type <> 'home' and bedrooms is null)
   );
 
--- Same function as before plus the new fields. A request that leaves a field
+-- Same function as before plus the new fields. The admin check is
+-- private.is_admin(): 20261117010000_move_policy_helpers_to_private.sql moved
+-- that helper out of the public schema. A request that leaves a field
 -- out (the older app) keeps that field's current value on update, so an old
 -- client editing a whole home can't turn it back into a residence.
 create or replace function public.save_residence(
@@ -39,7 +41,7 @@ declare
   kept_ids uuid[];
   idx int := 0;
 begin
-  if not public.is_admin() then
+  if not private.is_admin() then
     raise exception 'Only the Havenly team can edit residences.';
   end if;
 
