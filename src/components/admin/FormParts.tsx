@@ -56,9 +56,9 @@ export function SectionLabel({ children }: { children: string }) {
   return <Text style={styles.section} accessibilityRole="header">{children}</Text>;
 }
 
-export function Hint({ children, style }: { children: string; style?: StyleProp<ViewStyle> }) {
+export function Hint({ children }: { children: string }) {
   const { styles } = useStyles();
-  return <Text style={[styles.hint, style as never]}>{children}</Text>;
+  return <Text style={styles.hint}>{children}</Text>;
 }
 
 interface FieldProps extends TextInputProps {
@@ -122,24 +122,32 @@ interface SwitchRowProps {
   onChange: (value: boolean) => void;
 }
 
+// The bare switch (52 by 32): on is the primary colour, off is a stone grey.
+export function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (value: boolean) => void }) {
+  const { colors } = useStyles();
+  return (
+    <Switch
+      accessibilityLabel={label}
+      value={value}
+      onValueChange={onChange}
+      trackColor={{ true: colors.coral, false: SWITCH_OFF }}
+      thumbColor="#FFFFFF"
+      // Web only: the thumb colour when on.
+      {...({ activeThumbColor: '#FFFFFF' } as object)}
+      style={{ width: 52, height: 32 }}
+    />
+  );
+}
+
 export function SwitchRow({ title, hint, value, onChange }: SwitchRowProps) {
-  const { colors, styles } = useStyles();
+  const { styles } = useStyles();
   return (
     <View style={styles.switchRow}>
       <View style={{ flex: 1 }}>
         <Text style={styles.switchTitle}>{title}</Text>
         {hint ? <Text style={styles.switchHint}>{hint}</Text> : null}
       </View>
-      <Switch
-        accessibilityLabel={title}
-        value={value}
-        onValueChange={onChange}
-        trackColor={{ true: colors.coral, false: SWITCH_OFF }}
-        thumbColor="#FFFFFF"
-        // Web only: the thumb colour when on. The 52 by 32 size is the web default of this control.
-        {...({ activeThumbColor: '#FFFFFF' } as object)}
-        style={{ width: 52, height: 32 }}
-      />
+      <Toggle label={title} value={value} onChange={onChange} />
     </View>
   );
 }
