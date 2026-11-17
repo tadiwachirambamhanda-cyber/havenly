@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Empty, loading and error states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Schibsted+Grotesk:wght@500;600;700&display=swap">
+<style>
+body{margin:0;background:#E7EAE5;font-family:'Hanken Grotesk',system-ui,sans-serif;color:#15201B}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid #0B6B5E;outline-offset:2px}
+h2{margin:0;font-family:'Schibsted Grotesk',sans-serif;font-weight:700;font-size:22px;letter-spacing:-0.01em}
+.grid{display:grid;grid-template-columns:repeat(3,390px);gap:12px 60px;align-items:stretch}
+.cap{font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#4F5B55;margin-bottom:6px}
+.p{background:#F4F6F2;border:1px solid #CDD4CC;border-radius:14px;padding:18px 16px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;min-height:230px}
+.col{display:flex;flex-direction:column}
+.btn{height:48px;border:0;border-radius:12px;background:#0B6B5E;color:#FFFFFF;font-size:15px;font-weight:700;padding:0 20px}
+.btn2{height:48px;border:1px solid #CDD4CC;border-radius:12px;background:#FFFFFF;color:#15201B;font-size:15px;font-weight:600;padding:0 20px}
+.t{font-size:18px;font-weight:700;line-height:1.25;font-family:'Schibsted Grotesk',sans-serif}
+.s{font-size:14px;line-height:1.45;color:#2B3832}
+.sk{background:#D6DCD5;border-radius:8px}
+.card{background:#FFFFFF;border:1px solid #DDE2DC;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.err{background:#FCE8E6;border:1px solid #E7B5B0;color:#8E1B12;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.35}
+.f{height:48px;box-sizing:border-box;border:1px solid #CDD4CC;border-radius:10px;background:#FFFFFF;padding:0 14px;font-family:inherit;font-size:15px;color:#15201B;width:100%}
+.f.bad{border-color:#A3231A;border-width:2px}
+.ic{width:44px;height:44px;border-radius:999px;background:#E3E8E2;display:flex;align-items:center;justify-content:center}
+.rw{display:flex;justify-content:space-between;gap:10px;font-size:14px;font-variant-numeric:tabular-nums}
+</style>
+</helmet>
+<div style="width: 1290px; min-height: 2000px; box-sizing: border-box; padding: 40px 0 40px; background: #E7EAE5; display: flex; flex-direction: column; gap: 14px">
+
+  <!-- Housing -->
+  <h2>Housing</h2>
+  <div class="grid">
+    <div class="col"><div class="cap">Empty: nothing matches</div>
+      <div class="p" style="align-items: flex-start">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#15201B" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+        <div class="t">No places match these filters</div>
+        <div class="s">Try a higher budget or take a filter off. [N] places are listed near Heriot-Watt University Dubai.</div>
+        <button type="button" class="btn">Clear filters</button>
+      </div>
+    </div>
+    <div class="col"><div class="cap">Loading</div>
+      <div class="p">
+        <div class="card"><div class="sk" style="height: 120px"></div><div class="sk" style="height: 22px; width: 55%"></div><div class="sk" style="height: 14px; width: 80%"></div></div>
+        <div class="card"><div class="sk" style="height: 120px"></div><div class="sk" style="height: 22px; width: 45%"></div><div class="sk" style="height: 14px; width: 70%"></div></div>
+      </div>
+    </div>
+    <div class="col"><div class="cap">Error</div>
+      <div class="p" style="align-items: flex-start">
+        <div class="t">We could not load the places</div>
+        <div class="s">Check your connection and try again. Nothing you saved has been lost.</div>
+        <button type="button" class="btn">Try again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Listing -->
+  <h2 style="margin-top: 18px">Listing page</h2>
+  <div class="grid">
+    <div class="col"><div class="cap">Loading</div>
+      <div class="p">
+        <div class="sk" style="height: 150px"></div>
+        <div class="sk" style="height: 24px; width: 70%"></div>
+        <div class="sk" style="height: 14px; width: 45%"></div>
+        <div class="sk" style="height: 90px"></div>
+      </div>
+    </div>
+    <div class="col"><div class="cap">Unavailable: full or no longer listed</div>
+      <div class="p" style="align-items: flex-start">
+        <div class="err" style="background: #EEF1EC; border-color: #CDD4CC; color: #15201B; width: 100%; box-sizing: border-box">This place is full or no longer listed.</div>
+        <div class="s">You can still see its details below, but you cannot send an enquiry.</div>
+        <button type="button" class="btn2" style="width: 100%">See similar places near your campus</button>
+      </div>
+    </div>
+    <div class="col"><div class="cap">Error</div>
+      <div class="p" style="align-items: flex-start">
+        <div class="t">We could not open this listing</div>
+        <div class="s">It may have been removed, or your connection dropped. Go back to the results or try again.</div>
+        <div style="display: flex; gap: 8px"><button type="button" class="btn">Try again</button><button type="button" class="btn2">Back to results</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cost box variants and split rent -->
+  <h2 style="margin-top: 18px">Cost box and rent split variants</h2>
+  <div class="grid">
+    <div class="col"><div class="cap">Listing: student deal, not verified yet</div>
+      <div class="p">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap">
+          <span style="display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border-radius: 8px; background: #FBE3C9; color: #8A3D00; font-size: 12px; font-weight: 700">Student deal</span>
+          <span style="display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border-radius: 8px; background: #E3E8E2; color: #2B3832; font-size: 12px; font-weight: 600">Not yet checked by Havenly</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap"><span style="font-family: 'Schibsted Grotesk', sans-serif; font-weight: 700; font-size: 30px">AED 3,300</span><span class="s" style="text-decoration: line-through">AED 3,600</span><span class="s">per month</span></div>
+        <div class="s">Student rate. Bills not included, about AED 350 to 500 a month.</div>
+        <div class="rw"><span>Deposit</span><span>AED 1,800</span></div>
+        <div class="rw"><span>One-time fees</span><span>None</span></div>
+      </div>
+    </div>
+    <div class="col"><div class="cap">Split rent: bills included</div>
+      <div class="p">
+        <div style="background: #EAF3F0; border-radius: 12px; padding: 14px 14px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #0A5B50">Each person pays</span><span style="font-family: 'Schibsted Grotesk', sans-serif; font-weight: 700; font-size: 30px">AED 3,000</span><span class="s">a month, bills included</span></div>
+        <div class="rw"><span>Rent, AED 9,000 split 3 ways</span><span>AED 3,000</span></div>
+        <div class="rw"><span>Bills</span><span>Included</span></div>
+        <div class="rw"><span>Deposit, AED 4,500 split 3 ways</span><span>AED 1,500</span></div>
+      </div>
+    </div>
+    <div class="col"><div class="cap">Split rent: error, price missing</div>
+      <div class="p" style="align-items: flex-start">
+        <div class="t">We cannot split this one yet</div>
+        <div class="s">The price for this home is missing. Send an enquiry and the Havenly team will confirm it.</div>
+        <button type="button" class="btn">Enquire about this home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compare -->
+  <h2 style="margin-top: 18px">Compare</h2>
+  <div class="grid">
+    <div class="col"><div class="cap">Empty: nothing saved</div>
+      <div class="p" style="align-items: flex-start">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#15201B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></div>
+        <div class="t">Save places to compare them</div>
+        <div class="s">Tap the heart on a listing, then come back here to see up to 3 side by side.</div>
+        <button type="button" class="btn">Find a place</button>
+      </div>
+    </div>
+    <div class="col"><div class="cap">Limit reached: a 4th is refused</div>
+      <div class="p">
+        <div class="err" style="background: #EEF1EC; border-color: #CDD4CC; color: #15201B">You can compare up to 3 places. Remove one to add this one.</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px"><div class="sk" style="height: 64px"></div><div class="sk" style="height: 64px"></div><div class="sk" style="height: 64px"></div></div>
+        <button type="button" class="btn2">Choose one to remove</button>
+      </div>
+    </div>
+    <div class="col"><div class="cap">Error</div>
+      <div class="p" style="align-items: flex-start">
+        <div class="t">We could not load your saved places</div>
+        <div class="s">Check your connection and try again.</div>
+        <button type="button" class="btn">Try again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sign in -->
+  <h2 style="margin-top: 18px">Sign in to continue</h2>
+  <div class="grid">
+    <div class="col"><div class="cap">Error: wrong email or password</div>
+      <div class="p">
+        <label for="s1" style="font-size: 14px; font-weight: 600">Password</label>
+        <input id="s1" class="f bad" type="password" value="Sample-Pass-2" aria-describedby="s1e">
+        <div id="s1e" class="err">That email and password do not match. Check them and try again, or reset your password.</div>
+      </div>
+    </div>
+    <div class="col"><div class="cap">Error: password too weak</div>
+      <div class="p">
+        <label for="s2" style="font-size: 14px; font-weight: 600">Password</label>
+        <input id="s2" class="f bad" type="password" value="havenly" aria-describedby="s2e">
+        <div id="s2e" class="err">Use at least 8 characters, with a capital letter, a small letter and a number.</div>
+      </div>
+    </div>
+    <div class="col"><div class="cap">Loading: creating the account</div>
+      <div class="p" style="align-items: stretch">
+        <button type="button" class="btn" disabled style="opacity: 0.85">Creating your account...</button>
+        <div class="s">You will go straight back to the listing you were on.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit listing -->
+  <h2 style="margin-top: 18px">Edit listing, team</h2>
+  <div class="grid">
+    <div class="col"><div class="cap">Validation: what is wrong</div>
+      <div class="p">
+        <label for="e1" style="font-size: 14px; font-weight: 600">Deposit AED</label>
+        <input id="e1" class="f bad" value="1000.50" aria-describedby="e1e">
+        <div id="e1e" class="err">The deposit must be a whole amount in AED, like 1000 or 1,000.</div>
+      </div>
+    </div>
+    <div class="col"><div class="cap">Error: save failed</div>
+      <div class="p">
+        <div class="err">Could not save the listing, so nothing was changed. Check your connection and try again.</div>
+        <button type="button" class="btn">Save listing</button>
+      </div>
+    </div>
+    <div class="col"><div class="cap">Loading: saving</div>
+      <div class="p">
+        <button type="button" class="btn" disabled style="opacity: 0.85">Saving...</button>
+        <div class="s">Photos are still uploading. Save will be ready in a moment.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1290,"height":2500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
