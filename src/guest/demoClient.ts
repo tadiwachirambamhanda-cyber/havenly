@@ -9,8 +9,11 @@ export const GUEST_BLOCKED_CODE = 'GUEST_READ_ONLY';
 
 type Row = Record<string, any>;
 
-function blockedResult() {
-  notifyGuestBlocked();
+// `quiet` is for calls the app makes by itself on load (the streak counter): they
+// are still refused, but they must not flash the banner at a visitor who has not
+// tried anything yet.
+function blockedResult(quiet = false) {
+  if (!quiet) notifyGuestBlocked();
   return { data: null, count: null, status: 403, statusText: 'Forbidden', error: { message: GUEST_BLOCKED_MESSAGE, code: GUEST_BLOCKED_CODE, details: '', hint: '' } };
 }
 
@@ -181,7 +184,7 @@ export function createDemoClient(data: FixtureTables = createFixtures()): any {
   const blocked = () => Promise.resolve(blockedResult());
   return {
     from: (table: string) => new Query(table, data),
-    rpc: () => blocked(),
+    rpc: (name: string) => (name === 'bump_streak' ? Promise.resolve(blockedResult(true)) : blocked()),
     channel: () => channelStub(),
     removeChannel: () => Promise.resolve('ok'),
     removeAllChannels: () => Promise.resolve([]),
