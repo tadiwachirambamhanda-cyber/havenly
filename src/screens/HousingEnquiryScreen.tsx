@@ -79,7 +79,7 @@ export default function HousingEnquiryScreen() {
       const cleanBudget = budget.trim();
       // Whole AED only: digits, or digits grouped with commas. A minus sign or decimal is refused, not rewritten.
       budgetValue = /^(\d+|\d{1,3}(,\d{3})+)$/.test(cleanBudget) ? Number(cleanBudget.replace(/,/g, '')) : NaN;
-      if (!Number.isFinite(budgetValue) || budgetValue <= 0) return setError('Budget should be a number in AED per year, e.g. 45000.');
+      if (!Number.isFinite(budgetValue) || budgetValue <= 0 || budgetValue > 10_000_000) return setError('Budget should be a number in AED per year, e.g. 45000.');
     }
 
     setSending(true);
