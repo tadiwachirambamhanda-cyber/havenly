@@ -55,6 +55,8 @@ export default function ResidenceDetailScreen() {
   const [photoIndex, setPhotoIndex] = useState(0);
   const [openEnquiryStatus, setOpenEnquiryStatus] = useState<EnquiryStatus | null>(null);
   const [compareFull, setCompareFull] = useState(false);
+  // Once the photo has scrolled away, a solid strip keeps the floating buttons readable.
+  const [pastHero, setPastHero] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -183,7 +185,11 @@ export default function ResidenceDetailScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 190 }}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 190 }}
+        scrollEventThrottle={32}
+        onScroll={(e) => { const past = e.nativeEvent.contentOffset.y > HERO_HEIGHT - 90; setPastHero((cur) => (cur === past ? cur : past)); }}
+      >
         <View style={styles.hero}>
           {heroPhoto ? (
             <Image source={{ uri: heroPhoto }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} accessibilityLabel={`Photo ${photoIndex + 1} of ${residence.name}`} />
@@ -333,6 +339,11 @@ export default function ResidenceDetailScreen() {
         </View>
       </ScrollView>
 
+      {pastHero ? (
+        <View pointerEvents="none" style={[styles.strip, { height: insets.top + 68 }]}>
+          <Text style={styles.stripTitle} numberOfLines={1}>{residence.name}</Text>
+        </View>
+      ) : null}
       {backButton}
       <AnimatedPressable
         style={[styles.roundBtn, { top: insets.top + 12, right: 16 }]}
@@ -383,6 +394,8 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand },
     roundBtn: { position: 'absolute', zIndex: 2, width: 44, height: 44, borderRadius: 22, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
+    strip: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1, backgroundColor: colors.sand, borderBottomWidth: 1, borderColor: colors.line, justifyContent: 'flex-end', paddingBottom: 14, paddingHorizontal: 72 },
+    stripTitle: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 16, color: colors.ink, textAlign: 'center' },
     hero: { height: HERO_HEIGHT, overflow: 'hidden', backgroundColor: '#DDD7CB' },
     countPill: { position: 'absolute', right: 12, bottom: 12, backgroundColor: '#1F1B16', paddingHorizontal: 10, minHeight: 28, borderRadius: 8, justifyContent: 'center' },
     countPillText: { color: '#FFFFFF', fontFamily: 'HankenGrotesk_700Bold', fontSize: 13 },

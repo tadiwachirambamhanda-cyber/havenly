@@ -321,7 +321,7 @@ export default function HousingScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
       />
       {compareIds.length > 0 ? (
-        <AnimatedPressable style={styles.compareBar} onPress={openCompare} accessibilityRole="button" accessibilityLabel={`Compare ${compareIds.length} places`}>
+        <AnimatedPressable style={styles.compareBar} onPress={openCompare} accessibilityRole="button" accessibilityLabel={`Compare ${compareIds.length} ${compareIds.length === 1 ? "place" : "places"}`}>
           <Icon name="grid" size={18} color="#FFFFFF" />
           <Text style={styles.compareText}>Compare {compareIds.length} {compareIds.length === 1 ? 'place' : 'places'}</Text>
         </AnimatedPressable>
