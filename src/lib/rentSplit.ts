@@ -37,7 +37,10 @@ export interface RentSplit {
 export const MIN_PEOPLE = 1;
 export const MAX_PEOPLE = 10;
 
-const isWholeAed = (n: unknown): n is number => typeof n === 'number' && Number.isInteger(n) && n >= 0;
+// No real rent, deposit or fee is anywhere near this; a bigger number is a typo and, past the
+// safe-integer range, would also lose precision.
+export const MAX_AED = 10_000_000;
+const isWholeAed = (n: unknown): n is number => typeof n === 'number' && Number.isSafeInteger(n) && n >= 0 && n <= MAX_AED;
 
 // A student shares with others: the usual number is one per bedroom.
 export function defaultPeople(bedrooms: number | null | undefined): number {
@@ -88,9 +91,14 @@ export function splitRent(input: SplitInput): RentSplit | null {
   };
 }
 
-// First month's rent plus deposit plus one-time fees. Missing amounts count as none.
-export function moveInTotal(parts: { firstMonthAed: number; depositAed?: number | null; feesAed?: number | null }): number {
-  return parts.firstMonthAed + (parts.depositAed ?? 0) + (parts.feesAed ?? 0);
+// First month's rent plus deposit plus one-time fees. Missing deposit or fees count as none.
+// Returns null when any amount is not a sensible whole AED amount (negative, fractional, huge).
+export function moveInTotal(parts: { firstMonthAed: number; depositAed?: number | null; feesAed?: number | null }): number | null {
+  const { firstMonthAed, depositAed, feesAed } = parts;
+  if (!isWholeAed(firstMonthAed)) return null;
+  if (depositAed != null && !isWholeAed(depositAed)) return null;
+  if (feesAed != null && !isWholeAed(feesAed)) return null;
+  return firstMonthAed + (depositAed ?? 0) + (feesAed ?? 0);
 }
 
 const group = (n: number) => Math.round(n).toLocaleString('en-US');

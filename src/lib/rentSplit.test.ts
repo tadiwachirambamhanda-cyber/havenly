@@ -47,12 +47,23 @@ describe('splitRent', () => {
     expect(splitRent({ ...ok, rentAed: -5, people: 3 })).toBeNull();
     expect(splitRent({ rentAed: 9000, bills: { kind: 'range', minAed: 700, maxAed: 450 }, people: 3 })).toBeNull();
     expect(splitRent({ ...ok, depositAed: -1, people: 3 })).toBeNull();
+    expect(splitRent({ ...ok, rentAed: Number.MAX_SAFE_INTEGER, people: 3 })).toBeNull();
+    expect(splitRent({ ...ok, rentAed: 1e300, people: 3 })).toBeNull();
+    expect(splitRent({ ...ok, rentAed: Number.NaN, people: 3 })).toBeNull();
   });
 });
 
 describe('moveInTotal', () => {
   it('adds the first month, deposit and one-time fees', () => {
     expect(moveInTotal({ firstMonthAed: 2800, depositAed: 1000, feesAed: 500 })).toBe(4300);
+  });
+  it('returns null for negative, fractional, huge or unsafe amounts', () => {
+    expect(moveInTotal({ firstMonthAed: -1 })).toBeNull();
+    expect(moveInTotal({ firstMonthAed: 2800.5 })).toBeNull();
+    expect(moveInTotal({ firstMonthAed: 2800, depositAed: -100 })).toBeNull();
+    expect(moveInTotal({ firstMonthAed: 2800, feesAed: Number.NaN })).toBeNull();
+    expect(moveInTotal({ firstMonthAed: Number.MAX_SAFE_INTEGER })).toBeNull();
+    expect(moveInTotal({ firstMonthAed: 1e300 })).toBeNull();
   });
   it('counts missing amounts as none', () => {
     expect(moveInTotal({ firstMonthAed: 2800 })).toBe(2800);
