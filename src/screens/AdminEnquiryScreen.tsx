@@ -200,7 +200,7 @@ export default function AdminEnquiryScreen() {
 
       <View style={styles.card}>
         <Text style={styles.cardLabel}>Request</Text>
-        {detail('Residence', enquiry.residence?.name)}
+        {detail('Listing', enquiry.residence?.name)}
         {detail('Type', enquiry.kind === 'viewing' ? 'Viewing request' : 'Question')}
         {detail('Room', enquiry.room_type ? `${enquiry.room_type.name} · ${formatAed(enquiry.room_type.price_aed)}/${PERIOD_LABEL[enquiry.room_type.billing_period]}` : 'Not sure yet')}
         {detail('Move-in', `${formatMonth(enquiry.move_in_month)} · ${enquiry.duration_months} months`)}
@@ -273,7 +273,7 @@ export default function AdminEnquiryScreen() {
               </Text>
             </View>
             <AnimatedPressable style={[styles.paidBtn, !!enquiry.fee_paid_at && styles.paidBtnActive]} onPress={togglePaid}>
-              <Icon name={enquiry.fee_paid_at ? 'check-circle' : 'circle'} size={14} color={enquiry.fee_paid_at ? colors.teal : colors.ink} />
+              <Icon name={enquiry.fee_paid_at ? 'check-circle' : 'circle'} size={14} color={colors.ink} />
               <Text style={styles.paidBtnText}>{enquiry.fee_paid_at ? 'Paid' : 'Mark paid'}</Text>
             </AnimatedPressable>
           </View>
@@ -295,60 +295,60 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand },
     header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 12, paddingHorizontal: spacing.lg },
-    back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-    title: { flex: 1, fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
-    headerTime: { fontSize: 12, color: colors.inkSoft },
-    muted: { color: colors.inkSoft, textAlign: 'center', marginTop: 80 },
-    muted2: { fontSize: 12, color: colors.inkSoft, marginTop: 2 },
+    back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+    title: { flex: 1, fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 24, letterSpacing: -0.4, color: colors.ink },
+    headerTime: { fontSize: 13, color: colors.inkSoft },
+    muted: { color: colors.inkSoft, textAlign: 'center', marginTop: 80, fontSize: 15 },
+    muted2: { fontSize: 13, color: colors.inkSoft, marginTop: 2 },
     card: {
       marginHorizontal: spacing.lg, marginBottom: 12, backgroundColor: colors.white, borderWidth: 1,
-      borderColor: colors.line, borderRadius: radius.md, padding: 14,
+      borderColor: colors.line, borderRadius: radius.md, padding: 16,
     },
     cardLabel: {
-      fontFamily: 'HankenGrotesk_700Bold', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginBottom: 8,
+      fontFamily: 'HankenGrotesk_700Bold', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.72, color: colors.inkSoft, marginBottom: 8,
     },
-    bigName: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
-    phone: { fontSize: 16, fontWeight: '700', color: colors.ink, marginTop: 10, fontVariant: ['tabular-nums'] },
+    bigName: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 22, color: colors.ink },
+    phone: { fontSize: 17, fontWeight: '700', color: colors.ink, marginTop: 10, fontVariant: ['tabular-nums'] },
     actionRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
     actionBtn: {
-      flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 12,
-      borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.line,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: 44, paddingHorizontal: 16,
+      borderRadius: 12, borderWidth: 1.5, borderColor: colors.fieldLine,
     },
-    actionText: { fontSize: 12.5, fontWeight: '700', color: colors.ink },
-    detailRow: { flexDirection: 'row', gap: 10, paddingVertical: 4 },
-    detailLabel: { width: 82, fontSize: 12.5, color: colors.inkSoft },
-    detailValue: { flex: 1, fontSize: 12.5, fontWeight: '600', color: colors.ink },
-    message: { fontSize: 13, color: colors.ink, lineHeight: 19, marginTop: 8, fontStyle: 'italic' },
+    actionText: { fontSize: 14, fontWeight: '700', color: colors.ink },
+    detailRow: { flexDirection: 'row', gap: 10, paddingVertical: 5 },
+    detailLabel: { width: 82, fontSize: 14, color: colors.inkSoft },
+    detailValue: { flex: 1, fontSize: 14, fontWeight: '600', color: colors.ink },
+    message: { fontSize: 15, color: colors.inkBody, lineHeight: 22, marginTop: 8, fontStyle: 'italic' },
     copyBtn: {
-      flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: colors.ink,
-      paddingVertical: 11, borderRadius: radius.button, marginTop: 14,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.ink,
+      minHeight: 48, borderRadius: 12, marginTop: 14,
     },
-    copyBtnText: { color: colors.sand, fontWeight: '700', fontSize: 13 },
-    partnerName: { fontSize: 14, fontWeight: '700', color: colors.ink, marginBottom: 4 },
-    warn: { fontSize: 12.5, color: colors.coral, lineHeight: 18 },
+    copyBtnText: { color: colors.white, fontWeight: '700', fontSize: 15 },
+    partnerName: { fontSize: 16, fontWeight: '700', color: colors.ink, marginBottom: 4 },
+    warn: { fontSize: 14, color: colors.errorText, lineHeight: 20 },
     chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-    chip: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
+    chip: { minHeight: 40, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white, justifyContent: 'center' },
     chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
-    chipText: { fontSize: 12, fontWeight: '600', color: colors.ink },
-    chipTextSelected: { color: colors.sand },
-    inputLabel: { fontSize: 12, color: colors.inkSoft, marginTop: 14, marginBottom: 6 },
+    chipText: { fontSize: 14, fontWeight: '500', color: colors.ink },
+    chipTextSelected: { color: colors.white, fontWeight: '600' },
+    inputLabel: { fontSize: 14, color: colors.inkSoft, marginTop: 14, marginBottom: 6 },
     input: {
-      backgroundColor: colors.sand, borderWidth: 1, borderColor: colors.line, borderRadius: radius.sm,
-      padding: 12, fontSize: 15, color: colors.ink, fontVariant: ['tabular-nums'],
+      backgroundColor: colors.white, borderWidth: 1, borderColor: colors.fieldLine, borderRadius: 10,
+      minHeight: 48, paddingHorizontal: 14, fontSize: 16, color: colors.ink, fontVariant: ['tabular-nums'],
     },
-    feePreview: { fontSize: 12.5, fontWeight: '700', color: colors.teal, marginTop: 8 },
-    saveBtn: { marginTop: 14, backgroundColor: colors.coral, paddingVertical: 12, borderRadius: radius.button, alignItems: 'center' },
-    saveBtnText: { color: 'white', fontWeight: '700', fontSize: 13.5 },
+    feePreview: { fontSize: 14, fontWeight: '700', color: colors.ink, marginTop: 8 },
+    saveBtn: { marginTop: 14, backgroundColor: colors.coral, minHeight: 52, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+    saveBtnText: { color: 'white', fontWeight: '700', fontSize: 16 },
     feeBox: {
       flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 14, paddingTop: 14,
       borderTopWidth: 1, borderColor: colors.line,
     },
-    feeAmount: { fontSize: 20, fontWeight: '800', color: colors.ink, fontVariant: ['tabular-nums'] },
+    feeAmount: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 24, color: colors.ink },
     paidBtn: {
-      flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 12,
-      borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.line,
+      flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44, paddingHorizontal: 16,
+      borderRadius: 12, borderWidth: 1.5, borderColor: colors.fieldLine,
     },
-    paidBtnActive: { borderColor: colors.teal, backgroundColor: colors.tealSoft },
-    paidBtnText: { fontSize: 12.5, fontWeight: '700', color: colors.ink },
+    paidBtnActive: { borderColor: colors.ink, backgroundColor: colors.tintBg },
+    paidBtnText: { fontSize: 14, fontWeight: '700', color: colors.ink },
   });
 }
