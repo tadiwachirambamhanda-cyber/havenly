@@ -15,7 +15,7 @@ For the coding agent that builds these screens. Read `design/brief.md`, `docs/ux
 | `States.dc.html` | Empty, loading and error states for all six screens | all |
 | `screenshots/*.png` | One rendering of each at 2x (390 wide; States is 1290 wide) | |
 
-The `.dc.html` files are plain HTML with inline styles inside an `<x-dc>` tag, so every size, colour and spacing in them is an exact value to read. `{{accent}}` is the one tweakable colour (the primary green, default `#0B6B5E`). Ignore the `support.js` script line, it belongs to the design canvas. The screenshots were rendered from the same HTML in Chrome.
+The `.dc.html` files are plain HTML with inline styles inside an `<x-dc>` tag, so every size, colour and spacing in them is an exact value to read. `{{accent}}` is the one tweakable colour (the primary oxblood, default `#7A2433`). Ignore the `support.js` script line, it belongs to the design canvas. The screenshots were rendered from the same HTML in Chrome.
 
 All names, prices, areas and photos in the mock-ups are fictional ("Sample listing, for design only"). Photos are plain grey blocks on purpose; real photos replace them.
 
@@ -63,7 +63,7 @@ Spacing, size and shape: screen side gutter 16; gap between cards 16; card paddi
 
 ## Components
 
-- **Result card:** photo (188) with save heart (44 round, white) top right, a photo count (`1 / [N]`) bottom right, and the Verified badge or Student deal tag bottom left. Under it: price, "per month", and the Bills included tag on the right; then the kind and area; then commute line, then housemates line. A student deal shows the new price, the old price struck through, and "per month". A whole home shows the home price and, on its own line in primary green, the per-person range.
+- **Result card:** photo (188) with save heart (44 round, white) top right, a photo count (`1 / [N]`) bottom right, and the Verified badge or Student deal tag bottom left. Under it: price, "per month", and the Bills included tag on the right; then the kind and area; then commute line, then housemates line. A student deal shows the new price, the old price struck through, and "per month". A whole home shows the home price and, on its own line in the warm brown `#4A4036`, the per-person range.
 - **Filter chips:** a horizontally scrolling row. First chip is "Verified by Havenly" (with the shield icon). Selected chips are filled primary with white text.
 - **Cost box (listing page):** price large, a line on what bills include, then "To move in" rows (first month, deposit, one-time fees) and a bold total.
 - **Compare grid:** three equal columns (114 each at 390 wide), each row has an uppercase label above three cells.
