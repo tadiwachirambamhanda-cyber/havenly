@@ -10,35 +10,37 @@
 <helmet>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Schibsted+Grotesk:wght@500;600;700&display=swap">
 <style>
-body{margin:0;background:#E7EAE5;font-family:'Hanken Grotesk',system-ui,sans-serif;color:#15201B}
+body{margin:0;background:#E9E6DF;font-family:'Hanken Grotesk',system-ui,sans-serif;color:#1F1B16}
 button{font-family:inherit;cursor:pointer}
-button:focus-visible,input:focus-visible{outline:2px solid #0B6B5E;outline-offset:2px}
+button:focus-visible,input:focus-visible{outline:2px solid #7A2433;outline-offset:2px}
 h2{margin:0;font-family:'Schibsted Grotesk',sans-serif;font-weight:700;font-size:22px;letter-spacing:-0.01em}
 .grid{display:grid;grid-template-columns:repeat(3,390px);gap:12px 60px;align-items:stretch}
-.cap{font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#4F5B55;margin-bottom:6px}
-.p{background:#F4F6F2;border:1px solid #848E87;border-radius:14px;padding:18px 16px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;min-height:230px}
+.cap{font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#5A544B;margin-bottom:6px}
+.p{background:#F3F0EA;border:1px solid #8B8477;border-radius:14px;padding:18px 16px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;min-height:230px}
 .col{display:flex;flex-direction:column}
-.btn{height:48px;border:0;border-radius:12px;background:#0B6B5E;color:#FFFFFF;font-size:15px;font-weight:700;padding:0 20px}
-.btn2{height:48px;border:1px solid #848E87;border-radius:12px;background:#FFFFFF;color:#15201B;font-size:15px;font-weight:600;padding:0 20px}
+.btn{height:48px;border:0;border-radius:12px;background:#7A2433;color:#FFFFFF;font-size:15px;font-weight:700;padding:0 20px}
+.btn2{height:48px;border:1px solid #8B8477;border-radius:12px;background:#FFFFFF;color:#1F1B16;font-size:15px;font-weight:600;padding:0 20px}
 .t{font-size:18px;font-weight:700;line-height:1.25;font-family:'Schibsted Grotesk',sans-serif}
-.s{font-size:14px;line-height:1.45;color:#2B3832}
-.sk{background:#D6DCD5;border-radius:8px}
-.card{background:#FFFFFF;border:1px solid #DDE2DC;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px}
-.err{background:#FCE8E6;border:1px solid #E7B5B0;color:#8E1B12;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.35}
-.f{height:48px;box-sizing:border-box;border:1px solid #848E87;border-radius:10px;background:#FFFFFF;padding:0 14px;font-family:inherit;font-size:15px;color:#15201B;width:100%}
+.s{font-size:14px;line-height:1.45;color:#3A342D}
+.sk{background:#DDD7CB;border-radius:8px}
+.card{background:#FFFFFF;border:1px solid #E2DDD2;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.err{background:#FCE8E6;border:1px solid #E7B5B0;color:#8E1B12;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.35;display:flex;align-items:flex-start;gap:8px}
+.err.note::before{content:"i";background:#5A544B}
+.err::before{content:"!";display:inline-flex;align-items:center;justify-content:center;flex:none;width:18px;height:18px;border-radius:999px;background:#8E1B12;color:#FFFFFF;font-weight:700;font-size:12px;margin-top:1px}
+.f{height:48px;box-sizing:border-box;border:1px solid #8B8477;border-radius:10px;background:#FFFFFF;padding:0 14px;font-family:inherit;font-size:15px;color:#1F1B16;width:100%}
 .f.bad{border-color:#A3231A;border-width:2px}
-.ic{width:44px;height:44px;border-radius:999px;background:#E3E8E2;display:flex;align-items:center;justify-content:center}
+.ic{width:44px;height:44px;border-radius:999px;background:#E6E1D6;display:flex;align-items:center;justify-content:center}
 .rw{display:flex;justify-content:space-between;gap:10px;font-size:14px;font-variant-numeric:tabular-nums}
 </style>
 </helmet>
-<div style="width: 1290px; min-height: 2000px; box-sizing: border-box; padding: 40px 0 40px; background: #E7EAE5; display: flex; flex-direction: column; gap: 14px">
+<div style="width: 1290px; min-height: 2000px; box-sizing: border-box; padding: 40px 0 40px; background: #E9E6DF; display: flex; flex-direction: column; gap: 14px">
 
   <!-- Housing -->
   <h2>Housing</h2>
   <div class="grid">
     <div class="col"><div class="cap">Empty: nothing matches</div>
       <div class="p" style="align-items: flex-start">
-        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#15201B" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F1B16" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
         <div class="t">No places match these filters</div>
         <div class="s">Try a higher budget or take a filter off. [N] places are listed near Heriot-Watt University Dubai.</div>
         <button type="button" class="btn">Clear filters</button>
@@ -72,7 +74,7 @@ h2{margin:0;font-family:'Schibsted Grotesk',sans-serif;font-weight:700;font-size
     </div>
     <div class="col"><div class="cap">Unavailable: full or no longer listed</div>
       <div class="p" style="align-items: flex-start">
-        <div class="err" style="background: #EEF1EC; border-color: #848E87; color: #15201B; width: 100%; box-sizing: border-box">This place is full or no longer listed.</div>
+        <div class="err note" style="background: #ECE8DF; border-color: #8B8477; color: #1F1B16; width: 100%; box-sizing: border-box">This place is full or no longer listed.</div>
         <div class="s">You can still see its details below, but you cannot send an enquiry.</div>
         <button type="button" class="btn2" style="width: 100%">See similar places near your campus</button>
       </div>
@@ -92,8 +94,8 @@ h2{margin:0;font-family:'Schibsted Grotesk',sans-serif;font-weight:700;font-size
     <div class="col"><div class="cap">Listing: student deal, not verified yet</div>
       <div class="p">
         <div style="display: flex; gap: 8px; flex-wrap: wrap">
-          <span style="display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border-radius: 8px; background: #FBE3C9; color: #8A3D00; font-size: 12px; font-weight: 700">Student deal</span>
-          <span style="display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border-radius: 8px; background: #E3E8E2; color: #2B3832; font-size: 12px; font-weight: 600">Not yet checked by Havenly</span>
+          <span style="display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border-radius: 8px; background: #F5E2C6; color: #7A4300; font-size: 12px; font-weight: 700">Student deal</span>
+          <span style="display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border-radius: 8px; background: #E6E1D6; color: #3A342D; font-size: 12px; font-weight: 600">Not yet checked by Havenly</span>
         </div>
         <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap"><span style="font-family: 'Schibsted Grotesk', sans-serif; font-weight: 700; font-size: 30px">AED 3,300</span><span class="s" style="text-decoration: line-through">AED 3,600</span><span class="s">per month</span></div>
         <div class="s">Student rate. Bills not included, about AED 350 to 500 a month.</div>
@@ -103,7 +105,7 @@ h2{margin:0;font-family:'Schibsted Grotesk',sans-serif;font-weight:700;font-size
     </div>
     <div class="col"><div class="cap">Split rent: bills included</div>
       <div class="p">
-        <div style="background: #EAF3F0; border-radius: 12px; padding: 14px 14px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #0A5B50">Each person pays</span><span style="font-family: 'Schibsted Grotesk', sans-serif; font-weight: 700; font-size: 30px">AED 3,000</span><span class="s">a month, bills included</span></div>
+        <div style="background: #F1E9E4; border-radius: 12px; padding: 14px 14px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #4A4036">Each person pays</span><span style="font-family: 'Schibsted Grotesk', sans-serif; font-weight: 700; font-size: 30px">AED 3,000</span><span class="s">a month, bills included</span></div>
         <div class="rw"><span>Rent, AED 9,000 split 3 ways</span><span>AED 3,000</span></div>
         <div class="rw"><span>Bills</span><span>Included</span></div>
         <div class="rw"><span>Deposit, AED 4,500 split 3 ways</span><span>AED 1,500</span></div>
@@ -123,7 +125,7 @@ h2{margin:0;font-family:'Schibsted Grotesk',sans-serif;font-weight:700;font-size
   <div class="grid">
     <div class="col"><div class="cap">Empty: nothing saved</div>
       <div class="p" style="align-items: flex-start">
-        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#15201B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></div>
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F1B16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></div>
         <div class="t">Save places to compare them</div>
         <div class="s">Tap the heart on a listing, then come back here to see up to 3 side by side.</div>
         <button type="button" class="btn">Find a place</button>
@@ -131,7 +133,7 @@ h2{margin:0;font-family:'Schibsted Grotesk',sans-serif;font-weight:700;font-size
     </div>
     <div class="col"><div class="cap">Limit reached: a 4th is refused</div>
       <div class="p">
-        <div class="err" style="background: #EEF1EC; border-color: #848E87; color: #15201B">You can compare up to 3 places. Remove one to add this one.</div>
+        <div class="err note" style="background: #ECE8DF; border-color: #8B8477; color: #1F1B16">You can compare up to 3 places. Remove one to add this one.</div>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px"><div class="sk" style="height: 64px"></div><div class="sk" style="height: 64px"></div><div class="sk" style="height: 64px"></div></div>
         <button type="button" class="btn2">Choose one to remove</button>
       </div>

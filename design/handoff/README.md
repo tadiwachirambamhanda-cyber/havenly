@@ -21,30 +21,33 @@ All names, prices, areas and photos in the mock-ups are fictional ("Sample listi
 
 ## Tokens (exact values)
 
-Colour
+Colour (palette name: oxblood and stone)
 
 | Token | Value | Used for |
 |---|---|---|
-| ground | `#F4F6F2` | screen background |
+| ground | `#F3F0EA` | screen background (warm stone) |
 | surface | `#FFFFFF` | cards, fields, tab bar, sheets |
-| surface-soft | `#EEF1EC`, `#E3E8E2` | close buttons, neutral tags, panels |
-| photo-placeholder | `#D6DCD5` | empty photo and skeletons |
-| ink | `#15201B` | text, Verified badge background, selected chips |
-| ink-body | `#2B3832` | body paragraphs |
-| ink-soft | `#4F5B55` | secondary text, icons |
-| ink-muted | `#59655F` | small print only (12 px) |
-| placeholder | `#6A756F` | input placeholder |
-| line-card | `#DDE2DC` | card and tab-bar borders |
-| line-divider | `#E4E8E2` | rows inside a card |
-| line-field | `#848E87` | field, chip and outline-button borders (3.4:1 on white, so the control edge is visible) |
-| primary | `#0B6B5E` | the one main button, active filter chip, active tab |
-| primary-tint | `#EAF3F0` (panel), `#DDF0EC` (tag) with text `#0A5B50` | "Bills included" tag, each-person-pays panel |
-| deal | background `#FBE3C9`, text `#8A3D00` | Student deal tag only |
-| error | text `#8E1B12` / `#A3231A`, background `#FCE8E6`, border `#E7B5B0` | errors |
-| switch-off | `#B9C1B9` | switch track when off |
-| sheet-dim | `#78807A` (stands in for ink at about 55% over the screen) | dimmed area above a sheet |
+| surface-soft | `#ECE8DF`, `#E6E1D6` | close buttons, neutral tags, panels |
+| photo-placeholder | `#DDD7CB` | empty photo and skeletons |
+| ink | `#1F1B16` | text, Verified badge background, selected chips |
+| ink-body | `#3A342D` | body paragraphs |
+| ink-soft | `#5A544B` | secondary text, icons |
+| ink-muted | `#655F55` | small print only (12 px) |
+| placeholder | `#6B655A` | input placeholder |
+| line-card | `#E2DDD2` | card and tab-bar borders |
+| line-divider | `#E8E3D9` | rows inside a card |
+| line-field | `#8B8477` | field, chip and outline-button borders (3.7:1 on white, so the control edge is visible) |
+| primary | `#7A2433` (oxblood) | the one main button, active filter chip, active tab, selected thumbnail |
+| primary-tint | `#F1E9E4` (panel), `#E8E2D6` (tag) with text `#4A4036` | "Bills included" tag, each-person-pays panel |
+| deal | background `#F5E2C6`, text `#7A4300` | Student deal tag only |
+| error | text `#8E1B12` / `#A3231A`, background `#FCE8E6`, border `#E7B5B0`, always with a "!" icon and words | errors |
+| notice | background `#ECE8DF`, border `#8B8477`, text ink, with an "i" icon | neutral notices (for example "full or no longer listed") |
+| switch-off | `#BDB6A8` | switch track when off |
+| sheet-dim | `#7A756B` (stands in for ink at about 55% over the screen) | dimmed area above a sheet |
 
-Verified by Havenly is a solid ink (`#15201B`) badge with white text and a shield-check icon. It must never share a colour with the Student deal tag.
+Contrast (checked): white text on primary 9.9:1; primary on ground 8.7:1; ink on ground 15.1:1; ink-soft on ground 6.6:1; deal text on deal background 6.3:1; "Bills included" text 7.8:1; field border on white 3.7:1. Errors never rely on colour alone, because the primary is also a red family.
+
+Verified by Havenly is a solid ink (`#1F1B16`) badge with white text and a shield-check icon. It must never share a colour with the Student deal tag.
 
 Type (two families, load from Google Fonts or `@expo-google-fonts`)
 
@@ -83,7 +86,7 @@ One primary action per screen; price visible first; real photos lead; no sign-in
 
 ## What changed from the app today, and why
 
-The app today uses a warm sand ground, coral and teal, Fraunces headings and Plus Jakarta Sans, with a dark theme. The new look is a cool off-white ground, one deep green for the main action, dark ink for the Verified mark and amber for student deals, in Schibsted Grotesk and Hanken Grotesk. The old combination (cream, serif, warm accent) reads as an AI template and suits a social app, while this is a marketplace where price and trust must come first. The shared theme (`src/theme/tokens.ts`) and fonts belong to the Chief Architect's foundation step, not to a lane.
+The app today uses a warm sand ground, coral and teal, Fraunces headings and Plus Jakarta Sans, with a dark theme. The new look is a warm stone ground with warm charcoal text, one deep oxblood for the main action, dark ink for the Verified mark and amber for student deals, in Schibsted Grotesk and Hanken Grotesk. It was chosen on 2026-11-18 from five options (cool green, stone and forest, sand and midnight, oxblood and stone, petrol and stone) because it is warm and premium and does not look like other Dubai property portals or a green wellness brand. The old combination (cream, serif, warm accent) reads as an AI template and suits a social app, while this is a marketplace where price and trust must come first. The shared theme (`src/theme/tokens.ts`) and fonts belong to the Chief Architect's foundation step, not to a lane.
 
 ## Not designed yet, so do not invent it
 
