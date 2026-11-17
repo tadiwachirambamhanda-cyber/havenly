@@ -54,23 +54,24 @@ The founder has not given an out-of-scope list, so this is a proposal for the fo
 - Taking a cut of rent as a broker. The referral fee from the provider stays the model.
 - Map search with pins and a draw-on-map tool.
 - Reviews and ratings of places by students.
+- Villas. They are not listed.
 - Roommate matching, new-listing alerts, push notifications, virtual tours, Arabic.
 - New social features, or removing the existing ones.
 
 ## Data
 
 - Existing tables: `residences`, `room_types`, `residence_partner_terms` (fee and contacts, admin only), `saved_residences`, `housing_enquiries`. Listing type, extra costs, verification, and permit number are new fields.
-- The first real listings come from the founder: the residences already contacted and the rooms from the Havenly Housing WhatsApp and Instagram business (R01 to R03). The founder supplies the photos and prices.
+- The first real listings come from the founder: the residences already contacted. The founder supplies the photos and prices. The rooms from the separate Havenly Housing WhatsApp and Instagram business (R01 to R03) are not included for now.
 - Students' personal data stays limited to what an enquiry needs: name, phone, move-in month, budget. Nothing real in test data.
 
 ## Open questions
 
 1. **Decided 2026-11-18:** only the Havenly team adds listings in v1. Later, agents and residences add their own for a fee. Still open: how the fee works (per listing, monthly subscription, per featured listing), the amount, how they pay, and whether the referral fee per signed student stays alongside it.
-2. **Regulation (lawyer, before public launch):** as far as we know, property adverts in Dubai need a permit number from the regulator (Trakheesi) and renting out shared or partitioned rooms is restricted. Does Havenly need a brokerage licence, or is "provider pays a referral fee, contract is offline" enough? Which listing types are legal to show?
-3. **Which kinds of place go in v1:** residences only, or also shared-apartment rooms, private rooms and studios? This PRD assumes all four; confirm.
+2. **Regulation (parked for later, before public launch; the founder will deal with the lawyer review then):** as far as we know, property adverts in Dubai need a permit number from the regulator (Trakheesi) and renting out shared or partitioned rooms is restricted. Does Havenly need a brokerage licence, or is "provider pays a referral fee, contract is offline" enough? Which listing types are legal to show?
+3. **Decided 2026-11-18:** all four kinds of place go in v1 (student residence, room in a shared apartment, private room, studio). Villas are not listed.
 4. **Who pays?** Decided: students use it free; agents and residences pay to list. Still open: do private landlords (not agents) list at all, and does a listing fee replace or sit on top of today's referral fee per signed student?
 5. **Which areas and universities first?** (Dubai International Academic City, Knowledge Village, Silicon Oasis, Marina and JLT, others.)
 6. **Browse without an account:** OK to show full listings and the provider name to people who have not signed up?
-7. **The Havenly Housing WhatsApp and Google Form business:** does it move into the app (rooms R01 to R03 become listings, the form is replaced by the enquiry), or run in parallel?
+7. **Decided 2026-11-18:** the Havenly Housing WhatsApp and Google Form business (rooms R01 to R03) stays separate for now and does not become listings in the app.
 8. **Phone vs web for v1:** is web enough for the first friends and students, with the phone app waiting for the developer accounts?
 9. **Name of the social part:** keep "Feed, Discover, Inbox, Profile" as they are, or group them under one "Community" tab?
