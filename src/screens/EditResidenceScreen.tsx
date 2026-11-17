@@ -99,6 +99,7 @@ export default function EditResidenceScreen() {
   const scrollRef = useRef<ScrollView>(null);
 
   const [loading, setLoading] = useState(!!residenceId);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [name, setName] = useState('');
   const [providerName, setProviderName] = useState('');
   const [area, setArea] = useState('');
@@ -149,12 +150,19 @@ export default function EditResidenceScreen() {
   useEffect(() => {
     if (!residenceId) return;
     (async () => {
-      const [{ data: residenceRow }, { data: termsRow }] = await Promise.all([
+      const [{ data: residenceRow, error: residenceError }, { data: termsRow, error: termsError }] = await Promise.all([
         supabase.from('residences').select('*, room_types(*)').eq('id', residenceId).maybeSingle(),
         supabase.from('residence_partner_terms').select('*').eq('residence_id', residenceId).maybeSingle(),
       ]);
       const r = residenceRow as Residence | null;
-      if (r) {
+      // Never open a form on a listing that didn't load: saving it would send
+      // blanks over the stored values.
+      if (residenceError || termsError || !r) {
+        setLoadFailed(true);
+        setLoading(false);
+        return;
+      }
+      {
         setName(r.name);
         setProviderName(r.provider_name);
         setArea(r.area);
@@ -366,6 +374,17 @@ export default function EditResidenceScreen() {
 
   if (loading) {
     return <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}><ActivityIndicator color={colors.coral} /></View>;
+  }
+
+  if (loadFailed) {
+    return (
+      <View style={[styles.container, { paddingTop: Platform.OS === 'web' ? 20 : 60 }]}>
+        <ErrorNote message="Could not open this listing, so nothing was changed. Check your connection, go back and try again." />
+        <AnimatedPressable style={[styles.outlineBtn, { marginTop: 8 }]} onPress={() => navigation.goBack()} accessibilityRole="button">
+          <Text style={styles.outlineText}>Go back</Text>
+        </AnimatedPressable>
+      </View>
+    );
   }
 
   const busy = saving || uploading;
