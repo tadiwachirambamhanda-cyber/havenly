@@ -1621,6 +1621,7 @@ begin
   return rid;
 end;
 $$;
+revoke execute on function public.save_residence(uuid, jsonb, jsonb, jsonb) from public, anon;
 grant execute on function public.save_residence(uuid, jsonb, jsonb, jsonb) to authenticated;
 
 -- ==================== HOUSING NOTIFICATIONS ====================

@@ -60,6 +60,9 @@ Round 1: VERDICT FINDINGS(3). No findings on the database migration, the save fu
 2. MINOR, `src/lib/listing.test.ts`: no tests for malformed grouping. **Fixed**: added the cases.
 3. MAJOR, `src/screens/EditResidenceScreen.tsx:169`: latitude and longitude are only checked to be numbers, so a typo like 250 would be saved. **Dismissed for this change**: true, but it is behaviour that existed before F1, only the Havenly team can enter it, and the plan says to build nothing outside F1. Added to "Ideas for later".
 
+Round 2: VERDICT FINDINGS(1).
+1. MINOR, `supabase/schema.sql:1624`: the snapshot granted `save_residence` to signed-in users but did not revoke it from signed-out visitors (functions are callable by everyone by default), unlike the migration and the live database. **Fixed** (codex round 2 #1): added the same `revoke ... from public, anon` line. The function's admin check already blocked edits either way.
+
 ## Verification
 1. `npm run typecheck`, `npm run lint` and `npm test` pass (27 tests, 5 of them new for the listing fields). `npx expo export --platform web` passes.
 2. Live database after the migration: the 7 new columns exist; a whole home with no bedrooms, 0 or 4 bedrooms, a studio with 2 bedrooms and a negative deposit are all refused; an old-style insert and a valid 3-bedroom home both work (tested inside a rolled-back block). The first run of this test found the NULL bug listed above.
