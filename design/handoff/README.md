@@ -36,7 +36,7 @@ Colour
 | placeholder | `#6A756F` | input placeholder |
 | line-card | `#DDE2DC` | card and tab-bar borders |
 | line-divider | `#E4E8E2` | rows inside a card |
-| line-field | `#CDD4CC` | field, chip and outline-button borders |
+| line-field | `#848E87` | field, chip and outline-button borders (3.4:1 on white, so the control edge is visible) |
 | primary | `#0B6B5E` | the one main button, active filter chip, active tab |
 | primary-tint | `#EAF3F0` (panel), `#DDF0EC` (tag) with text `#0A5B50` | "Bills included" tag, each-person-pays panel |
 | deal | background `#FBE3C9`, text `#8A3D00` | Student deal tag only |
