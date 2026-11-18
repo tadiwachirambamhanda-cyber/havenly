@@ -115,7 +115,7 @@ export default function EditProfileScreen() {
       } catch (privateError) {
         // The name, bio, photo and university were already saved above; say so, and let the student try again.
         console.error('Failed to save private profile fields:', privateError);
-        await refreshProfile();
+        try { await refreshProfile(); } catch { /* the message below is what matters; a failed refresh must not replace it */ }
         setError('Your name, photo and university were saved, but your housing details were not. Tap Save to try again.');
         return;
       }

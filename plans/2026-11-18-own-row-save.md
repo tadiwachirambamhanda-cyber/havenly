@@ -20,3 +20,7 @@ Also: the board's tag chips use a position-based key, so a stored duplicate tag 
 Round 1: VERDICT FINDINGS(2).
 1. MAJOR, `ownRow.ts:15-17`: two first-time saves could race, and the loser reported a failure though the row existed. **Fixed:** on a duplicate-key error the save retries as an update and fails only if that also fails.
 2. MAJOR, `EditProfileScreen.tsx:91-110`: the public profile saved before the private fields, so a failure of the second left a half-saved profile with a misleading message. **Fixed:** the screen now says "Your name, photo and university were saved, but your housing details were not. Tap Save to try again.", refreshes the profile so what was saved shows, stays on the screen, and scrolls the message into view.
+
+Round 2: VERDICT FINDINGS(2).
+3. MAJOR, `ownRow.ts:13`: an update that matches no visible row is treated as "no row", which could turn into a confusing duplicate-key error if row security hid an existing row. **Dismissed:** a student can always read their own row (the select policy is `auth.uid() = user_id`), so "no row visible" means no row, and the real test saved the insert path and the update path against the live database. If both fail the real database error is shown, which is the right signal.
+4. MINOR, `EditProfileScreen.tsx:118`: a failed profile refresh after a partial save could replace the explanatory message. **Fixed:** the refresh is wrapped so the message stays.
