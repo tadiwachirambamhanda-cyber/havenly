@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
-import { SchibstedGrotesk_500Medium_Italic, SchibstedGrotesk_600SemiBold, SchibstedGrotesk_700Bold, SchibstedGrotesk_700Bold_Italic } from '@expo-google-fonts/schibsted-grotesk';
+import { SchibstedGrotesk_500Medium_Italic, SchibstedGrotesk_600SemiBold, SchibstedGrotesk_700Bold, SchibstedGrotesk_700Bold_Italic, SchibstedGrotesk_800ExtraBold } from '@expo-google-fonts/schibsted-grotesk';
 import {
   HankenGrotesk_400Regular,
   HankenGrotesk_500Medium,
@@ -56,6 +56,7 @@ export default function App() {
     SchibstedGrotesk_600SemiBold,
     SchibstedGrotesk_700Bold,
     SchibstedGrotesk_700Bold_Italic,
+    SchibstedGrotesk_800ExtraBold,
     HankenGrotesk_400Regular,
     HankenGrotesk_500Medium,
     HankenGrotesk_600SemiBold,
