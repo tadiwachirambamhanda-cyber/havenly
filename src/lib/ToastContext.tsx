@@ -27,7 +27,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const showToast = useCallback((message: string, type: ToastType = 'success') => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setToast({ message, type, key: Date.now() });
+    const key = Date.now();
+    setToast({ message, type, key });
     translateY.setValue(-80);
     opacity.setValue(0);
     Animated.parallel([
@@ -38,7 +39,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       Animated.parallel([
         Animated.timing(translateY, { toValue: -80, duration: 220, useNativeDriver: true }),
         Animated.timing(opacity, { toValue: 0, duration: 220, useNativeDriver: true }),
-      ]).start(() => setToast(null));
+      // Only the toast that is still showing may clear itself: a newer toast that appeared during this hide must stay.
+      ]).start(({ finished }) => { if (finished) setToast((current) => (current && current.key === key ? null : current)); });
     }, 2600);
   }, [translateY, opacity]);
 

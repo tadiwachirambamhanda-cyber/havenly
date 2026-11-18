@@ -19,3 +19,7 @@ Create `src/theme/motion.ts`, `src/theme/motion.test.ts`. Change `TabBar.tsx`, `
 ## Codex review
 Round 1: VERDICT FINDINGS(1).
 1. MINOR, `TabBar.tsx:40`: on the first render the highlight started at x=0 and width=0 and slid in from the left edge. **Fixed:** the first time the active tab is measured the highlight is placed there at once; later changes slide. Verified in the browser: from its first frame the highlight is at x=22 with its full width and never moves.
+
+Round 2: VERDICT FINDINGS(2).
+2. MAJOR, `ToastContext.tsx:41`: a toast shown while the previous one was finishing its hide could be removed early by the old completion callback. **Fixed** (older code, cheap to fix): the callback runs only if its animation finished and clears only the toast it belongs to.
+3. MINOR, `TabBar.tsx:43`: the highlight's first position is set in an effect, so one frame could use x=0, width=0. **Dismissed:** with width 0 nothing is visible in that frame, and the browser recording shows the highlight at x=22 with its full width from the first sampled frame and never moving.
