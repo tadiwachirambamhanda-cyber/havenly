@@ -143,7 +143,7 @@ function createStyles(colors: ColorTokens) {
   btnPrimary: { backgroundColor: colors.coral, paddingVertical: 16, borderRadius: radius.button, alignItems: 'center', marginTop: 10 },
   btnPrimaryText: { color: 'white', fontWeight: '700', fontSize: 15 },
   switchLink: { textAlign: 'center', marginTop: 18, fontSize: 13.5, color: colors.inkSoft },
-  switchLinkBold: { color: colors.teal, fontWeight: '700' },
+  switchLinkBold: { color: colors.coral, fontWeight: '700' },
   btnGhost: { borderWidth: 1.5, borderColor: colors.line, paddingVertical: 14, borderRadius: radius.button, alignItems: 'center', marginTop: 26 },
   btnGhostText: { color: colors.ink, fontWeight: '700', fontSize: 15 },
   btnGhostHint: { color: colors.inkSoft, fontSize: 12.5, marginTop: 3 },

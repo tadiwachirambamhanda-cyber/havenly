@@ -619,7 +619,7 @@ export default function PostDetailScreen() {
 
         {post.location ? (
           <AnimatedPressable style={styles.locationLink} onPress={() => openInMaps({ label: post.location })} accessibilityRole="link" accessibilityLabel={`Open ${post.location} in Maps`}>
-            <Icon name="map-pin" size={15} color={colors.teal} />
+            <Icon name="map-pin" size={15} color={colors.coral} />
             <Text style={styles.locationLinkText} numberOfLines={2}>{post.location}</Text>
             <Text style={styles.locationLinkCta}>Open in Maps</Text>
           </AnimatedPressable>
@@ -746,7 +746,7 @@ function createStyles(colors: ColorTokens) {
   followBtnTextActive: { color: colors.ink },
   locationLink: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 14, paddingVertical: 12, paddingHorizontal: 14, borderRadius: radius.md, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   locationLinkText: { flex: 1, fontSize: 13.5, fontWeight: '600', color: colors.ink },
-  locationLinkCta: { fontSize: 12.5, fontWeight: '700', color: colors.teal },
+  locationLinkCta: { fontSize: 12.5, fontWeight: '700', color: colors.coral },
   text: { fontSize: 13.5, lineHeight: 22, color: colors.inkSoft },
   actionBar: { flexDirection: 'row', gap: 18, marginTop: 20, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.line },
   actionItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
