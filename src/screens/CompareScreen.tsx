@@ -107,7 +107,7 @@ export default function CompareScreen() {
       <View style={styles.container}>
         {header}
         <StateBlock icon="heart" title="Save places to compare them" body="Open a listing and choose Add to compare, then come back here to see up to 3 side by side."
-          primary={{ label: 'Find a place', onPress: () => navigation.goBack() }} />
+          primary={{ label: 'Find a place', onPress: () => (route.name === 'Compare' ? navigation.goBack() : navigation.navigate('MainTabs', { screen: 'Housing' })) }} />
       </View>
     );
   }
