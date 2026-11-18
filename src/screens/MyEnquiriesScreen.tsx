@@ -14,7 +14,7 @@ import { ENQUIRY_STATUS_LABEL, formatMonth } from '@/lib/housing';
 import { timeAgo } from '@/utils/timeAgo';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
-import EmptyState from '@/components/EmptyState';
+import { StateBlock } from '@/components/housing/parts';
 import PersonRowSkeleton from '@/components/PersonRowSkeleton';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
@@ -31,15 +31,20 @@ export default function MyEnquiriesScreen() {
   const myId = session?.user.id;
   const [enquiries, setEnquiries] = useState<HousingEnquiry[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     if (!myId) return;
-    const { data } = await supabase.from('housing_enquiries')
+    const { data, error } = await supabase.from('housing_enquiries')
       .select('*, residence:residences(id, name, area, photo_urls, provider_name), room_type:room_types(id, name, price_aed, billing_period)')
       .eq('user_id', myId)
       .order('created_at', { ascending: false });
-    setEnquiries((data as unknown as HousingEnquiry[]) ?? []);
+    if (error) setFailed(true);
+    else {
+      setFailed(false);
+      setEnquiries((data as unknown as HousingEnquiry[]) ?? []);
+    }
     setLoaded(true);
   }, [myId]);
 
@@ -52,10 +57,10 @@ export default function MyEnquiriesScreen() {
   }, [load]);
 
   const statusTone = (status: EnquiryStatus) => {
-    if (status === 'signed') return { bg: colors.tealSoft, fg: colors.teal };
-    if (status === 'lost') return { bg: colors.sandDeep, fg: colors.inkSoft };
-    if (status === 'new') return { bg: colors.coralSoft, fg: colors.coral };
-    return { bg: `${colors.gold}26`, fg: colors.gold };
+    if (status === 'signed') return { bg: '#1F1B16', fg: '#FFFFFF' };
+    if (status === 'lost') return { bg: colors.sandDeep, fg: colors.inkBody };
+    if (status === 'new') return { bg: colors.tintBg, fg: colors.tintText };
+    return { bg: colors.dealBg, fg: colors.dealText };
   };
 
   return (
@@ -68,13 +73,16 @@ export default function MyEnquiriesScreen() {
       </View>
       {!loaded ? (
         <View style={{ paddingTop: spacing.sm }}>{[0, 1, 2].map((i) => <PersonRowSkeleton key={i} />)}</View>
+      ) : failed ? (
+        <StateBlock icon="alert-circle" kind="error" title="We could not load your enquiries" body="Check your connection and try again."
+          primary={{ label: 'Try again', onPress: () => { setLoaded(false); load(); } }} />
       ) : (
         <FlatList
           data={enquiries}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.sm, flexGrow: 1 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
-          ListEmptyComponent={<EmptyState icon="clipboard" text="No enquiries yet. Ask a residence a question or book a viewing from its page." action={{ label: 'Browse housing', onPress: () => navigation.navigate('MainTabs', { screen: 'Housing' }) }} />}
+          ListEmptyComponent={<StateBlock icon="clipboard" title="No enquiries yet" body="Ask a residence a question or book a viewing from its page." primary={{ label: 'Browse housing', onPress: () => navigation.navigate('MainTabs', { screen: 'Housing' }) }} />}
           renderItem={({ item, index }) => {
             const tone = statusTone(item.status);
             const photo = item.residence?.photo_urls?.[0];
@@ -115,15 +123,15 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand },
     header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 12, paddingHorizontal: spacing.lg },
-    back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-    title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
+    back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+    title: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 26, letterSpacing: -0.4, color: colors.ink },
     card: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
     thumb: { width: 60, height: 60, borderRadius: radius.sm },
-    name: { fontSize: 14, fontWeight: '700', color: colors.ink },
-    meta: { fontSize: 12, color: colors.inkSoft, marginTop: 2 },
+    name: { fontSize: 15, fontWeight: '700', color: colors.ink },
+    meta: { fontSize: 13, color: colors.inkBody, marginTop: 2 },
     footRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 7 },
-    statusPill: { paddingHorizontal: 9, paddingVertical: 3, borderRadius: radius.tag },
-    statusText: { fontSize: 11, fontWeight: '700' },
-    time: { fontSize: 11, color: colors.inkSoft },
+    statusPill: { paddingHorizontal: 10, minHeight: 26, justifyContent: 'center', borderRadius: 8 },
+    statusText: { fontSize: 12, fontWeight: '700' },
+    time: { fontSize: 12, color: colors.inkMuted },
   });
 }
