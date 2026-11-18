@@ -4,6 +4,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { createDemoClient, GUEST_BLOCKED_CODE, GUEST_BLOCKED_MESSAGE } from './demoClient';
 import { createSwitchingClient } from './clientSwitch';
 import { createFixtures, SAMPLE_IMAGE_BASE, GUEST_USER_ID } from './fixtures';
+import { splitRent } from '../lib/rentSplit';
+import { isStudentFriendly } from '../lib/ranking';
 import { enterGuestMode, exitGuestMode, isGuestMode, subscribeGuestBlocked, subscribeGuestMode } from './guestState';
 
 afterEach(() => exitGuestMode());
@@ -226,5 +228,39 @@ describe('the guest folder stays self-contained', () => {
       expect(text, f).not.toMatch(/\bfetch\(/);
       expect(text, f).not.toMatch(/AsyncStorage|localStorage|sessionStorage|secureStorage/);
     }
+  });
+});
+
+describe('housing sample listings show the new screens', () => {
+  const residences = createFixtures().residences as any[];
+  const rooms = createFixtures().room_types as any[];
+
+  it('has a whole 3 bedroom home whose split is the design example', () => {
+    const home = residences.find((r) => r.listing_type === 'home');
+    expect(home).toBeDefined();
+    expect(home.bedrooms).toBe(3);
+    const room = rooms.find((r) => r.residence_id === home.id);
+    expect(room.price_aed).toBe(9000);
+    expect(room.billing_period).toBe('month');
+    const split = splitRent({
+      rentAed: room.price_aed,
+      depositAed: home.deposit_aed,
+      feesAed: home.move_in_fee_aed,
+      bills: { kind: 'range', minAed: home.bills_min_aed, maxAed: home.bills_max_aed },
+      people: home.bedrooms,
+    });
+    expect(split?.monthlyEachMin).toBe(3150);
+    expect(split?.monthlyEachMax).toBe(3233);
+  });
+
+  it('has a Verified listing, a student-rate listing with a lower price, and commute times', () => {
+    expect(residences.some((r) => r.is_verified === true)).toBe(true);
+    const rated = residences.find((r) => r.student_rate_aed != null);
+    expect(rated).toBeDefined();
+    const room = rooms.find((r) => r.residence_id === rated.id);
+    const monthly = room.billing_period === 'year' ? room.price_aed / 12 : room.price_aed;
+    expect(rated.student_rate_aed).toBeLessThan(monthly);
+    expect(residences.every((r) => Array.isArray(r.commutes) && r.commutes.length > 0)).toBe(true);
+    expect(residences.some((r) => isStudentFriendly({ billsIncluded: r.bills_included, studentDealTypes: r.student_deal_types, studentRateAed: r.student_rate_aed }))).toBe(true);
   });
 });
