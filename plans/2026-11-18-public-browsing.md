@@ -35,6 +35,8 @@ Photos, real listings, the pitches, dark theme.
 Round 1: VERDICT FINDINGS(1).
 1. MAJOR, `supabase/schema.sql` (room_types policy): signed-out visitors could read the rooms and prices of hidden listings, because the room policy allowed every row. **Fixed:** a migration (`20261118300000_room_types_follow_listing_visibility.sql`) makes a room visible only when its listing is; `schema.sql` matches. Not applied to the live database until the owner says yes; it must be applied before this goes live.
 
+Round 2: VERDICT PASS (no findings).
+
 ## Ideas for later
 - On web, the save heart is a button inside the card button, which React logs as invalid HTML nesting in development (Lane A's `HousingScreen.tsx`, `housing/parts.tsx`). It works; fix by making the heart a sibling of the card.
 - In the team form, a field's red edge stays after the mistake is fixed until the next save (Lane B's form).
