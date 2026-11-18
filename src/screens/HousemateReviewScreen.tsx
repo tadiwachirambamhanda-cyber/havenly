@@ -42,7 +42,7 @@ export default function HousemateReviewScreen() {
     setRows((data as PendingCard[]) ?? []);
   }, []);
 
-  useFocusEffect(useCallback(() => { load(); }, [load]));
+  useFocusEffect(useCallback(() => { if (me?.is_admin) load(); }, [load, me?.is_admin]));
 
   const decide = async (card: PendingCard, status: 'approved' | 'hidden') => {
     setBusy(card.user_id);

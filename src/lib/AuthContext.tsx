@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState, useRef } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { setCrashReportingUser } from '@/lib/crashReporting';
@@ -29,7 +29,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // call; this keeps the screens in step with it.
   useEffect(() => subscribeGuestMode(() => setIsGuest(isGuestMode())), []);
 
+  // The account the profile is being loaded for. A slow load that finishes after the account changed is dropped,
+  // so one student's private fields (budget, gender and so on) are never shown under another account.
+  const loadingFor = useRef<string | null>(null);
   const loadProfile = useCallback(async (userId: string) => {
+    loadingFor.current = userId;
     const [{ data, error }, { data: priv }] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
       // Gender, budget, move-in month and housemate preference live in their own table that only you can read.
@@ -39,6 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // from another device) while this device still holds its session —
     // without signing out, RootNavigator waits on a profile forever. A
     // network error is left alone so a flaky connection never logs anyone out.
+    if (loadingFor.current !== userId) return;
     if (!error && !data) {
       await supabase.auth.signOut();
       return;
@@ -68,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (nextSession?.user) {
         await loadProfile(nextSession.user.id);
       } else {
+        loadingFor.current = null;
         setProfile(null);
       }
       setLoading(false);

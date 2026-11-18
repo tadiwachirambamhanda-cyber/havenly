@@ -56,7 +56,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       bullets: [
         'Other Havenly users you message can see your display name, username and profile photo. Messages are visible only to the people in that conversation.',
         'Residences you enquire with receive your name, university, phone or WhatsApp number and your enquiry details, so they can contact you. Once they have it, they handle it under their own privacy policy.',
-        'Other Havenly students can see your housemate card, if you publish one, but only students whose "who I would live with" choice matches yours and whom you have not blocked. They never see your phone number or email, and they contact you through a Havenly message request. Our team reads cards to check them.',
+        'Other Havenly students can see your housemate card, if you publish one, once our team has approved it. A student sees your card only if what each of you said about who you would like to live with fits the other (your choice and gender, and theirs), and neither of you has blocked the other. Havenly does not show your phone number or email on your card, and people contact you through a Havenly message request, but your note is free text that everyone who sees your card can read, so do not put contact details in it. Our team reads cards to check them.',
         'Service providers who run parts of Havenly for us: Supabase (database, accounts and file storage), Mapbox (maps) and Sentry (crash reports, when switched on, which record what went wrong and on which screen, linked to your account ID at most and never to your name, email or messages). They process data only to provide their service.',
         'Authorities, where UAE law requires us to.',
       ],
