@@ -47,3 +47,10 @@ Changing the email address (needs the email confirmation flow), photos upload ch
 1. typecheck, lint (no warnings), 102 tests (9 new for budget parsing, the summary line and the saved move-in month), expo-doctor 20/20, export for web, iOS and Android pass.
 2. Migration, tested live inside blocks that rolled back: a negative, zero or over-limit budget, a mid-month date and a bogus preference are all refused; valid values and nulls are accepted; as the signed-in role, a profile can write the new columns and `is_admin` is still locked.
 3. Demo in the browser: Profile shows the new header, enquiries (empty state, and with two seeded sample enquiries the rows and status chips), the preferences card, the Account section; Edit profile has no cover, shows the preferences, refuses a bad budget with the message at the top; Change password opens with the demo notice and a disabled button; Settings has no Log out or Delete.
+
+## Codex review
+Round 1: VERDICT FINDINGS(4).
+1. MAJOR, `HousingEnquiryScreen.tsx:40-43`: the profile budget is per month but the enquiry form's budget is per year (the team sees "/ year"), so pre-filling 3000 would have sent AED 3,000 a year. **Fixed:** the pre-fill is the monthly budget times 12. (The enquiry form asking per year while the rest of the app is monthly is an older mismatch; flagged to the owner.)
+2. MAJOR, `ProfileScreen.tsx:53-65`: profile and enquiries stayed in local state across an account change. **Fixed:** loaded data is tagged with its account and never shown for another one.
+3. MINOR, `HousingEnquiryScreen.tsx:69`: the discard guard only looked at message and budget. **Fixed:** it now covers move-in month, length, room, viewing time, kind and phone (a phone filled in from the last enquiry does not count as a change).
+4. MINOR, `legal.ts:71,80`: the policy still said account deletion is in Settings. **Fixed:** it says Profile.

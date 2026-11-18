@@ -41,9 +41,13 @@ export default function ProfileScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const hasUnreadNotifs = useUnreadNotifications();
 
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [enquiries, setEnquiries] = useState<EnquiryRow[] | null>(null);
-  const [enquiriesFailed, setEnquiriesFailed] = useState(false);
+  // Loaded data is tagged with the account it belongs to; a slow load that finishes after the account changed
+  // is never shown, so one person never sees another's profile or enquiries on a shared device.
+  const [data, setData] = useState<{ owner: string; profile: Profile | null; enquiries: EnquiryRow[]; enquiriesFailed: boolean } | null>(null);
+  const mine = data && data.owner === session?.user.id ? data : null;
+  const profile = mine?.profile ?? null;
+  const enquiries = mine ? mine.enquiries : null;
+  const enquiriesFailed = mine?.enquiriesFailed ?? false;
   const [refreshing, setRefreshing] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [logoutConfirm, setLogoutConfirm] = useState(false);
@@ -59,9 +63,12 @@ export default function ProfileScreen() {
         .select('id, kind, status, status_updated_at, residence:residences(id, name)')
         .eq('user_id', userId).order('created_at', { ascending: false }).limit(3),
     ]);
-    setProfile(profileRes.data as Profile);
-    if (enquiryRes.error) { setEnquiriesFailed(true); setEnquiries([]); }
-    else { setEnquiriesFailed(false); setEnquiries((enquiryRes.data as unknown as EnquiryRow[]) ?? []); }
+    setData({
+      owner: userId,
+      profile: (profileRes.data as Profile) ?? null,
+      enquiries: enquiryRes.error ? [] : ((enquiryRes.data as unknown as EnquiryRow[]) ?? []),
+      enquiriesFailed: !!enquiryRes.error,
+    });
   }, [session]);
 
   useFocusEffect(useCallback(() => { (async () => { await load(); setHasLoadedOnce(true); })(); }, [load]));
