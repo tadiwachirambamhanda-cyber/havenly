@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { View, StyleSheet, ScrollView, type ScrollViewInstance, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation } from '@react-navigation/native';
@@ -19,6 +19,7 @@ import type { ColorTokens } from '@/theme/tokens';
 import UniversityPickerModal from '@/components/UniversityPickerModal';
 import { Notice, PrimaryButton } from '@/components/housing/parts';
 import { upcomingMonths, formatMonth } from '@/lib/housing';
+import { saveOwnRow } from '@/lib/ownRow';
 import { HOUSEMATE_PREF_OPTIONS, parseBudget, type HousematePref } from '@/lib/profilePrefs';
 
 export default function EditProfileScreen() {
@@ -44,6 +45,9 @@ export default function EditProfileScreen() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [universityPickerVisible, setUniversityPickerVisible] = useState(false);
+  const scrollRef = useRef<ScrollViewInstance>(null);
+  // The error is shown at the top of the form; bring it into view (Save can be tapped from the bottom).
+  useEffect(() => { if (error) scrollRef.current?.scrollTo({ y: 0, animated: true }); }, [error]);
 
   const allowLeave = useConfirmDiscard(!saved && (
     displayName !== (profile?.display_name ?? '')
@@ -101,14 +105,20 @@ export default function EditProfileScreen() {
       }
 
       // Budget, move-in month, housemate preference and gender are private: they have their own table.
-      const { error: privateError } = await supabase.from('profile_private').upsert({
-        user_id: session.user.id,
-        budget_aed: budget.value,
-        move_in_month: moveIn,
-        housemate_pref: housemates,
-        gender,
-      }, { onConflict: 'user_id' });
-      if (privateError) throw privateError;
+      try {
+        await saveOwnRow('profile_private', session.user.id, {
+          budget_aed: budget.value,
+          move_in_month: moveIn,
+          housemate_pref: housemates,
+          gender,
+        });
+      } catch (privateError) {
+        // The name, bio, photo and university were already saved above; say so, and let the student try again.
+        console.error('Failed to save private profile fields:', privateError);
+        try { await refreshProfile(); } catch { /* the message below is what matters; a failed refresh must not replace it */ }
+        setError('Your name, photo and university were saved, but your housing details were not. Tap Save to try again.');
+        return;
+      }
 
       await refreshProfile();
       haptics.success();
@@ -130,7 +140,7 @@ export default function EditProfileScreen() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
+    <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <AnimatedPressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></AnimatedPressable>
         <Text style={styles.headerTitle}>Edit profile</Text>

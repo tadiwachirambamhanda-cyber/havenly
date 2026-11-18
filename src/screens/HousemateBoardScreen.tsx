@@ -183,7 +183,7 @@ function HousemateBoard() {
         ) : null}
         {item.lifestyle.length > 0 ? (
           <View style={styles.tags}>
-            {item.lifestyle.map((k) => <View key={k} style={styles.tag}><Text style={styles.tagText}>{LIFESTYLE_LABEL[k]}</Text></View>)}
+            {item.lifestyle.map((k, i) => <View key={`${k}-${i}`} style={styles.tag}><Text style={styles.tagText}>{LIFESTYLE_LABEL[k]}</Text></View>)}
           </View>
         ) : null}
         {item.note ? <Text style={styles.note}>{item.note.slice(0, NOTE_MAX)}</Text> : null}
