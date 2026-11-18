@@ -327,14 +327,14 @@ function createStyles(colors: ColorTokens) {
   description: { fontSize: 13.5, color: colors.inkSoft, lineHeight: 20, marginTop: 12 },
   streakRow: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 16 },
   streakRowText: { fontSize: 12.5, color: colors.inkSoft },
-  claimBtn: { marginTop: 20, backgroundColor: colors.coral, paddingVertical: 15, borderRadius: radius.button, alignItems: 'center' },
+  claimBtn: { marginTop: 20, backgroundColor: colors.coralFill, paddingVertical: 15, borderRadius: radius.button, alignItems: 'center' },
   claimBtnText: { color: 'white', fontWeight: '700', fontSize: 14 },
   lockedBox: {
     flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 20, backgroundColor: colors.sandDeep,
     paddingVertical: 13, paddingHorizontal: 16, borderRadius: radius.button,
   },
   progressTrack: { height: 6, borderRadius: 3, backgroundColor: colors.sandDeep, marginTop: 8, overflow: 'hidden' },
-  progressFill: { height: 6, borderRadius: 3, backgroundColor: colors.coral },
+  progressFill: { height: 6, borderRadius: 3, backgroundColor: colors.coralFill },
   lockedText: { color: colors.inkSoft, fontSize: 12.5, fontWeight: '600' },
   codeCard: {
     marginTop: 20, backgroundColor: colors.ink, borderRadius: radius.md, paddingVertical: 20, alignItems: 'center',
@@ -353,7 +353,7 @@ function createStyles(colors: ColorTokens) {
   goingAvatar: { width: 24, height: 24, borderRadius: 12, marginLeft: -8, borderWidth: 2, borderColor: colors.sand },
   goingListText: { marginLeft: 6, fontSize: 11.5, color: colors.inkSoft, fontWeight: '600' },
   checkInBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.coral,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.coralFill,
     paddingVertical: 13, borderRadius: radius.button, marginTop: 20,
   },
   checkInBtnActive: { backgroundColor: colors.coralSoft, borderWidth: 1.5, borderColor: colors.coral },

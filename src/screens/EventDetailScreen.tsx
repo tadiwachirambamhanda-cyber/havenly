@@ -327,7 +327,7 @@ function createStyles(colors: ColorTokens) {
   goingAvatar: { width: 24, height: 24, borderRadius: 12, marginLeft: -8, borderWidth: 2, borderColor: colors.sand },
   goingListText: { marginLeft: 6, fontSize: 11.5, color: colors.inkSoft, fontWeight: '600' },
   checkInBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.coral,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.coralFill,
     paddingVertical: 13, borderRadius: radius.button, marginTop: 20,
   },
   checkInBtnActive: { backgroundColor: colors.coralSoft, borderWidth: 1.5, borderColor: colors.coral },

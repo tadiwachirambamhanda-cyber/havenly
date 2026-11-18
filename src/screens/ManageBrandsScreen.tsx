@@ -137,7 +137,7 @@ function createStyles(colors: ColorTokens) {
   chipText: { fontSize: 12.5, fontWeight: '600', color: colors.ink },
   chipTextSelected: { color: colors.sand },
   createBtn: {
-    marginHorizontal: spacing.lg, marginTop: spacing.lg, backgroundColor: colors.coral,
+    marginHorizontal: spacing.lg, marginTop: spacing.lg, backgroundColor: colors.coralFill,
     paddingVertical: 14, borderRadius: radius.button, alignItems: 'center',
   },
   createBtnText: { color: 'white', fontWeight: '700', fontSize: 14 },

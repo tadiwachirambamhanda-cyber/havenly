@@ -82,10 +82,10 @@ function createScrubberStyles(colors: ColorTokens) {
   return StyleSheet.create({
     track: { height: 28, justifyContent: 'center' },
     trackBg: { height: 4, borderRadius: 2, backgroundColor: colors.sandDeep },
-    trackFill: { position: 'absolute', left: 0, height: 4, borderRadius: 2, backgroundColor: colors.coral },
+    trackFill: { position: 'absolute', left: 0, height: 4, borderRadius: 2, backgroundColor: colors.coralFill },
     thumb: {
       position: 'absolute', width: 16, height: 16, borderRadius: 8, marginLeft: -8,
-      backgroundColor: colors.coral, borderWidth: 2, borderColor: colors.white,
+      backgroundColor: colors.coralFill, borderWidth: 2, borderColor: colors.white,
     },
   });
 }
@@ -389,7 +389,7 @@ function createStyles(colors: ColorTokens) {
   progressWrap: { paddingHorizontal: spacing.lg, marginBottom: 12, gap: 6 },
   uploadStatus: { fontSize: 12, color: colors.inkSoft, textAlign: 'center' },
   progressTrack: { height: 4, borderRadius: 2, backgroundColor: colors.sandDeep, overflow: 'hidden' },
-  progressFill: { height: '100%', borderRadius: 2, backgroundColor: colors.coral },
+  progressFill: { height: '100%', borderRadius: 2, backgroundColor: colors.coralFill },
   imagePicker: {
     height: 200, marginHorizontal: spacing.lg, borderRadius: radius.md, backgroundColor: colors.sandDeep,
     alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.line, overflow: 'hidden',

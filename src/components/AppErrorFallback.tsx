@@ -35,7 +35,7 @@ function createStyles(colors: ColorTokens) {
     icon: { width: 52, height: 52, borderRadius: 26, backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },
     title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 22, color: colors.ink, textAlign: 'center' },
     body: { fontSize: 14, lineHeight: 21, color: colors.inkSoft, textAlign: 'center', maxWidth: 320 },
-    button: { marginTop: 8, backgroundColor: colors.coral, paddingVertical: 13, paddingHorizontal: 32, borderRadius: radius.button },
+    button: { marginTop: 8, backgroundColor: colors.coralFill, paddingVertical: 13, paddingHorizontal: 32, borderRadius: radius.button },
     buttonText: { color: 'white', fontWeight: '700', fontSize: 14 },
   });
 }

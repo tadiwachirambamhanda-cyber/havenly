@@ -187,7 +187,7 @@ function createStyles(colors: ColorTokens) {
   message: { fontSize: 13, color: colors.ink, lineHeight: 18 },
   time: { fontSize: 11, color: colors.inkSoft, marginTop: 2 },
   postThumb: { width: 40, height: 40, borderRadius: 8 },
-  brandAvatar: { backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center' },
+  brandAvatar: { backgroundColor: colors.coralFill, alignItems: 'center', justifyContent: 'center' },
   brandMark: { fontFamily: 'SchibstedGrotesk_700Bold_Italic', fontSize: 20, color: 'white', marginTop: -2 },
   });
 }

@@ -646,7 +646,7 @@ function createStyles(colors: ColorTokens) {
     cancelBtn: { minHeight: 44, paddingHorizontal: 4, justifyContent: 'center' },
     cancelText: { fontSize: 15, fontWeight: '600', color: colors.inkSoft },
     headerTitle: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 18, color: colors.ink },
-    headerSave: { minHeight: 44, paddingHorizontal: 18, borderRadius: 12, backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center' },
+    headerSave: { minHeight: 44, paddingHorizontal: 18, borderRadius: 12, backgroundColor: colors.coralFill, alignItems: 'center', justifyContent: 'center' },
     headerSaveText: { fontSize: 15, fontWeight: '700', color: '#FFFFFF' },
     saveDisabled: { opacity: 0.85 },
     half: { flex: 1, marginHorizontal: 0 },
@@ -678,7 +678,7 @@ function createStyles(colors: ColorTokens) {
     },
     outlineText: { fontSize: 14, fontWeight: '700', color: colors.ink },
     bottom: { paddingHorizontal: 16, paddingTop: 24, paddingBottom: 28 },
-    saveBtn: { minHeight: 52, borderRadius: 12, backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center' },
+    saveBtn: { minHeight: 52, borderRadius: 12, backgroundColor: colors.coralFill, alignItems: 'center', justifyContent: 'center' },
     saveBtnText: { fontSize: 16, fontWeight: '700', color: '#FFFFFF' },
   });
 }

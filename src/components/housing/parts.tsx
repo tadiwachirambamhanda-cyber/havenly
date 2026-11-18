@@ -87,7 +87,7 @@ export function PrimaryButton({ label, onPress, disabled, loading, icon, style, 
       accessibilityLabel={label}
       disabled={off}
       onPress={onPress}
-      style={[{ height, minHeight: 44, borderRadius: 12, backgroundColor: off ? colors.inkSoft : colors.coral, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8, paddingHorizontal: 20 }, style]}
+      style={[{ height, minHeight: 44, borderRadius: 12, backgroundColor: off ? colors.inkSoft : colors.coralFill, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8, paddingHorizontal: 20 }, style]}
     >
       {loading ? <ActivityIndicator color="#FFFFFF" /> : icon ? <Icon name={icon} size={18} color="#FFFFFF" /> : null}
       <Text style={{ fontFamily: 'HankenGrotesk_700Bold', fontSize: 16, color: '#FFFFFF' }}>{label}</Text>

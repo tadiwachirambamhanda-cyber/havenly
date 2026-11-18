@@ -282,7 +282,7 @@ function createStyles(colors: ColorTokens) {
   name: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 21, color: colors.ink, marginTop: 8 },
   members: { fontSize: 12, color: colors.inkSoft, marginTop: 4 },
   desc: { fontSize: 13, color: colors.inkSoft, lineHeight: 20, marginTop: 12 },
-  joinBtn: { marginTop: 16, backgroundColor: colors.coral, paddingVertical: 13, borderRadius: radius.button, alignItems: 'center' },
+  joinBtn: { marginTop: 16, backgroundColor: colors.coralFill, paddingVertical: 13, borderRadius: radius.button, alignItems: 'center' },
   joinBtnJoined: { backgroundColor: colors.ink },
   joinBtnText: { color: 'white', fontWeight: '700', fontSize: 14 },
   // joinBtn stays coral regardless of theme, so its text stays literal white;

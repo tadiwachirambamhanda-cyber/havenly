@@ -958,7 +958,7 @@ function createStyles(colors: ColorTokens) {
   },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   legendItemOff: { opacity: 0.45 },
-  legendDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.coral },
+  legendDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.coralFill },
   legendText: { fontSize: 10.5, fontWeight: '600', color: colors.inkSoft },
   legendTextOff: { textDecorationLine: 'line-through' },
   });

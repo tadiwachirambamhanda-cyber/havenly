@@ -3,6 +3,9 @@ export const lightColors = {
   // primary accent); the values follow design/handoff/README.md (oxblood and stone).
   sand: '#F3F0EA', sandDeep: '#ECE8DF', ink: '#1F1B16', inkSoft: '#5A544B',
   coral: '#7A2433', coralSoft: '#F1E9E4',
+  // coral is the accent as text, icons and outlines; coralFill is the accent as a solid fill
+  // (buttons, selected chips, dots) that carries white text. Same in light; they differ in dark.
+  coralFill: '#7A2433',
   white: '#FFFFFF', line: '#E2DDD2',
   // Housing redesign tokens.
   inkBody: '#3A342D', inkMuted: '#655F55',
@@ -22,12 +25,13 @@ export const lightColors = {
 // an "always-dark" accent pill background (send buttons, selected chips) —
 // those still read correctly here since the paired foreground color on top
 // of them flips too (colors.sand/white), preserving the same contrast.
-// The dark theme's accent is a lighter oxblood-rose (6.1:1 on the dark ground), because
-// oxblood itself is too dark to read as text or icons there. White text on it is 3.1:1,
-// the same as before; a proper dark design is still to do.
+// Dark theme: oxblood is too dark to read as text or icons on the dark ground, so the accent
+// as text is a lighter rose (coral, 6.1:1) and the accent as a fill is a mid rose (coralFill,
+// 3.65:1 against the ground, and 5.1:1 under white text).
 export const darkColors: typeof lightColors = {
   sand: '#151310', sandDeep: '#1D1A15', ink: '#F3ECDC', inkSoft: '#B7AC93',
   coral: '#D4788A', coralSoft: '#3A2429',
+  coralFill: '#BA4660',
   white: '#211D17', line: '#332D22',
   inkBody: '#E6DFCC', inkMuted: '#9C9279',
   fieldLine: '#7A715F',

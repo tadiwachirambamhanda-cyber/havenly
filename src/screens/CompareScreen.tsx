@@ -224,7 +224,7 @@ function createStyles(colors: ColorTokens) {
     photo: { height: 80, borderRadius: 10, overflow: 'hidden', backgroundColor: '#DDD7CB' },
     colName: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 13, lineHeight: 17, color: colors.ink, minHeight: 34 },
     choose: { height: 44, borderRadius: 10, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 },
-    chooseOn: { backgroundColor: colors.coral, borderColor: colors.coral },
+    chooseOn: { backgroundColor: colors.coralFill, borderColor: colors.coralFill },
     chooseText: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 14, color: colors.ink },
     remove: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
     removeText: { fontSize: 14, color: colors.inkSoft, textDecorationLine: 'underline' },

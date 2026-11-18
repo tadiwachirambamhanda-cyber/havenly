@@ -238,7 +238,7 @@ function createStyles(colors: ColorTokens) {
       backgroundColor: colors.sandDeep, borderRadius: radius.pill,
     },
     segmentItem: { flex: 1, minHeight: 44, justifyContent: 'center', paddingVertical: 10, borderRadius: radius.pill, alignItems: 'center' },
-    segmentItemActive: { backgroundColor: colors.coral },
+    segmentItemActive: { backgroundColor: colors.coralFill },
     segmentText: { fontSize: 13, fontWeight: '600', color: colors.inkSoft },
     segmentTextActive: { color: '#FFFFFF', fontWeight: '700' },
     sectionLabel: {
@@ -247,7 +247,7 @@ function createStyles(colors: ColorTokens) {
     chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: spacing.lg },
     chipRow: { gap: 8, paddingHorizontal: spacing.lg },
     chip: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white },
-    chipSelected: { backgroundColor: colors.coral, borderColor: colors.coral },
+    chipSelected: { backgroundColor: colors.coralFill, borderColor: colors.coralFill },
     chipText: { fontSize: 14, fontWeight: '600', color: colors.ink },
     chipTextSelected: { color: '#FFFFFF' },
     fieldInput: {

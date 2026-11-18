@@ -356,7 +356,7 @@ function createStyles(colors: ColorTokens) {
       flexDirection: 'row', alignItems: 'center', gap: 6, height: 40, paddingHorizontal: 14, borderRadius: 100,
       borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white,
     },
-    chipSelected: { backgroundColor: colors.coral, borderColor: colors.coral },
+    chipSelected: { backgroundColor: colors.coralFill, borderColor: colors.coralFill },
     chipText: { fontFamily: 'HankenGrotesk_600SemiBold', fontSize: 14, color: colors.ink },
     chipTextSelected: { color: '#FFFFFF' },
     countRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingHorizontal: 16, marginTop: 12, minHeight: 44 },
@@ -386,7 +386,7 @@ function createStyles(colors: ColorTokens) {
     metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 },
     meta: { flex: 1, fontSize: 14, color: colors.inkBody },
     compareBar: {
-      position: 'absolute', left: 16, right: 16, bottom: 84, height: 52, borderRadius: 12, backgroundColor: colors.coral,
+      position: 'absolute', left: 16, right: 16, bottom: 84, height: 52, borderRadius: 12, backgroundColor: colors.coralFill,
       flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
     },
     compareText: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 16, color: '#FFFFFF' },
