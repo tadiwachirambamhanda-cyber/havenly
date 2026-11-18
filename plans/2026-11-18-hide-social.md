@@ -1,43 +1,58 @@
-# Plan: hide the social features behind a switch
+# Plan: remove the social features, archive them for later
 
-Branch: `feature/hide-social`. Written by the Chief Architect (navigation and shared files).
+Branch: `feature/hide-social` (name kept from the first draft). Written by the Chief Architect. Updated after the owner's answers: the Saved tab reuses the Compare list; the bell stays for enquiry updates; the features that need a crowd are removed for real and kept safe in an archive.
 
 ## Goal
-A signed-in student sees a housing app: four tabs (Housing, Saved, Inbox, Profile), with no feed, Discover, posts, communities, events, follow lists or perks anywhere. One switch brings the social side back. No code is deleted and the database is untouched.
+A signed-in student sees a housing app: four tabs (Housing, Saved, Inbox, Profile) and no trace of the feed, posts, communities, events or follow lists. The removed code is not lost: it is frozen in a git tag so it can be brought back when there are enough students. The database is untouched.
 
 ## Feature
-Follows F4 (Housing first). Not a new feature ID: it narrows the app to the housing pivot. Done check: I log in and the tab bar shows only Housing, Saved, Inbox and Profile, and I cannot reach any social screen by tapping.
+Follows F4 (Housing first). Not a new feature ID. Done check: I log in and see exactly four tabs, no tap anywhere opens a social screen, and enquiry updates still arrive in the bell.
+
+## What goes, what stays
+| | Decision | Why |
+|---|---|---|
+| Feed, posts, video, post detail, create post, share post | **Removed** (archived) | Needs a crowd |
+| Discover tab | **Removed** | It only points at the social features |
+| Communities, community detail, group chat (new group) | **Removed** | Needs a crowd |
+| Events, event detail, create event, check-ins | **Removed** | Needs a crowd |
+| Follow lists, other people's profiles | **Removed** | Only matter with a feed |
+| Perks and offers (Offers, OfferDetail, ManageBrands, CreateOffer) | **Kept in the code, unlinked** | Student discounts are part of the pitch; they come back when brands sign up |
+| Notifications bell | **Kept**, shows enquiry updates only | The enquiry notifications already exist in the database |
+| Inbox and one-to-one chat | **Kept** | Becomes the enquiry thread later |
+| Map | **Kept** | Shows places to live |
+| Profile | **Kept**, cut down to saved places, enquiries and settings | |
 
 ## Steps
-1. **The switch.** New `src/lib/features.ts` exporting `SOCIAL_ENABLED = false`. Run: typecheck.
-2. **Tabs.** In `RootNavigator.tsx` and `TabBar.tsx`, register Feed and Discover only when the switch is on; add a Saved tab (reusing the saved-places list that Compare already loads, see Questions); drop the floating "+" (new post) button when off. Run: web app shows four tabs.
-3. **Social screens out of the stack.** With the switch off, do not register PostDetail, UserProfile, SharePost, NewGroup, Communities, CommunityDetail, CreatePost, CreateEvent, FollowList, Offers, OfferDetail, EventDetail, ManageBrands, CreateOffer. Keep Notifications, Chat, Settings, EditProfile, BlockedUsers, Map and all housing screens.
-4. **Entry points.** Hide the taps that lead to the social screens: on Profile the Posts/Saved-posts grid, follower and following counts, and perks rows; on Inbox the new-group button and shared-post cards; on Settings "Create event"; in Chat the tap on a person (opens UserProfile) and shared posts; in Notifications, notifications about posts, follows and offers are filtered out; on the Map, event and offer pins and their popups.
-5. **Onboarding and demo.** Onboarding keeps only what housing needs (no interest chips for communities if they lead nowhere); the demo-mode banner and sample content keep working with four tabs.
-6. **Checks.** typecheck, lint, tests, expo-doctor, `expo export`; walk the app in light and dark; flipping the switch to true brings back all five original tabs.
+1. **Archive first.** Tag the current main as `archive/social-v1` and push the tag, and write `docs/archive/social.md`: what was removed, the tag name, and how to restore it (`git checkout archive/social-v1 -- <path>`). Run: `git tag` shows it and it is on GitHub.
+2. **Tabs.** `RootNavigator.tsx` and `TabBar.tsx`: tabs become Housing, Saved, Inbox, Profile; remove the floating "+"; the Saved tab shows the saved-places list from the Compare screen (retitled "Saved", empty state when nothing is saved). Run: web app shows four tabs.
+3. **Remove the screens** listed as removed, plus files only they use (found with a search at build time, for example the video player and post cards) and their routes and types in the navigator. Run: typecheck shows what still points at them.
+4. **Clean the entry points** that led to them: Profile (posts grid, follower counts, perks rows), Inbox (new-group button, shared-post cards), Chat (tap on a person, shared posts), Settings ("Create event"), Map (event pins and popups; offer pins removed too, since perks are unlinked), Onboarding (interest steps that lead nowhere). Run: typecheck, then tap through each screen.
+5. **Bell.** `NotificationsScreen.tsx` lists only `enquiry_new` and `enquiry_status` and opens the enquiry; follow, like, comment and offer notifications are not shown. Run: demo and a signed-in check.
+6. **Demo mode and tests.** Remove the social sample content from `src/guest/` only where a removed screen needed it, and keep the guest tests passing (never weakened; a test of a removed feature is removed with it and said so here). Run: `npm test`.
+7. **Checks.** typecheck, lint, tests, expo-doctor, `expo export`; walk the app in light and dark.
 
 ## Files
-- Create: `src/lib/features.ts`.
-- Change: `src/navigation/RootNavigator.tsx`, `src/navigation/TabBar.tsx`, `src/screens/ProfileScreen.tsx`, `InboxScreen.tsx`, `ChatScreen.tsx`, `SettingsScreen.tsx`, `NotificationsScreen.tsx`, `MapScreen.tsx`, `OnboardingScreen.tsx`, `CLAUDE.md` (one line on the switch).
-- Not touched: `supabase/`, `src/guest/` data, any social screen file itself.
+- Create: `docs/archive/social.md`, the git tag `archive/social-v1`.
+- Change: `src/navigation/RootNavigator.tsx`, `TabBar.tsx`, `src/screens/ProfileScreen.tsx`, `InboxScreen.tsx`, `ChatScreen.tsx`, `SettingsScreen.tsx`, `NotificationsScreen.tsx`, `MapScreen.tsx`, `OnboardingScreen.tsx`, `CompareScreen.tsx` (title only), `src/types/index.ts`, `src/guest/`, `CLAUDE.md`.
+- Delete: about 12 screen files (roughly 5,000 lines) and the components only they use.
+- Not touched: `supabase/` (tables, policies and functions all stay).
 
 ## Checks
 1. `npm run typecheck`, `npm run lint`, `npm test`, `npx expo-doctor`, `npx expo export --platform web` pass.
-2. Signed in (demo mode counts): tab bar is Housing, Saved, Inbox, Profile; Housing opens first.
-3. Tap through Profile, Inbox, Chat, Settings, Notifications and Map: nothing opens a feed, post, community, event, perk or another person's social profile; no dead taps or blank screens.
-4. Housing, listing, split, compare, enquiry and the admin screens behave as before.
-5. Set `SOCIAL_ENABLED = true` locally: the original five tabs and every social screen work again.
-6. Saved tab lists saved places, and shows an empty state when there are none.
+2. `git tag` lists `archive/social-v1` and `git ls-remote --tags origin` shows it.
+3. Signed in (demo counts): tab bar is Housing, Saved, Inbox, Profile; Housing opens first.
+4. Tap through Profile, Inbox, Chat, Settings, Notifications, Map: no dead taps, no blank screens, nothing about posts, communities, events or followers.
+5. Saved tab: three saved places show; with none, an empty state; Compare still works from Housing.
+6. In a real account, a new enquiry status produces a bell item that opens the enquiry (tested with a test account on the live database, then removed).
+7. Housing, listing, split, enquiry and admin screens behave as before.
 
 ## What could break
-Hiding screens that other screens still link to: a tap that navigates to an unregistered screen does nothing or errors on native. Step 4 and check 3 exist for this. Also Inbox: chat messages that carry a shared post must not crash when the post screen is missing.
+Removed code that something kept still imports: typecheck catches it. Chat messages that carried a shared post, and old notifications about posts, must be skipped without crashing (check 4). Restoring later will need the navigator and types edited back by hand, which the archive note explains.
 
 ## Not doing
-- Deleting any social code, tables, or policies (a later pull request, after a few weeks of nothing missed).
-- New features, a new look for Profile, or a redesign of Inbox as an enquiry thread (separate plan).
-- Removing the Map (kept; its native-only limit stays).
-- Changing the signed-out flow.
+- Dropping database tables, policies or functions (later, separate plan, after weeks of nothing missed).
+- Turning Inbox into an enquiry thread, a new Profile, or new notification types.
+- Removing the perks code or the Map.
 
 ## Questions
-1. **Saved tab:** reuse the saved-places list on the Compare screen as the Saved tab (smallest change, my recommendation), or build a separate Saved screen?
-2. **Notifications bell:** keep it (filtered to housing: enquiry updates) or hide it for now? I suggest hide it, since the only live notifications are social.
+None open.
