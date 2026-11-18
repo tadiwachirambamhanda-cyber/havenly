@@ -24,3 +24,5 @@ Round 1: VERDICT FINDINGS(2).
 Round 2: VERDICT FINDINGS(2).
 3. MAJOR, `ownRow.ts:13`: an update that matches no visible row is treated as "no row", which could turn into a confusing duplicate-key error if row security hid an existing row. **Dismissed:** a student can always read their own row (the select policy is `auth.uid() = user_id`), so "no row visible" means no row, and the real test saved the insert path and the update path against the live database. If both fail the real database error is shown, which is the right signal.
 4. MINOR, `EditProfileScreen.tsx:118`: a failed profile refresh after a partial save could replace the explanatory message. **Fixed:** the refresh is wrapped so the message stays.
+
+Round 3: VERDICT PASS (no findings).
