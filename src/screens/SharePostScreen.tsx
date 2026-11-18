@@ -157,7 +157,7 @@ export default function SharePostScreen() {
                   <Image source={{ uri: item.imageUrl }} style={styles.avatar} transition={200} />
                 ) : item.kind === 'group' ? (
                   <View style={[styles.avatar, styles.groupAvatar]}>
-                    <Icon name="users" size={18} color={colors.teal} />
+                    <Icon name="users" size={18} color={colors.coral} />
                   </View>
                 ) : (
                   <InitialsAvatar name={item.name} style={styles.avatar} />

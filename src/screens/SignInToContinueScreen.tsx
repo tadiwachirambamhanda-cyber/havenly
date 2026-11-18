@@ -195,7 +195,7 @@ function createStyles(colors: ColorTokens) {
     showBtn: { minHeight: 44, minWidth: 44, alignItems: 'center', justifyContent: 'center', marginTop: -12 },
     showText: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 14, color: colors.coral },
     field: { height: 52, borderRadius: 12, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white, paddingHorizontal: 14, fontSize: 16, color: colors.ink, outlineStyle: 'none' } as never,
-    fieldBad: { borderColor: '#A3231A', borderWidth: 2 },
+    fieldBad: { borderColor: colors.errorText, borderWidth: 2 },
     rule: { fontSize: 13, color: colors.inkMuted, marginTop: 6 },
     linkBtn: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
     link: { fontFamily: 'HankenGrotesk_600SemiBold', fontSize: 15, color: colors.ink, textDecorationLine: 'underline' },

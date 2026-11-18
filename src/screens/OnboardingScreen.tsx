@@ -95,11 +95,11 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   // Fixed dark hero regardless of app theme (same as Login), so its
   // text stays literal cream rather than colors.sand.
-  container: { flex: 1, backgroundColor: '#2A2118' },
+  container: { flex: 1, backgroundColor: '#1F1B16' },
   hero: { paddingHorizontal: spacing.xl, paddingTop: 52, paddingBottom: 12 },
-  eyebrow: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, color: '#F0C79A', textTransform: 'uppercase', letterSpacing: 0.8 },
+  eyebrow: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, color: '#E8E2D6', textTransform: 'uppercase', letterSpacing: 0.8 },
   title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 32, color: '#F3F0EA', marginTop: 10, lineHeight: 36 },
-  sub: { fontSize: 14, color: '#E7D9C8', marginTop: 10, lineHeight: 20, maxWidth: 300 },
+  sub: { fontSize: 14, color: '#DDD7CB', marginTop: 10, lineHeight: 20, maxWidth: 300 },
   panel: { backgroundColor: colors.sand, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, paddingBottom: 12, marginTop: 14 },
   question: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 22, color: colors.ink },
   questionHint: { fontSize: 12.5, color: colors.inkSoft, marginTop: 4, marginBottom: 20 },

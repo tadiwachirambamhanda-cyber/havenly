@@ -208,7 +208,7 @@ export default function InboxScreen() {
                   <Image source={{ uri: item.icon_url }} style={styles.avatar} transition={200} />
                 ) : (
                   <View style={[styles.avatar, styles.groupAvatar]}>
-                    <Icon name="users" size={20} color={colors.teal} />
+                    <Icon name="users" size={20} color={colors.coral} />
                   </View>
                 )
               ) : item.otherUser?.avatar_url ? (

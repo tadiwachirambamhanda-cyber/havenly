@@ -50,15 +50,15 @@ interface SearchResult {
 
 interface MapPalette {
   land: string; landuse: string; water: string; roadMinor: string; roadMajor: string;
-  building: string; label: string; labelHalo: string; boundary: string; teal: string; coral: string; gold: string;
+  building: string; label: string; labelHalo: string; boundary: string; event: string; coral: string; residence: string;
 }
 
 function paletteFor(colors: ColorTokens): MapPalette {
   return {
-    land: colors.sand, landuse: colors.sandDeep, water: colors.tealSoft,
+    land: colors.sand, landuse: colors.sandDeep, water: colors.coralSoft,
     roadMinor: colors.line, roadMajor: colors.coral, building: colors.sandDeep,
     label: colors.inkSoft, labelHalo: colors.sand, boundary: colors.line,
-    teal: colors.teal, coral: colors.coral, gold: colors.gold,
+    event: colors.ink, coral: colors.coral, residence: colors.tintText,
   };
 }
 
@@ -143,7 +143,7 @@ function buildMapHtml(params: {
     .checkin-wrap { position: relative; width: 36px; height: 36px; cursor: pointer; }
     .checkin-pulse {
       position: absolute; inset: -9px; border-radius: 50%;
-      background: ${palette.teal}59; animation: livePulse 2.2s ease-in-out infinite;
+      background: ${palette.event}59; animation: livePulse 2.2s ease-in-out infinite;
     }
     .checkin-pin {
       position: absolute; inset: 0; border-radius: 50%; border: 2.5px solid white;
@@ -158,11 +158,11 @@ function buildMapHtml(params: {
     @keyframes pingBurst { from { transform: scale(0.5); opacity: 0.9; } to { transform: scale(2.4); opacity: 0; } }
     @keyframes livePulse { 0%, 100% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.3); opacity: 0; } }
     .user-dot { position: relative; width: 16px; height: 16px; }
-    .user-dot-pulse { position: absolute; inset: -10px; border-radius: 50%; background: ${palette.teal}4d; animation: livePulse 2.6s ease-in-out infinite; }
-    .user-dot-core { position: absolute; inset: 0; border-radius: 50%; background: ${palette.teal}; border: 3px solid white; box-shadow: 0 0 0 3px ${palette.teal}4d; }
+    .user-dot-pulse { position: absolute; inset: -10px; border-radius: 50%; background: ${palette.event}4d; animation: livePulse 2.6s ease-in-out infinite; }
+    .user-dot-core { position: absolute; inset: 0; border-radius: 50%; background: ${palette.event}; border: 3px solid white; box-shadow: 0 0 0 3px ${palette.event}4d; }
     .mapboxgl-popup-content { border-radius: 14px; padding: 12px 14px; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; }
     .popup-title { font-weight: 700; font-size: 13px; margin-bottom: 2px; color: #1F1B16; }
-    .popup-sub { font-size: 11.5px; color: #5B6459; margin-bottom: 8px; }
+    .popup-sub { font-size: 11.5px; color: #5A544B; margin-bottom: 8px; }
     .popup-btn {
       display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: white;
       background: ${palette.coral}; border: none; border-radius: 100px; padding: 7px 14px; cursor: pointer;
@@ -170,9 +170,9 @@ function buildMapHtml(params: {
     .popup-row { display: flex; gap: 6px; align-items: center; }
     .interest-btn {
       display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; color: #1F1B16;
-      background: #EDEAE2; border: 1.5px solid #E7DDC9; border-radius: 100px; padding: 6px 12px; cursor: pointer;
+      background: #ECE8DF; border: 1.5px solid #E2DDD2; border-radius: 100px; padding: 6px 12px; cursor: pointer;
     }
-    .interest-btn-active { color: #B8791E; background: #FBEBCF; border-color: #E3A23A; }
+    .interest-btn-active { color: #7A2433; background: #F1E9E4; border-color: #7A2433; }
   </style>
 </head>
 <body>
@@ -416,11 +416,11 @@ function buildMapHtml(params: {
       renderTypeMarkers(renderedOffer, { type: 'offer', data: offerData, color: '${palette.coral}', icon: '${ICON_GIFT}', popupHtml: offerPopupHtml });
     }
     function renderEventMarkers() {
-      renderTypeMarkers(renderedEvent, { type: 'event', data: eventData, color: '${palette.teal}', icon: '${ICON_CALENDAR}', popupHtml: eventPopupHtml });
+      renderTypeMarkers(renderedEvent, { type: 'event', data: eventData, color: '${palette.event}', icon: '${ICON_CALENDAR}', popupHtml: eventPopupHtml });
     }
 
     function renderResidenceMarkers() {
-      renderTypeMarkers(renderedResidence, { type: 'residence', data: residenceData, color: '${palette.gold}', icon: '${ICON_HOME}', popupHtml: residencePopupHtml });
+      renderTypeMarkers(renderedResidence, { type: 'residence', data: residenceData, color: '${palette.residence}', icon: '${ICON_HOME}', popupHtml: residencePopupHtml });
     }
 
     function addOneCheckin(p) {
@@ -848,7 +848,7 @@ export default function MapScreen() {
                   <Icon
                     name={r.type === 'offer' ? 'gift' : r.type === 'event' ? 'calendar' : r.type === 'residence' ? 'home' : 'user'}
                     size={13}
-                    color={r.type === 'offer' ? colors.coral : r.type === 'event' ? colors.teal : r.type === 'residence' ? colors.gold : colors.inkSoft}
+                    color={r.type === 'offer' ? colors.coral : r.type === 'event' ? colors.coral : r.type === 'residence' ? colors.coral : colors.inkSoft}
                   />
                 </View>
                 <View style={{ flex: 1 }}>
@@ -890,7 +890,7 @@ export default function MapScreen() {
           onPress={() => toggleTypeFilter('event')}
           accessibilityLabel={hiddenTypes.event ? 'Show events' : 'Hide events'}
         >
-          <Icon name="calendar" size={12} color={hiddenTypes.event ? colors.inkSoft : colors.teal} />
+          <Icon name="calendar" size={12} color={hiddenTypes.event ? colors.inkSoft : colors.coral} />
           <Text style={[styles.legendText, hiddenTypes.event && styles.legendTextOff]}>Events</Text>
         </AnimatedPressable>
         <AnimatedPressable
@@ -898,7 +898,7 @@ export default function MapScreen() {
           onPress={() => toggleTypeFilter('residence')}
           accessibilityLabel={hiddenTypes.residence ? 'Show housing' : 'Hide housing'}
         >
-          <Icon name="home" size={12} color={hiddenTypes.residence ? colors.inkSoft : colors.gold} />
+          <Icon name="home" size={12} color={hiddenTypes.residence ? colors.inkSoft : colors.coral} />
           <Text style={[styles.legendText, hiddenTypes.residence && styles.legendTextOff]}>Housing</Text>
         </AnimatedPressable>
         <AnimatedPressable
@@ -932,8 +932,8 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: colors.sand,
   },
   locationNoticeText: { flex: 1, fontSize: 11.5, color: colors.inkSoft },
-  locationEnableBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.teal },
-  locationEnableBtnText: { fontSize: 11, fontWeight: '700', color: colors.teal },
+  locationEnableBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.coral },
+  locationEnableBtnText: { fontSize: 11, fontWeight: '700', color: colors.coral },
   searchBar: {
     flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: spacing.lg, marginBottom: 10,
     paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.button, backgroundColor: colors.white,

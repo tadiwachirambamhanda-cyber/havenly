@@ -2,8 +2,8 @@ export const lightColors = {
   // Surfaces and text. The names are historical (sand is the screen ground, coral is the
   // primary accent); the values follow design/handoff/README.md (oxblood and stone).
   sand: '#F3F0EA', sandDeep: '#ECE8DF', ink: '#1F1B16', inkSoft: '#5A544B',
-  coral: '#7A2433', coralSoft: '#F1E9E4', teal: '#0F8B82', tealSoft: '#DCF2EF',
-  gold: '#E3A23A', white: '#FFFFFF', line: '#E2DDD2',
+  coral: '#7A2433', coralSoft: '#F1E9E4',
+  white: '#FFFFFF', line: '#E2DDD2',
   // Housing redesign tokens.
   inkBody: '#3A342D', inkMuted: '#655F55',
   // Edge of a form field, chip or outline button: 3:1 or better against white.
@@ -22,12 +22,13 @@ export const lightColors = {
 // an "always-dark" accent pill background (send buttons, selected chips) —
 // those still read correctly here since the paired foreground color on top
 // of them flips too (colors.sand/white), preserving the same contrast.
-// The dark theme was not part of the housing redesign: its accent stays the old
-// coral until a dark version of the oxblood palette is designed and checked.
+// The dark theme's accent is a lighter oxblood-rose (6.1:1 on the dark ground), because
+// oxblood itself is too dark to read as text or icons there. White text on it is 3.1:1,
+// the same as before; a proper dark design is still to do.
 export const darkColors: typeof lightColors = {
   sand: '#151310', sandDeep: '#1D1A15', ink: '#F3ECDC', inkSoft: '#B7AC93',
-  coral: '#FF5A3C', coralSoft: '#3D2A22', teal: '#2BBBA8', tealSoft: '#173330',
-  gold: '#E3A23A', white: '#211D17', line: '#332D22',
+  coral: '#D4788A', coralSoft: '#3A2429',
+  white: '#211D17', line: '#332D22',
   inkBody: '#E6DFCC', inkMuted: '#9C9279',
   fieldLine: '#7A715F',
   dealBg: '#3A2D18', dealText: '#F3C46D',
@@ -55,12 +56,8 @@ export const fonts = {
   body: 'HankenGrotesk_400Regular', bodySemiBold: 'HankenGrotesk_600SemiBold',
   bodyBold: 'HankenGrotesk_700Bold', mono: 'JetBrainsMono_500Medium',
 };
-// Tonal pairs: light to deep within one brand colour. Gradients never mix
-// two different hues (teal into coral made a muddy middle) and stay inside
-// the brand palette: no purple, blue or pink.
+// Tonal pair: light to deep within the one brand colour (oxblood), used for gradients. They
+// stay inside the brand palette: no teal, purple, blue or pink.
 export const tones = {
   coral: ['#A8465A', '#5E1824'],
-  teal: ['#3DB5A9', '#0B6F68'],
-  gold: ['#F3C46D', '#CF8B22'],
-  olive: ['#7A8577', '#2E372D'],
 } as const satisfies Record<string, readonly [string, string]>;

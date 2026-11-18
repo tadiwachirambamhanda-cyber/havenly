@@ -118,7 +118,7 @@ export default function NewGroupScreen() {
           <Image source={{ uri: iconUri }} style={styles.iconPreview} transition={200} />
         ) : (
           <View style={[styles.iconPreview, styles.iconPlaceholder]}>
-            <Icon name="camera" size={20} color={colors.teal} />
+            <Icon name="camera" size={20} color={colors.coral} />
           </View>
         )}
         <Text style={styles.iconPickerText}>{iconUri ? 'Change group photo' : 'Add group photo'}</Text>
@@ -204,7 +204,7 @@ function createStyles(colors: ColorTokens) {
   iconPicker: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: spacing.lg, marginBottom: 14 },
   iconPreview: { width: 56, height: 56, borderRadius: 28 },
   iconPlaceholder: { backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },
-  iconPickerText: { fontSize: 13, fontWeight: '700', color: colors.teal },
+  iconPickerText: { fontSize: 13, fontWeight: '700', color: colors.coral },
   nameInput: {
     marginHorizontal: spacing.lg, marginBottom: 10, backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line,
     borderRadius: radius.sm, paddingHorizontal: 16, paddingVertical: 12, fontSize: 14, color: colors.ink,

@@ -134,7 +134,7 @@ export default function OffersScreen() {
                   <Text style={styles.cardDiscount}>{item.discount_label}</Text>
                   {distance != null && (
                     <View style={styles.distancePill}>
-                      <Icon name="map-pin" size={9} color={colors.teal} />
+                      <Icon name="map-pin" size={9} color={colors.coral} />
                       <Text style={styles.distancePillText}>{formatDistance(distance)}</Text>
                     </View>
                   )}
@@ -171,16 +171,16 @@ function createStyles(colors: ColorTokens) {
     borderWidth: 1, borderColor: colors.line,
   },
   locationNoticeText: { flex: 1, fontSize: 11.5, color: colors.inkSoft },
-  locationEnableBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.teal },
-  locationEnableBtnText: { fontSize: 11, fontWeight: '700', color: colors.teal },
+  locationEnableBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.coral },
+  locationEnableBtnText: { fontSize: 11, fontWeight: '700', color: colors.coral },
   card: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   cardImage: { width: 56, height: 56, borderRadius: radius.sm },
-  cardBrand: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
+  cardBrand: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft },
   cardTitle: { fontSize: 13.5, fontWeight: '700', color: colors.ink, marginTop: 2, lineHeight: 17 },
   cardMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 3 },
   cardDiscount: { fontSize: 12, color: colors.coral, fontWeight: '700' },
   distancePill: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: colors.sandDeep, paddingHorizontal: 7, paddingVertical: 2, borderRadius: radius.tag },
-  distancePillText: { fontSize: 10, fontWeight: '700', color: colors.teal },
+  distancePillText: { fontSize: 10, fontWeight: '700', color: colors.coral },
   lockBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: colors.sandDeep, paddingHorizontal: 8, paddingVertical: 5, borderRadius: radius.tag },
   lockBadgeText: { fontSize: 10.5, fontWeight: '700', color: colors.inkSoft },
   });

@@ -177,7 +177,7 @@ export default function EventDetailScreen() {
         <Text style={styles.title}>{event.title}</Text>
 
         <View style={styles.metaRow}>
-          <Icon name="calendar" size={13} color={colors.teal} />
+          <Icon name="calendar" size={13} color={colors.coral} />
           <Text style={styles.metaText}>{dateLabel} · {timeLabel}</Text>
         </View>
         <AnimatedPressable style={styles.metaRow} onPress={() => openInMaps({ label: event.location, latitude: event.latitude, longitude: event.longitude })} accessibilityRole="link" accessibilityLabel={`Open ${event.location} in Maps`}>
@@ -196,10 +196,10 @@ export default function EventDetailScreen() {
             accessibilityLabel={myInterest ? "Not down to go anymore" : "I'm down to go"}
           >
             {togglingInterest ? (
-              <ActivityIndicator size="small" color={myInterest ? colors.gold : colors.ink} />
+              <ActivityIndicator size="small" color={myInterest ? colors.coral : colors.ink} />
             ) : (
               <>
-                <Icon name="thumbs-up" size={14} color={myInterest ? colors.gold : colors.ink} weight={myInterest ? 'fill' : undefined} />
+                <Icon name="thumbs-up" size={14} color={myInterest ? colors.coral : colors.ink} weight={myInterest ? 'fill' : undefined} />
                 <Text style={[styles.goingBtnText, myInterest && styles.goingBtnTextActive]}>
                   {myInterest ? "You're down to go" : "I'm down to go"}
                 </Text>
@@ -310,7 +310,7 @@ function createStyles(colors: ColorTokens) {
   dateMonth: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.coral },
   dateDay: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 30, color: colors.ink, lineHeight: 34 },
   body: { padding: spacing.lg },
-  tag: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
+  tag: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft },
   title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 22, color: colors.ink, marginTop: 6 },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10 },
   metaText: { fontSize: 13, color: colors.inkSoft, fontWeight: '600' },
@@ -320,19 +320,19 @@ function createStyles(colors: ColorTokens) {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.sandDeep,
     paddingVertical: 13, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.line,
   },
-  goingBtnActive: { backgroundColor: `${colors.gold}26`, borderColor: colors.gold },
+  goingBtnActive: { backgroundColor: `${colors.coral}26`, borderColor: colors.coral },
   goingBtnText: { color: colors.ink, fontWeight: '700', fontSize: 13.5 },
-  goingBtnTextActive: { color: colors.gold },
+  goingBtnTextActive: { color: colors.coral },
   goingList: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 12 },
   goingAvatar: { width: 24, height: 24, borderRadius: 12, marginLeft: -8, borderWidth: 2, borderColor: colors.sand },
   goingListText: { marginLeft: 6, fontSize: 11.5, color: colors.inkSoft, fontWeight: '600' },
   checkInBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.teal,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.coral,
     paddingVertical: 13, borderRadius: radius.button, marginTop: 20,
   },
-  checkInBtnActive: { backgroundColor: colors.tealSoft, borderWidth: 1.5, borderColor: colors.teal },
+  checkInBtnActive: { backgroundColor: colors.coralSoft, borderWidth: 1.5, borderColor: colors.coral },
   checkInBtnText: { color: 'white', fontWeight: '700', fontSize: 13.5 },
-  checkInBtnTextActive: { color: colors.teal },
+  checkInBtnTextActive: { color: colors.coral },
   checkInList: { marginTop: 18 },
   checkInListLabel: {
     fontFamily: 'HankenGrotesk_700Bold', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginBottom: 10,

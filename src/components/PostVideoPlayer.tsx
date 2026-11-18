@@ -75,5 +75,5 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   progressTrack: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, backgroundColor: 'rgba(255,255,255,0.3)' },
-  progressFill: { height: '100%', backgroundColor: '#FF5A3C' },
+  progressFill: { height: '100%', backgroundColor: '#FFFFFF' },
 });

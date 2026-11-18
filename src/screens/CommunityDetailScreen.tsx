@@ -154,7 +154,7 @@ export default function CommunityDetailScreen() {
       </BackButton>
       <View style={styles.body}>
         <View style={styles.iconChip}>
-          <Icon name={communityIcon(community)} size={28} color={colors.teal} />
+          <Icon name={communityIcon(community)} size={28} color={colors.coral} />
         </View>
         <Text style={styles.name}>{community.name}</Text>
         <Text style={styles.members}>{formatMembers(community.member_count)}</Text>
@@ -314,7 +314,7 @@ function createStyles(colors: ColorTokens) {
   emptyText: { color: colors.inkSoft, textAlign: 'center', marginTop: 24, paddingHorizontal: spacing.lg, fontSize: 13 },
   postCard: { flexDirection: 'row', gap: 12, marginHorizontal: spacing.lg, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   postImage: { width: 66, height: 66, borderRadius: radius.sm, overflow: 'hidden' },
-  postTag: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 9, color: colors.teal, textTransform: 'uppercase', letterSpacing: 0.8 },
+  postTag: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 9, color: colors.inkSoft, textTransform: 'uppercase', letterSpacing: 0.8 },
   postTitle: { fontSize: 13, fontWeight: '700', color: colors.ink, marginTop: 3, lineHeight: 17 },
   postMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 },
   postUserTap: { flex: 1 },
