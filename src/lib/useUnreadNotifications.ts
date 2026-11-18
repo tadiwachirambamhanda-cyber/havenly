@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { HOUSING_NOTIFICATION_TYPES } from '@/lib/notificationTypes';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
@@ -9,6 +9,10 @@ export function useUnreadNotifications(): boolean {
   const { session } = useAuth();
   const myId = session?.user.id;
   const [hasUnread, setHasUnread] = useState(false);
+  // Several places show this dot (the tab bar and the Profile screen). A live channel's name must be unique
+  // per listener: two with the same name share one channel, and adding a listener to a channel that is
+  // already subscribed throws.
+  const instanceId = useId();
 
   // Returns the answer instead of setting state itself, so the effect below
   // is the only place state changes (inside the promise callback).
@@ -26,11 +30,11 @@ export function useUnreadNotifications(): boolean {
     let active = true;
     const refresh = () => { fetchHasUnread().then((value) => { if (active) setHasUnread(value); }); };
     refresh();
-    const channel = supabase.channel('unread-notifications-badge')
+    const channel = supabase.channel(`unread-notifications-badge-${instanceId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${myId}` }, refresh)
       .subscribe();
     return () => { active = false; supabase.removeChannel(channel); };
-  }, [myId, fetchHasUnread]);
+  }, [myId, fetchHasUnread, instanceId]);
 
   // Signed out means nothing unread, whatever the last signed-in value was.
   return myId ? hasUnread : false;
