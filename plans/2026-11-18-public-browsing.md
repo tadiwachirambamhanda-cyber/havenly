@@ -33,7 +33,7 @@ Photos, real listings, the pitches, dark theme.
 
 ## Codex review
 Round 1: VERDICT FINDINGS(1).
-1. MAJOR, `supabase/schema.sql` (room_types policy): signed-out visitors could read the rooms and prices of hidden listings, because the room policy allowed every row. **Fixed:** a migration (`20261118300000_room_types_follow_listing_visibility.sql`) makes a room visible only when its listing is; `schema.sql` matches. Not applied to the live database until the owner says yes; it must be applied before this goes live.
+1. MAJOR, `supabase/schema.sql` (room_types policy): signed-out visitors could read the rooms and prices of hidden listings, because the room policy allowed every row. **Fixed:** a migration (`20261118300000_room_types_follow_listing_visibility.sql`) makes a room visible only when its listing is; `schema.sql` matches. Applied to the live database on 2026-11-18 with the owner's yes (as SQL, recorded with `supabase migration repair`) and checked inside a rolled-back test: a signed-out visitor and a student see rooms only for visible listings, a hidden listing's rooms are invisible to them, an admin sees all, and partner terms stay hidden from non-admins.
 
 Round 2: VERDICT PASS (no findings).
 
