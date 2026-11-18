@@ -1,3 +1,4 @@
+import { HOUSING_NOTIFICATION_TYPES } from '@/lib/notificationTypes';
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { Text } from '@/components/Text';
@@ -12,7 +13,6 @@ import Icon, { type IconName } from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
-import { useToast } from '@/lib/ToastContext';
 import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
@@ -61,7 +61,6 @@ export default function NotificationsScreen() {
   const navigation = useNavigation<Nav>();
   const { session } = useAuth();
   const { colors } = useTheme();
-  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
 
@@ -74,21 +73,13 @@ export default function NotificationsScreen() {
     const { data } = await supabase.from('notifications')
       .select('*, actor:profiles!notifications_actor_id_fkey(*), post:posts(id, title, image_url), check_in:check_ins(id, place_type, place_id), enquiry:housing_enquiries(id, kind, residence:residences(id, name))')
       .eq('recipient_id', myId)
+      // Housing only: follow, like, comment and ping notifications are archived (tag archive/social-v1).
+      .in('type', [...HOUSING_NOTIFICATION_TYPES])
       .order('created_at', { ascending: false })
       .limit(100);
     const notifs = (data as unknown as Notification[]) ?? [];
 
-    // Ping notifications only — resolve the place name from whichever
-    // table the check-in actually points at.
-    const offerIds = notifs.filter((n) => n.check_in?.place_type === 'offer').map((n) => n.check_in!.place_id);
-    const eventIds = notifs.filter((n) => n.check_in?.place_type === 'event').map((n) => n.check_in!.place_id);
-    const [{ data: offerRows }, { data: eventRows }] = await Promise.all([
-      offerIds.length ? supabase.from('offers').select('id, title').in('id', offerIds) : Promise.resolve({ data: [] as { id: string; title: string }[] }),
-      eventIds.length ? supabase.from('events').select('id, title').in('id', eventIds) : Promise.resolve({ data: [] as { id: string; title: string }[] }),
-    ]);
-    const titleById = new Map([...(offerRows ?? []), ...(eventRows ?? [])].map((r) => [r.id, r.title]));
-
-    setRows(notifs.map((n) => ({ ...n, place_title: n.check_in ? titleById.get(n.check_in.place_id) : undefined })));
+    setRows(notifs);
     setLoaded(true);
 
     // Snapshot each row's real is_read state into local state above before
@@ -113,13 +104,6 @@ export default function NotificationsScreen() {
       navigation.navigate('AdminEnquiry', { enquiryId: n.enquiry_id });
     } else if (n.type === 'enquiry_status') {
       navigation.navigate('MyEnquiries');
-    } else if (n.type === 'follow') {
-      navigation.navigate('UserProfile', { userId: n.actor_id });
-    } else if (n.type === 'ping' && n.check_in) {
-      if (n.check_in.place_type === 'offer') navigation.navigate('OfferDetail', { offerId: n.check_in.place_id });
-      else showToast('Open Discover to see this event.');
-    } else if (n.post_id) {
-      navigation.navigate('PostDetail', { postId: n.post_id });
     }
   };
 

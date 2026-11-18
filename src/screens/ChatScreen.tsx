@@ -1,3 +1,4 @@
+import { chatBubbleText } from '@/utils/chatMessage';
 import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { View, StyleSheet, FlatList, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
@@ -249,8 +250,8 @@ export default function ChatScreen() {
           </BackButton>
           <AnimatedPressable
             style={styles.headerAuthorTap}
-            onPress={() => (isGroup ? openMembersModal() : otherUserId && navigation.navigate('UserProfile', { userId: otherUserId }))}
-            accessibilityLabel={isGroup ? 'View group info' : `View ${otherUser?.display_name ?? 'their'} profile`}
+            onPress={() => { if (isGroup) openMembersModal(); }}
+            accessibilityLabel={isGroup ? 'View group info' : undefined}
           >
             {isGroup ? (
               conversation?.icon_url ? (
@@ -296,25 +297,8 @@ export default function ChatScreen() {
               // adds space after the last message too, unlike a real separator.
               <Animated.View entering={isFresh ? FadeInDown.duration(calmDuration).easing(calmEasing) : undefined}>
                 {senderName && <Text style={styles.senderName}>{senderName}</Text>}
-                <View style={[styles.bubble, mine ? styles.bubbleMe : styles.bubbleThem, item.shared_post && styles.bubbleShared, item._pending && { opacity: 0.6 }]}>
-                  {item.shared_post ? (
-                    <AnimatedPressable
-                      style={styles.sharedPostRow}
-                      onPress={() => navigation.navigate('PostDetail', { postId: item.shared_post!.id })}
-                      accessibilityLabel={`Open post: ${item.shared_post.title}`}
-                    >
-                      {item.shared_post.image_url && (
-                        <Image source={{ uri: item.shared_post.image_url }} style={styles.sharedPostThumb} contentFit="cover" transition={200} />
-                      )}
-                      <View style={{ flex: 1 }}>
-                        <Text style={[styles.sharedPostTag, textStyle]}>{item.shared_post.tag}</Text>
-                        <Text style={[styles.sharedPostTitle, textStyle]} numberOfLines={2}>{item.shared_post.title}</Text>
-                      </View>
-                      <Icon name="chevron-right" size={14} color={mine ? 'rgba(255,255,255,0.8)' : colors.inkSoft} />
-                    </AnimatedPressable>
-                  ) : (
-                    <Text style={textStyle}>{item.body}</Text>
-                  )}
+                <View style={[styles.bubble, mine ? styles.bubbleMe : styles.bubbleThem, item._pending && { opacity: 0.6 }]}>
+                  <Text style={textStyle}>{chatBubbleText(item)}</Text>
                   <Text style={mine ? styles.bubbleTimeMe : styles.bubbleTimeThem}>{timeAgo(item.created_at)}</Text>
                 </View>
               </Animated.View>
@@ -416,8 +400,7 @@ export default function ChatScreen() {
               renderItem={({ item }) => (
                 <AnimatedPressable
                   style={styles.memberRow}
-                  onPress={() => { setMembersModalVisible(false); navigation.navigate('UserProfile', { userId: item.id }); }}
-                  accessibilityLabel={`View ${item.display_name}'s profile`}
+                  onPress={() => setMembersModalVisible(false)}
                 >
                   {item.avatar_url ? (
                     <Image source={{ uri: item.avatar_url }} style={styles.memberAvatar} transition={200} />

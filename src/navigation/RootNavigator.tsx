@@ -12,30 +12,18 @@ import LaunchAnimation from '@/components/LaunchAnimation';
 import GuestBanner from '@/components/GuestBanner';
 
 import OnboardingScreen from '@/screens/OnboardingScreen';
-import FeedScreen from '@/screens/FeedScreen';
-import DiscoverScreen from '@/screens/DiscoverScreen';
 import InboxScreen from '@/screens/InboxScreen';
 import ChatScreen from '@/screens/ChatScreen';
 import ProfileScreen from '@/screens/ProfileScreen';
-import UserProfileScreen from '@/screens/UserProfileScreen';
 import NotificationsScreen from '@/screens/NotificationsScreen';
-import SharePostScreen from '@/screens/SharePostScreen';
-import PostDetailScreen from '@/screens/PostDetailScreen';
-import CommunitiesScreen from '@/screens/CommunitiesScreen';
-import CommunityDetailScreen from '@/screens/CommunityDetailScreen';
-import CreatePostScreen from '@/screens/CreatePostScreen';
-import CreateEventScreen from '@/screens/CreateEventScreen';
 import BlockedUsersScreen from '@/screens/BlockedUsersScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
 import EditProfileScreen from '@/screens/EditProfileScreen';
-import FollowListScreen from '@/screens/FollowListScreen';
-import NewGroupScreen from '@/screens/NewGroupScreen';
 import OffersScreen from '@/screens/OffersScreen';
 import OfferDetailScreen from '@/screens/OfferDetailScreen';
 import ManageBrandsScreen from '@/screens/ManageBrandsScreen';
 import CreateOfferScreen from '@/screens/CreateOfferScreen';
 import MapScreen from '@/screens/MapScreen';
-import EventDetailScreen from '@/screens/EventDetailScreen';
 import HousingScreen from '@/screens/HousingScreen';
 import ResidenceDetailScreen from '@/screens/ResidenceDetailScreen';
 import HousingEnquiryScreen from '@/screens/HousingEnquiryScreen';
@@ -55,26 +43,16 @@ export type AccountReason = 'save' | 'enquire' | 'compare' | 'join' | 'login';
 export type RootStackParamList = {
   Onboarding: undefined;
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
-  PostDetail: { postId: string };
-  UserProfile: { userId: string };
   Notifications: undefined;
-  SharePost: { postId: string };
   Chat: { conversationId: string; otherUserId?: string };
-  NewGroup: undefined;
-  Communities: undefined;
-  CommunityDetail: { communityId: string };
-  CreatePost: { communityId?: string } | undefined;
-  CreateEvent: undefined;
   BlockedUsers: undefined;
   Settings: undefined;
   EditProfile: undefined;
-  FollowList: { userId: string; initialTab: 'followers' | 'following'; displayName: string };
   Offers: undefined;
   OfferDetail: { offerId: string };
   ManageBrands: undefined;
   CreateOffer: undefined;
   Map: undefined;
-  EventDetail: { eventId: string };
   PublicHousing: undefined;
   ResidenceDetail: { residenceId: string };
   SplitRent: { residenceId: string };
@@ -91,8 +69,7 @@ export type RootStackParamList = {
 
 export type MainTabParamList = {
   Housing: undefined;
-  Discover: undefined;
-  Feed: undefined;
+  CompareTab: undefined;
   Inbox: undefined;
   Profile: undefined;
 };
@@ -104,8 +81,7 @@ function MainTabs() {
   return (
     <Tab.Navigator initialRouteName="Housing" screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
       <Tab.Screen name="Housing" component={HousingScreen} />
-      <Tab.Screen name="Discover" component={DiscoverScreen} />
-      <Tab.Screen name="Feed" component={FeedScreen} />
+      <Tab.Screen name="CompareTab" component={CompareScreen} />
       <Tab.Screen name="Inbox" component={InboxScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
@@ -176,26 +152,16 @@ export default function RootNavigator() {
           // Signed in, returning user — full app.
           <>
             <Stack.Screen name="MainTabs" component={MainTabs} />
-            <Stack.Screen name="PostDetail" component={PostDetailScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="UserProfile" component={UserProfileScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="SharePost" component={SharePostScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Chat" component={ChatScreen} />
-            <Stack.Screen name="NewGroup" component={NewGroupScreen} options={{ presentation: 'modal' }} />
-            <Stack.Screen name="Communities" component={CommunitiesScreen} />
-            <Stack.Screen name="CommunityDetail" component={CommunityDetailScreen} />
-            <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ presentation: 'modal' }} />
-            <Stack.Screen name="CreateEvent" component={CreateEventScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="BlockedUsers" component={BlockedUsersScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ presentation: 'modal' }} />
-            <Stack.Screen name="FollowList" component={FollowListScreen} />
             <Stack.Screen name="Offers" component={OffersScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="OfferDetail" component={OfferDetailScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="ManageBrands" component={ManageBrandsScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="CreateOffer" component={CreateOfferScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Map" component={MapScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="EventDetail" component={EventDetailScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="ResidenceDetail" component={ResidenceDetailScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="SplitRent" component={SplitRentScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Compare" component={CompareScreen} options={{ presentation: 'card' }} />

@@ -111,11 +111,6 @@ export default function SettingsScreen() {
             <Text style={styles.chevron}>›</Text>
           </AnimatedPressable>
           <View style={styles.divider} />
-          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('CreateEvent')}>
-            <Text style={styles.rowText}>Create event</Text>
-            <Text style={styles.chevron}>›</Text>
-          </AnimatedPressable>
-          <View style={styles.divider} />
           <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('ManageBrands')}>
             <Text style={styles.rowText}>Manage brands</Text>
             <Text style={styles.chevron}>›</Text>
