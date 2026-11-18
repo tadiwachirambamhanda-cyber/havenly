@@ -248,7 +248,7 @@ function createStyles(colors: ColorTokens) {
     feeText: { fontSize: 13, fontWeight: '700', color: colors.ink, fontVariant: ['tabular-nums'] },
     thumb: { width: 56, height: 56, borderRadius: 10 },
     addBtn: {
-      flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.coral,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.coralFill,
       minHeight: 52, borderRadius: 12, marginBottom: 14,
     },
     addBtnText: { color: 'white', fontWeight: '700', fontSize: 16 },

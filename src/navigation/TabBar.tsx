@@ -138,7 +138,7 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: colors.sand, borderWidth: 1.5, borderColor: colors.coral,
   },
   fab: {
-    width: 46, height: 46, borderRadius: 23, backgroundColor: colors.coral, flexShrink: 0,
+    width: 46, height: 46, borderRadius: 23, backgroundColor: colors.coralFill, flexShrink: 0,
     alignItems: 'center', justifyContent: 'center',
   },
   });

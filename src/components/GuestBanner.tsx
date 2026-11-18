@@ -25,12 +25,12 @@ export default function GuestBanner() {
     };
   }, []);
   return (
-    <View style={[styles.bar, { backgroundColor: flash ? colors.coral : colors.ink }]} accessibilityRole="alert">
-      <Text style={[styles.text, { color: flash ? colors.ink : colors.sand }]} numberOfLines={1}>
+    <View style={[styles.bar, { backgroundColor: flash ? colors.coralFill : colors.ink }]} accessibilityRole="alert">
+      <Text style={[styles.text, { color: flash ? '#FFFFFF' : colors.sand }]} numberOfLines={1}>
         {flash ? 'Create an account to do this.' : 'Demo mode · sample content only'}
       </Text>
       <Pressable onPress={exitGuest} hitSlop={8} accessibilityRole="button" accessibilityLabel="Leave the demo and create an account">
-        <Text style={[styles.cta, { color: flash ? colors.ink : colors.sand, textDecorationLine: 'underline' }]}>Create account</Text>
+        <Text style={[styles.cta, { color: flash ? '#FFFFFF' : colors.sand, textDecorationLine: 'underline' }]}>Create account</Text>
       </Pressable>
     </View>
   );

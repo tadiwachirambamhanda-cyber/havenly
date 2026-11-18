@@ -337,7 +337,7 @@ function createStyles(colors: ColorTokens) {
       minHeight: 48, paddingHorizontal: 14, fontSize: 16, color: colors.ink, fontVariant: ['tabular-nums'],
     },
     feePreview: { fontSize: 14, fontWeight: '700', color: colors.ink, marginTop: 8 },
-    saveBtn: { marginTop: 14, backgroundColor: colors.coral, minHeight: 52, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+    saveBtn: { marginTop: 14, backgroundColor: colors.coralFill, minHeight: 52, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
     saveBtnText: { color: 'white', fontWeight: '700', fontSize: 16 },
     feeBox: {
       flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 14, paddingTop: 14,

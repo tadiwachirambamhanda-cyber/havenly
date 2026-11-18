@@ -110,7 +110,7 @@ function createStyles(colors: ColorTokens) {
   chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
   chipText: { fontSize: 13.5, fontWeight: '600', color: colors.ink },
   chipTextSelected: { color: colors.sand },
-  btnPrimary: { backgroundColor: colors.coral, paddingVertical: 16, borderRadius: radius.button, alignItems: 'center' },
+  btnPrimary: { backgroundColor: colors.coralFill, paddingVertical: 16, borderRadius: radius.button, alignItems: 'center' },
   btnPrimaryText: { color: 'white', fontWeight: '700', fontSize: 15 },
   bar: { backgroundColor: colors.sand, paddingHorizontal: 24, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.line },
   skip: { textAlign: 'center', marginTop: 12, fontSize: 12.5, color: colors.inkSoft, fontWeight: '600' },

@@ -611,11 +611,11 @@ function createStyles(colors: ColorTokens) {
   container: { flex: 1, backgroundColor: colors.sand },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingTop: 60, paddingBottom: spacing.md },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  brandDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral },
+  brandDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coralFill },
   brand: { fontFamily: 'SchibstedGrotesk_700Bold_Italic', fontSize: 24, color: colors.ink },
   topBarActions: { flexDirection: 'row', gap: spacing.sm },
   iconBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-  iconBtnDot: { position: 'absolute', top: 6, right: 7, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral, borderWidth: 1.5, borderColor: colors.white },
+  iconBtnDot: { position: 'absolute', top: 6, right: 7, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coralFill, borderWidth: 1.5, borderColor: colors.white },
   // Neutral like the bell and communities buttons beside it; only the
   // flame is coral, so the badge doesn't compete with the + button.
   streakBadge: { height: 36, paddingHorizontal: 12, borderRadius: 18, flexDirection: 'row', gap: 4, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },

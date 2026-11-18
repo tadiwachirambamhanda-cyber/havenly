@@ -85,7 +85,7 @@ function createStyles(colors: ColorTokens) {
     },
     actionBackdrop: {
       position: 'absolute', top: 0, right: 0, bottom: 0, width: ACTION_WIDTH,
-      backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center',
+      backgroundColor: colors.coralFill, alignItems: 'center', justifyContent: 'center',
     },
     actionBtn: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center' },
     actionText: { color: 'white', fontWeight: '700', fontSize: 12.5 },

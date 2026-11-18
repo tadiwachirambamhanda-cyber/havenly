@@ -68,7 +68,7 @@ function createStyles(colors: ColorTokens) {
     },
     steps: { gap: 10, marginTop: 12 },
     step: { fontSize: 15, lineHeight: 22, color: colors.inkBody },
-    primary: { backgroundColor: colors.coral, minHeight: 52, justifyContent: 'center', borderRadius: radius.md, alignItems: 'center' },
+    primary: { backgroundColor: colors.coralFill, minHeight: 52, justifyContent: 'center', borderRadius: radius.md, alignItems: 'center' },
     primaryText: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
     secondary: { minHeight: 48, justifyContent: 'center', alignItems: 'center', marginTop: 4 },
     secondaryText: { color: colors.ink, fontWeight: '700', fontSize: 15 },

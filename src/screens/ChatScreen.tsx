@@ -455,7 +455,7 @@ function createStyles(colors: ColorTokens) {
   senderName: { fontSize: 10.5, fontWeight: '700', color: colors.inkSoft, marginBottom: 3, marginLeft: 4 },
   bubble: { maxWidth: '75%', padding: 12, borderRadius: 14 },
   bubbleThem: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignSelf: 'flex-start' },
-  bubbleMe: { backgroundColor: colors.coral, alignSelf: 'flex-end' },
+  bubbleMe: { backgroundColor: colors.coralFill, alignSelf: 'flex-end' },
   bubbleTextThem: { color: colors.ink, fontSize: 13 },
   bubbleTextMe: { color: 'white', fontSize: 13 },
   bubbleTimeThem: { color: colors.inkSoft, fontSize: 9.5, marginTop: 3 },
@@ -475,7 +475,7 @@ function createStyles(colors: ColorTokens) {
   requestActions: { flexDirection: 'row', gap: 10 },
   declineBtn: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
   declineBtnText: { fontSize: 13, fontWeight: '700', color: colors.ink },
-  acceptBtn: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: radius.button, backgroundColor: colors.coral },
+  acceptBtn: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: radius.button, backgroundColor: colors.coralFill },
   acceptBtnText: { fontSize: 13, fontWeight: '700', color: 'white' },
   membersBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   membersCard: {

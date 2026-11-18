@@ -257,7 +257,7 @@ function createStyles(colors: ColorTokens) {
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: spacing.lg, paddingVertical: 10 },
   avatar: { width: 50, height: 50, borderRadius: 25 },
-  unreadDot: { position: 'absolute', top: -2, right: -2, width: 12, height: 12, borderRadius: 6, backgroundColor: colors.coral, borderWidth: 2, borderColor: colors.sand },
+  unreadDot: { position: 'absolute', top: -2, right: -2, width: 12, height: 12, borderRadius: 6, backgroundColor: colors.coralFill, borderWidth: 2, borderColor: colors.sand },
   name: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   preview: { fontSize: 12, color: colors.inkSoft, marginTop: 2 },
   previewUnread: { color: colors.ink, fontWeight: '600' },

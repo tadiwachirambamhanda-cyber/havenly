@@ -307,7 +307,7 @@ function createStyles(colors: ColorTokens) {
   tab: { flex: 1, alignItems: 'center', paddingVertical: 11 },
   tabText: { fontSize: 12, fontWeight: '700', color: colors.inkSoft },
   tabTextActive: { color: colors.ink },
-  tabUnderline: { position: 'absolute', bottom: -1, height: 2, width: '60%', backgroundColor: colors.coral, borderRadius: 1 },
+  tabUnderline: { position: 'absolute', bottom: -1, height: 2, width: '60%', backgroundColor: colors.coralFill, borderRadius: 1 },
   gridCell: { flex: 1, aspectRatio: 1 / 1.15, overflow: 'hidden', marginBottom: 2 },
   // Text-only post in the grid: its title on a quiet tile, not a colour block.
   gridText: { flex: 1, backgroundColor: colors.sandDeep, padding: 10, justifyContent: 'flex-end' },
