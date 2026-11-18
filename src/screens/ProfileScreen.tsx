@@ -1,90 +1,49 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, StyleSheet, FlatList, Pressable, RefreshControl, type ViewToken } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable, RefreshControl } from 'react-native';
 import { Text } from '@/components/Text';
-import { useNavigation, useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import InitialsAvatar from '@/components/InitialsAvatar';
 import Icon from '@/components/Icon';
-import Animated from 'react-native-reanimated';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
+import { useUnreadNotifications } from '@/lib/useUnreadNotifications';
 import { useTheme } from '@/lib/ThemeContext';
-import { useToast } from '@/lib/ToastContext';
-import { haptics } from '@/lib/haptics';
-import { formatCount } from '@/utils/formatCount';
 import { radius, spacing, tones } from '@/theme/tokens';
-import AnimatedPressable from '@/components/AnimatedPressable';
-import ActionSheet from '@/components/ActionSheet';
-import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
-import VideoThumb from '@/components/VideoThumb';
 import type { ColorTokens } from '@/theme/tokens';
-import { INTEREST_OPTIONS } from '@/constants/interests';
-import type { Post, Profile } from '@/types';
+import type { Profile } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
-
-type GridTab = 'posts' | 'saved';
-
-const GRID_TABS: { key: GridTab; label: string }[] = [
-  { key: 'posts', label: 'Posts' }, { key: 'saved', label: 'Saved' },
+const ROWS: { label: string; icon: 'file-text' | 'bell'; go: (nav: Nav) => void }[] = [
+  { label: 'My enquiries', icon: 'file-text', go: (nav) => nav.navigate('MyEnquiries') },
+  { label: 'Notifications', icon: 'bell', go: (nav) => nav.navigate('Notifications') },
 ];
 
 export default function ProfileScreen() {
   const navigation = useNavigation<Nav>();
-  const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
   const { session } = useAuth();
   const { colors } = useTheme();
-  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  // Same collision guard as UserProfileScreen's avatarMarginTop: the avatar
-  // normally overlaps the cover by 38px, landing its top edge 72px down.
-  // The settings button floats over the cover pinned at insets.top + 12, so
-  // on a tall-inset device (Dynamic Island etc.) it can collide with the
-  // avatar unless pulled down further.
+  const hasUnreadNotifs = useUnreadNotifications();
+  // The avatar normally overlaps the cover by 38px; on tall-inset devices the
+  // settings button would collide with it, so pull the avatar down further.
   const avatarMarginTop = Math.max(-38, insets.top - 52);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [stats, setStats] = useState({ posts: 0, followers: 0, following: 0 });
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [savedPosts, setSavedPosts] = useState<Post[]>([]);
-  const [activeTab, setActiveTab] = useState<GridTab>('posts');
   const [refreshing, setRefreshing] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<Post | null>(null);
-  const [visibleVideoIds, setVisibleVideoIds] = useState<Set<string>>(new Set());
-  // FlatList (unlike FeedScreen's manual masonry ScrollView) has built-in
-  // viewability tracking — no need to measure card positions by hand here.
-  // Both must stay stable across renders or FlatList warns/ignores them:
-  // the callback only uses a state setter, and the config is a module constant.
-  const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken[] }) => {
-    setVisibleVideoIds(new Set(viewableItems.map((vi) => vi.item.id)));
-  }, []);
 
   const load = useCallback(async () => {
     const userId = session?.user.id;
     if (!userId) return;
-
-    const [{ data: profileData }, { count: postCount }, { count: followerCount }, { count: followingCount }, { data: postData }, { data: savedData }] =
-      await Promise.all([
-        supabase.from('profiles').select('*').eq('id', userId).single(),
-        supabase.from('posts').select('*', { count: 'exact', head: true }).eq('author_id', userId),
-        supabase.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', userId),
-        supabase.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', userId),
-        supabase.from('posts').select('*').eq('author_id', userId).order('created_at', { ascending: false }),
-        supabase.from('saved_posts').select('created_at, post:posts(*)').eq('user_id', userId).order('created_at', { ascending: false }),
-      ]);
-
-    setProfile(profileData as Profile);
-    setStats({ posts: postCount ?? 0, followers: followerCount ?? 0, following: followingCount ?? 0 });
-    setPosts((postData as Post[]) ?? []);
-    setSavedPosts(((savedData ?? []) as unknown as { post: Post }[]).map((row) => row.post).filter(Boolean));
+    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    setProfile(data as Profile);
   }, [session]);
 
   useFocusEffect(
@@ -99,29 +58,6 @@ export default function ProfileScreen() {
     setRefreshing(false);
   }, [load]);
 
-  const handleLongPressPost = (post: Post) => {
-    haptics.tap();
-    setDeleteTarget(post);
-  };
-
-  const confirmDeletePost = async () => {
-    const target = deleteTarget;
-    if (!target) return;
-    // Removed from the grid immediately — the whole point of a long-press
-    // shortcut is that it feels instant, not like it's waiting on a request.
-    setPosts((prev) => prev.filter((p) => p.id !== target.id));
-    setStats((prev) => ({ ...prev, posts: Math.max(prev.posts - 1, 0) }));
-    const { error } = await supabase.from('posts').delete().eq('id', target.id);
-    if (error) {
-      setPosts((prev) => [...prev, target].sort((a, b) => b.created_at.localeCompare(a.created_at)));
-      setStats((prev) => ({ ...prev, posts: prev.posts + 1 }));
-      showToast('Couldn’t delete post. Try again.', 'error');
-      return;
-    }
-    haptics.success();
-    showToast('Post deleted');
-  };
-
   if (!profile) {
     if (hasLoadedOnce) return null;
     return (
@@ -133,153 +69,63 @@ export default function ProfileScreen() {
         </View>
         <Skeleton style={{ height: 20, width: '50%', marginTop: 12, marginHorizontal: spacing.lg }} />
         <Skeleton style={{ height: 13, width: '35%', marginTop: 8, marginHorizontal: spacing.lg }} />
-        <View style={[styles.statsRow, { gap: 22 }]}>
-          {[0, 1, 2].map((i) => <Skeleton key={i} style={{ width: 40, height: 30 }} />)}
-        </View>
-        <View style={styles.skeletonGrid}>
-          {[0, 1, 2, 3, 4, 5].map((i) => <Skeleton key={i} style={styles.skeletonGridCell} />)}
-        </View>
       </View>
     );
   }
 
-  const interestChips = INTEREST_OPTIONS.filter((opt) => profile.interests.includes(opt.key));
-
   return (
-    <FlatList
+    <ScrollView
       style={styles.container}
-      data={activeTab === 'posts' ? posts : savedPosts}
-      keyExtractor={(item) => item.id}
-      numColumns={3}
-      columnWrapperStyle={{ gap: 2 }}
-      contentContainerStyle={{ paddingBottom: 40 }}
+      contentContainerStyle={{ paddingBottom: 120 }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
-      onViewableItemsChanged={onViewableItemsChanged}
-      viewabilityConfig={viewabilityConfig}
-      renderItem={({ item, index }) => {
-        return (
-          <Animated.View style={styles.gridCell}>
-          <AnimatedPressable
-            style={{ flex: 1 }}
-            scaleTo={0.93}
-            onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
-            onLongPress={activeTab === 'posts' ? () => handleLongPressPost(item) : undefined}
-            delayLongPress={350}
-          >
-            {item.video_url ? (
-              <VideoThumb uri={item.video_url} isVisible={isFocused && visibleVideoIds.has(item.id)} />
-            ) : item.image_url ? (
-              <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
-            ) : (
-              <View style={styles.gridText}><Text style={styles.gridTextTitle} numberOfLines={5}>{item.title}</Text></View>
-            )}
-          </AnimatedPressable>
-          </Animated.View>
-        );
-      }}
-      ListEmptyComponent={
-        <EmptyState
-          icon={activeTab === 'posts' ? 'grid' : 'bookmark'}
-          text={activeTab === 'posts' ? 'No posts yet.' : 'Nothing saved yet. Tap the bookmark on a post to keep it here.'}
-          action={activeTab === 'posts' ? { label: 'Write your first post', onPress: () => navigation.navigate('CreatePost') } : undefined}
-        />
-      }
-      ListHeaderComponent={
-        <View>
-          {profile.cover_url ? (
-            <Image source={{ uri: profile.cover_url }} style={styles.cover} contentFit="cover" transition={200} />
-          ) : (
-            <LinearGradient colors={[...tones.coral]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cover} />
-          )}
-          <Pressable hitSlop={8}
-            style={[styles.settingsBtn, { top: insets.top + 12 }]}
-            onPress={() => navigation.navigate('Settings')}
-            accessibilityLabel="Settings"
-          >
-            <Icon name="settings" size={17} color="#1F1B16" />
+    >
+      {profile.cover_url ? (
+        <Image source={{ uri: profile.cover_url }} style={styles.cover} contentFit="cover" transition={200} />
+      ) : (
+        <LinearGradient colors={[...tones.coral]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cover} />
+      )}
+      <Pressable hitSlop={8}
+        style={[styles.settingsBtn, { top: insets.top + 12 }]}
+        onPress={() => navigation.navigate('Settings')}
+        accessibilityLabel="Settings"
+      >
+        <Icon name="settings" size={17} color="#1F1B16" />
+      </Pressable>
+      <View style={[styles.avatarRow, { marginTop: avatarMarginTop }]}>
+        {profile.avatar_url ? (
+          <Image source={{ uri: profile.avatar_url }} style={styles.avatar} transition={200} />
+        ) : (
+          <InitialsAvatar name={profile.display_name} style={styles.avatar} />
+        )}
+        <Pressable style={styles.editBtn} onPress={() => navigation.navigate('EditProfile')} accessibilityLabel="Edit profile">
+          <Text style={styles.editBtnText}>Edit profile</Text>
+        </Pressable>
+      </View>
+
+      <Text style={styles.name}>{profile.display_name}</Text>
+      <Text style={styles.handle}>{profile.university ?? ''}</Text>
+      {profile.bio ? <Text style={styles.bio}>{profile.bio}</Text> : null}
+
+      <View style={{ marginTop: 24 }}>
+        {ROWS.map((row) => (
+          <Pressable key={row.label} style={styles.listRow} onPress={() => row.go(navigation)} accessibilityRole="button" accessibilityLabel={row.label}>
+            <Icon name={row.icon} size={18} color={colors.ink} />
+            <Text style={styles.listRowText}>{row.label}</Text>
+            {row.label === 'Notifications' && hasUnreadNotifs && <View style={styles.newDot} accessibilityLabel="New updates" />}
+            <Icon name="chevron-right" size={14} color={colors.inkSoft} />
           </Pressable>
-          <View style={[styles.avatarRow, { marginTop: avatarMarginTop }]}>
-            {profile.avatar_url ? (
-              <Image source={{ uri: profile.avatar_url }} style={styles.avatar} transition={200} />
-            ) : (
-              <InitialsAvatar name={profile.display_name} style={styles.avatar} />
-            )}
-            <Pressable style={styles.editBtn} onPress={() => navigation.navigate('EditProfile')} accessibilityLabel="Edit profile">
-              <Text style={styles.editBtnText}>Edit profile</Text>
-            </Pressable>
-          </View>
-
-          <Text style={styles.name}>{profile.display_name}</Text>
-          <Text style={styles.handle}>@{profile.username}{profile.university ? ` · ${profile.university}` : ''}</Text>
-          {profile.bio ? <Text style={styles.bio}>{profile.bio}</Text> : null}
-
-          <View style={styles.statsRow}>
-            <View><Text style={styles.statNum}>{formatCount(stats.posts)}</Text><Text style={styles.statLabel}>Posts</Text></View>
-            <Pressable
-              onPress={() => navigation.navigate('FollowList', { userId: profile.id, initialTab: 'followers', displayName: profile.display_name })}
-              accessibilityLabel="View followers"
-            >
-              <Text style={styles.statNum}>{formatCount(stats.followers)}</Text><Text style={styles.statLabel}>Followers</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => navigation.navigate('FollowList', { userId: profile.id, initialTab: 'following', displayName: profile.display_name })}
-              accessibilityLabel="View following"
-            >
-              <Text style={styles.statNum}>{formatCount(stats.following)}</Text><Text style={styles.statLabel}>Following</Text>
-            </Pressable>
-            <Pressable onPress={() => navigation.navigate('Offers')} accessibilityLabel="View your perks">
-              <View style={styles.streakStat}>
-                <Icon name="flame" size={15} color={colors.coral} weight="fill" />
-                <Text style={styles.statNum}>{profile.current_streak}</Text>
-              </View>
-              <Text style={styles.statLabel}>Streak</Text>
-            </Pressable>
-          </View>
-          <Pressable style={styles.perksRow} onPress={() => navigation.navigate('Offers')} accessibilityLabel="View your perks">
-            <Icon name="gift" size={13} color={colors.coral} />
-            <Text style={styles.perksRowText}>View your perks</Text>
-            <Icon name="chevron-right" size={13} color={colors.inkSoft} />
-          </Pressable>
-
-          {interestChips.length > 0 && (
-            <View style={styles.chipRow}>
-              {interestChips.map((chip) => (
-                <View key={chip.key} style={styles.chip}>
-                  <Text style={styles.chipText}>{chip.label}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-          <View style={styles.tabRow}>
-            {GRID_TABS.map((tab) => (
-              <Pressable key={tab.key} style={styles.tab} onPress={() => { haptics.tap(); setActiveTab(tab.key); }}>
-                <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>{tab.label}</Text>
-                {activeTab === tab.key && <View style={styles.tabUnderline} />}
-              </Pressable>
-            ))}
-          </View>
-        </View>
-      }
-      ListFooterComponent={
-        <>
-          <View style={{ height: 24 }} />
-          <ActionSheet
-            visible={!!deleteTarget}
-            onClose={() => setDeleteTarget(null)}
-            title="Delete this post?"
-            message="This removes the post with its likes and comments. You can't undo it."
-            actions={[{ label: 'Delete', destructive: true, onPress: confirmDeletePost }]}
-          />
-        </>
-      }
-    />
+        ))}
+      </View>
+    </ScrollView>
   );
 }
 
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
+  listRow: { flexDirection: 'row', alignItems: 'center', gap: 14, minHeight: 56, paddingHorizontal: spacing.lg, borderBottomWidth: 1, borderBottomColor: colors.line },
+  newDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.coralFill },
+  listRowText: { flex: 1, fontFamily: 'HankenGrotesk_600SemiBold', fontSize: 16, color: colors.ink },
   skeletonGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 2, paddingHorizontal: 0, marginTop: 20 },
   skeletonGridCell: { width: '33%', aspectRatio: 1 / 1.15, borderRadius: 0 },
   cover: { height: 110 },

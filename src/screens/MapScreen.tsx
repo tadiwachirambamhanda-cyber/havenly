@@ -546,10 +546,11 @@ export default function MapScreen() {
     setCenter(loc ?? DUBAI_FALLBACK);
 
     const [{ data: offerData }, { data: eventData }, { data: checkInData }, { data: interestData }, { data: residenceData }] = await Promise.all([
-      supabase.from('offers').select('*, brand:brands(*)').eq('is_active', true).not('latitude', 'is', null),
-      supabase.from('events').select('*').not('latitude', 'is', null).gt('event_date', new Date().toISOString()),
-      supabase.from('check_ins').select('*, user:profiles(*)').gt('expires_at', new Date().toISOString()),
-      supabase.from('interests').select('*'),
+      // Offers, events and check-ins are archived (tag archive/social-v1): the map shows homes only.
+      Promise.resolve({ data: [] as unknown[] }),
+      Promise.resolve({ data: [] as unknown[] }),
+      Promise.resolve({ data: [] as unknown[] }),
+      Promise.resolve({ data: [] as unknown[] }),
       supabase.from('residences').select('*, room_types(*)').eq('is_active', true).not('latitude', 'is', null),
     ]);
 
@@ -725,15 +726,6 @@ export default function MapScreen() {
   type FilterType = 'offer' | 'event' | 'residence' | 'checkin';
   const filterTypeFor = (t: SearchResult['type']): FilterType => (t === 'person' ? 'checkin' : t);
 
-  const toggleTypeFilter = (type: FilterType) => {
-    haptics.tap();
-    const nextHidden = !hiddenTypes[type];
-    setHiddenTypes((prev) => ({ ...prev, [type]: nextHidden }));
-    if (typeof webviewRef.current?.injectJavaScript === 'function') {
-      webviewRef.current.injectJavaScript(`window.setTypeVisible && window.setTypeVisible(${JSON.stringify(type)}, ${!nextHidden}); true;`);
-    }
-  };
-
   const handleSelectResult = (result: SearchResult) => {
     haptics.tap();
     Keyboard.dismiss();
@@ -756,9 +748,7 @@ export default function MapScreen() {
   const onMessage = (event: { nativeEvent: { data: string } }) => {
     try {
       const msg = JSON.parse(event.nativeEvent.data);
-      if (msg.type === 'openOffer') navigation.navigate('OfferDetail', { offerId: msg.id });
-      else if (msg.type === 'openEvent') navigation.navigate('EventDetail', { eventId: msg.id });
-      else if (msg.type === 'openResidence') navigation.navigate('ResidenceDetail', { residenceId: msg.id });
+      if (msg.type === 'openResidence') navigation.navigate('ResidenceDetail', { residenceId: msg.id });
       else if (msg.type === 'ping') handlePing(msg.id);
       else if (msg.type === 'toggleInterest') handleToggleInterest(msg.placeType, msg.id);
     } catch {
@@ -876,40 +866,6 @@ export default function MapScreen() {
           originWhitelist={['*']}
         />
       )}
-      <View style={styles.legend}>
-        <AnimatedPressable
-          style={[styles.legendItem, hiddenTypes.offer && styles.legendItemOff]}
-          onPress={() => toggleTypeFilter('offer')}
-          accessibilityLabel={hiddenTypes.offer ? 'Show offers' : 'Hide offers'}
-        >
-          <Icon name="gift" size={12} color={hiddenTypes.offer ? colors.inkSoft : colors.coral} />
-          <Text style={[styles.legendText, hiddenTypes.offer && styles.legendTextOff]}>Offers</Text>
-        </AnimatedPressable>
-        <AnimatedPressable
-          style={[styles.legendItem, hiddenTypes.event && styles.legendItemOff]}
-          onPress={() => toggleTypeFilter('event')}
-          accessibilityLabel={hiddenTypes.event ? 'Show events' : 'Hide events'}
-        >
-          <Icon name="calendar" size={12} color={hiddenTypes.event ? colors.inkSoft : colors.ink} />
-          <Text style={[styles.legendText, hiddenTypes.event && styles.legendTextOff]}>Events</Text>
-        </AnimatedPressable>
-        <AnimatedPressable
-          style={[styles.legendItem, hiddenTypes.residence && styles.legendItemOff]}
-          onPress={() => toggleTypeFilter('residence')}
-          accessibilityLabel={hiddenTypes.residence ? 'Show housing' : 'Hide housing'}
-        >
-          <Icon name="home" size={12} color={hiddenTypes.residence ? colors.inkSoft : colors.tintText} />
-          <Text style={[styles.legendText, hiddenTypes.residence && styles.legendTextOff]}>Housing</Text>
-        </AnimatedPressable>
-        <AnimatedPressable
-          style={[styles.legendItem, hiddenTypes.checkin && styles.legendItemOff]}
-          onPress={() => toggleTypeFilter('checkin')}
-          accessibilityLabel={hiddenTypes.checkin ? 'Show checked in' : 'Hide checked in'}
-        >
-          <View style={[styles.legendDot, hiddenTypes.checkin && { backgroundColor: colors.inkSoft }]} />
-          <Text style={[styles.legendText, hiddenTypes.checkin && styles.legendTextOff]}>Checked in</Text>
-        </AnimatedPressable>
-      </View>
     </View>
   );
 }

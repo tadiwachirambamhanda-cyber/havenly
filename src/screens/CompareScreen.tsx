@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Text } from '@/components/Text';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -28,6 +28,7 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function CompareScreen() {
   const navigation = useNavigation<Nav>();
+  const route = useRoute();
   const insets = useSafeAreaInsets();
   const { profile } = useAuth();
   const { colors } = useTheme();
@@ -74,7 +75,7 @@ export default function CompareScreen() {
 
   const header = (
     <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-      <BackButton style={styles.backBtn}><Icon name="arrow-left" size={20} color={colors.ink} /></BackButton>
+      {route.name === 'Compare' && <BackButton style={styles.backBtn}><Icon name="arrow-left" size={20} color={colors.ink} /></BackButton>}
       <View style={{ flex: 1 }}>
         <Text style={styles.title} accessibilityRole="header">Compare</Text>
         <Text style={styles.count}>{ids.length} of {MAX_COMPARE} places</Text>
@@ -106,7 +107,7 @@ export default function CompareScreen() {
       <View style={styles.container}>
         {header}
         <StateBlock icon="heart" title="Save places to compare them" body="Open a listing and choose Add to compare, then come back here to see up to 3 side by side."
-          primary={{ label: 'Find a place', onPress: () => navigation.goBack() }} />
+          primary={{ label: 'Find a place', onPress: () => (route.name === 'Compare' ? navigation.goBack() : navigation.navigate('MainTabs', { screen: 'Housing' })) }} />
       </View>
     );
   }

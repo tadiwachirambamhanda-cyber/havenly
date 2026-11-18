@@ -9,13 +9,13 @@ import AnimatedPressable from '@/components/AnimatedPressable';
 import { useTheme } from '@/lib/ThemeContext';
 import type { ColorTokens } from '@/theme/tokens';
 import { useUnreadMessages } from '@/lib/useUnreadMessages';
+import { useUnreadNotifications } from '@/lib/useUnreadNotifications';
 import { haptics } from '@/lib/haptics';
 
 // Every tab shows its name under the icon: icons alone (a key for Housing,
 // a tray for Inbox) have to be guessed, words don't.
 const TAB_CONFIG: Record<string, { icon: IconName; label: string }> = {
-  Feed: { icon: 'home', label: 'Feed' },
-  Discover: { icon: 'search', label: 'Discover' },
+  CompareTab: { icon: 'grid', label: 'Compare' },
   Housing: { icon: 'key', label: 'Housing' },
   Inbox: { icon: 'inbox', label: 'Inbox' },
   Profile: { icon: 'user', label: 'Profile' },
@@ -26,6 +26,7 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const hasUnread = useUnreadMessages();
+  const hasUnreadNotifs = useUnreadNotifications();
   // Measured per-tab, not computed from the pill's total width divided
   // evenly — the pill has its own padding and a gap between items, so a
   // formula-based width would drift out of alignment with the real icons
@@ -56,7 +57,7 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
         key={route.key}
         style={styles.pillItem}
         scaleTo={0.92}
-        accessibilityLabel={route.name}
+        accessibilityLabel={config.label}
         onLayout={(e) => {
           const { x, width } = e.nativeEvent.layout;
           setItemLayouts((prev) => ({ ...prev, [index]: { x, width } }));
@@ -75,7 +76,7 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
           <Icon name={config.icon} size={19} color={isFocused ? colors.ink : colors.sand} weight={isFocused ? 'fill' : 'bold'} />
           <Text style={[styles.tabLabel, { color: isFocused ? colors.ink : colors.sand }]} numberOfLines={1}>{config.label}</Text>
         </View>
-        {route.name === 'Inbox' && hasUnread && <View style={styles.unreadDot} />}
+        {((route.name === 'Inbox' && hasUnread) || (route.name === 'Profile' && hasUnreadNotifs)) && <View style={styles.unreadDot} />}
       </AnimatedPressable>
     );
   };
@@ -88,17 +89,6 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
         )}
         {state.routes.map(renderTab)}
       </View>
-      <AnimatedPressable
-        style={styles.fab}
-        scaleTo={0.92}
-        accessibilityLabel="Create post"
-        onPress={() => {
-          haptics.tap();
-          navigation.getParent()?.navigate('CreatePost');
-        }}
-      >
-        <Icon name="plus" size={20} color="white" />
-      </AnimatedPressable>
     </View>
   );
 }

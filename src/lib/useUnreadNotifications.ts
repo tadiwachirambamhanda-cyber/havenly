@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { HOUSING_NOTIFICATION_TYPES } from '@/lib/notificationTypes';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 
@@ -14,7 +15,9 @@ export function useUnreadNotifications(): boolean {
   const fetchHasUnread = useCallback(async (): Promise<boolean> => {
     if (!myId) return false;
     const { count } = await supabase.from('notifications')
-      .select('*', { count: 'exact', head: true }).eq('recipient_id', myId).eq('is_read', false);
+      .select('*', { count: 'exact', head: true }).eq('recipient_id', myId).eq('is_read', false)
+      // Housing updates only; older social notifications are archived (tag archive/social-v1).
+      .in('type', [...HOUSING_NOTIFICATION_TYPES]);
     return !!count && count > 0;
   }, [myId]);
 
