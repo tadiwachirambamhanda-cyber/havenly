@@ -38,3 +38,6 @@ None.
 Round 1: VERDICT FINDINGS(2).
 1. MAJOR, `SavedScreen.tsx:54-58`: after a failed reload the old rows (and the header count) stayed. **Fixed:** a failed load clears the rows, so the error screen shows "0 places" instead of a stale number.
 2. MINOR, `routes.test.ts`: nothing stopped the removed `CompareTab` from coming back. **Fixed:** it is now in the list of routes that must be absent.
+
+Round 2: VERDICT FINDINGS(1).
+3. MAJOR, `SavedScreen.tsx:72`: two quick removals each kept a snapshot of the whole list, so one failing could bring back a place that the other had already removed for good. **Fixed:** a failed removal puts back only its own place, at its old position.

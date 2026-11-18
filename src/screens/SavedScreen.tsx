@@ -69,12 +69,18 @@ export default function SavedScreen() {
 
   const unsave = async (r: Residence) => {
     if (!myId) return;
-    const before = rows;
+    const index = rows.findIndex((x) => x.id === r.id);
     setRows((prev) => prev.filter((x) => x.id !== r.id));
     try {
       await setResidenceSaved(myId, r.id, false);
     } catch {
-      setRows(before);
+      // Put back only this place, so another removal that already succeeded stays removed.
+      setRows((prev) => {
+        if (prev.some((x) => x.id === r.id)) return prev;
+        const next = [...prev];
+        next.splice(Math.min(Math.max(index, 0), next.length), 0, r);
+        return next;
+      });
       showToast('Couldn’t remove it from your saved list. Try again.', 'error');
     }
   };
