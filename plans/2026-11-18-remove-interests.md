@@ -31,3 +31,7 @@ None.
 Round 1: VERDICT FINDINGS(2).
 1. MAJOR, `legal.ts:33`: the policy said one-to-one messages only, but group chats that already exist are still stored and open. **Fixed:** it now says messages, including one-to-one chats and any group conversations you are already part of.
 2. MINOR, `MapScreen.tsx:637`: the search box still said "events, offers, housing, friends". **Fixed:** "Search a home or an area".
+
+Round 2: VERDICT FINDINGS(2).
+3. MAJOR, `legal.ts:34`: the policy said location is used only for the map, but the perks screen (still in the code, unlinked) sorts by distance. **Fixed:** the original wording is back: "the map or location-based sorting".
+4. MINOR, `legal.ts:57`: Sentry crash reporting is off until a key is set, but the policy described it as running. **Fixed:** the policy now says crash reports apply "when crash reporting is switched on".

@@ -31,10 +31,10 @@ export const PRIVACY_POLICY: LegalDocument = {
         'Account details: your email address and password. Passwords are stored encrypted by our authentication provider; we never see them.',
         'Your profile: display name, username, bio, profile and cover photos, and university.',
         'Messages: your messages, including one-to-one chats and any group conversations you are already part of.',
-        'Location: only while you use the map, and only if you allow it. We don\'t track your location in the background.',
+        'Location: only while you use the map or location-based sorting, and only if you allow it. We don\'t track your location in the background.',
         'Housing: residences you save, and enquiries you send: move-in month, length of stay, room, budget, viewing availability, your message and the phone or WhatsApp number you give us. If you sign with a residence, we record the contract value so we can work out the fee the residence owes us.',
         'Safety: people you block and reports you make.',
-        'Technical data: standard logs from our hosting provider (such as IP address, device type and request times), and crash reports when the app hits an error, used to keep the service running and secure.',
+        'Technical data: standard logs from our hosting provider (such as IP address, device type and request times), and, when crash reporting is switched on, crash reports when the app hits an error, used to keep the service running and secure.',
       ],
     },
     {
@@ -54,7 +54,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       bullets: [
         'Other Havenly users you message can see your display name, username and profile photo. Messages are visible only to the people in that conversation.',
         'Residences you enquire with receive your name, university, phone or WhatsApp number and your enquiry details, so they can contact you. Once they have it, they handle it under their own privacy policy.',
-        'Service providers who run parts of Havenly for us: Supabase (database, accounts and file storage), Mapbox (maps) and Sentry (crash reports, which record what went wrong and on which screen, linked to your account ID at most and never to your name, email or messages). They process data only to provide their service.',
+        'Service providers who run parts of Havenly for us: Supabase (database, accounts and file storage), Mapbox (maps) and Sentry (crash reports, when switched on, which record what went wrong and on which screen, linked to your account ID at most and never to your name, email or messages). They process data only to provide their service.',
         'Authorities, where UAE law requires us to.',
       ],
     },
