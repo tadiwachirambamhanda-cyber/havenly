@@ -24,3 +24,6 @@ Changing the sheet's look, password rules or the demo itself.
 
 ## Verification
 As in Checks (typecheck, lint, 85 tests pass; the three on-screen checks done).
+
+## Codex review
+Round 1: VERDICT PASS (no findings).
