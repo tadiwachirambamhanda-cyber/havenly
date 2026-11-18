@@ -29,7 +29,7 @@ export default function HousingEnquirySentScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top + 56, paddingBottom: insets.bottom + 20 }]}>
       <View style={styles.body}>
-        <Icon name="check-circle" size={44} color={colors.teal} weight="fill" />
+        <Icon name="check-circle" size={44} color={colors.ink} weight="fill" />
         <Text style={styles.title}>{isViewing ? 'Viewing request sent' : 'Question sent'}</Text>
         <Text style={styles.summary}>
           {residenceName}
@@ -60,17 +60,17 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand, paddingHorizontal: spacing.lg },
     body: { flex: 1, alignItems: 'flex-start' },
-    title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 28, color: colors.ink, marginTop: 18 },
-    summary: { fontSize: 14.5, fontWeight: '600', color: colors.inkSoft, marginTop: 6 },
+    title: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 28, letterSpacing: -0.4, color: colors.ink, marginTop: 18 },
+    summary: { fontSize: 15, fontWeight: '600', color: colors.inkBody, marginTop: 6 },
     nextLabel: {
-      fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8,
+      fontFamily: 'HankenGrotesk_700Bold', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.72,
       color: colors.inkSoft, marginTop: 36,
     },
     steps: { gap: 10, marginTop: 12 },
-    step: { fontSize: 14.5, lineHeight: 21, color: colors.ink },
-    primary: { backgroundColor: colors.coral, paddingVertical: 15, borderRadius: radius.button, alignItems: 'center' },
-    primaryText: { color: 'white', fontWeight: '700', fontSize: 15 },
-    secondary: { paddingVertical: 14, alignItems: 'center', marginTop: 4 },
-    secondaryText: { color: colors.ink, fontWeight: '700', fontSize: 14 },
+    step: { fontSize: 15, lineHeight: 22, color: colors.inkBody },
+    primary: { backgroundColor: colors.coral, minHeight: 52, justifyContent: 'center', borderRadius: radius.md, alignItems: 'center' },
+    primaryText: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
+    secondary: { minHeight: 48, justifyContent: 'center', alignItems: 'center', marginTop: 4 },
+    secondaryText: { color: colors.ink, fontWeight: '700', fontSize: 15 },
   });
 }
