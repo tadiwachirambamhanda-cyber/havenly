@@ -848,7 +848,7 @@ export default function MapScreen() {
                   <Icon
                     name={r.type === 'offer' ? 'gift' : r.type === 'event' ? 'calendar' : r.type === 'residence' ? 'home' : 'user'}
                     size={13}
-                    color={r.type === 'offer' ? colors.coral : r.type === 'event' ? colors.coral : r.type === 'residence' ? colors.coral : colors.inkSoft}
+                    color={r.type === 'offer' ? colors.coral : r.type === 'event' ? colors.ink : r.type === 'residence' ? colors.tintText : colors.inkSoft}
                   />
                 </View>
                 <View style={{ flex: 1 }}>
@@ -890,7 +890,7 @@ export default function MapScreen() {
           onPress={() => toggleTypeFilter('event')}
           accessibilityLabel={hiddenTypes.event ? 'Show events' : 'Hide events'}
         >
-          <Icon name="calendar" size={12} color={hiddenTypes.event ? colors.inkSoft : colors.coral} />
+          <Icon name="calendar" size={12} color={hiddenTypes.event ? colors.inkSoft : colors.ink} />
           <Text style={[styles.legendText, hiddenTypes.event && styles.legendTextOff]}>Events</Text>
         </AnimatedPressable>
         <AnimatedPressable
@@ -898,7 +898,7 @@ export default function MapScreen() {
           onPress={() => toggleTypeFilter('residence')}
           accessibilityLabel={hiddenTypes.residence ? 'Show housing' : 'Hide housing'}
         >
-          <Icon name="home" size={12} color={hiddenTypes.residence ? colors.inkSoft : colors.coral} />
+          <Icon name="home" size={12} color={hiddenTypes.residence ? colors.inkSoft : colors.tintText} />
           <Text style={[styles.legendText, hiddenTypes.residence && styles.legendTextOff]}>Housing</Text>
         </AnimatedPressable>
         <AnimatedPressable

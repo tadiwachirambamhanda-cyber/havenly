@@ -26,3 +26,8 @@ A full dark-theme design, and photos or illustrations (they carry their own colo
 
 ## Verification
 typecheck, lint and 85 tests pass. On screen in the demo (light): the Feed and Housing show no teal, the category labels are grey and the community badges oxblood. Dark: Housing shows the rose accent. The native-only map was not run (it does not work on web).
+
+## Codex review
+Round 1: VERDICT FINDINGS(2).
+1. MAJOR, `EventDetailScreen.tsx`: in dark mode the check-in button has white text on the rose accent (3.1:1). **Dismissed:** the same pairing was 3.1:1 with the old coral, so this is not a regression. With one accent colour used both as a fill and as text on the dark ground, 4.5:1 is impossible for both (oxblood-rose light enough to read as text is too light for white text). It needs the proper dark-theme design (separate fill and text accents), which is listed as still to do.
+2. MINOR, `MapScreen.tsx`: the search-result icons and the legend used coral for all three types, so colour no longer told them apart. **Fixed:** perks oxblood, events ink, housing warm brown, matching the pins.
