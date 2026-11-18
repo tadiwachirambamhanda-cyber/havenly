@@ -19,3 +19,6 @@ The browser demo's database stand-in does not enforce this rule, and the web tap
 
 ## Verification
 typecheck, lint, 93 tests pass. Reproduced against the real database client: two channels with the same name throw exactly the phone error; two with different names do not. Not yet seen on the phone.
+
+## Codex review
+Round 1: VERDICT PASS (no findings). Also checked: the other live channels are each mounted once.
