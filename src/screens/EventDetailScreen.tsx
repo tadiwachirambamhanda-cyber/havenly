@@ -181,9 +181,9 @@ export default function EventDetailScreen() {
           <Text style={styles.metaText}>{dateLabel} · {timeLabel}</Text>
         </View>
         <AnimatedPressable style={styles.metaRow} onPress={() => openInMaps({ label: event.location, latitude: event.latitude, longitude: event.longitude })} accessibilityRole="link" accessibilityLabel={`Open ${event.location} in Maps`}>
-          <Icon name="map-pin" size={13} color={colors.teal} />
+          <Icon name="map-pin" size={13} color={colors.coral} />
           <Text style={[styles.metaText, { textDecorationLine: 'underline' }]}>{event.location}</Text>
-          <Text style={{ fontSize: 12.5, fontWeight: '700', color: colors.teal }}>Open in Maps</Text>
+          <Text style={{ fontSize: 12.5, fontWeight: '700', color: colors.coral }}>Open in Maps</Text>
         </AnimatedPressable>
 
         {event.description ? <Text style={styles.description}>{event.description}</Text> : null}
