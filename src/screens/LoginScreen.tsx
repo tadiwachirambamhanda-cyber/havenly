@@ -107,7 +107,7 @@ export default function LoginScreen() {
         <AnimatedPressable style={styles.btnPrimary} onPress={handleLogin} disabled={loading}>
           {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnPrimaryText}>Log in</Text>}
         </AnimatedPressable>
-        <AnimatedPressable onPress={() => navigation.navigate('SignUp')}>
+        <AnimatedPressable onPress={() => navigation.navigate('SignInToContinue', { reason: 'join' })}>
           <Text style={styles.switchLink}>New to Havenly? <Text style={styles.switchLinkBold}>Create an account</Text></Text>
         </AnimatedPressable>
         <AnimatedPressable style={styles.btnGhost} onPress={enterGuest} accessibilityRole="button" accessibilityLabel="Explore Havenly without signing up">
