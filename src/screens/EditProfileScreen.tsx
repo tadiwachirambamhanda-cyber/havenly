@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import InitialsAvatar from '@/components/InitialsAvatar';
 import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
@@ -15,9 +14,12 @@ import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { useConfirmDiscard } from '@/lib/useConfirmDiscard';
-import { radius, spacing, tones } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import UniversityPickerModal from '@/components/UniversityPickerModal';
+import { Notice, PrimaryButton } from '@/components/housing/parts';
+import { upcomingMonths, formatMonth } from '@/lib/housing';
+import { HOUSEMATE_PREF_OPTIONS, parseBudget, type HousematePref } from '@/lib/profilePrefs';
 
 export default function EditProfileScreen() {
   const navigation = useNavigation();
@@ -33,8 +35,10 @@ export default function EditProfileScreen() {
   const [university, setUniversity] = useState(profile?.university ?? '');
   const [avatarUri, setAvatarUri] = useState<string | null>(profile?.avatar_url ?? null);
   const [newAvatarPicked, setNewAvatarPicked] = useState(false);
-  const [coverUri, setCoverUri] = useState<string | null>(profile?.cover_url ?? null);
-  const [newCoverPicked, setNewCoverPicked] = useState(false);
+  const [budgetText, setBudgetText] = useState(profile?.budget_aed != null ? String(profile.budget_aed) : '');
+  const [moveIn, setMoveIn] = useState<string | null>(profile?.move_in_month ?? null);
+  const [housemates, setHousemates] = useState<HousematePref | null>(profile?.housemate_pref ?? null);
+  const months = useMemo(() => upcomingMonths(12), []);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +50,9 @@ export default function EditProfileScreen() {
     || bio !== (profile?.bio ?? '')
     || university !== (profile?.university ?? '')
     || newAvatarPicked
-    || newCoverPicked
+    || budgetText.trim() !== (profile?.budget_aed != null ? String(profile.budget_aed) : '')
+    || moveIn !== (profile?.move_in_month ?? null)
+    || housemates !== (profile?.housemate_pref ?? null)
   ));
 
   const pickAvatar = async () => {
@@ -57,19 +63,13 @@ export default function EditProfileScreen() {
     }
   };
 
-  const pickCover = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8, allowsEditing: true, aspect: [3, 1] });
-    if (!result.canceled) {
-      setCoverUri(result.assets[0].uri);
-      setNewCoverPicked(true);
-    }
-  };
-
   const save = async () => {
     setError(null);
     if (!session?.user) return;
     if (!displayName.trim()) { setError('Add a display name.'); return; }
     if (!username.trim()) { setError('Add a username.'); return; }
+    const budget = parseBudget(budgetText);
+    if (budget.error) { setError(budget.error); return; }
 
     setSaving(true);
     try {
@@ -85,25 +85,15 @@ export default function EditProfileScreen() {
         avatarUrl = supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl;
       }
 
-      let coverUrl = profile?.cover_url ?? null;
-      if (newCoverPicked && coverUri) {
-        const ext = coverUri.split('.').pop()?.toLowerCase() ?? 'jpg';
-        const path = `${session.user.id}/${Date.now()}.${ext}`;
-        const arrayBuffer = await fetch(coverUri).then((r) => r.arrayBuffer());
-        const { error: uploadError } = await supabase.storage.from('covers').upload(path, arrayBuffer, {
-          contentType: `image/${ext === 'jpg' ? 'jpeg' : ext}`,
-        });
-        if (uploadError) throw uploadError;
-        coverUrl = supabase.storage.from('covers').getPublicUrl(path).data.publicUrl;
-      }
-
       const { error: updateError } = await supabase.from('profiles').update({
         display_name: displayName.trim(),
         username: username.trim(),
         bio: bio.trim() || null,
         university: university.trim() || null,
         avatar_url: avatarUrl,
-        cover_url: coverUrl,
+        budget_aed: budget.value,
+        move_in_month: moveIn,
+        housemate_pref: housemates,
       }).eq('id', session.user.id);
 
       if (updateError) {
@@ -140,17 +130,7 @@ export default function EditProfileScreen() {
         </AnimatedPressable>
       </View>
 
-      <AnimatedPressable onPress={pickCover} accessibilityLabel="Change cover photo">
-        {coverUri ? (
-          <Image source={{ uri: coverUri }} style={styles.cover} transition={200} />
-        ) : (
-          <LinearGradient colors={[...tones.coral]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cover} />
-        )}
-        <View style={styles.coverEditBadge}>
-          <Icon name="camera" size={12} color="white" />
-          <Text style={styles.coverEditBadgeText}>Change cover</Text>
-        </View>
-      </AnimatedPressable>
+      {error ? <Notice style={{ marginHorizontal: spacing.lg, marginBottom: 8 }}>{error}</Notice> : null}
 
       <AnimatedPressable style={styles.avatarWrap} onPress={pickAvatar} accessibilityLabel="Change profile photo">
         {avatarUri ? (
@@ -185,7 +165,48 @@ export default function EditProfileScreen() {
         onSelect={(name) => setUniversity(name ?? '')}
       />
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      <Text style={styles.section}>What I’m looking for</Text>
+      <Text style={styles.sectionHint}>Optional. Saved here so your enquiries start filled in.</Text>
+
+      <Text style={styles.label}>Monthly budget (AED)</Text>
+      <TextInput
+        style={styles.input}
+        value={budgetText}
+        onChangeText={setBudgetText}
+        keyboardType="number-pad"
+        placeholder="For example 3000"
+        placeholderTextColor={colors.inkSoft}
+        accessibilityLabel="Monthly budget in AED"
+        maxLength={9}
+      />
+
+      <Text style={styles.label}>Move in from</Text>
+      <View style={styles.chipGrid}>
+        {months.map((m) => {
+          const on = moveIn === m;
+          return (
+            <AnimatedPressable key={m} style={[styles.chip, on && styles.chipOn]} onPress={() => { haptics.tap(); setMoveIn(on ? null : m); }} accessibilityRole="button" accessibilityState={{ selected: on }}>
+              <Text style={[styles.chipText, on && styles.chipTextOn]}>{formatMonth(m)}</Text>
+            </AnimatedPressable>
+          );
+        })}
+      </View>
+
+      <Text style={styles.label}>I would live with</Text>
+      <View style={styles.chipGrid}>
+        {HOUSEMATE_PREF_OPTIONS.map((o) => {
+          const on = housemates === o.key;
+          return (
+            <AnimatedPressable key={o.key} style={[styles.chip, on && styles.chipOn]} onPress={() => { haptics.tap(); setHousemates(on ? null : o.key); }} accessibilityRole="button" accessibilityState={{ selected: on }}>
+              <Text style={[styles.chipText, on && styles.chipTextOn]}>{o.label}</Text>
+            </AnimatedPressable>
+          );
+        })}
+      </View>
+
+      <View style={{ paddingHorizontal: spacing.lg, marginTop: 28 }}>
+        <PrimaryButton label="Save" onPress={save} loading={saving} />
+      </View>
     </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -198,13 +219,7 @@ function createStyles(colors: ColorTokens) {
   headerTitle: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 17, color: colors.ink },
   headerBtn: { fontSize: 14, fontWeight: '600', color: colors.inkSoft },
   saveBtn: { color: colors.coral, fontWeight: '700' },
-  cover: { height: 110 },
-  coverEditBadge: {
-    position: 'absolute', bottom: 10, right: 16, flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: radius.pill,
-  },
-  coverEditBadgeText: { color: 'white', fontSize: 11, fontWeight: '700' },
-  avatarWrap: { alignSelf: 'flex-start', marginTop: -38, marginLeft: spacing.lg, marginBottom: 20 },
+  avatarWrap: { alignSelf: 'flex-start', marginTop: 8, marginLeft: spacing.lg, marginBottom: 20 },
   avatar: { width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand },
   avatarEditBadge: {
     position: 'absolute', bottom: 0, right: 0, width: 24, height: 24, borderRadius: 12,
@@ -220,6 +235,12 @@ function createStyles(colors: ColorTokens) {
   bioInput: { minHeight: 80, textAlignVertical: 'top' },
   universityValue: { fontSize: 14, color: colors.ink },
   universityPlaceholder: { fontSize: 14, color: colors.inkSoft },
-  error: { color: colors.coral, fontSize: 13, marginTop: 16, marginHorizontal: spacing.lg },
+  section: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 19, color: colors.ink, paddingHorizontal: spacing.lg, marginTop: 28 },
+  sectionHint: { fontSize: 13, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 4 },
+  chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: spacing.lg },
+  chip: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white },
+  chipOn: { backgroundColor: colors.coralFill, borderColor: colors.coralFill },
+  chipText: { fontSize: 14, fontWeight: '600', color: colors.ink },
+  chipTextOn: { color: '#FFFFFF' },
   });
 }

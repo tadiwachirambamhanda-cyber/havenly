@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
@@ -7,17 +7,13 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon, { type IconName } from '@/components/Icon';
-import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import type { ThemeMode } from '@/lib/ThemeContext';
-import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
-import { deleteOwnAccount } from '@/lib/account';
-import ActionSheet from '@/components/ActionSheet';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -30,29 +26,9 @@ const MODE_OPTIONS: { key: ThemeMode; label: string; icon: IconName }[] = [
 export default function SettingsScreen() {
   const navigation = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
-  const { session, profile } = useAuth();
+  const { profile } = useAuth();
   const { colors, mode, setMode } = useTheme();
-  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const [deleting, setDeleting] = useState(false);
-  const [logoutConfirmVisible, setLogoutConfirmVisible] = useState(false);
-  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
-
-  const handleLogout = () => setLogoutConfirmVisible(true);
-  const confirmLogout = () => supabase.auth.signOut();
-
-  const handleDeleteAccount = () => setDeleteConfirmVisible(true);
-  const confirmDeleteAccount = async () => {
-    const userId = session?.user.id;
-    if (!userId) return;
-    setDeleting(true);
-    try {
-      await deleteOwnAccount(userId);
-    } catch (e) {
-      setDeleting(false);
-      showToast(e instanceof Error ? e.message : 'Couldn’t delete your account. Please try again.', 'error');
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -123,32 +99,8 @@ export default function SettingsScreen() {
         </>
       )}
 
-      <Text style={styles.sectionLabel}>Account</Text>
-      <AnimatedPressable style={styles.row} onPress={handleLogout}>
-        <Text style={[styles.rowText, styles.logoutText]}>Log out</Text>
-      </AnimatedPressable>
-
-      <View style={styles.divider} />
-
-      <AnimatedPressable style={styles.row} onPress={handleDeleteAccount} disabled={deleting}>
-        <Text style={[styles.rowText, styles.deleteText]}>Delete account</Text>
-        {deleting && <ActivityIndicator color={colors.coral} size="small" />}
-      </AnimatedPressable>
       </ScrollView>
 
-      <ActionSheet
-        visible={logoutConfirmVisible}
-        onClose={() => setLogoutConfirmVisible(false)}
-        title="Log out?"
-        actions={[{ label: 'Log out', destructive: true, onPress: confirmLogout }]}
-      />
-      <ActionSheet
-        visible={deleteConfirmVisible}
-        onClose={() => setDeleteConfirmVisible(false)}
-        title="Delete your account?"
-        message="This permanently deletes your profile, posts, comments, and messages. This can’t be undone."
-        actions={[{ label: 'Delete account', destructive: true, onPress: confirmDeleteAccount }]}
-      />
     </View>
   );
 }
@@ -177,7 +129,5 @@ function createStyles(colors: ColorTokens) {
     rowText: { fontSize: 14, fontWeight: '600', color: colors.ink },
     chevron: { fontSize: 18, color: colors.inkSoft },
     divider: { height: 1, backgroundColor: colors.line, marginHorizontal: spacing.lg, marginTop: 16 },
-    logoutText: { color: colors.coral },
-    deleteText: { color: colors.coral },
   });
 }

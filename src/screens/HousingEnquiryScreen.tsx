@@ -1,3 +1,4 @@
+import { usableMoveIn } from '@/lib/profilePrefs';
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
@@ -26,7 +27,7 @@ export default function HousingEnquiryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<Route>();
   const { residenceId } = route.params;
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
@@ -35,10 +36,16 @@ export default function HousingEnquiryScreen() {
   const [residence, setResidence] = useState<Residence | null>(null);
   const [kind, setKind] = useState<EnquiryKind>(route.params.kind);
   const [roomTypeId, setRoomTypeId] = useState<string | null>(null);
-  const [moveIn, setMoveIn] = useState<string>(months[1]);
+  // Start from what the student saved on their profile (budget and move-in month), if anything.
+  // The profile budget is per month; this form asks for the budget per year, so it is multiplied by 12.
+  const savedBudget = profile?.budget_aed != null ? String(profile.budget_aed * 12) : '';
+  const initialMoveIn = usableMoveIn(profile?.move_in_month, months) ?? months[1];
+  const [moveIn, setMoveIn] = useState<string>(initialMoveIn);
   const [duration, setDuration] = useState(12);
-  const [budget, setBudget] = useState('');
+  const [budget, setBudget] = useState(savedBudget);
   const [phone, setPhone] = useState('');
+  // The number filled in from the last enquiry is not a change the student made.
+  const [prefilledPhone, setPrefilledPhone] = useState('');
   const [viewingTime, setViewingTime] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -58,12 +65,15 @@ export default function HousingEnquiryScreen() {
         .order('created_at', { ascending: false }).limit(1)
         .then(({ data }) => {
           const last = (data as { contact_phone: string }[] | null)?.[0]?.contact_phone;
-          if (last) setPhone((cur) => cur || last);
+          if (last) { setPhone((cur) => cur || last); setPrefilledPhone(last); }
         });
     }
   }, [residenceId, myId]);
 
-  const allowLeave = useConfirmDiscard(!sent && (message.trim() !== '' || budget.trim() !== ''));
+  const allowLeave = useConfirmDiscard(!sent && (
+    message.trim() !== '' || budget.trim() !== savedBudget || moveIn !== initialMoveIn || duration !== 12
+    || roomTypeId !== null || viewingTime !== null || kind !== route.params.kind || phone.trim() !== prefilledPhone
+  ));
 
   const availableRooms = (residence?.room_types ?? []).filter((r) => r.is_available);
 

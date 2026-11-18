@@ -29,7 +29,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       paragraphs: ['We only collect what the app needs to work:'],
       bullets: [
         'Account details: your email address and password. Passwords are stored encrypted by our authentication provider; we never see them.',
-        'Your profile: display name, username, bio, profile and cover photos, and university.',
+        'Your profile: display name, username, bio, profile photo and university, and, if you choose to add them, your monthly budget, preferred move-in month and who you would like to live with.',
         'Messages: your messages, including one-to-one chats and any group conversations you are already part of.',
         'Location: only while you use the map or location-based sorting, and only if you allow it. We don\'t track your location in the background.',
         'Housing: residences you save, and enquiries you send: move-in month, length of stay, room, budget, viewing availability, your message and the phone or WhatsApp number you give us. If you sign with a residence, we record the contract value so we can work out the fee the residence owes us.',
@@ -68,16 +68,16 @@ export const PRIVACY_POLICY: LegalDocument = {
       heading: 'How long we keep it',
       paragraphs: [
         'We keep your information while your account is open.',
-        `If you delete your account (Settings → Delete account), we delete your account, profile, messages you sent, saved places, enquiries, and the photos you uploaded, including anything you posted in earlier versions of Havenly. If you signed with a residence through Havenly, we keep a record of that deal (the residence, dates, contract value and fee) with your name, phone number and messages removed, because we need it for accounting. Information a residence already received from an enquiry is held by that residence.`,
+        `If you delete your account (Profile → Delete account), we delete your account, profile, messages you sent, saved places, enquiries, and the photos you uploaded, including anything you posted in earlier versions of Havenly. If you signed with a residence through Havenly, we keep a record of that deal (the residence, dates, contract value and fee) with your name, phone number and messages removed, because we need it for accounting. Information a residence already received from an enquiry is held by that residence.`,
       ],
     },
     {
       heading: 'Your choices and rights',
       bullets: [
-        'Edit your profile and university at any time.',
+        'Edit your profile, university and housing preferences at any time.',
         'Turn off location access in your phone\'s settings; the map then shows Dubai without your position.',
         'Block anyone, and report people or messages.',
-        'Delete your account from Settings.',
+        'Delete your account from Profile.',
         `Ask us for a copy of your information, to correct it, or to delete it, by emailing ${LEGAL_CONTACT_EMAIL}. We reply within 30 days.`,
       ],
     },
@@ -148,7 +148,7 @@ export const TERMS_OF_USE: LegalDocument = {
     },
     {
       heading: 'Ending your account',
-      paragraphs: ['You can delete your account at any time in Settings. We may close accounts that break these terms. Sections that by their nature should continue (such as content licences already used, disclaimers and the limits on liability) continue after your account ends.'],
+      paragraphs: ['You can delete your account at any time in Profile. We may close accounts that break these terms. Sections that by their nature should continue (such as content licences already used, disclaimers and the limits on liability) continue after your account ends.'],
     },
     {
       heading: 'Disclaimers and liability',

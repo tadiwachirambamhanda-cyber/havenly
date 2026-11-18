@@ -20,16 +20,24 @@ const daysAhead = (n: number, hour = 18) => {
   return d.toISOString();
 };
 
+// First of next month, as the preference picker stores it.
+function nextMonthStart(): string {
+  const next = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
+  return `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}-01`;
+}
+
 function profile(id: string, username: string, display_name: string, bio: string, university: string, interests: string[]): Profile {
   return {
     id, username, display_name, bio, avatar_url: null, cover_url: null, university,
     interests: interests as Profile['interests'], current_streak: 4, longest_streak: 9,
     last_active_date: null, has_completed_onboarding: true, is_admin: false, created_at: daysAgo(40),
+    budget_aed: null, move_in_month: null, housemate_pref: null,
   };
 }
 
 export const GUEST_PROFILE: Profile = {
   ...profile(GUEST_USER_ID, 'guest_demo', 'Guest', 'Looking around Havenly in demo mode.', 'Murdoch University Dubai', ['cafes', 'fitness', 'padel']),
+  budget_aed: 3000, move_in_month: nextMonthStart(), housemate_pref: 'any',
   current_streak: 3,
   longest_streak: 3,
 };
