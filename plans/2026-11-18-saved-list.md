@@ -41,3 +41,6 @@ Round 1: VERDICT FINDINGS(2).
 
 Round 2: VERDICT FINDINGS(1).
 3. MAJOR, `SavedScreen.tsx:72`: two quick removals each kept a snapshot of the whole list, so one failing could bring back a place that the other had already removed for good. **Fixed:** a failed removal puts back only its own place, at its old position.
+
+Round 3: VERDICT FINDINGS(1).
+4. MAJOR, `SavedScreen.tsx:44-53`: a slow load for one account could finish after the account changed and show the old account's saved places. **Fixed:** results are applied only if the signed-in account is still the one the load started for, and the list is cleared when the account changes.

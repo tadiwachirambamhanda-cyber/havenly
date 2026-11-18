@@ -36,27 +36,29 @@ export default function SavedScreen() {
   const myUniversity = profile?.university ?? null;
   const compareCount = useCompareIds().length;
 
-  const [rows, setRows] = useState<Residence[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  const [failed, setFailed] = useState(false);
+  // The loaded list is tagged with the account it was loaded for. A slow load that finishes after the
+  // account changed is tagged with the old account and is never shown, so one person never sees another's
+  // saved places on a shared device.
+  const [data, setData] = useState<{ owner: string | undefined; rows: Residence[]; failed: boolean } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const current = data && data.owner === myId ? data : null;
+  const loaded = current !== null;
+  const rows = useMemo(() => current?.rows ?? [], [current]);
+  const failed = current?.failed ?? false;
 
   const load = useCallback(async () => {
-    if (!myId) { setRows([]); setLoaded(true); return; }
+    if (!myId) { setData({ owner: myId, rows: [], failed: false }); return; }
     try {
       const saved = await supabase.from('saved_residences').select('residence_id, created_at').eq('user_id', myId).order('created_at', { ascending: false });
       if (saved.error) throw saved.error;
       const ids = ((saved.data as { residence_id: string }[]) ?? []).map((r) => r.residence_id);
-      if (ids.length === 0) { setRows([]); setFailed(false); setLoaded(true); return; }
+      if (ids.length === 0) { setData({ owner: myId, rows: [], failed: false }); return; }
       const res = await supabase.from('residences').select('*, room_types(*)').eq('is_active', true).in('id', ids);
       if (res.error) throw res.error;
-      setRows(orderByIds((res.data as Residence[]) ?? [], ids));
-      setFailed(false);
+      setData({ owner: myId, rows: orderByIds((res.data as Residence[]) ?? [], ids), failed: false });
     } catch {
-      setRows([]);
-      setFailed(true);
+      setData({ owner: myId, rows: [], failed: true });
     }
-    setLoaded(true);
   }, [myId]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
@@ -70,14 +72,16 @@ export default function SavedScreen() {
   const unsave = async (r: Residence) => {
     if (!myId) return;
     const index = rows.findIndex((x) => x.id === r.id);
-    setRows((prev) => prev.filter((x) => x.id !== r.id));
+    const edit = (change: (list: Residence[]) => Residence[]) =>
+      setData((prev) => (prev && prev.owner === myId ? { ...prev, rows: change(prev.rows) } : prev));
+    edit((list) => list.filter((x) => x.id !== r.id));
     try {
       await setResidenceSaved(myId, r.id, false);
     } catch {
       // Put back only this place, so another removal that already succeeded stays removed.
-      setRows((prev) => {
-        if (prev.some((x) => x.id === r.id)) return prev;
-        const next = [...prev];
+      edit((list) => {
+        if (list.some((x) => x.id === r.id)) return list;
+        const next = [...list];
         next.splice(Math.min(Math.max(index, 0), next.length), 0, r);
         return next;
       });
@@ -110,7 +114,7 @@ export default function SavedScreen() {
       <View style={styles.container}>
         {header}
         <StateBlock icon="alert-circle" kind="error" title="We could not load your saved places" body="Check your connection and try again. Nothing you saved has been lost."
-          primary={{ label: 'Try again', onPress: () => { setLoaded(false); load(); } }} />
+          primary={{ label: 'Try again', onPress: () => { setData(null); load(); } }} />
       </View>
     );
   }
