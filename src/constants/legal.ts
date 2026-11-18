@@ -33,6 +33,7 @@ export const PRIVACY_POLICY: LegalDocument = {
         'Messages: your messages, including one-to-one chats and any group conversations you are already part of.',
         'Location: only while you use the map or location-based sorting, and only if you allow it. We don\'t track your location in the background.',
         'Housing: residences you save, and enquiries you send: move-in month, length of stay, room, budget, viewing availability, your message and the phone or WhatsApp number you give us. If you sign with a residence, we record the contract value so we can work out the fee the residence owes us.',
+        'Housemate card (optional): if you make one, the area you want to live in, up to five lifestyle tags, a short note, how many housemates you need and which home, if any. It also shows your display name, university, gender (if you gave it), budget and move-in month from your profile. Your gender is optional and is used only to match housemate preferences.',
         'Safety: people you block and reports you make.',
         'Technical data: standard logs from our hosting provider (such as IP address, device type and request times), and, when crash reporting is switched on, crash reports when the app hits an error, used to keep the service running and secure.',
       ],
@@ -43,6 +44,7 @@ export const PRIVACY_POLICY: LegalDocument = {
         'To run the app: show your profile, messages, saved places, the map and housing listings.',
         'To show you how far each place is from your university.',
         'To pass your housing enquiries to the residence you contacted and follow them up.',
+        'To show your housemate card to other students whose housemate preference matches yours, after our team has checked it, and to let them message you.',
         'To calculate and invoice the referral fees residences pay us.',
         'To send you in-app notifications, for example when your enquiry moves forward.',
         'To keep Havenly safe: reviewing reports, enforcing our terms and preventing abuse.',
@@ -54,6 +56,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       bullets: [
         'Other Havenly users you message can see your display name, username and profile photo. Messages are visible only to the people in that conversation.',
         'Residences you enquire with receive your name, university, phone or WhatsApp number and your enquiry details, so they can contact you. Once they have it, they handle it under their own privacy policy.',
+        'Other Havenly students can see your housemate card, if you publish one, but only students whose "who I would live with" choice matches yours and whom you have not blocked. They never see your phone number or email, and they contact you through a Havenly message request. Our team reads cards to check them.',
         'Service providers who run parts of Havenly for us: Supabase (database, accounts and file storage), Mapbox (maps) and Sentry (crash reports, when switched on, which record what went wrong and on which screen, linked to your account ID at most and never to your name, email or messages). They process data only to provide their service.',
         'Authorities, where UAE law requires us to.',
       ],
@@ -77,6 +80,7 @@ export const PRIVACY_POLICY: LegalDocument = {
         'Edit your profile, university and housing preferences at any time.',
         'Turn off location access in your phone\'s settings; the map then shows Dubai without your position.',
         'Block anyone, and report people or messages.',
+        'Switch your housemate card off or remove it at any time from My card.',
         'Delete your account from Profile.',
         `Ask us for a copy of your information, to correct it, or to delete it, by emailing ${LEGAL_CONTACT_EMAIL}. We reply within 30 days.`,
       ],
@@ -133,6 +137,15 @@ export const TERMS_OF_USE: LegalDocument = {
         'Any tenancy, deposit or payment is between you and the residence, on their terms. Havenly never collects rent or deposits. Read the residence\'s contract carefully before you sign.',
         'Havenly is free for students. Residences may pay Havenly a referral fee when a student we introduced signs with them.',
         'Listings are written from information residences give us. We check them, but we can\'t guarantee availability, prices or descriptions. Confirm details with the residence, and visit before you commit. For your safety, meet residences at their premises and never pay anyone through Havenly messages.',
+      ],
+    },
+    {
+      heading: 'Housemates',
+      paragraphs: [
+        'The housemate board helps students who want to live together find each other. You must be 18 or over. Havenly does not list bed spaces or sublets, and the board is not a place to advertise them. It is for friends and students taking a whole home together, on one lease and with the landlord\'s agreement.',
+        'Shared housing in Dubai is regulated. Before you share a home, check that the home may be shared and that every person who lives there is on the tenancy or has the landlord\'s written consent.',
+        'Our team checks each card before it appears and may hide a card that breaks these terms. Be honest on your card. Do not post contact details, ask for money, or contact someone who has not replied. You can block and report anyone.',
+        'Havenly introduces students to each other. We do not check who anyone is beyond what they tell us, we are not responsible for what students agree between themselves, and we are not a party to any arrangement between housemates.',
       ],
     },
     {

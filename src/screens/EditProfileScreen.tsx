@@ -38,6 +38,7 @@ export default function EditProfileScreen() {
   const [budgetText, setBudgetText] = useState(profile?.budget_aed != null ? String(profile.budget_aed) : '');
   const [moveIn, setMoveIn] = useState<string | null>(profile?.move_in_month ?? null);
   const [housemates, setHousemates] = useState<HousematePref | null>(profile?.housemate_pref ?? null);
+  const [gender, setGender] = useState<'female' | 'male' | null>(profile?.gender ?? null);
   const months = useMemo(() => upcomingMonths(12), []);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -53,6 +54,7 @@ export default function EditProfileScreen() {
     || budgetText.trim() !== (profile?.budget_aed != null ? String(profile.budget_aed) : '')
     || moveIn !== (profile?.move_in_month ?? null)
     || housemates !== (profile?.housemate_pref ?? null)
+    || gender !== (profile?.gender ?? null)
   ));
 
   const pickAvatar = async () => {
@@ -94,6 +96,7 @@ export default function EditProfileScreen() {
         budget_aed: budget.value,
         move_in_month: moveIn,
         housemate_pref: housemates,
+        gender,
       }).eq('id', session.user.id);
 
       if (updateError) {
@@ -191,6 +194,19 @@ export default function EditProfileScreen() {
           );
         })}
       </View>
+
+      <Text style={styles.label}>My gender (optional)</Text>
+      <View style={styles.chipGrid}>
+        {([{ key: 'female', label: 'Woman' }, { key: 'male', label: 'Man' }] as const).map((o) => {
+          const on = gender === o.key;
+          return (
+            <AnimatedPressable key={o.key} style={[styles.chip, on && styles.chipOn]} onPress={() => { haptics.tap(); setGender(on ? null : o.key); }} accessibilityRole="button" accessibilityState={{ selected: on }}>
+              <Text style={[styles.chipText, on && styles.chipTextOn]}>{o.label}</Text>
+            </AnimatedPressable>
+          );
+        })}
+      </View>
+      <Text style={styles.sectionHint}>Used only to match housemate preferences. It is shown on your housemate card, if you make one, and nowhere else.</Text>
 
       <Text style={styles.label}>I would live with</Text>
       <View style={styles.chipGrid}>

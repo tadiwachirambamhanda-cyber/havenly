@@ -10,6 +10,8 @@ export interface Profile {
   has_completed_onboarding: boolean; is_admin: boolean; created_at: string;
   // What the student is looking for (all optional).
   budget_aed: number | null; move_in_month: string | null; housemate_pref: 'any' | 'female_only' | 'male_only' | null;
+  // Optional; used only to match housemate preferences.
+  gender: 'female' | 'male' | null;
 }
 
 export interface Post {

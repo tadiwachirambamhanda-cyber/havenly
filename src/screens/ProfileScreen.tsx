@@ -193,6 +193,18 @@ export default function ProfileScreen() {
         </View>
       </Pressable>
 
+      <Text style={[styles.section, styles.sectionPad]}>Housemates</Text>
+      <View style={styles.card}>
+        <View style={styles.housemateBody}>
+          <Text style={styles.enquiryName}>Want to live with other students?</Text>
+          <Text style={styles.muted2}>Make a card so students who want to live together can find you. The team checks every card first.</Text>
+          <View style={styles.housemateBtns}>
+            <OutlineButton label="See the board" icon="users" onPress={() => navigation.navigate('HousemateBoard')} height={44} />
+            <OutlineButton label="My card" onPress={() => navigation.navigate('MyHousemateCard')} height={44} />
+          </View>
+        </View>
+      </View>
+
       <Text style={[styles.section, styles.sectionPad]}>Account</Text>
       <View style={styles.card}>
         {email ? (
@@ -264,6 +276,8 @@ function createStyles(colors: ColorTokens) {
     statusChip: { backgroundColor: colors.tintBg, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 5 },
     statusText: { fontSize: 12, fontWeight: '700', color: colors.tintText },
     prefRow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, paddingHorizontal: 16, paddingVertical: 12 },
+    housemateBody: { padding: 16, gap: 6 },
+    housemateBtns: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 10 },
     prefText: { fontSize: 15, lineHeight: 21, color: colors.ink },
     accountRow: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 52, paddingHorizontal: 16 },
     accountLabel: { fontSize: 14, color: colors.inkSoft },

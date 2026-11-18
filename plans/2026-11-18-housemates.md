@@ -43,3 +43,16 @@ Compatibility scores or swiping, photos on cards, verifying students by universi
 2. Cards go live only after the team approves them (my recommendation), or instantly with report and hide after the fact?
 3. Gender is an optional profile field used only for matching, and shown on the card if given: OK?
 4. Please merge PR 36 first; this feature uses the budget and move-in month saved there.
+
+## Changes from the plan
+- The owner approved: apply the migration, team approval before a card goes live, an optional gender field. PR 36 was merged first. Migration `20261118500000_housemates.sql` was applied live and recorded with `supabase migration repair`.
+- A new sign-in reason `housemates` ("Make a free account to find housemates"). The `join` copy lost its "join in" social wording.
+- The demo answers the board with two sample cards (reads only; Say hi and publishing stay blocked as in all demo writes).
+- Edit profile's gender and the card screen explain the matching in plain words (`visibilityExplainer`), including the case where someone prefers one gender but has not given their own (nobody sees them, and they see no one).
+- The My card screen scrolls to its error at the top, because the Publish button is at the bottom of a long form.
+
+## Verification
+1. typecheck, lint (no warnings), 114 tests (12 new for card rules and wording), expo-doctor 20/20, export for web, iOS and Android pass.
+2. **Matching tested live in a block that rolled back** with six test users (woman women-only, man anyone, woman anyone, no gender anyone, a second woman, man men-only), every viewer in turn: a women-only woman sees only women who accept her; a man sees men and "anyone" women; a student with no gender sees and is seen only by "anyone" cards; the men-only student sees only the man. Also verified: a student reads only their own row of the table; cannot set status; cannot approve; editing an approved card sends it back to pending; a block hides both sides; inactive and hidden cards vanish; filters; a signed-out caller cannot call the board; a live card needs budget and move-in month; more than 5 tags, an unknown tag, a note over 280 characters and a card tied to a non-home are refused. Afterwards: 0 test users, 0 cards.
+3. Browser demo: signed-out Find housemates opens the sign-up sheet with the new wording; the board shows sample cards with filters, Report, Block, and Say hi is blocked with the demo message; My card shows the form, the explainer and the switch; a whole-home page shows "1 student is looking for housemates here" and opens the board.
+4. Not tested: real accounts end to end (two test accounts, a test home and an approval), a card tied to a real whole home (there are no listings), and a phone.

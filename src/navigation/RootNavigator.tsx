@@ -19,6 +19,9 @@ import NotificationsScreen from '@/screens/NotificationsScreen';
 import BlockedUsersScreen from '@/screens/BlockedUsersScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
 import ChangePasswordScreen from '@/screens/ChangePasswordScreen';
+import HousemateBoardScreen from '@/screens/HousemateBoardScreen';
+import MyHousemateCardScreen from '@/screens/MyHousemateCardScreen';
+import HousemateReviewScreen from '@/screens/HousemateReviewScreen';
 import EditProfileScreen from '@/screens/EditProfileScreen';
 import OffersScreen from '@/screens/OffersScreen';
 import OfferDetailScreen from '@/screens/OfferDetailScreen';
@@ -40,7 +43,7 @@ import SignInToContinueScreen from '@/screens/SignInToContinueScreen';
 import LegalScreen from '@/screens/LegalScreen';
 
 // Why a signed-out visitor is being asked to make an account (shown in SignInToContinue).
-export type AccountReason = 'save' | 'enquire' | 'compare' | 'join' | 'login';
+export type AccountReason = 'save' | 'enquire' | 'compare' | 'join' | 'login' | 'housemates';
 
 export type RootStackParamList = {
   Onboarding: undefined;
@@ -50,6 +53,9 @@ export type RootStackParamList = {
   BlockedUsers: undefined;
   Settings: undefined;
   ChangePassword: undefined;
+  HousemateBoard: { residenceId?: string } | undefined;
+  MyHousemateCard: { residenceId?: string } | undefined;
+  HousemateReview: undefined;
   EditProfile: undefined;
   Offers: undefined;
   OfferDetail: { offerId: string };
@@ -161,6 +167,9 @@ export default function RootNavigator() {
             <Stack.Screen name="BlockedUsers" component={BlockedUsersScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+            <Stack.Screen name="HousemateBoard" component={HousemateBoardScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="MyHousemateCard" component={MyHousemateCardScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="HousemateReview" component={HousemateReviewScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Offers" component={OffersScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="OfferDetail" component={OfferDetailScreen} options={{ presentation: 'card' }} />

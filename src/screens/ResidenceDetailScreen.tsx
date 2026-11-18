@@ -9,6 +9,7 @@ import PhotoPlaceholder from '@/components/PhotoPlaceholder';
 import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
+import { countForHome } from '@/lib/housematesApi';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
@@ -55,6 +56,7 @@ export default function ResidenceDetailScreen() {
   const [photoIndex, setPhotoIndex] = useState(0);
   const [openEnquiryStatus, setOpenEnquiryStatus] = useState<EnquiryStatus | null>(null);
   const [compareFull, setCompareFull] = useState(false);
+  const [housemateCount, setHousemateCount] = useState(0);
   // Once the photo has scrolled away, a solid strip keeps the floating buttons readable.
   const [pastHero, setPastHero] = useState(false);
 
@@ -76,6 +78,9 @@ export default function ResidenceDetailScreen() {
         row.room_types = [...row.room_types].sort((a, b) => a.sort_order - b.sort_order || annualPrice(a) - annualPrice(b));
       }
       setResidence(row);
+      // How many students are looking for housemates for this whole home (only for signed-in students).
+      if (row?.listing_type === 'home' && myId) countForHome(residenceId).then(setHousemateCount);
+      else setHousemateCount(0);
       setSaved(!!savedRes.data);
       setOpenEnquiryStatus(((enquiryRes.data as { status: EnquiryStatus }[]) ?? [])[0]?.status ?? null);
       setFailed(false);
@@ -269,6 +274,18 @@ export default function ResidenceDetailScreen() {
               <Text style={styles.muted}>The price is not listed yet. Send an enquiry and the Havenly team will confirm it.</Text>
             )}
             {home ? <OutlineButton label="Split the rent" icon="users" onPress={() => navigation.navigate('SplitRent', { residenceId })} style={{ marginTop: 14 }} /> : null}
+            {home ? (
+              <View style={{ marginTop: 10, gap: 8 }}>
+                <OutlineButton
+                  label={housemateCount > 0 ? `${housemateCount} ${housemateCount === 1 ? 'student is' : 'students are'} looking for housemates here` : 'Find housemates for this home'}
+                  icon="users"
+                  onPress={() => { if (requireAccount('housemates', residenceId)) navigation.navigate(housemateCount > 0 ? 'HousemateBoard' : 'MyHousemateCard', { residenceId }); }}
+                />
+                {housemateCount > 0 ? (
+                  <OutlineButton label="Look for housemates for this home myself" onPress={() => { if (requireAccount('housemates', residenceId)) navigation.navigate('MyHousemateCard', { residenceId }); }} />
+                ) : null}
+              </View>
+            ) : null}
           </View>
 
           <OutlineButton
