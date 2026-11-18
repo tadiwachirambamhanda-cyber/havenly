@@ -1938,7 +1938,8 @@ as $$
   where v.id = viewer and o.id = owner;
 $$;
 
--- 5. The board: approved, live, compatible cards, not yours, no block either way.
+-- 5. The board: approved, live, compatible cards, not yours, no block either way. A home is shown only while it
+-- is still a listed whole home (20261118510000_housemates_home_checks.sql).
 create or replace function public.housemate_board(
   p_university text default null,
   p_max_budget int default null,
@@ -1957,9 +1958,10 @@ set search_path to 'public'
 as $$
   select c.user_id, p.display_name, p.university, p.gender, p.budget_aed, p.move_in_month,
          c.area, c.lifestyle, c.note,
-         case when r.is_active then c.residence_id end,
-         case when r.is_active then r.name end,
-         c.spots_needed, c.updated_at
+         case when r.is_active and r.listing_type = 'home' then c.residence_id end,
+         case when r.is_active and r.listing_type = 'home' then r.name end,
+         case when r.is_active and r.listing_type = 'home' then c.spots_needed end,
+         c.updated_at
   from housemate_cards c
   join profiles p on p.id = c.user_id
   left join residences r on r.id = c.residence_id
@@ -1973,12 +1975,11 @@ as $$
     and (p_max_budget is null or p.budget_aed <= p_max_budget)
     and (p_move_in is null or p.move_in_month = p_move_in)
     and (p_area is null or c.area ilike '%' || p_area || '%')
-    and (p_residence is null or c.residence_id = p_residence)
+    and (p_residence is null or (c.residence_id = p_residence and r.is_active and r.listing_type = 'home'))
   order by c.updated_at desc
   limit 100;
 $$;
 
--- How many students are looking for housemates for one home (for its page).
 create or replace function public.housemates_for_home(p_residence uuid)
 returns int
 language sql
@@ -1988,6 +1989,7 @@ set search_path to 'public'
 as $$
   select count(*)::int
   from housemate_cards c
+  join residences r on r.id = c.residence_id and r.is_active and r.listing_type = 'home'
   where auth.uid() is not null
     and c.residence_id = p_residence and c.status = 'approved' and c.active
     and c.user_id <> auth.uid()

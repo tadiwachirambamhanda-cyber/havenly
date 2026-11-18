@@ -30,7 +30,13 @@ type Route = RouteProp<RootStackParamList, 'MyHousemateCard'>;
 
 interface HomeOption { id: string; name: string; area: string }
 
+// Keyed by the account, so the form starts fresh if the signed-in account ever changes while it is open.
 export default function MyHousemateCardScreen() {
+  const { session } = useAuth();
+  return <MyHousemateCardForm key={session?.user.id ?? 'signed-out'} />;
+}
+
+function MyHousemateCardForm() {
   const navigation = useNavigation<Nav>();
   const startHome = useRoute<Route>().params?.residenceId ?? null;
   const insets = useSafeAreaInsets();
