@@ -1,3 +1,4 @@
+import { RN_SETTLE } from '@/theme/motion';
 import React, { useRef, useState } from 'react';
 import { Animated, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/Text';
@@ -23,7 +24,7 @@ export default function SwipeToAction({ children, actionLabel, onAction }: Props
 
   const close = () => {
     offset.current = 0;
-    Animated.spring(translateX, { toValue: 0, useNativeDriver: true, friction: 8 }).start();
+    Animated.timing(translateX, { toValue: 0, useNativeDriver: true, ...RN_SETTLE }).start();
   };
 
   // Where this touch started, and how far it has moved since the swipe was
@@ -37,7 +38,7 @@ export default function SwipeToAction({ children, actionLabel, onAction }: Props
     const next = offset.current + lastDx.current;
     offset.current = next < -ACTION_WIDTH / 2 ? -ACTION_WIDTH : 0;
     lastDx.current = 0;
-    Animated.spring(translateX, { toValue: offset.current, useNativeDriver: true, friction: 8 }).start();
+    Animated.timing(translateX, { toValue: offset.current, useNativeDriver: true, ...RN_SETTLE }).start();
   };
 
   return (

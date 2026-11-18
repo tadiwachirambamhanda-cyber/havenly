@@ -1,3 +1,4 @@
+import { RN_TOAST_IN } from '@/theme/motion';
 import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/Text';
@@ -30,7 +31,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     translateY.setValue(-80);
     opacity.setValue(0);
     Animated.parallel([
-      Animated.spring(translateY, { toValue: 0, useNativeDriver: true, friction: 8, tension: 60 }),
+      Animated.timing(translateY, { toValue: 0, useNativeDriver: true, ...RN_TOAST_IN }),
       Animated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }),
     ]).start();
     timeoutRef.current = setTimeout(() => {

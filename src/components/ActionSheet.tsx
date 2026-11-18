@@ -1,3 +1,4 @@
+import { SHEET_IN } from '@/theme/motion';
 import React, { useMemo } from 'react';
 import { Modal, View, Pressable, StyleSheet } from 'react-native';
 import { Text } from '@/components/Text';
@@ -38,7 +39,7 @@ export default function ActionSheet({ visible, onClose, title, message, actions,
             entering animation — the card remounts each time the Modal opens
             (RN unmounts a Modal's children while visible=false), so this
             replays on every open without any manual state tracking. */}
-        <Animated.View entering={SlideInDown.springify().damping(20).stiffness(220)}>
+        <Animated.View entering={SlideInDown.duration(SHEET_IN.duration).easing(SHEET_IN.easing)}>
           <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
             {(title || message) && (
               <View style={styles.header}>

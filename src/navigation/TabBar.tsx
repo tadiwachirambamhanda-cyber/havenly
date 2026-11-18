@@ -4,7 +4,8 @@ import { Text } from '@/components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon, { type IconName } from '@/components/Icon';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { TAB_SLIDE } from '@/theme/motion';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { useTheme } from '@/lib/ThemeContext';
 import type { ColorTokens } from '@/theme/tokens';
@@ -38,8 +39,8 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
   const activeLayout = itemLayouts[state.index];
   React.useEffect(() => {
     if (!activeLayout) return;
-    indicatorX.value = withSpring(activeLayout.x, { damping: 18, stiffness: 220 });
-    indicatorWidth.value = withSpring(activeLayout.width, { damping: 18, stiffness: 220 });
+    indicatorX.value = withTiming(activeLayout.x, TAB_SLIDE);
+    indicatorWidth.value = withTiming(activeLayout.width, TAB_SLIDE);
   }, [activeLayout, indicatorX, indicatorWidth]);
 
   const indicatorStyle = useAnimatedStyle(() => ({

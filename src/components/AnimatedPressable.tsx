@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, type PressableProps, type StyleProp, type ViewStyle } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { PRESS_IN, PRESS_OUT } from '@/theme/motion';
 
 const Base = Animated.createAnimatedComponent(Pressable);
 
@@ -22,11 +23,11 @@ export default function AnimatedPressable({ style, scaleTo = 0.97, onPressIn, on
     <Base
       style={[style, animatedStyle]}
       onPressIn={(e) => {
-        scale.set(withSpring(scaleTo, { damping: 16, stiffness: 400 }));
+        scale.set(withTiming(scaleTo, PRESS_IN));
         onPressIn?.(e);
       }}
       onPressOut={(e) => {
-        scale.set(withSpring(1, { damping: 16, stiffness: 400 }));
+        scale.set(withTiming(1, PRESS_OUT));
         onPressOut?.(e);
       }}
       {...rest}

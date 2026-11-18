@@ -1,3 +1,4 @@
+import { SHEET_IN } from '@/theme/motion';
 import React, { useMemo } from 'react';
 import { Modal, Pressable, StyleSheet } from 'react-native';
 import { Text } from '@/components/Text';
@@ -20,7 +21,7 @@ export default function ReportModal({ visible, onClose, onSubmit }: Props) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
-        <Animated.View entering={SlideInDown.springify().damping(20).stiffness(220)}>
+        <Animated.View entering={SlideInDown.duration(SHEET_IN.duration).easing(SHEET_IN.easing)}>
           <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
             <Text style={styles.title}>Why are you reporting this?</Text>
             {REASONS.map((reason) => (
