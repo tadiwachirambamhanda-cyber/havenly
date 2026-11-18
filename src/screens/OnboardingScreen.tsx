@@ -93,7 +93,7 @@ export default function OnboardingScreen() {
 
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
-  // Fixed dark hero regardless of app theme (same as Login/SignUp), so its
+  // Fixed dark hero regardless of app theme (same as Login), so its
   // text stays literal cream rather than colors.sand.
   container: { flex: 1, backgroundColor: '#2A2118' },
   hero: { paddingHorizontal: spacing.xl, paddingTop: 52, paddingBottom: 12 },

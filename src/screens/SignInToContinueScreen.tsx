@@ -20,12 +20,14 @@ const TITLE: Record<AccountReason, string> = {
   enquire: 'Make a free account to send your enquiry',
   save: 'Make a free account to save places',
   compare: 'Make a free account to compare places',
+  join: 'Make a free account',
 };
 
 const WHY: Record<AccountReason, string> = {
   enquire: 'So the Havenly team and the provider can reach you about this place.',
   save: 'So your saved places are kept for you on any device.',
   compare: 'So the places you compare are kept for you.',
+  join: 'So you can save places, send enquiries and join in.',
 };
 
 export default function SignInToContinueScreen() {

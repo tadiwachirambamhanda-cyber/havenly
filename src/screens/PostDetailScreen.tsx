@@ -766,7 +766,7 @@ function createStyles(colors: ColorTokens) {
   // Fixed black background regardless of theme — a full-screen video player
   // reads the same way (and the overlaid white text/icons stay legible)
   // whether the app is in light or dark mode, same reasoning as the
-  // Login/SignUp hero always being a fixed dark panel.
+  // Login hero always being a fixed dark panel.
   videoContainer: { flex: 1, backgroundColor: '#000' },
   videoBack: {
     position: 'absolute', left: 16, width: 34, height: 34, borderRadius: 17,
