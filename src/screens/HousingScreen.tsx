@@ -148,6 +148,9 @@ export default function HousingScreen() {
           <AnimatedPressable style={styles.iconBtn} onPress={() => navigation.navigate('Map')} accessibilityRole="button" accessibilityLabel="See the homes on a map">
             <Icon name="map-pin" size={18} color={colors.ink} />
           </AnimatedPressable>
+          <AnimatedPressable style={styles.iconBtn} onPress={() => { if (requireAccount('housemates')) navigation.navigate('HousemateBoard'); }} accessibilityRole="button" accessibilityLabel="Find housemates">
+            <Icon name="users" size={18} color={colors.ink} />
+          </AnimatedPressable>
           {myId ? (
             <AnimatedPressable style={styles.iconBtn} onPress={() => navigation.navigate('MyEnquiries')} accessibilityRole="button" accessibilityLabel="My enquiries">
               <Icon name="clipboard" size={18} color={colors.ink} />

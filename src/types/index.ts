@@ -8,8 +8,9 @@ export interface Profile {
   avatar_url: string | null; cover_url: string | null; university: string | null; interests: Interest[];
   current_streak: number; longest_streak: number; last_active_date: string | null;
   has_completed_onboarding: boolean; is_admin: boolean; created_at: string;
-  // What the student is looking for (all optional).
-  budget_aed: number | null; move_in_month: string | null; housemate_pref: 'any' | 'female_only' | 'male_only' | null;
+  // Private fields (table profile_private): only present on your own profile, never on other students'.
+  budget_aed?: number | null; move_in_month?: string | null; housemate_pref?: 'any' | 'female_only' | 'male_only' | null;
+  gender?: 'female' | 'male' | null;
 }
 
 export interface Post {

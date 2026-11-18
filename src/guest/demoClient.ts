@@ -1,7 +1,7 @@
 // An in-memory stand-in for the Supabase client, used only in guest mode. It
 // answers reads from the sample fixtures and refuses every write. It never makes
 // a network request.
-import { createFixtures, type FixtureTables } from './fixtures';
+import { createFixtures, GUEST_HOUSEMATE_CARDS, type FixtureTables } from './fixtures';
 import { exitGuestMode, notifyGuestBlocked } from './guestState';
 
 export const GUEST_BLOCKED_MESSAGE = 'Create an account to do this.';
@@ -184,7 +184,13 @@ export function createDemoClient(data: FixtureTables = createFixtures()): any {
   const blocked = () => Promise.resolve(blockedResult());
   return {
     from: (table: string) => new Query(table, data),
-    rpc: (name: string) => (name === 'bump_streak' ? Promise.resolve(blockedResult(true)) : blocked()),
+    rpc: (name: string) => {
+      if (name === 'bump_streak') return Promise.resolve(blockedResult(true));
+      // Reads for the housemate board are answered with sample cards; every write stays blocked.
+      if (name === 'housemate_board') return Promise.resolve({ data: GUEST_HOUSEMATE_CARDS, error: null });
+      if (name === 'housemates_for_home') return Promise.resolve({ data: 1, error: null });
+      return blocked();
+    },
     channel: () => channelStub(),
     removeChannel: () => Promise.resolve('ok'),
     removeAllChannels: () => Promise.resolve([]),

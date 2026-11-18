@@ -31,13 +31,12 @@ function profile(id: string, username: string, display_name: string, bio: string
     id, username, display_name, bio, avatar_url: null, cover_url: null, university,
     interests: interests as Profile['interests'], current_streak: 4, longest_streak: 9,
     last_active_date: null, has_completed_onboarding: true, is_admin: false, created_at: daysAgo(40),
-    budget_aed: null, move_in_month: null, housemate_pref: null,
   };
 }
 
 export const GUEST_PROFILE: Profile = {
   ...profile(GUEST_USER_ID, 'guest_demo', 'Guest', 'Looking around Havenly in demo mode.', 'Murdoch University Dubai', ['cafes', 'fitness', 'padel']),
-  budget_aed: 3000, move_in_month: nextMonthStart(), housemate_pref: 'any',
+  budget_aed: 3000, move_in_month: nextMonthStart(), housemate_pref: 'any', gender: null,
   current_streak: 3,
   longest_streak: 3,
 };
@@ -198,6 +197,7 @@ const empty = (): Row[] => [];
 export function createFixtures(): FixtureTables {
   return {
     profiles: profiles as unknown as Row[],
+    profile_private: [{ user_id: GUEST_USER_ID, budget_aed: 3000, move_in_month: nextMonthStart(), housemate_pref: 'any', gender: null }],
     posts, comments, communities, events, residences, room_types, brands, offers,
     community_members: [],
     follows: [],
@@ -217,3 +217,13 @@ export function createFixtures(): FixtureTables {
     residence_partner_terms: empty(),
   };
 }
+
+// Sample cards for the demo's housemate board (the demo never reaches the real database).
+export const GUEST_HOUSEMATE_CARDS = [
+  { user_id: 'sample-card-1', display_name: 'Nora', university: 'Murdoch University Dubai', gender: 'female', budget_aed: 2800, move_in_month: nextMonthStart(),
+    area: 'Dubai Knowledge Park', lifestyle: ['quiet', 'non_smoker', 'studies_at_home'], note: 'Second-year business student. Looking for one or two calm housemates. Sample card.',
+    residence_id: null, residence_name: null, spots_needed: null, updated_at: daysAgo(1) },
+  { user_id: 'sample-card-2', display_name: 'Karim', university: 'Murdoch University Dubai', gender: 'male', budget_aed: 3200, move_in_month: nextMonthStart(),
+    area: 'Jumeirah Lake Towers', lifestyle: ['night_owl', 'social', 'guests_ok'], note: 'Taking the 3 bedroom in JLT with a friend and need one more. Sample card.',
+    residence_id: 'residence-4', residence_name: 'Sample Home, Jumeirah Lake Towers', spots_needed: 1, updated_at: daysAgo(2) },
+];
