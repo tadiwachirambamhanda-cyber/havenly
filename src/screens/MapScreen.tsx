@@ -634,7 +634,7 @@ export default function MapScreen() {
         <Icon name="search" size={15} color={colors.inkSoft} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search events, offers, housing, friends…"
+          placeholder="Search a home or an area"
           placeholderTextColor={colors.inkSoft}
           value={searchQuery}
           onChangeText={setSearchQuery}

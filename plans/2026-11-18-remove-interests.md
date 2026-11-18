@@ -26,3 +26,8 @@ Deleting the offers (perks) code or its "interested" button, the database column
 
 ## Questions
 None.
+
+## Codex review
+Round 1: VERDICT FINDINGS(2).
+1. MAJOR, `legal.ts:33`: the policy said one-to-one messages only, but group chats that already exist are still stored and open. **Fixed:** it now says messages, including one-to-one chats and any group conversations you are already part of.
+2. MINOR, `MapScreen.tsx:637`: the search box still said "events, offers, housing, friends". **Fixed:** "Search a home or an area".

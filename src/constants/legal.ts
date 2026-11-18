@@ -30,7 +30,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       bullets: [
         'Account details: your email address and password. Passwords are stored encrypted by our authentication provider; we never see them.',
         'Your profile: display name, username, bio, profile and cover photos, and university.',
-        'Messages: your one-to-one messages.',
+        'Messages: your messages, including one-to-one chats and any group conversations you are already part of.',
         'Location: only while you use the map, and only if you allow it. We don\'t track your location in the background.',
         'Housing: residences you save, and enquiries you send: move-in month, length of stay, room, budget, viewing availability, your message and the phone or WhatsApp number you give us. If you sign with a residence, we record the contract value so we can work out the fee the residence owes us.',
         'Safety: people you block and reports you make.',
