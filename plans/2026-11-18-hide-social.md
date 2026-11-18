@@ -29,7 +29,9 @@ Follows F4 (Housing first). Not a new feature ID. Done check: I log in and see e
 4. **Clean the entry points** that led to them: Profile (posts grid, follower counts, perks rows), Inbox (new-group button, shared-post cards), Chat (tap on a person, shared posts), Settings ("Create event"), Map (event pins and popups; offer pins removed too, since perks are unlinked), Onboarding (interest steps that lead nowhere). Run: typecheck, then tap through each screen.
 5. **Bell.** `NotificationsScreen.tsx` lists only `enquiry_new` and `enquiry_status` and opens the enquiry; follow, like, comment and offer notifications are not shown. Run: demo and a signed-in check.
 6. **Demo mode and tests.** Remove the social sample content from `src/guest/` only where a removed screen needed it, and keep the guest tests passing (never weakened; a test of a removed feature is removed with it and said so here). Run: `npm test`.
-7. **Checks.** typecheck, lint, tests, expo-doctor, `expo export`; walk the app in light and dark.
+7. **Dead-link test.** A permanent test reads every `navigate('Name')` and `getParent()?.navigate('Name')` in `src/` and fails if `Name` is not a registered screen. Run: `npm test`.
+8. **Old data.** Notifications query asks only for `enquiry_new` and `enquiry_status`; a chat message that shared a post renders as plain text "Shared a post (no longer available)" and never opens it. Tests feed in old-style rows and check nothing crashes.
+9. **Checks.** typecheck, lint, tests, expo-doctor, `expo export`; walk the app in light and dark, scripted tap-through of every tab and screen with the console watched for errors.
 
 ## Files
 - Create: `docs/archive/social.md`, the git tag `archive/social-v1`.
