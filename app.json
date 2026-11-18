@@ -33,7 +33,10 @@
           "image": "./assets/splash.png",
           "imageWidth": 200,
           "backgroundColor": "#F3F0EA",
-          "dark": { "image": "./assets/splash-dark.png", "backgroundColor": "#151310" }
+          "dark": {
+            "image": "./assets/splash-dark.png",
+            "backgroundColor": "#151310"
+          }
         }
       ],
       "expo-font",
@@ -41,8 +44,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Havenly needs access to your photos to share them in a post.",
-          "cameraPermission": "Havenly needs access to your camera to take a photo or video for a post.",
+          "photosPermission": "Havenly needs access to your photos so you can add a picture to your profile or a listing.",
+          "cameraPermission": "Havenly needs access to your camera so you can take a picture for your profile or a listing.",
           "microphonePermission": "Havenly needs access to your microphone to record video for a post."
         }
       ],
@@ -50,10 +53,12 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Havenly uses your location to show offers, events, and check-ins near you."
+          "locationWhenInUsePermission": "Havenly uses your location to show homes near you on the map."
         }
       ],
-      "@sentry/react-native"
+      "@sentry/react-native",
+      "expo-image",
+      "expo-status-bar"
     ]
   }
 }
