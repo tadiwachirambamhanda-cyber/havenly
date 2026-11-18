@@ -315,7 +315,7 @@ export default function DiscoverScreen() {
           <Text style={styles.sectionLabel}>Communities</Text>
           {communities.map((c) => (
             <Pressable key={c.id} style={styles.resultRow} onPress={() => navigation.navigate('CommunityDetail', { communityId: c.id })}>
-              <View style={styles.resultIcon}><Icon name={communityIcon(c)} size={15} color={colors.teal} /></View>
+              <View style={styles.resultIcon}><Icon name={communityIcon(c)} size={15} color={colors.coral} /></View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.resultTitle}>{c.name}</Text>
                 <Text style={styles.resultSub}>{formatMembers(c.member_count)}</Text>
@@ -465,8 +465,8 @@ function createStyles(colors: ColorTokens) {
   },
   eventRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   eventDate: { width: 46, height: 46, borderRadius: radius.sm, backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },
-  eventDay: { fontSize: 15, lineHeight: 17, fontWeight: '800', color: colors.teal },
-  eventMonth: { fontSize: 8.5, textTransform: 'uppercase', fontWeight: '800', color: colors.teal },
+  eventDay: { fontSize: 15, lineHeight: 17, fontWeight: '800', color: colors.coral },
+  eventMonth: { fontSize: 8.5, textTransform: 'uppercase', fontWeight: '800', color: colors.inkSoft },
   eventName: { fontSize: 12.5, fontWeight: '700', color: colors.ink },
   eventLoc: { fontSize: 10.5, color: colors.inkSoft, marginTop: 2 },
   eventActions: { flexDirection: 'row', alignItems: 'center', gap: 10 },

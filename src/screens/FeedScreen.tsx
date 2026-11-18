@@ -530,7 +530,7 @@ export default function FeedScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.myCommunitiesRow}>
             {myCommunities.map((c) => (
               <Pressable key={c.id} style={styles.myCommunityChip} onPress={() => navigation.navigate('CommunityDetail', { communityId: c.id })}>
-                <Icon name={communityIcon(c)} size={12} color={colors.teal} />
+                <Icon name={communityIcon(c)} size={12} color={colors.coral} />
                 <Text style={styles.myCommunityChipText} numberOfLines={1}>{c.name}</Text>
               </Pressable>
             ))}
@@ -586,7 +586,7 @@ export default function FeedScreen() {
                   <Image source={{ uri: housingTeaser.photo }} style={styles.housingPhoto} contentFit="cover" transition={200} />
                 ) : (
                   <View style={[styles.housingPhoto, styles.housingPhotoEmpty]}>
-                    <Icon name="home" size={22} color={colors.gold} />
+                    <Icon name="home" size={22} color={colors.coral} />
                   </View>
                 )}
                 <View style={{ flex: 1 }}>
@@ -638,7 +638,7 @@ function createStyles(colors: ColorTokens) {
   },
   myCommunityChipText: { fontSize: 11.5, fontWeight: '700', color: colors.ink },
   communityBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
-  communityBadgeText: { fontSize: 9.5, fontWeight: '700', color: colors.teal },
+  communityBadgeText: { fontSize: 9.5, fontWeight: '700', color: colors.coral },
   sectionLabel: {
     fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 10,
   },
@@ -648,8 +648,8 @@ function createStyles(colors: ColorTokens) {
     borderRadius: radius.md,
   },
   housingPhoto: { width: 64, height: 64, borderRadius: radius.sm },
-  housingPhotoEmpty: { backgroundColor: `${colors.gold}26`, alignItems: 'center', justifyContent: 'center' },
-  housingEyebrow: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.teal },
+  housingPhotoEmpty: { backgroundColor: `${colors.coral}26`, alignItems: 'center', justifyContent: 'center' },
+  housingEyebrow: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft },
   housingTitle: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 15.5, color: colors.ink, marginTop: 2, lineHeight: 20 },
   housingSub: { fontSize: 12, color: colors.inkSoft, marginTop: 3 },
   dailyPickCard: {
@@ -664,21 +664,21 @@ function createStyles(colors: ColorTokens) {
   // Literal white/gold regardless of theme — this card is always a photo or
   // gradient with a dark overlay gradient under it, same reasoning as the
   // full-screen video layout's own white text.
-  dailyPickEyebrow: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10.5, color: colors.gold, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 },
+  dailyPickEyebrow: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10.5, color: colors.coral, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 },
   dailyPickTitle: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: 'white', lineHeight: 24 },
   dailyPickExcerpt: { fontSize: 12.5, color: 'rgba(255,255,255,0.75)', lineHeight: 18, marginTop: 6 },
   dailyPickMeta: { fontSize: 11.5, color: 'rgba(255,255,255,0.8)', fontWeight: '600', marginTop: 6 },
   masonryRow: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.lg },
   masonryColumn: { flex: 1, gap: spacing.sm },
   card: { borderRadius: radius.md, overflow: 'hidden', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
-  cardEditorial: { borderColor: colors.gold, borderWidth: 1.5 },
+  cardEditorial: { borderColor: colors.coral, borderWidth: 1.5 },
   cardImage: { justifyContent: 'flex-start', backgroundColor: colors.sandDeep },
   // Fixed dark plaque regardless of theme — colors.ink would flip to cream in
   // dark mode and break the gold text's contrast, so this one stays literal.
   editorialBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: '#1F1B16', paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.tag },
-  editorialBadgeText: { color: colors.gold, fontSize: 9, fontWeight: '700' },
+  editorialBadgeText: { color: colors.coral, fontSize: 9, fontWeight: '700' },
   cardBody: { padding: 11 },
-  cardTag: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 9.5, color: colors.teal, textTransform: 'uppercase', letterSpacing: 0.8 },
+  cardTag: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 9.5, color: colors.inkSoft, textTransform: 'uppercase', letterSpacing: 0.8 },
   cardTitle: { fontSize: 13.5, fontWeight: '700', marginTop: 5, color: colors.ink, lineHeight: 18 },
   cardExcerpt: { fontSize: 12, color: colors.inkSoft, marginTop: 5, lineHeight: 17 },
   cardMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 9 },

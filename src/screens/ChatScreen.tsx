@@ -257,7 +257,7 @@ export default function ChatScreen() {
                 <Image source={{ uri: conversation.icon_url }} style={styles.headerAvatar} transition={200} />
               ) : (
                 <View style={[styles.headerAvatar, styles.groupAvatar]}>
-                  <Icon name="users" size={16} color={colors.teal} />
+                  <Icon name="users" size={16} color={colors.coral} />
                 </View>
               )
             ) : otherUser?.avatar_url ? (
@@ -390,7 +390,7 @@ export default function ChatScreen() {
                 <Image source={{ uri: conversation.icon_url }} style={styles.groupIconEditImg} transition={200} />
               ) : (
                 <View style={[styles.groupIconEditImg, styles.groupAvatar]}>
-                  <Icon name="users" size={22} color={colors.teal} />
+                  <Icon name="users" size={22} color={colors.coral} />
                 </View>
               )}
               <View style={styles.groupIconEditBadge}>

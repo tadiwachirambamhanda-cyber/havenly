@@ -56,7 +56,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             <Icon
               name={toast.type === 'error' ? 'alert-circle' : 'check-circle'}
               size={15}
-              color={toast.type === 'error' ? colors.coral : colors.teal}
+              color={toast.type === 'error' ? colors.coral : colors.ink}
             />
             <Text style={styles.text} numberOfLines={2}>{toast.message}</Text>
           </View>

@@ -151,7 +151,7 @@ export default function CommunitiesScreen() {
           <Animated.View>
           <AnimatedPressable style={styles.card} onPress={() => navigation.navigate('CommunityDetail', { communityId: item.id })}>
             <View style={styles.iconChip}>
-              <Icon name={communityIcon(item)} size={16} color={colors.teal} />
+              <Icon name={communityIcon(item)} size={16} color={colors.coral} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.cardName}>{item.name}</Text>
@@ -187,6 +187,6 @@ function createStyles(colors: ColorTokens) {
   cardName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
   cardMeta: { fontSize: 11, color: colors.inkSoft, marginTop: 2 },
   matchBadge: { backgroundColor: colors.sandDeep, paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.tag },
-  matchBadgeText: { fontSize: 10, fontWeight: '700', color: colors.teal },
+  matchBadgeText: { fontSize: 10, fontWeight: '700', color: colors.coral },
   });
 }
