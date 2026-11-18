@@ -15,3 +15,7 @@ Create `src/theme/motion.ts`, `src/theme/motion.test.ts`. Change `TabBar.tsx`, `
 1. typecheck, lint, tests (one new), expo-doctor, export pass.
 2. Browser, same probe before and after. **Before:** Housing to Profile: highlight path went 22, 72, 206, 337, 411, 421 (target 315), right edge 516 against a bar edge of 414, still moving after 1.4 s. **After:** Housing to Profile: 22, 107, 215, 277, 306, 313, 315; never beyond the target, right edge at most 409 (inside the bar), settled in 337 ms. Profile to Housing: 315 down to exactly 22, settled in 305 ms, never below 22. Button press: dips to 0.97, back to exactly 1, no overshoot, done about 100 ms after release (before: min 0.977, max 1.012, still wobbling at 1.2 s).
 3. The other springs (sheets, toast, swipe rows, heart pop) are timed moves that cannot overshoot by construction; the heart pop is the one deliberate bounce. Not tested on a phone: native rendering of the timed moves.
+
+## Codex review
+Round 1: VERDICT FINDINGS(1).
+1. MINOR, `TabBar.tsx:40`: on the first render the highlight started at x=0 and width=0 and slid in from the left edge. **Fixed:** the first time the active tab is measured the highlight is placed there at once; later changes slide. Verified in the browser: from its first frame the highlight is at x=22 with its full width and never moves.

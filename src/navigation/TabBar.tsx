@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from '@/components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -37,8 +37,17 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
   const indicatorWidth = useSharedValue(0);
 
   const activeLayout = itemLayouts[state.index];
+  // The first time the active tab is measured the highlight is placed there at once (otherwise it would slide in
+  // from the left edge when the app opens); after that every change slides.
+  const placed = useRef(false);
   React.useEffect(() => {
     if (!activeLayout) return;
+    if (!placed.current) {
+      placed.current = true;
+      indicatorX.value = activeLayout.x;
+      indicatorWidth.value = activeLayout.width;
+      return;
+    }
     indicatorX.value = withTiming(activeLayout.x, TAB_SLIDE);
     indicatorWidth.value = withTiming(activeLayout.width, TAB_SLIDE);
   }, [activeLayout, indicatorX, indicatorWidth]);
