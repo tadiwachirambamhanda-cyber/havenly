@@ -63,3 +63,5 @@ None open.
 Round 1: VERDICT FINDINGS(2).
 1. MAJOR, `RootNavigator.tsx:84`: the tab is "Compare", not a "Saved" list of hearted places. **Dismissed, with a flag to the owner:** it is the deliberate change recorded above (the owner chose to reuse the Compare list; calling it Saved would mislead). Hearted places still have no list of their own except the "Saved" chip on Housing; the owner decides whether to build one.
 2. MINOR, `CompareScreen.tsx:110`: the empty-state button called `goBack()`, which has nowhere to go on a tab. **Fixed:** on the tab it opens the Housing tab; on the stack screen it still goes back.
+
+Round 2: VERDICT PASS (no findings).
