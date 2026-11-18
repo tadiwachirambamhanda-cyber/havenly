@@ -93,16 +93,22 @@ export default function EditProfileScreen() {
         bio: bio.trim() || null,
         university: university.trim() || null,
         avatar_url: avatarUrl,
-        budget_aed: budget.value,
-        move_in_month: moveIn,
-        housemate_pref: housemates,
-        gender,
       }).eq('id', session.user.id);
 
       if (updateError) {
         if (updateError.code === '23505') throw new Error('That username is already taken.');
         throw updateError;
       }
+
+      // Budget, move-in month, housemate preference and gender are private: they have their own table.
+      const { error: privateError } = await supabase.from('profile_private').upsert({
+        user_id: session.user.id,
+        budget_aed: budget.value,
+        move_in_month: moveIn,
+        housemate_pref: housemates,
+        gender,
+      }, { onConflict: 'user_id' });
+      if (privateError) throw privateError;
 
       await refreshProfile();
       haptics.success();

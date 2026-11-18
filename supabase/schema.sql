@@ -13,12 +13,6 @@ create table profiles (
   cover_url text,
   university text,
   interests text[] default '{}',
-  -- What the student is looking for (all optional); see 20261118400000_profile_housing_preferences.sql.
-  budget_aed int check (budget_aed between 1 and 100000),
-  move_in_month date check (move_in_month = date_trunc('month', move_in_month)::date),
-  housemate_pref text check (housemate_pref in ('any', 'female_only', 'male_only')),
-  -- Optional; used only to match housemate preferences (20261118500000_housemates.sql).
-  gender text check (gender in ('female', 'male')),
   -- Daily activity streak — see bump_streak() below for how these advance.
   -- last_active_date is the UTC date it was last extended, matching the
   -- daily-pick feature's own day-boundary convention.
@@ -39,7 +33,7 @@ create policy "Users can update their own profile" on profiles for update using 
 -- is_admin and streaks), so updates are limited to editable columns and
 -- direct inserts are closed (see 20261106100000_lock_down_profile_columns.sql).
 revoke update on profiles from authenticated, anon;
-grant update (username, display_name, bio, avatar_url, cover_url, university, interests, has_completed_onboarding, budget_aed, move_in_month, housemate_pref, gender) on profiles to authenticated;
+grant update (username, display_name, bio, avatar_url, cover_url, university, interests, has_completed_onboarding) on profiles to authenticated;
 revoke insert on profiles from authenticated, anon;
 create policy "Users can insert their own profile" on profiles for insert with check (auth.uid() = id);
 
@@ -1830,12 +1824,28 @@ $$;
 grant execute on function public.leave_group(uuid) to authenticated;
 
 -- ==================== HOUSEMATES ====================
--- Housemates: students who want to live together find each other.
---
--- Who sees whom is decided here, in the database, never in the app: a card is shown to a viewer only
--- if the owner's "who I would live with" choice accepts the viewer's gender AND the viewer's own choice
--- accepts the owner's gender. Nobody can read another student's card directly; they get the filtered
--- board from housemate_board() only.
+-- Private profile fields (gender, budget, move-in month, housemate preference) are in their own table because
+-- profiles are readable by everyone (20261118520000_profile_private.sql).
+create table public.profile_private (
+  user_id uuid primary key references public.profiles(id) on delete cascade,
+  budget_aed int check (budget_aed between 1 and 100000),
+  move_in_month date check (move_in_month = date_trunc('month', move_in_month)::date),
+  housemate_pref text check (housemate_pref in ('any', 'female_only', 'male_only')),
+  gender text check (gender in ('female', 'male')),
+  updated_at timestamptz not null default now()
+);
+alter table public.profile_private enable row level security;
+create policy "Students read their own private profile" on public.profile_private
+  for select using (auth.uid() = user_id);
+create policy "Students create their own private profile" on public.profile_private
+  for insert with check (auth.uid() = user_id);
+create policy "Students edit their own private profile" on public.profile_private
+  for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+revoke all on public.profile_private from anon, authenticated;
+grant select on public.profile_private to authenticated;
+grant insert (user_id, budget_aed, move_in_month, housemate_pref, gender) on public.profile_private to authenticated;
+grant update (budget_aed, move_in_month, housemate_pref, gender) on public.profile_private to authenticated;
+
 
 -- 2. One card per student.
 create table public.housemate_cards (
@@ -1875,49 +1885,9 @@ grant insert (user_id, active, area, lifestyle, note, residence_id, spots_needed
 grant update (active, area, lifestyle, note, residence_id, spots_needed) on public.housemate_cards to authenticated;
 grant delete on public.housemate_cards to authenticated;
 
--- 3. Rules that need other tables: checked by a trigger.
-create or replace function private.housemate_card_rules()
-returns trigger
-language plpgsql
-security definer
-set search_path to 'public'
-as $$
-declare
-  p profiles%rowtype;
-  home_ok boolean;
-begin
-  new.updated_at := now();
-
-  if new.residence_id is not null then
-    select (listing_type = 'home' and is_active) into home_ok from residences where id = new.residence_id;
-    if home_ok is distinct from true then
-      raise exception 'A housemate card can only be tied to a whole home that is listed.' using errcode = 'check_violation';
-    end if;
-  end if;
-
-  -- A live card needs the budget and move-in month saved on the profile (they are shown on the card).
-  -- Checked when a student creates or edits it, not when the team approves it.
-  if new.active and (tg_op = 'INSERT' or old.active is distinct from new.active or not private.is_admin()) then
-    select * into p from profiles where id = new.user_id;
-    if p.budget_aed is null or p.move_in_month is null then
-      raise exception 'Set your monthly budget and move-in month in Edit profile first.' using errcode = 'check_violation';
-    end if;
-  end if;
-
-  -- Changing what other students will read sends the card back to the team.
-  if tg_op = 'UPDATE' and old.status = 'approved' and not private.is_admin()
-     and (new.area is distinct from old.area or new.lifestyle is distinct from old.lifestyle
-          or new.note is distinct from old.note or new.residence_id is distinct from old.residence_id) then
-    new.status := 'pending';
-  end if;
-  return new;
-end;
-$$;
-create trigger housemate_card_rules
-  before insert or update on public.housemate_cards
-  for each row execute function private.housemate_card_rules();
-
--- 4. The matching rule, both ways. No gender given means only "anyone" matches.
+-- Rules that need other tables, the matching rule, the board and the team queue (final versions).
+-- The matching rule, now reading the private table. A student with no row has no gender and no preference:
+-- only "anyone" matches.
 create or replace function private.housemate_compatible(viewer uuid, owner uuid)
 returns boolean
 language sql
@@ -1934,12 +1904,49 @@ as $$
       or (v.housemate_pref = 'female_only' and o.gender = 'female')
       or (v.housemate_pref = 'male_only' and o.gender = 'male')),
     false)
-  from profiles v, profiles o
-  where v.id = viewer and o.id = owner;
+  from profiles vp
+  left join profile_private v on v.user_id = vp.id
+  cross join profiles op
+  left join profile_private o on o.user_id = op.id
+  where vp.id = viewer and op.id = owner;
 $$;
 
--- 5. The board: approved, live, compatible cards, not yours, no block either way. A home is shown only while it
--- is still a listed whole home (20261118510000_housemates_home_checks.sql).
+create or replace function private.housemate_card_rules()
+returns trigger
+language plpgsql
+security definer
+set search_path to 'public'
+as $$
+declare
+  b int;
+  m date;
+  home_ok boolean;
+begin
+  new.updated_at := now();
+
+  if new.residence_id is not null then
+    select (listing_type = 'home' and is_active) into home_ok from residences where id = new.residence_id;
+    if home_ok is distinct from true then
+      raise exception 'A housemate card can only be tied to a whole home that is listed.' using errcode = 'check_violation';
+    end if;
+  end if;
+
+  if new.active and (tg_op = 'INSERT' or old.active is distinct from new.active or not private.is_admin()) then
+    select budget_aed, move_in_month into b, m from profile_private where user_id = new.user_id;
+    if b is null or m is null then
+      raise exception 'Set your monthly budget and move-in month in Edit profile first.' using errcode = 'check_violation';
+    end if;
+  end if;
+
+  if tg_op = 'UPDATE' and old.status = 'approved' and not private.is_admin()
+     and (new.area is distinct from old.area or new.lifestyle is distinct from old.lifestyle
+          or new.note is distinct from old.note or new.residence_id is distinct from old.residence_id) then
+    new.status := 'pending';
+  end if;
+  return new;
+end;
+$$;
+
 create or replace function public.housemate_board(
   p_university text default null,
   p_max_budget int default null,
@@ -1956,7 +1963,7 @@ stable
 security definer
 set search_path to 'public'
 as $$
-  select c.user_id, p.display_name, p.university, p.gender, p.budget_aed, p.move_in_month,
+  select c.user_id, p.display_name, p.university, pp.gender, pp.budget_aed, pp.move_in_month,
          c.area, c.lifestyle, c.note,
          case when r.is_active and r.listing_type = 'home' then c.residence_id end,
          case when r.is_active and r.listing_type = 'home' then r.name end,
@@ -1964,21 +1971,52 @@ as $$
          c.updated_at
   from housemate_cards c
   join profiles p on p.id = c.user_id
+  join profile_private pp on pp.user_id = c.user_id
   left join residences r on r.id = c.residence_id
   where auth.uid() is not null
     and c.status = 'approved' and c.active
     and c.user_id <> auth.uid()
-    and p.budget_aed is not null and p.move_in_month is not null
+    and pp.budget_aed is not null and pp.move_in_month is not null
     and not private.is_blocked_between(auth.uid(), c.user_id)
     and private.housemate_compatible(auth.uid(), c.user_id)
     and (p_university is null or p.university = p_university)
-    and (p_max_budget is null or p.budget_aed <= p_max_budget)
-    and (p_move_in is null or p.move_in_month = p_move_in)
+    and (p_max_budget is null or pp.budget_aed <= p_max_budget)
+    and (p_move_in is null or pp.move_in_month = p_move_in)
     and (p_area is null or c.area ilike '%' || p_area || '%')
     and (p_residence is null or (c.residence_id = p_residence and r.is_active and r.listing_type = 'home'))
   order by c.updated_at desc
   limit 100;
 $$;
+
+-- The team's queue: pending cards with the fields needed to check them. Admins only.
+create or replace function public.pending_housemate_cards()
+returns table (
+  user_id uuid, display_name text, university text, gender text, budget_aed int, move_in_month date,
+  area text, lifestyle text[], note text, active boolean, residence_name text, spots_needed int
+)
+language plpgsql
+stable
+security definer
+set search_path to 'public'
+as $$
+begin
+  if not private.is_admin() then
+    raise exception 'Only the Havenly team can review housemate cards.' using errcode = 'insufficient_privilege';
+  end if;
+  return query
+  select c.user_id, p.display_name, p.university, pp.gender, pp.budget_aed, pp.move_in_month,
+         c.area, c.lifestyle, c.note, c.active, r.name, c.spots_needed
+  from housemate_cards c
+  join profiles p on p.id = c.user_id
+  left join profile_private pp on pp.user_id = c.user_id
+  left join residences r on r.id = c.residence_id
+  where c.status = 'pending'
+  order by c.updated_at asc;
+end;
+$$;
+revoke all on function public.pending_housemate_cards() from public, anon;
+grant execute on function public.pending_housemate_cards() to authenticated;
+
 
 create or replace function public.housemates_for_home(p_residence uuid)
 returns int

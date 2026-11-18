@@ -30,7 +30,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => subscribeGuestMode(() => setIsGuest(isGuestMode())), []);
 
   const loadProfile = useCallback(async (userId: string) => {
-    const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+    const [{ data, error }, { data: priv }] = await Promise.all([
+      supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
+      // Gender, budget, move-in month and housemate preference live in their own table that only you can read.
+      supabase.from('profile_private').select('budget_aed, move_in_month, housemate_pref, gender').eq('user_id', userId).maybeSingle(),
+    ]);
     // No error but no row means the account itself is gone (deleted, maybe
     // from another device) while this device still holds its session —
     // without signing out, RootNavigator waits on a profile forever. A
@@ -39,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await supabase.auth.signOut();
       return;
     }
-    setProfile((data as Profile) ?? null);
+    setProfile(data ? ({ ...(data as Profile), ...(priv ?? { budget_aed: null, move_in_month: null, housemate_pref: null, gender: null }) } as Profile) : null);
   }, []);
 
   useEffect(() => { setCrashReportingUser(session?.user.id ?? null); }, [session?.user.id]);

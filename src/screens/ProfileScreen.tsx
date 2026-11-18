@@ -59,8 +59,9 @@ export default function ProfileScreen() {
     const userId = session?.user.id;
     if (!userId) return;
     const loadId = ++latestLoad.current;
-    const [profileRes, enquiryRes] = await Promise.all([
+    const [profileRes, privateRes, enquiryRes] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', userId).single(),
+      supabase.from('profile_private').select('budget_aed, move_in_month, housemate_pref, gender').eq('user_id', userId).maybeSingle(),
       supabase.from('housing_enquiries')
         .select('id, kind, status, status_updated_at, residence:residences(id, name)')
         .eq('user_id', userId).order('created_at', { ascending: false }).limit(3),
@@ -68,7 +69,7 @@ export default function ProfileScreen() {
     if (loadId !== latestLoad.current) return;
     setData({
       owner: userId,
-      profile: (profileRes.data as Profile) ?? null,
+      profile: profileRes.data ? ({ ...(profileRes.data as Profile), ...(privateRes.data ?? {}) } as Profile) : null,
       enquiries: enquiryRes.error ? [] : ((enquiryRes.data as unknown as EnquiryRow[]) ?? []),
       enquiriesFailed: !!enquiryRes.error,
     });

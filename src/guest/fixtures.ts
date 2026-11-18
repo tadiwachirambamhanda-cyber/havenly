@@ -31,13 +31,12 @@ function profile(id: string, username: string, display_name: string, bio: string
     id, username, display_name, bio, avatar_url: null, cover_url: null, university,
     interests: interests as Profile['interests'], current_streak: 4, longest_streak: 9,
     last_active_date: null, has_completed_onboarding: true, is_admin: false, created_at: daysAgo(40),
-    budget_aed: null, move_in_month: null, housemate_pref: null, gender: null,
   };
 }
 
 export const GUEST_PROFILE: Profile = {
   ...profile(GUEST_USER_ID, 'guest_demo', 'Guest', 'Looking around Havenly in demo mode.', 'Murdoch University Dubai', ['cafes', 'fitness', 'padel']),
-  budget_aed: 3000, move_in_month: nextMonthStart(), housemate_pref: 'any',
+  budget_aed: 3000, move_in_month: nextMonthStart(), housemate_pref: 'any', gender: null,
   current_streak: 3,
   longest_streak: 3,
 };
@@ -198,6 +197,7 @@ const empty = (): Row[] => [];
 export function createFixtures(): FixtureTables {
   return {
     profiles: profiles as unknown as Row[],
+    profile_private: [{ user_id: GUEST_USER_ID, budget_aed: 3000, move_in_month: nextMonthStart(), housemate_pref: 'any', gender: null }],
     posts, comments, communities, events, residences, room_types, brands, offers,
     community_members: [],
     follows: [],

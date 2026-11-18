@@ -17,9 +17,9 @@ import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 
 interface PendingCard {
-  user_id: string; area: string | null; lifestyle: LifestyleKey[]; note: string | null; active: boolean;
-  residence: { name: string } | null; spots_needed: number | null;
-  profile: { display_name: string; university: string | null; gender: 'female' | 'male' | null; budget_aed: number | null; move_in_month: string | null } | null;
+  user_id: string; display_name: string; university: string | null; gender: 'female' | 'male' | null;
+  budget_aed: number | null; move_in_month: string | null; area: string | null; lifestyle: LifestyleKey[];
+  note: string | null; active: boolean; residence_name: string | null; spots_needed: number | null;
 }
 
 // For the Havenly team: cards wait here until approved. Only admins can read other students' cards or approve them
@@ -36,12 +36,10 @@ export default function HousemateReviewScreen() {
   const [busy, setBusy] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const { data, error } = await supabase.from('housemate_cards')
-      .select('user_id, area, lifestyle, note, active, spots_needed, residence:residences(name), profile:profiles(display_name, university, gender, budget_aed, move_in_month)')
-      .eq('status', 'pending').order('updated_at', { ascending: true });
+    const { data, error } = await supabase.rpc('pending_housemate_cards');
     if (error) { setFailed(true); setRows([]); return; }
     setFailed(false);
-    setRows((data as unknown as PendingCard[]) ?? []);
+    setRows((data as PendingCard[]) ?? []);
   }, []);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
@@ -85,14 +83,13 @@ export default function HousemateReviewScreen() {
         contentContainerStyle={{ paddingBottom: 60 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await load(); setRefreshing(false); }} tintColor={colors.coral} />}
         renderItem={({ item }) => {
-          const p = item.profile;
           return (
             <View style={styles.card}>
-              <Text style={styles.name}>{p?.display_name ?? 'Student'}</Text>
-              <Text style={styles.meta}>{[genderLabel(p?.gender ?? null), p?.university].filter(Boolean).join(' · ') || 'No gender or university given'}</Text>
-              {p?.budget_aed != null && p.move_in_month ? <Text style={styles.line}>{budgetLine({ budget_aed: p.budget_aed, move_in_month: p.move_in_month })}</Text> : <Text style={styles.warn}>No budget or move-in month on the profile</Text>}
+              <Text style={styles.name}>{item.display_name}</Text>
+              <Text style={styles.meta}>{[genderLabel(item.gender), item.university].filter(Boolean).join(' · ') || 'No gender or university given'}</Text>
+              {item.budget_aed != null && item.move_in_month ? <Text style={styles.line}>{budgetLine({ budget_aed: item.budget_aed, move_in_month: item.move_in_month })}</Text> : <Text style={styles.warn}>No budget or move-in month on the profile</Text>}
               {item.area ? <Text style={styles.meta}>Area: {item.area}</Text> : null}
-              {item.residence ? <Text style={styles.meta}>{`For ${item.residence.name}${item.spots_needed ? `, needs ${item.spots_needed}` : ''}`}</Text> : null}
+              {item.residence_name ? <Text style={styles.meta}>{`For ${item.residence_name}${item.spots_needed ? `, needs ${item.spots_needed}` : ''}`}</Text> : null}
               {item.lifestyle.length > 0 ? <Text style={styles.meta}>{item.lifestyle.map((k) => LIFESTYLE_LABEL[k]).join(', ')}</Text> : null}
               {item.note ? <Text style={styles.note}>{item.note}</Text> : null}
               <View style={styles.actions}>
