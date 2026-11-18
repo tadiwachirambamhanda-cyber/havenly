@@ -32,7 +32,8 @@
         {
           "image": "./assets/splash.png",
           "imageWidth": 200,
-          "backgroundColor": "#F3F0EA"
+          "backgroundColor": "#F3F0EA",
+          "dark": { "image": "./assets/splash-dark.png", "backgroundColor": "#151310" }
         }
       ],
       "expo-font",
