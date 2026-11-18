@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { saveOwnRow } from '@/lib/ownRow';
 import type { BoardCard, CardInput, MyCard } from './housemates';
 
 // Database calls for the housemate board. The rules about who sees whom live in the database function
@@ -37,16 +38,14 @@ export async function fetchMyCard(userId: string): Promise<MyCard | null> {
 }
 
 export async function saveMyCard(userId: string, input: CardInput, active: boolean): Promise<void> {
-  const { error } = await supabase.from('housemate_cards').upsert({
-    user_id: userId,
+  await saveOwnRow('housemate_cards', userId, {
     active,
     area: input.area.trim(),
     lifestyle: [...input.lifestyle],
     note: input.note.trim() || null,
     residence_id: input.residenceId,
     spots_needed: input.residenceId ? input.spots : null,
-  }, { onConflict: 'user_id' });
-  if (error) throw error;
+  });
 }
 
 export async function deleteMyCard(userId: string): Promise<void> {

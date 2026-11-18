@@ -19,6 +19,7 @@ import type { ColorTokens } from '@/theme/tokens';
 import UniversityPickerModal from '@/components/UniversityPickerModal';
 import { Notice, PrimaryButton } from '@/components/housing/parts';
 import { upcomingMonths, formatMonth } from '@/lib/housing';
+import { saveOwnRow } from '@/lib/ownRow';
 import { HOUSEMATE_PREF_OPTIONS, parseBudget, type HousematePref } from '@/lib/profilePrefs';
 
 export default function EditProfileScreen() {
@@ -101,14 +102,12 @@ export default function EditProfileScreen() {
       }
 
       // Budget, move-in month, housemate preference and gender are private: they have their own table.
-      const { error: privateError } = await supabase.from('profile_private').upsert({
-        user_id: session.user.id,
+      await saveOwnRow('profile_private', session.user.id, {
         budget_aed: budget.value,
         move_in_month: moveIn,
         housemate_pref: housemates,
         gender,
-      }, { onConflict: 'user_id' });
-      if (privateError) throw privateError;
+      });
 
       await refreshProfile();
       haptics.success();
