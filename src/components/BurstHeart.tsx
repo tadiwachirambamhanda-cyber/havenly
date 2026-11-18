@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import Icon from '@/components/Icon';
-import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import { HEART_DOWN, HEART_PEAK, HEART_UP } from '@/theme/motion';
 
 interface Props {
   active: boolean;
@@ -23,8 +24,8 @@ export default function BurstHeart({ active, size, color, activeColor }: Props) 
   useEffect(() => {
     if (active && !wasActive.current) {
       scale.value = withSequence(
-        withSpring(1.35, { damping: 6, stiffness: 260 }),
-        withSpring(1, { damping: 6, stiffness: 260 }),
+        withTiming(HEART_PEAK, HEART_UP),
+        withTiming(1, HEART_DOWN),
       );
     }
     wasActive.current = active;

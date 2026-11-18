@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from '@/components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon, { type IconName } from '@/components/Icon';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { TAB_SLIDE } from '@/theme/motion';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { useTheme } from '@/lib/ThemeContext';
 import type { ColorTokens } from '@/theme/tokens';
@@ -36,10 +37,19 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
   const indicatorWidth = useSharedValue(0);
 
   const activeLayout = itemLayouts[state.index];
+  // The first time the active tab is measured the highlight is placed there at once (otherwise it would slide in
+  // from the left edge when the app opens); after that every change slides.
+  const placed = useRef(false);
   React.useEffect(() => {
     if (!activeLayout) return;
-    indicatorX.value = withSpring(activeLayout.x, { damping: 18, stiffness: 220 });
-    indicatorWidth.value = withSpring(activeLayout.width, { damping: 18, stiffness: 220 });
+    if (!placed.current) {
+      placed.current = true;
+      indicatorX.value = activeLayout.x;
+      indicatorWidth.value = activeLayout.width;
+      return;
+    }
+    indicatorX.value = withTiming(activeLayout.x, TAB_SLIDE);
+    indicatorWidth.value = withTiming(activeLayout.width, TAB_SLIDE);
   }, [activeLayout, indicatorX, indicatorWidth]);
 
   const indicatorStyle = useAnimatedStyle(() => ({
