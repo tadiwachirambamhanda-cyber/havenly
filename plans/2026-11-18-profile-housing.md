@@ -59,3 +59,5 @@ Round 2: VERDICT FINDINGS(3), all minor.
 5. `ProfileScreen.tsx:66-74`: an older profile load could overwrite a newer one. **Fixed:** only the latest request updates the screen, and a missing profile always shows the loading placeholder.
 6. `legal.ts:151`: the Terms still said deletion is in Settings. **Fixed:** the one location is updated to Profile; nothing else in the Terms was touched (the rest still needs its own update).
 7. `ProfileScreen.tsx:215-217`: Delete account looked active in demo mode. **Fixed:** in demo mode it shows "Demo mode: make an account to manage one."
+
+Round 3: VERDICT PASS (no findings).
