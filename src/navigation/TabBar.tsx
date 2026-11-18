@@ -15,7 +15,7 @@ import { haptics } from '@/lib/haptics';
 // Every tab shows its name under the icon: icons alone (a key for Housing,
 // a tray for Inbox) have to be guessed, words don't.
 const TAB_CONFIG: Record<string, { icon: IconName; label: string }> = {
-  CompareTab: { icon: 'grid', label: 'Compare' },
+  Saved: { icon: 'heart', label: 'Saved' },
   Housing: { icon: 'key', label: 'Housing' },
   Inbox: { icon: 'inbox', label: 'Inbox' },
   Profile: { icon: 'user', label: 'Profile' },

@@ -28,3 +28,8 @@ Folders or notes for saved places, sorting options, sharing a saved list, price-
 
 ## Questions
 None.
+
+## Verification
+1. typecheck, lint (no warnings), 93 tests (3 new for the ordering), expo-doctor 21/21 and the web export pass.
+2. Demo with two sample saved places seeded temporarily (restored afterwards; demo mode blocks real saving): Housing showed both hearts filled; Saved listed both, newest first, with price, bills, deal tag and commute; tapping a row opened the listing; tapping the heart with writes blocked put the row back and showed "Couldn't remove it from your saved list".
+3. Not tested: saving and removing against a real account on the live database (same `setResidenceSaved` call Housing already uses), and a phone.

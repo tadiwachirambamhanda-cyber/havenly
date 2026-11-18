@@ -34,6 +34,7 @@ import AdminEnquiryScreen from '@/screens/AdminEnquiryScreen';
 import EditResidenceScreen from '@/screens/EditResidenceScreen';
 import SplitRentScreen from '@/screens/SplitRentScreen';
 import CompareScreen from '@/screens/CompareScreen';
+import SavedScreen from '@/screens/SavedScreen';
 import SignInToContinueScreen from '@/screens/SignInToContinueScreen';
 import LegalScreen from '@/screens/LegalScreen';
 
@@ -69,7 +70,7 @@ export type RootStackParamList = {
 
 export type MainTabParamList = {
   Housing: undefined;
-  CompareTab: undefined;
+  Saved: undefined;
   Inbox: undefined;
   Profile: undefined;
 };
@@ -81,7 +82,7 @@ function MainTabs() {
   return (
     <Tab.Navigator initialRouteName="Housing" screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
       <Tab.Screen name="Housing" component={HousingScreen} />
-      <Tab.Screen name="CompareTab" component={CompareScreen} />
+      <Tab.Screen name="Saved" component={SavedScreen} />
       <Tab.Screen name="Inbox" component={InboxScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>

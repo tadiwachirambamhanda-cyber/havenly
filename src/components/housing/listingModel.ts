@@ -161,3 +161,10 @@ export function filterAndSort(list: readonly Residence[], f: Filters, sort: Sort
   const byId = new Map(matching.map((r) => [r.id, r]));
   return sortForSearch(matching.map(toRankInput), sort).map((x) => byId.get(x.id)!);
 }
+
+// The listings that are still on offer, in the order of `ids` (the newest save first).
+// A saved place that was switched off or removed simply drops out of the list.
+export function orderByIds<T extends { id: string }>(list: readonly T[], ids: readonly string[]): T[] {
+  const byId = new Map(list.map((r) => [r.id, r]));
+  return ids.map((id) => byId.get(id)).filter((r): r is T => !!r);
+}

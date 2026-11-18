@@ -6,7 +6,7 @@ Removed from the app on 2026-11-18 when Havenly became a housing-first platform.
 Feed, posts and video, post detail, create post, share post, Discover, communities (list and detail), group chat creation, events (detail and create), check-ins, follow lists, other people's profiles, the floating "+" button, the post grid on Profile, and the interest picker in onboarding. Also the files only they used (`VideoThumb`, `PostVideoPlayer`, `uploadWithProgress`, `constants/tags`, `utils/formatCount`).
 
 ## What stayed, changed
-- Tabs are now Housing, Compare, Inbox, Profile.
+- Tabs are now Housing, Saved, Inbox, Profile.
 - Notifications shows only enquiry updates (`enquiry_new`, `enquiry_status`); it opens from Profile, with a dot on the Profile tab when there is something new.
 - A chat message that shared a post reads "Shared a post (no longer available)".
 - The Map shows homes only. Perks code (`OffersScreen`, `OfferDetailScreen`, `ManageBrandsScreen`, `CreateOfferScreen`) is still in the repo but nothing links to it.

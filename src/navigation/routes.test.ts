@@ -18,7 +18,7 @@ const registered = new Set([...root.matchAll(/(?:Stack|Tab)\.Screen\s+name="(\w+
 
 describe('navigation targets', () => {
   it('registers the screens we expect', () => {
-    for (const name of ['MainTabs', 'Housing', 'CompareTab', 'Inbox', 'Profile', 'ResidenceDetail', 'Notifications']) {
+    for (const name of ['MainTabs', 'Housing', 'Saved', 'Compare', 'Inbox', 'Profile', 'ResidenceDetail', 'Notifications']) {
       expect(registered.has(name), name).toBe(true);
     }
     for (const gone of ['Feed', 'Discover', 'PostDetail', 'CreatePost', 'Communities', 'EventDetail', 'FollowList', 'UserProfile', 'NewGroup', 'SharePost']) {
