@@ -35,3 +35,8 @@ Round 1: VERDICT FINDINGS(2).
 Round 2: VERDICT FINDINGS(2).
 3. MAJOR, `legal.ts:34`: the policy said location is used only for the map, but the perks screen (still in the code, unlinked) sorts by distance. **Fixed:** the original wording is back: "the map or location-based sorting".
 4. MINOR, `legal.ts:57`: Sentry crash reporting is off until a key is set, but the policy described it as running. **Fixed:** the policy now says crash reports apply "when crash reporting is switched on".
+
+Round 3: VERDICT PASS (no findings).
+
+## Verification
+typecheck, lint (no warnings), 93 tests, expo-doctor 20/20, export for web and iOS pass. Browser (dev server, demo): Housing shows the Map button signed out and signed in; Map opens its web notice; Edit profile has no Interests section. Not tested: the Map on a phone.
