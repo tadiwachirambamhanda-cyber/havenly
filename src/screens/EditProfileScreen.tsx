@@ -17,10 +17,7 @@ import { haptics } from '@/lib/haptics';
 import { useConfirmDiscard } from '@/lib/useConfirmDiscard';
 import { radius, spacing, tones } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
-import { INTEREST_CATEGORIES, INTEREST_OPTIONS } from '@/constants/interests';
-import { interestIcon } from '@/constants/topicIcons';
 import UniversityPickerModal from '@/components/UniversityPickerModal';
-import type { Interest } from '@/types';
 
 export default function EditProfileScreen() {
   const navigation = useNavigation();
@@ -34,7 +31,6 @@ export default function EditProfileScreen() {
   const [username, setUsername] = useState(profile?.username ?? '');
   const [bio, setBio] = useState(profile?.bio ?? '');
   const [university, setUniversity] = useState(profile?.university ?? '');
-  const [interests, setInterests] = useState<Set<Interest>>(new Set(profile?.interests ?? []));
   const [avatarUri, setAvatarUri] = useState<string | null>(profile?.avatar_url ?? null);
   const [newAvatarPicked, setNewAvatarPicked] = useState(false);
   const [coverUri, setCoverUri] = useState<string | null>(profile?.cover_url ?? null);
@@ -44,8 +40,6 @@ export default function EditProfileScreen() {
   const [error, setError] = useState<string | null>(null);
   const [universityPickerVisible, setUniversityPickerVisible] = useState(false);
 
-  const interestsChanged = interests.size !== (profile?.interests ?? []).length
-    || Array.from(interests).some((k) => !profile?.interests.includes(k));
   const allowLeave = useConfirmDiscard(!saved && (
     displayName !== (profile?.display_name ?? '')
     || username !== (profile?.username ?? '')
@@ -53,17 +47,7 @@ export default function EditProfileScreen() {
     || university !== (profile?.university ?? '')
     || newAvatarPicked
     || newCoverPicked
-    || interestsChanged
   ));
-
-  const toggleInterest = (key: Interest) => {
-    setInterests((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  };
 
   const pickAvatar = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8, allowsEditing: true, aspect: [1, 1] });
@@ -118,7 +102,6 @@ export default function EditProfileScreen() {
         username: username.trim(),
         bio: bio.trim() || null,
         university: university.trim() || null,
-        interests: Array.from(interests),
         avatar_url: avatarUrl,
         cover_url: coverUrl,
       }).eq('id', session.user.id);
@@ -202,25 +185,6 @@ export default function EditProfileScreen() {
         onSelect={(name) => setUniversity(name ?? '')}
       />
 
-      <Text style={styles.label}>Interests</Text>
-      {INTEREST_CATEGORIES.map((category) => (
-        <View key={category.label}>
-          <Text style={styles.groupLabel}>{category.label}</Text>
-          <View style={styles.chipGrid}>
-            {category.keys.map((key) => {
-              const opt = INTEREST_OPTIONS.find((o) => o.key === key)!;
-              const isSelected = interests.has(opt.key);
-              return (
-                <AnimatedPressable key={opt.key} style={[styles.chip, isSelected && styles.chipSelected]} onPress={() => { haptics.tap(); toggleInterest(opt.key); }}>
-                  <Icon name={interestIcon(opt.key)} size={13} color={isSelected ? colors.sand : colors.ink} />
-                  <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{opt.label}</Text>
-                </AnimatedPressable>
-              );
-            })}
-          </View>
-        </View>
-      ))}
-
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </ScrollView>
     </KeyboardAvoidingView>
@@ -256,12 +220,6 @@ function createStyles(colors: ColorTokens) {
   bioInput: { minHeight: 80, textAlignVertical: 'top' },
   universityValue: { fontSize: 14, color: colors.ink },
   universityPlaceholder: { fontSize: 14, color: colors.inkSoft },
-  groupLabel: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 10, marginBottom: 6 },
-  chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 9, paddingHorizontal: spacing.lg },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: 9, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
-  chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
-  chipText: { fontSize: 12.5, fontWeight: '600', color: colors.ink },
-  chipTextSelected: { color: colors.sand },
   error: { color: colors.coral, fontSize: 13, marginTop: 16, marginHorizontal: spacing.lg },
   });
 }

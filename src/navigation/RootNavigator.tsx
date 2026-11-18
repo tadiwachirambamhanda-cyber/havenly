@@ -141,6 +141,7 @@ export default function RootNavigator() {
           // login or sign-up screen.
           <>
             <Stack.Screen name="PublicHousing" component={HousingScreen} />
+            <Stack.Screen name="Map" component={MapScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="ResidenceDetail" component={ResidenceDetailScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="SplitRent" component={SplitRentScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="SignInToContinue" component={SignInToContinueScreen} options={{ presentation: 'modal' }} />
