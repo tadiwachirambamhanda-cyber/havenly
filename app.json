@@ -33,7 +33,10 @@
           "image": "./assets/splash.png",
           "imageWidth": 200,
           "backgroundColor": "#F3F0EA",
-          "dark": { "image": "./assets/splash-dark.png", "backgroundColor": "#151310" }
+          "dark": {
+            "image": "./assets/splash-dark.png",
+            "backgroundColor": "#151310"
+          }
         }
       ],
       "expo-font",
@@ -53,7 +56,9 @@
           "locationWhenInUsePermission": "Havenly uses your location to show offers, events, and check-ins near you."
         }
       ],
-      "@sentry/react-native"
+      "@sentry/react-native",
+      "expo-image",
+      "expo-status-bar"
     ]
   }
 }

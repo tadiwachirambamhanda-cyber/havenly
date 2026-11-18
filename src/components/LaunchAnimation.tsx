@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Animated, StyleSheet } from 'react-native';
+import { View, Animated, Easing, StyleSheet } from 'react-native';
 import { RoofH, Wordmark } from '@/components/Brand';
 import { useTheme } from '@/lib/ThemeContext';
 import type { ColorTokens } from '@/theme/tokens';
@@ -17,15 +17,18 @@ export default function LaunchAnimation({ onFinish }: { onFinish: () => void }) 
 
   useEffect(() => {
     Animated.sequence([
-      Animated.spring(hScale, { toValue: 1, friction: 5, tension: 60, useNativeDriver: true }),
+      Animated.timing(hScale, { toValue: 1, duration: 520, easing: Easing.out(Easing.back(1.7)), useNativeDriver: true }),
       Animated.delay(450),
       Animated.parallel([
         Animated.timing(hOpacity, { toValue: 0, duration: 250, useNativeDriver: true }),
         Animated.timing(wordmarkOpacity, { toValue: 1, duration: 380, delay: 80, useNativeDriver: true }),
-        Animated.spring(wordmarkScale, { toValue: 1, friction: 6, tension: 50, delay: 80, useNativeDriver: true }),
+        Animated.timing(wordmarkScale, { toValue: 1, duration: 420, delay: 80, easing: Easing.out(Easing.back(1.4)), useNativeDriver: true }),
       ]),
       Animated.delay(500),
     ]).start(() => onFinish());
+    // Safety net: whatever the animation engine does, the app never waits more than a few seconds here.
+    const safety = setTimeout(onFinish, 4000);
+    return () => clearTimeout(safety);
   }, [hScale, hOpacity, wordmarkOpacity, wordmarkScale, onFinish]);
 
   return (

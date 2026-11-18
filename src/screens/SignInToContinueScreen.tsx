@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TextInput as RNTextInput } from 'react-native';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, type TextInputInstance } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -48,7 +48,7 @@ export default function SignInToContinueScreen() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
-  const passwordRef = useRef<RNTextInput>(null);
+  const passwordRef = useRef<TextInputInstance>(null);
   const { enterGuest } = useAuth();
 
   // Once there is an account, the visitor lands back on this listing (see HousingScreen).

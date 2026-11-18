@@ -3,7 +3,7 @@ import { View, StyleSheet, ActivityIndicator, Keyboard, Platform } from 'react-n
 import { Text, TextInput } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BackButton from '@/components/BackButton';
-import { WebView } from 'react-native-webview';
+import { WebView, type WebViewProps } from 'react-native-webview';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from '@/components/Icon';
@@ -21,6 +21,10 @@ import { toggleInterest } from '@/lib/interests';
 import type { CheckIn, HavenlyEvent, Offer, PlaceInterest, Profile, Residence } from '@/types';
 import { cheapestRoom, formatAed, PERIOD_LABEL } from '@/lib/housing';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
+
+// react-native-webview 14 ships class typings that React Native 0.88 reads as having no props, so the
+// component is given its props type by hand. Behaviour is unchanged.
+const MapWebView = WebView as unknown as React.ComponentType<WebViewProps & { ref?: React.Ref<WebView> }>;
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -858,7 +862,7 @@ export default function MapScreen() {
       ) : !loaded || !html ? (
         <View style={styles.centered}><ActivityIndicator color={colors.coral} /></View>
       ) : (
-        <WebView
+        <MapWebView
           ref={webviewRef}
           source={{ html }}
           style={{ flex: 1 }}
