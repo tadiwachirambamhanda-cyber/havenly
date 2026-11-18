@@ -78,10 +78,10 @@ export default function ManageHousingScreen() {
   const visibleEnquiries = statusFilter === 'all' ? enquiries : enquiries.filter((e) => e.status === statusFilter);
 
   const tone = (status: EnquiryStatus) => {
-    if (status === 'signed') return { bg: colors.tealSoft, fg: colors.teal };
+    if (status === 'signed') return { bg: colors.ink, fg: colors.white };
     if (status === 'lost') return { bg: colors.sandDeep, fg: colors.inkSoft };
     if (status === 'new') return { bg: colors.coralSoft, fg: colors.coral };
-    return { bg: `${colors.gold}26`, fg: colors.gold };
+    return { bg: colors.tintBg, fg: colors.tintText };
   };
 
   const renderEnquiries = () => (
@@ -106,7 +106,7 @@ export default function ManageHousingScreen() {
               <Text style={styles.statLabel}>Fees owed</Text>
             </View>
             <View style={styles.statCard}>
-              <Text style={[styles.statValue, { color: colors.teal }]}>{formatAed(totals.received)}</Text>
+              <Text style={styles.statValue}>{formatAed(totals.received)}</Text>
               <Text style={styles.statLabel}>Fees received</Text>
             </View>
           </View>
@@ -129,7 +129,7 @@ export default function ManageHousingScreen() {
           <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('AdminEnquiry', { enquiryId: item.id })}>
             <View style={{ flex: 1 }}>
               <Text style={styles.rowTitle} numberOfLines={1}>
-                {item.user?.display_name ?? 'Deleted account'} → {item.residence?.name ?? 'Residence'}
+                {item.user?.display_name ?? 'Deleted account'} → {item.residence?.name ?? 'Listing'}
               </Text>
               <Text style={styles.rowMeta} numberOfLines={1}>
                 {item.kind === 'viewing' ? 'Viewing' : 'Question'} · {formatMonth(item.move_in_month)} · {item.duration_months} mo · {timeAgo(item.created_at)}
@@ -157,11 +157,11 @@ export default function ManageHousingScreen() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
       ListHeaderComponent={
         <AnimatedPressable style={styles.addBtn} onPress={() => navigation.navigate('EditResidence', {})}>
-          <Icon name="plus" size={15} color="white" />
-          <Text style={styles.addBtnText}>Add residence</Text>
+          <Icon name="plus" size={16} color="white" />
+          <Text style={styles.addBtnText}>Add listing</Text>
         </AnimatedPressable>
       }
-      ListEmptyComponent={loaded ? <EmptyState icon="home" text="No residences yet. Add your first partner." /> : <PersonRowSkeleton count={4} thumb="square" />}
+      ListEmptyComponent={loaded ? <EmptyState icon="home" text="No listings yet. Add your first one." /> : <PersonRowSkeleton count={4} thumb="square" />}
       renderItem={({ item }) => {
         const terms = termsByResidence.get(item.id);
         return (
@@ -182,7 +182,7 @@ export default function ManageHousingScreen() {
                 <Text style={[styles.statusText, { color: colors.inkSoft }]}>Hidden</Text>
               </View>
             )}
-            {!terms && <Icon name="alert-circle" size={15} color={colors.coral} />}
+            {!terms && <Icon name="alert-circle" size={20} color={colors.errorText} />}
           </AnimatedPressable>
         );
       }}
@@ -201,7 +201,7 @@ export default function ManageHousingScreen() {
         {(['enquiries', 'residences'] as Tab[]).map((t) => (
           <AnimatedPressable key={t} style={[styles.segmentItem, tab === t && styles.segmentItemActive]} onPress={() => { haptics.tap(); setTab(t); }}>
             <Text style={[styles.segmentText, tab === t && styles.segmentTextActive]}>
-              {t === 'enquiries' ? `Enquiries${totals.newCount ? ` (${totals.newCount} new)` : ''}` : 'Residences'}
+              {t === 'enquiries' ? `Enquiries${totals.newCount ? ` (${totals.newCount} new)` : ''}` : 'Listings'}
             </Text>
           </AnimatedPressable>
         ))}
@@ -215,42 +215,42 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand },
     header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 12, paddingHorizontal: spacing.lg },
-    back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-    title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
+    back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+    title: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 24, letterSpacing: -0.4, color: colors.ink },
     segment: {
       flexDirection: 'row', marginHorizontal: spacing.lg, marginBottom: spacing.md, padding: 4,
       backgroundColor: colors.sandDeep, borderRadius: radius.pill,
     },
-    segmentItem: { flex: 1, paddingVertical: 9, borderRadius: radius.pill, alignItems: 'center' },
+    segmentItem: { flex: 1, minHeight: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
     segmentItemActive: { backgroundColor: colors.ink },
-    segmentText: { fontSize: 12.5, fontWeight: '600', color: colors.inkSoft },
-    segmentTextActive: { color: colors.sand, fontWeight: '700' },
+    segmentText: { fontSize: 14, fontWeight: '600', color: colors.inkSoft },
+    segmentTextActive: { color: colors.white, fontWeight: '700' },
     statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     statCard: {
       flexGrow: 1, flexBasis: '45%', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,
-      borderRadius: radius.md, padding: 12,
+      borderRadius: radius.md, padding: 14,
     },
-    statValue: { fontSize: 18, fontWeight: '800', color: colors.ink, fontVariant: ['tabular-nums'] },
-    statLabel: { fontSize: 11.5, color: colors.inkSoft, marginTop: 2 },
+    statValue: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 22, color: colors.ink },
+    statLabel: { fontSize: 13, color: colors.inkSoft, marginTop: 2 },
     filterRow: { gap: 8, paddingVertical: 14 },
-    chip: { paddingVertical: 7, paddingHorizontal: 12, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
+    chip: { minHeight: 40, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white, justifyContent: 'center' },
     chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
-    chipText: { fontSize: 12, fontWeight: '600', color: colors.ink },
-    chipTextSelected: { color: colors.sand },
+    chipText: { fontSize: 14, fontWeight: '500', color: colors.ink },
+    chipTextSelected: { color: colors.white, fontWeight: '600' },
     row: {
-      flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.white, borderWidth: 1,
-      borderColor: colors.line, borderRadius: radius.md, padding: 12, marginBottom: 8,
+      flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.white, borderWidth: 1,
+      borderColor: colors.line, borderRadius: radius.md, padding: 14, marginBottom: 10, minHeight: 64,
     },
-    rowTitle: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
-    rowMeta: { fontSize: 11.5, color: colors.inkSoft, marginTop: 2 },
-    statusPill: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.tag },
-    statusText: { fontSize: 10.5, fontWeight: '700' },
-    feeText: { fontSize: 11, fontWeight: '700', color: colors.ink, fontVariant: ['tabular-nums'] },
-    thumb: { width: 46, height: 46, borderRadius: radius.sm },
+    rowTitle: { fontSize: 15, fontWeight: '700', color: colors.ink },
+    rowMeta: { fontSize: 13, color: colors.inkSoft, marginTop: 2 },
+    statusPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
+    statusText: { fontSize: 12, fontWeight: '700' },
+    feeText: { fontSize: 13, fontWeight: '700', color: colors.ink, fontVariant: ['tabular-nums'] },
+    thumb: { width: 56, height: 56, borderRadius: 10 },
     addBtn: {
-      flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: colors.coral,
-      paddingVertical: 12, borderRadius: radius.button, marginBottom: 14,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.coral,
+      minHeight: 52, borderRadius: 12, marginBottom: 14,
     },
-    addBtnText: { color: 'white', fontWeight: '700', fontSize: 13.5 },
+    addBtnText: { color: 'white', fontWeight: '700', fontSize: 16 },
   });
 }
