@@ -26,7 +26,13 @@ import type { RootStackParamList } from '@/navigation/RootNavigator';
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 type Route = RouteProp<RootStackParamList, 'HousemateBoard'>;
 
+// Keyed by the account, so open report and block prompts and the loaded list reset if the account ever changes.
 export default function HousemateBoardScreen() {
+  const { session } = useAuth();
+  return <HousemateBoard key={session?.user.id ?? 'signed-out'} />;
+}
+
+function HousemateBoard() {
   const navigation = useNavigation<Nav>();
   const { residenceId } = useRoute<Route>().params ?? {};
   const insets = useSafeAreaInsets();

@@ -1940,7 +1940,8 @@ begin
 
   if tg_op = 'UPDATE' and old.status = 'approved' and not private.is_admin()
      and (new.area is distinct from old.area or new.lifestyle is distinct from old.lifestyle
-          or new.note is distinct from old.note or new.residence_id is distinct from old.residence_id) then
+          or new.note is distinct from old.note or new.residence_id is distinct from old.residence_id
+          or new.spots_needed is distinct from old.spots_needed) then
     new.status := 'pending';
   end if;
   return new;

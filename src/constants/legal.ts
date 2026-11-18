@@ -71,7 +71,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       heading: 'How long we keep it',
       paragraphs: [
         'We keep your information while your account is open.',
-        `If you delete your account (Profile → Delete account), we delete your account, profile, messages you sent, saved places, enquiries, and the photos you uploaded, including anything you posted in earlier versions of Havenly. If you signed with a residence through Havenly, we keep a record of that deal (the residence, dates, contract value and fee) with your name, phone number and messages removed, because we need it for accounting. Information a residence already received from an enquiry is held by that residence.`,
+        `If you delete your account (Profile → Delete account), we delete your account, profile, housemate card, messages you sent, saved places, enquiries, and the photos you uploaded, including anything you posted in earlier versions of Havenly. If you signed with a residence through Havenly, we keep a record of that deal (the residence, dates, contract value and fee) with your name, phone number and messages removed, because we need it for accounting. Information a residence already received from an enquiry is held by that residence.`,
       ],
     },
     {

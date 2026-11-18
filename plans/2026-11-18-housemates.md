@@ -75,3 +75,8 @@ Round 3: VERDICT FINDINGS(4).
 6. MAJOR, `MyHousemateCardScreen.tsx:67`: demo mode might read the real database. **Dismissed with evidence:** the `supabase` client every screen imports is a switch (`src/guest/clientSwitch.ts`, covered by tests with a real client that fails if used) that sends every read, write and RPC to the demo client while in demo mode. In the browser demo the card screen listed the sample home from the demo data.
 7. MINOR, `legal.ts:59`: the policy did not state the two-way rule, blocking and approval, and said people "never see" contact details though the note is free text. **Fixed:** the policy now says each side's choice and gender must fit the other, blocked users never match, and the note is visible to everyone who sees the card, so no contact details in it.
 8. MINOR, `HousemateReviewScreen.tsx:45`: the team queue was requested for every user (the server refuses non-admins). **Fixed:** only admins make the request.
+
+Round 4: VERDICT FINDINGS(2).
+9. MAJOR, `profile_private.sql:84`: changing "housemates needed" on an approved card did not send it back to the team, though other students read it. **Fixed** with migration `20261118530000_housemate_spots_review.sql` (one added condition in the card rules; applied live and recorded). Tested live in a block that rolled back: a student changing the spots sends an approved card back to pending; switching the card off does not.
+10. MINOR, `HousemateBoardScreen.tsx:89`: an open report or block prompt could act for the new account if the account changed. **Fixed:** the board is keyed by the account, so it starts fresh.
+Also: the policy's account-deletion sentence now names the housemate card.
