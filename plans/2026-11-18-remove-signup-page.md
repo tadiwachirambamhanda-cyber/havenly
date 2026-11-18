@@ -24,3 +24,6 @@ Changing the sheet's look, the demo banner, or the password rules (the sheet alr
 
 ## Verification
 typecheck, lint and 85 tests pass. On screen: Log in, then "Create an account", opens "Make a free account" with email, password, Create account, "I already have an account. Log in" and Not now.
+
+## Codex review
+Round 1: VERDICT PASS (no findings).
