@@ -14,5 +14,12 @@ export async function saveOwnRow(
   if (error) throw error;
   if (data && data.length > 0) return;
   const { error: insertError } = await supabase.from(table).insert({ user_id: userId, ...values });
-  if (insertError) throw insertError;
+  if (!insertError) return;
+  // Two first-time saves can race: the other one inserted the row a moment ago. Then the row exists, so update it.
+  if (insertError.code === '23505') {
+    const retry = await supabase.from(table).update(values).eq('user_id', userId).select('user_id');
+    if (retry.error) throw retry.error;
+    if (retry.data && retry.data.length > 0) return;
+  }
+  throw insertError;
 }

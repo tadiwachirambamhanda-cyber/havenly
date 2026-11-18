@@ -15,3 +15,8 @@ Also: the board's tag chips use a position-based key, so a stored duplicate tag 
 3. The one miss: the database allows a duplicate lifestyle tag stored by a hand-made request (the app refuses it). Harmless (display only, now handled); not worth another database change.
 4. Cleanup verified: 0 test accounts, cards, homes, blocks or conversations left; counts back to what they were. The saved test passwords file was deleted.
 5. Not tested: a phone, and the screens themselves against real accounts (the test used the same calls the screens make).
+
+## Codex review
+Round 1: VERDICT FINDINGS(2).
+1. MAJOR, `ownRow.ts:15-17`: two first-time saves could race, and the loser reported a failure though the row existed. **Fixed:** on a duplicate-key error the save retries as an update and fails only if that also fails.
+2. MAJOR, `EditProfileScreen.tsx:91-110`: the public profile saved before the private fields, so a failure of the second left a half-saved profile with a misleading message. **Fixed:** the screen now says "Your name, photo and university were saved, but your housing details were not. Tap Save to try again.", refreshes the profile so what was saved shows, stays on the screen, and scrolls the message into view.
