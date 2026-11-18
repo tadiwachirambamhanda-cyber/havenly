@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
-import { Text } from '@/components/Text';
+import { RoofH, Wordmark } from '@/components/Brand';
 import { useTheme } from '@/lib/ThemeContext';
 import type { ColorTokens } from '@/theme/tokens';
 
-// Plays once per cold start: the h mark bounces in, holds, then fades into
-// the exact wordmark used in Feed's top bar — landing on the real brand
-// instead of a separate one-off launch graphic.
+// Plays once per cold start: the roof-h mark bounces in, holds, then fades into
+// the exact wordmark used in the top bars — landing on the real brand instead of
+// a separate one-off launch graphic.
 export default function LaunchAnimation({ onFinish }: { onFinish: () => void }) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -30,10 +30,11 @@ export default function LaunchAnimation({ onFinish }: { onFinish: () => void }) 
 
   return (
     <View style={styles.container}>
-      <Animated.Text style={[styles.h, { opacity: hOpacity, transform: [{ scale: hScale }] }]}>h</Animated.Text>
+      <Animated.View style={[styles.h, { opacity: hOpacity, transform: [{ scale: hScale }] }]}>
+        <RoofH size={96} />
+      </Animated.View>
       <Animated.View style={[styles.wordmarkRow, { opacity: wordmarkOpacity, transform: [{ scale: wordmarkScale }] }]}>
-        <View style={styles.dot} />
-        <Text style={styles.wordmark}>havenly.</Text>
+        <Wordmark size={34} />
       </Animated.View>
     </View>
   );
@@ -42,9 +43,7 @@ export default function LaunchAnimation({ onFinish }: { onFinish: () => void }) 
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand, alignItems: 'center', justifyContent: 'center' },
-    h: { position: 'absolute', fontFamily: 'SchibstedGrotesk_700Bold_Italic', fontSize: 96, color: colors.ink },
-    wordmarkRow: { position: 'absolute', flexDirection: 'row', alignItems: 'center', gap: 6 },
-    dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.coral },
-    wordmark: { fontFamily: 'SchibstedGrotesk_700Bold_Italic', fontSize: 24, color: colors.ink },
+    h: { position: 'absolute' },
+    wordmarkRow: { position: 'absolute', flexDirection: 'row', alignItems: 'center' },
   });
 }

@@ -14,7 +14,7 @@
       "package": "com.havenly.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FF5A3C"
+        "backgroundColor": "#7A2433"
       }
     },
     "web": {

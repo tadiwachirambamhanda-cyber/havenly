@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl, ScrollView } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
+import { Wordmark } from '@/components/Brand';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
@@ -142,7 +143,7 @@ export default function HousingScreen() {
   const header = (
     <View>
       <View style={styles.topRow}>
-        <Text style={styles.wordmark}>havenly</Text>
+        <Wordmark size={26} />
         <View style={styles.topActions}>
           {myId ? (
             <AnimatedPressable style={styles.iconBtn} onPress={() => navigation.navigate('MyEnquiries')} accessibilityRole="button" accessibilityLabel="My enquiries">

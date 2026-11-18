@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, ScrollView, Pressable, ActivityIndicator, KeyboardAvoidingView, Platform, TextInput as RNTextInput } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
+import { Wordmark } from '@/components/Brand';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -66,8 +67,7 @@ export default function SignUpScreen() {
         contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top + 28, paddingBottom: 40, paddingHorizontal: spacing.xl }}
       >
         <View style={styles.masthead}>
-          <View style={styles.brandDot} />
-          <Text style={styles.brandWordmark}>havenly.</Text>
+          <Wordmark size={26} />
         </View>
 
         <Text style={styles.eyebrow}>Join Havenly</Text>

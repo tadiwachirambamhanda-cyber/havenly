@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, ScrollView, Pressable, RefreshControl, useWindowDimensions, type NativeSyntheticEvent, type NativeScrollEvent, type StyleProp, type ViewStyle, type TextStyle } from 'react-native';
 import { Text } from '@/components/Text';
+import { Wordmark } from '@/components/Brand';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from '@/components/Icon';
@@ -437,8 +438,7 @@ export default function FeedScreen() {
       <View style={styles.container}>
         <View style={styles.topBar}>
           <View style={styles.brandRow}>
-            <View style={styles.brandDot} />
-            <Text style={styles.brand}>havenly.</Text>
+            <Wordmark size={26} />
           </View>
         </View>
         <View style={styles.masonryRow}>
@@ -465,8 +465,7 @@ export default function FeedScreen() {
     <View style={styles.container}>
       <View style={styles.topBar}>
         <Pressable style={styles.brandRow} onPress={refreshFeed} accessibilityLabel="Refresh feed">
-          <View style={styles.brandDot} />
-          <Text style={styles.brand}>havenly.</Text>
+          <Wordmark size={26} />
         </Pressable>
         <View style={styles.topBarActions}>
           {!!profile?.current_streak && (
