@@ -13,6 +13,10 @@ create table profiles (
   cover_url text,
   university text,
   interests text[] default '{}',
+  -- What the student is looking for (all optional); see 20261118400000_profile_housing_preferences.sql.
+  budget_aed int check (budget_aed between 1 and 100000),
+  move_in_month date check (move_in_month = date_trunc('month', move_in_month)::date),
+  housemate_pref text check (housemate_pref in ('any', 'female_only', 'male_only')),
   -- Daily activity streak — see bump_streak() below for how these advance.
   -- last_active_date is the UTC date it was last extended, matching the
   -- daily-pick feature's own day-boundary convention.
@@ -33,7 +37,7 @@ create policy "Users can update their own profile" on profiles for update using 
 -- is_admin and streaks), so updates are limited to editable columns and
 -- direct inserts are closed (see 20261106100000_lock_down_profile_columns.sql).
 revoke update on profiles from authenticated, anon;
-grant update (username, display_name, bio, avatar_url, cover_url, university, interests, has_completed_onboarding) on profiles to authenticated;
+grant update (username, display_name, bio, avatar_url, cover_url, university, interests, has_completed_onboarding, budget_aed, move_in_month, housemate_pref) on profiles to authenticated;
 revoke insert on profiles from authenticated, anon;
 create policy "Users can insert their own profile" on profiles for insert with check (auth.uid() = id);
 

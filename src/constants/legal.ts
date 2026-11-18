@@ -29,7 +29,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       paragraphs: ['We only collect what the app needs to work:'],
       bullets: [
         'Account details: your email address and password. Passwords are stored encrypted by our authentication provider; we never see them.',
-        'Your profile: display name, username, bio, profile and cover photos, and university.',
+        'Your profile: display name, username, bio, profile photo and university, and, if you choose to add them, your monthly budget, preferred move-in month and who you would like to live with.',
         'Messages: your messages, including one-to-one chats and any group conversations you are already part of.',
         'Location: only while you use the map or location-based sorting, and only if you allow it. We don\'t track your location in the background.',
         'Housing: residences you save, and enquiries you send: move-in month, length of stay, room, budget, viewing availability, your message and the phone or WhatsApp number you give us. If you sign with a residence, we record the contract value so we can work out the fee the residence owes us.',
@@ -74,7 +74,7 @@ export const PRIVACY_POLICY: LegalDocument = {
     {
       heading: 'Your choices and rights',
       bullets: [
-        'Edit your profile and university at any time.',
+        'Edit your profile, university and housing preferences at any time.',
         'Turn off location access in your phone\'s settings; the map then shows Dubai without your position.',
         'Block anyone, and report people or messages.',
         'Delete your account from Settings.',

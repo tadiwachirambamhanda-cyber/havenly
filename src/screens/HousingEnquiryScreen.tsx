@@ -1,3 +1,4 @@
+import { usableMoveIn } from '@/lib/profilePrefs';
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
@@ -26,7 +27,7 @@ export default function HousingEnquiryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<Route>();
   const { residenceId } = route.params;
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
@@ -35,9 +36,11 @@ export default function HousingEnquiryScreen() {
   const [residence, setResidence] = useState<Residence | null>(null);
   const [kind, setKind] = useState<EnquiryKind>(route.params.kind);
   const [roomTypeId, setRoomTypeId] = useState<string | null>(null);
-  const [moveIn, setMoveIn] = useState<string>(months[1]);
+  // Start from what the student saved on their profile (budget and move-in month), if anything.
+  const savedBudget = profile?.budget_aed != null ? String(profile.budget_aed) : '';
+  const [moveIn, setMoveIn] = useState<string>(() => usableMoveIn(profile?.move_in_month, months) ?? months[1]);
   const [duration, setDuration] = useState(12);
-  const [budget, setBudget] = useState('');
+  const [budget, setBudget] = useState(savedBudget);
   const [phone, setPhone] = useState('');
   const [viewingTime, setViewingTime] = useState<string | null>(null);
   const [message, setMessage] = useState('');
@@ -63,7 +66,7 @@ export default function HousingEnquiryScreen() {
     }
   }, [residenceId, myId]);
 
-  const allowLeave = useConfirmDiscard(!sent && (message.trim() !== '' || budget.trim() !== ''));
+  const allowLeave = useConfirmDiscard(!sent && (message.trim() !== '' || budget.trim() !== savedBudget));
 
   const availableRooms = (residence?.room_types ?? []).filter((r) => r.is_available);
 

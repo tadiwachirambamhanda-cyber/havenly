@@ -18,6 +18,7 @@ import ProfileScreen from '@/screens/ProfileScreen';
 import NotificationsScreen from '@/screens/NotificationsScreen';
 import BlockedUsersScreen from '@/screens/BlockedUsersScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
+import ChangePasswordScreen from '@/screens/ChangePasswordScreen';
 import EditProfileScreen from '@/screens/EditProfileScreen';
 import OffersScreen from '@/screens/OffersScreen';
 import OfferDetailScreen from '@/screens/OfferDetailScreen';
@@ -48,6 +49,7 @@ export type RootStackParamList = {
   Chat: { conversationId: string; otherUserId?: string };
   BlockedUsers: undefined;
   Settings: undefined;
+  ChangePassword: undefined;
   EditProfile: undefined;
   Offers: undefined;
   OfferDetail: { offerId: string };
@@ -158,6 +160,7 @@ export default function RootNavigator() {
             <Stack.Screen name="Chat" component={ChatScreen} />
             <Stack.Screen name="BlockedUsers" component={BlockedUsersScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
+            <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Offers" component={OffersScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="OfferDetail" component={OfferDetailScreen} options={{ presentation: 'card' }} />

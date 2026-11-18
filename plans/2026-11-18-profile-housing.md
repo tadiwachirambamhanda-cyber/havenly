@@ -35,3 +35,15 @@ Changing the email address (needs the email confirmation flow), photos upload ch
 ## Questions
 1. May I apply the migration to the live database (step 1)? It only adds three empty columns.
 2. Move Log out and Delete account from Settings to Profile (my recommendation), or keep them in both places?
+
+## Changes from the plan
+- The owner approved the migration and moving Log out and Delete account. The migration `20261118400000_profile_housing_preferences.sql` was applied live on 2026-11-18 and recorded with `supabase migration repair`.
+- Edit profile gets a Save button at the bottom as well as the header (the form is now long), and its error message shows at the top, under the header, instead of at the bottom.
+- The "Delete your account?" warning now says profile, saved places, enquiries and messages (it still said posts and comments).
+- The Notifications row moved into the Account section; the new-update dot is on both My enquiries and that row.
+- The real-account test (plan check 4) was not run: it needs a test account on the live database and the owner's yes.
+
+## Verification
+1. typecheck, lint (no warnings), 102 tests (9 new for budget parsing, the summary line and the saved move-in month), expo-doctor 20/20, export for web, iOS and Android pass.
+2. Migration, tested live inside blocks that rolled back: a negative, zero or over-limit budget, a mid-month date and a bogus preference are all refused; valid values and nulls are accepted; as the signed-in role, a profile can write the new columns and `is_admin` is still locked.
+3. Demo in the browser: Profile shows the new header, enquiries (empty state, and with two seeded sample enquiries the rows and status chips), the preferences card, the Account section; Edit profile has no cover, shows the preferences, refuses a bad budget with the message at the top; Change password opens with the demo notice and a disabled button; Settings has no Log out or Delete.
