@@ -150,7 +150,7 @@ export default function HousingScreen() {
               <Icon name="clipboard" size={18} color={colors.ink} />
             </AnimatedPressable>
           ) : (
-            <AnimatedPressable style={styles.loginBtn} onPress={() => navigation.navigate('Login')} accessibilityRole="button" accessibilityLabel="Log in">
+            <AnimatedPressable style={styles.loginBtn} onPress={() => navigation.navigate('SignInToContinue', { reason: 'login' })} accessibilityRole="button" accessibilityLabel="Log in">
               <Text style={styles.loginText}>Log in</Text>
             </AnimatedPressable>
           )}

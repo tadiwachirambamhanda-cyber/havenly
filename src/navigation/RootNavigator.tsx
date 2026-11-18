@@ -10,9 +10,7 @@ import { useStreakBump } from '@/lib/useStreakBump';
 import TabBar from '@/navigation/TabBar';
 import LaunchAnimation from '@/components/LaunchAnimation';
 import GuestBanner from '@/components/GuestBanner';
-import { PUBLIC_BROWSING } from '@/config/features';
 
-import LoginScreen from '@/screens/LoginScreen';
 import OnboardingScreen from '@/screens/OnboardingScreen';
 import FeedScreen from '@/screens/FeedScreen';
 import DiscoverScreen from '@/screens/DiscoverScreen';
@@ -52,10 +50,9 @@ import SignInToContinueScreen from '@/screens/SignInToContinueScreen';
 import LegalScreen from '@/screens/LegalScreen';
 
 // Why a signed-out visitor is being asked to make an account (shown in SignInToContinue).
-export type AccountReason = 'save' | 'enquire' | 'compare' | 'join';
+export type AccountReason = 'save' | 'enquire' | 'compare' | 'join' | 'login';
 
 export type RootStackParamList = {
-  Login: undefined;
   Onboarding: undefined;
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   PostDetail: { postId: string };
@@ -159,24 +156,16 @@ export default function RootNavigator() {
     {isGuest ? <GuestBanner /> : null}
     <NavigationContainer theme={navTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!session && PUBLIC_BROWSING ? (
-          // Signed out, public browsing on: the real Housing screen first, a listing and
-          // the rent split without an account. Saving, enquiring and comparing open
-          // SignInToContinue (useRequireAccount). That sheet is also the only place an account is
-          // made (Login's "Create an account" link opens it with reason 'join'); Login stays for
-          // people who already have one.
+        {!session ? (
+          // Signed out: the real Housing screen first, then a listing and the rent split, all
+          // without an account. Saving, enquiring and comparing open SignInToContinue
+          // (useRequireAccount). That sheet is the only place to make an account or log in:
+          // the Housing screen's "Log in" opens it in log-in mode. There is no separate
+          // login or sign-up screen.
           <>
             <Stack.Screen name="PublicHousing" component={HousingScreen} />
             <Stack.Screen name="ResidenceDetail" component={ResidenceDetailScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="SplitRent" component={SplitRentScreen} options={{ presentation: 'modal' }} />
-            <Stack.Screen name="SignInToContinue" component={SignInToContinueScreen} options={{ presentation: 'modal' }} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Legal" component={LegalScreen} options={{ presentation: 'card' }} />
-          </>
-        ) : !session ? (
-          // Signed out — auth flow only.
-          <>
-            <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="SignInToContinue" component={SignInToContinueScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Legal" component={LegalScreen} options={{ presentation: 'card' }} />
           </>

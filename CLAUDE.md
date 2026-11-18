@@ -17,7 +17,7 @@ Work is split into two lanes plus the Chief Architect. A lane changes only the p
 | Path | Owner |
 |---|---|
 | `src/theme/`, `App.tsx`, `app.json`, `package.json`, `package-lock.json` | Chief Architect |
-| `src/types/`, `src/config/`, `src/navigation/`, `src/lib/AuthContext.tsx`, `src/lib/ThemeContext.tsx`, `src/lib/supabase.ts`, `src/lib/housing.ts`, `src/lib/rentSplit.ts`, `src/lib/ranking.ts`, `src/lib/requireAccount.ts` | Chief Architect |
+| `src/types/`, `src/navigation/`, `src/lib/AuthContext.tsx`, `src/lib/ThemeContext.tsx`, `src/lib/supabase.ts`, `src/lib/housing.ts`, `src/lib/rentSplit.ts`, `src/lib/ranking.ts`, `src/lib/requireAccount.ts` | Chief Architect |
 | `supabase/` (schema and migrations), `src/guest/` (demo mode and its sample data) | Chief Architect |
 | `docs/`, `design/`, `CLAUDE.md`, `.github/`, `plans/` for the Chief Architect's own plans | Chief Architect |
 | `src/screens/HousingScreen.tsx`, `ResidenceDetailScreen.tsx`, `HousingEnquiryScreen.tsx`, `HousingEnquirySentScreen.tsx`, `MyEnquiriesScreen.tsx`, `SplitRentScreen.tsx`, `CompareScreen.tsx`, `SignInToContinueScreen.tsx`, `src/components/housing/`, `plans/lane-a-*` | Lane A (find a home) |

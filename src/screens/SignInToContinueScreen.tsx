@@ -6,6 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { PASSWORD_HINT, passwordProblem } from '@/lib/passwordRules';
 import { Notice, PrimaryButton, SheetHeader } from '@/components/housing/parts';
@@ -21,6 +22,7 @@ const TITLE: Record<AccountReason, string> = {
   save: 'Make a free account to save places',
   compare: 'Make a free account to compare places',
   join: 'Make a free account',
+  login: 'Welcome back',
 };
 
 const WHY: Record<AccountReason, string> = {
@@ -28,6 +30,7 @@ const WHY: Record<AccountReason, string> = {
   save: 'So your saved places are kept for you on any device.',
   compare: 'So the places you compare are kept for you.',
   join: 'So you can save places, send enquiries and join in.',
+  login: 'Log in to see your saved places and your enquiries.',
 };
 
 export default function SignInToContinueScreen() {
@@ -38,7 +41,7 @@ export default function SignInToContinueScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
-  const [mode, setMode] = useState<'create' | 'login'>('create');
+  const [mode, setMode] = useState<'create' | 'login'>(reason === 'login' ? 'login' : 'create');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -46,6 +49,7 @@ export default function SignInToContinueScreen() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const passwordRef = useRef<RNTextInput>(null);
+  const { enterGuest } = useAuth();
 
   // Once there is an account, the visitor lands back on this listing (see HousingScreen).
   useEffect(() => {
@@ -98,7 +102,7 @@ export default function SignInToContinueScreen() {
           <View style={{ gap: 6 }}>
             <Text style={styles.heading}>{TITLE[reason]}</Text>
             <Text style={styles.body}>
-              {WHY[reason]}{residenceId ? ' It takes a minute, and you stay on this listing afterwards.' : ' It takes a minute.'}
+              {WHY[reason]}{reason === 'login' ? '' : residenceId ? ' It takes a minute, and you stay on this listing afterwards.' : ' It takes a minute.'}
             </Text>
           </View>
 
@@ -162,6 +166,11 @@ export default function SignInToContinueScreen() {
           <AnimatedPressable style={styles.linkBtn} onPress={close} accessibilityRole="button" accessibilityLabel="Not now">
             <Text style={styles.link}>Not now</Text>
           </AnimatedPressable>
+          {reason === 'join' || reason === 'login' ? (
+            <AnimatedPressable style={styles.linkBtn} onPress={enterGuest} accessibilityRole="button" accessibilityLabel="Explore Havenly without signing up, a read-only demo with sample content">
+              <Text style={styles.link}>Just looking? Explore the demo</Text>
+            </AnimatedPressable>
+          ) : null}
 
           <Text style={styles.legal}>
             By creating an account you agree to the{' '}
