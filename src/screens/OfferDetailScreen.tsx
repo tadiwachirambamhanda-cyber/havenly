@@ -183,9 +183,9 @@ export default function OfferDetailScreen() {
 
         {(offer.address || (offer.latitude != null && offer.longitude != null)) && (
           <AnimatedPressable style={styles.streakRow} onPress={() => openInMaps({ label: offer.address, latitude: offer.latitude, longitude: offer.longitude })} accessibilityRole="link">
-            <Icon name="map-pin" size={13} color={colors.teal} />
+            <Icon name="map-pin" size={13} color={colors.coral} />
             <Text style={[styles.streakRowText, { textDecorationLine: 'underline' }]}>{offer.address ?? 'See where this is'}</Text>
-            <Text style={{ fontSize: 12.5, fontWeight: '700', color: colors.teal }}>Open in Maps</Text>
+            <Text style={{ fontSize: 12.5, fontWeight: '700', color: colors.coral }}>Open in Maps</Text>
           </AnimatedPressable>
         )}
 
