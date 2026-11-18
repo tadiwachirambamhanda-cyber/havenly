@@ -22,3 +22,9 @@ A fill left on `coral` in dark would stay at 3.1:1 (cosmetic only). Translucent 
 
 ## Not doing
 No change to the light palette, no new dark logo.
+
+## Codex review
+Round 1: VERDICT PASS (no findings).
+
+## Verification
+typecheck, lint and 85 tests pass. Dark mode in the browser: Log in button, floating add button show the deeper rose with white text. Light mode unchanged (coralFill equals coral there).
