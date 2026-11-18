@@ -116,8 +116,8 @@ const residences: Row[] = [
     address: 'Dubai Knowledge Park, Dubai', latitude: 25.1015, longitude: 55.1648, photo_urls: [],
     amenities: ['Wi-Fi', 'Study lounge', 'Gym', 'Laundry'], nearby_universities: ['Murdoch University Dubai', 'Heriot-Watt University Dubai'],
     gender_policy: 'mixed', is_active: true, created_at: daysAgo(20),
-    listing_type: 'residence', bedrooms: null, deposit_aed: null, move_in_fee_aed: null,
-    is_verified: false, verified_at: null, permit_number: null,
+    listing_type: 'residence', bedrooms: null, deposit_aed: 3000, move_in_fee_aed: 500,
+    is_verified: true, verified_at: daysAgo(10), permit_number: null,
     bills_included: true, bills_min_aed: null, bills_max_aed: null, student_deal_types: [], student_rate_aed: null, housemates: null,
     commutes: [{ university: 'Heriot-Watt University Dubai', minutes: 12, mode: 'shuttle' }, { university: 'Murdoch University Dubai', minutes: 15, mode: 'shuttle' }],
   },
@@ -143,6 +143,17 @@ const residences: Row[] = [
     bills_included: null, bills_min_aed: null, bills_max_aed: null, student_deal_types: ['student_rate'], student_rate_aed: 3100, housemates: null,
     commutes: [{ university: 'American University in Dubai', minutes: 14, mode: 'metro' }],
   },
+  {
+    id: 'residence-4', name: 'Sample Home, Jumeirah Lake Towers', provider_name: 'Sample Housing Partner', area: 'Jumeirah Lake Towers',
+    description: 'A made-up whole 3 bedroom home for the demo, for three students to share and split the rent. (Sample listing)',
+    address: 'Jumeirah Lake Towers, Dubai', latitude: 25.0657, longitude: 55.1413, photo_urls: [],
+    amenities: ['Furnished', 'Wi-Fi', 'Parking'], nearby_universities: ['American University in Dubai'],
+    gender_policy: 'mixed', is_active: true, created_at: daysAgo(12),
+    listing_type: 'home', bedrooms: 3, deposit_aed: 4500, move_in_fee_aed: 500,
+    is_verified: false, verified_at: null, permit_number: null,
+    bills_included: false, bills_min_aed: 450, bills_max_aed: 700, student_deal_types: [], student_rate_aed: null, housemates: null,
+    commutes: [{ university: 'American University in Dubai', minutes: 25, mode: 'metro' }],
+  },
 ];
 
 const room_types: Row[] = [
@@ -151,6 +162,7 @@ const room_types: Row[] = [
   room('room-2a', 'residence-2', 'Single room', 3200, 'month', 1, 1),
   room('room-2b', 'residence-2', 'Shared room', 2100, 'month', 2, 2),
   room('room-3a', 'residence-3', 'Private studio', 41000, 'year', 1, 1),
+  room('room-4a', 'residence-4', 'Whole 3 bedroom home', 9000, 'month', 1, 1),
 ];
 
 const brands: Row[] = [

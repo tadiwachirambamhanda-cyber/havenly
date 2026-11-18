@@ -1330,7 +1330,10 @@ create table room_types (
   created_at timestamptz default now()
 );
 alter table room_types enable row level security;
-create policy "Room types are viewable by everyone" on room_types for select using (true);
+-- A room is visible only when its listing is (the residences policy shows active listings, and admins all).
+create policy "Room types follow their listing's visibility" on room_types for select using (
+  exists (select 1 from residences r where r.id = room_types.residence_id)
+);
 create policy "Admins can create room types" on room_types for insert with check (public.is_admin());
 create policy "Admins can update room types" on room_types for update using (public.is_admin());
 create policy "Admins can delete room types" on room_types for delete using (public.is_admin());
