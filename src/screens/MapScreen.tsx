@@ -11,13 +11,10 @@ import Constants from 'expo-constants';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
-import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
 import { getCurrentLocation, requestLocationAccess, openLocationSettings, type Coords } from '@/lib/location';
-import { sendPing } from '@/lib/checkIns';
 import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
-import { toggleInterest } from '@/lib/interests';
 import type { CheckIn, HavenlyEvent, Offer, PlaceInterest, Profile, Residence } from '@/types';
 import { cheapestRoom, formatAed, PERIOD_LABEL } from '@/lib/housing';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -72,10 +69,16 @@ function paletteFor(colors: ColorTokens): MapPalette {
 // matching the app's current theme), then every layer is recolored to
 // Havenly's own palette so it reads as a branded map, not a generic one.
 function buildMapHtml(params: {
-  center: Coords; offers: Offer[]; events: HavenlyEvent[]; residences: Residence[]; checkIns: MapCheckIn[]; interests: PlaceInterest[];
+  center: Coords; residences: Residence[];
   myId: string | undefined; mapboxToken: string; colors: ColorTokens;
 }): string {
-  const { center, offers, events, residences, checkIns, interests, myId, mapboxToken, colors } = params;
+  const { center, residences, myId, mapboxToken, colors } = params;
+  // The map page still carries code for offer, event and check-in pins; those lists are always empty now
+  // (archived, tag archive/social-v1) so none of it runs. Removing the page code is a separate, phone-tested change.
+  const offers: Offer[] = [];
+  const events: HavenlyEvent[] = [];
+  const checkIns: MapCheckIn[] = [];
+  const interests: PlaceInterest[] = [];
   const palette = paletteFor(colors);
   // Every Mapbox dark preset (dark-v11, navigation-night-v1) is a stripped
   // "driving at night" style with far fewer building/POI labels than
@@ -519,132 +522,27 @@ export default function MapScreen() {
   const navigation = useNavigation<Nav>();
   const { session } = useAuth();
   const { colors } = useTheme();
-  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
   const webviewRef = useRef<WebView>(null);
 
   const [center, setCenter] = useState<Coords | null>(null);
-  const [offers, setOffers] = useState<Offer[]>([]);
-  const [events, setEvents] = useState<HavenlyEvent[]>([]);
   const [residences, setResidences] = useState<Residence[]>([]);
-  const [checkIns, setCheckIns] = useState<MapCheckIn[]>([]);
-  const [interests, setInterests] = useState<PlaceInterest[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [hiddenTypes, setHiddenTypes] = useState<{ offer: boolean; event: boolean; residence: boolean; checkin: boolean }>({
-    offer: false, event: false, residence: false, checkin: false,
-  });
-  // Realtime handlers below need the latest offers/events to resolve a new
-  // check-in's place, but re-subscribing the channel every time offers/
-  // events change (a normal useCallback dependency would do that) would
-  // drop and reopen the connection far more than needed — a ref sidesteps
-  // that without going stale.
-  const offersRef = useRef<Offer[]>([]);
-  const eventsRef = useRef<HavenlyEvent[]>([]);
 
   const load = useCallback(async () => {
     const loc = await getCurrentLocation();
     setLocationDenied(!loc);
     setCenter(loc ?? DUBAI_FALLBACK);
-
-    const [{ data: offerData }, { data: eventData }, { data: checkInData }, { data: interestData }, { data: residenceData }] = await Promise.all([
-      // Offers, events and check-ins are archived (tag archive/social-v1): the map shows homes only.
-      Promise.resolve({ data: [] as unknown[] }),
-      Promise.resolve({ data: [] as unknown[] }),
-      Promise.resolve({ data: [] as unknown[] }),
-      Promise.resolve({ data: [] as unknown[] }),
-      supabase.from('residences').select('*, room_types(*)').eq('is_active', true).not('latitude', 'is', null),
-    ]);
-
-    const offerList = (offerData as unknown as Offer[]) ?? [];
-    const eventList = (eventData as HavenlyEvent[]) ?? [];
-    const offerById = new Map(offerList.map((o) => [o.id, o]));
-    const eventById = new Map(eventList.map((e) => [e.id, e]));
-
-    const checkInList = ((checkInData as unknown as CheckIn[]) ?? []).map((c): MapCheckIn => ({
-      ...(c as CheckIn & { user: Profile }),
-      place: c.place_type === 'offer' ? offerById.get(c.place_id) ?? null : eventById.get(c.place_id) ?? null,
-    }));
-
-    setOffers(offerList);
-    setEvents(eventList);
+    // Offers, events, check-ins and "interested" taps are archived (tag archive/social-v1): the map shows homes only.
+    const { data: residenceData } = await supabase.from('residences').select('*, room_types(*)').eq('is_active', true).not('latitude', 'is', null);
     setResidences((residenceData as Residence[]) ?? []);
-    setCheckIns(checkInList);
-    setInterests((interestData as unknown as PlaceInterest[]) ?? []);
     setLoaded(true);
-    offersRef.current = offerList;
-    eventsRef.current = eventList;
   }, []);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
-
-  // Patches the WebView directly (addCheckin/removeCheckin/setInterest)
-  // rather than calling load() + rebuilding the page on every event — same
-  // "don't reset the user's pan/zoom for one small change" reasoning as
-  // handleToggleInterest. Someone else's check-in appearing, disappearing,
-  // or a "down to go" count changing shows up live while this screen is
-  // open, instead of only on the next reopen.
-  const handleCheckInInsert = useCallback(async (row: CheckIn) => {
-    let place = row.place_type === 'offer'
-      ? offersRef.current.find((o) => o.id === row.place_id)
-      : eventsRef.current.find((e) => e.id === row.place_id);
-    // Not in the last-loaded snapshot yet — either this event raced load()'s
-    // fetch, or the place was created after load() last ran. Fetch it
-    // directly rather than silently dropping the check-in.
-    if (!place) {
-      const { data } = row.place_type === 'offer'
-        ? await supabase.from('offers').select('*, brand:brands(*)').eq('id', row.place_id).maybeSingle()
-        : await supabase.from('events').select('*').eq('id', row.place_id).maybeSingle();
-      place = (data as unknown as Offer | HavenlyEvent) ?? undefined;
-    }
-    if (!place || place.latitude == null || place.longitude == null) return;
-
-    const { data: userData } = await supabase.from('profiles').select('*').eq('id', row.user_id).maybeSingle();
-    if (!userData) return;
-    const user = userData as Profile;
-
-    setCheckIns((prev) => (prev.some((c) => c.id === row.id) ? prev : [...prev, { ...row, user, place }]));
-
-    const patch = {
-      id: row.id, lat: place.latitude, lng: place.longitude,
-      name: user.display_name, avatar: user.avatar_url, mine: row.user_id === myId,
-      placeTitle: place.title,
-    };
-    if (typeof webviewRef.current?.injectJavaScript === 'function') {
-      webviewRef.current.injectJavaScript(`window.addCheckin && window.addCheckin(${JSON.stringify(patch)}); true;`);
-    }
-  }, [myId]);
-
-  const handleCheckInDelete = useCallback((id: string) => {
-    setCheckIns((prev) => prev.filter((c) => c.id !== id));
-    if (typeof webviewRef.current?.injectJavaScript === 'function') {
-      webviewRef.current.injectJavaScript(`window.removeCheckin && window.removeCheckin(${JSON.stringify(id)}); true;`);
-    }
-  }, []);
-
-  const handleInterestChange = useCallback(async (row: { place_type: string; place_id: string } | undefined) => {
-    if (!row || (row.place_type !== 'offer' && row.place_type !== 'event')) return;
-    const { data } = await supabase.from('interests').select('user_id').eq('place_type', row.place_type).eq('place_id', row.place_id);
-    const rows = (data as { user_id: string }[]) ?? [];
-    const count = rows.length;
-    const mine = !!myId && rows.some((r) => r.user_id === myId);
-    const key = `${row.place_type}:${row.place_id}`;
-    if (typeof webviewRef.current?.injectJavaScript === 'function') {
-      webviewRef.current.injectJavaScript(`window.setInterest && window.setInterest(${JSON.stringify(key)}, ${count}, ${mine}); true;`);
-    }
-  }, [myId]);
-
-  useFocusEffect(useCallback(() => {
-    const channel = supabase.channel('map-live')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'check_ins' }, (payload) => handleCheckInInsert(payload.new as CheckIn))
-      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'check_ins' }, (payload) => handleCheckInDelete((payload.old as { id: string }).id))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'interests' },
-        (payload) => handleInterestChange((payload.new ?? payload.old) as { place_type: string; place_id: string } | undefined))
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [handleCheckInInsert, handleCheckInDelete, handleInterestChange]));
 
   const handleEnableLocation = async () => {
     haptics.tap();
@@ -657,93 +555,23 @@ export default function MapScreen() {
     }
   };
 
-  const handlePing = async (checkInId: string) => {
-    haptics.tap();
-    try {
-      await sendPing(checkInId);
-      haptics.success();
-      showToast('Ping sent');
-    } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Couldn’t send ping.', 'error');
-    }
-  };
-
-  // Patches the popup in place via window.setInterest rather than reloading
-  // the map — reloading (a whole new WebView source={{html}}) would reset
-  // the user's current pan/zoom just to update one count.
-  const handleToggleInterest = async (placeType: 'offer' | 'event', placeId: string) => {
-    if (!myId) return;
-    haptics.tap();
-    try {
-      const nowMine = await toggleInterest(placeType, placeId);
-      const filtered = interests.filter((i) => !(i.user_id === myId && i.place_type === placeType && i.place_id === placeId));
-      const nextInterests = nowMine
-        ? [...filtered, { id: `local-${placeType}-${placeId}`, user_id: myId, place_type: placeType, place_id: placeId, created_at: new Date().toISOString() }]
-        : filtered;
-      setInterests(nextInterests);
-      const count = nextInterests.filter((i) => i.place_type === placeType && i.place_id === placeId).length;
-      const key = `${placeType}:${placeId}`;
-      if (typeof webviewRef.current?.injectJavaScript === 'function') {
-        webviewRef.current.injectJavaScript(`window.setInterest && window.setInterest(${JSON.stringify(key)}, ${count}, ${nowMine}); true;`);
-      }
-    } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Couldn’t update. Try again.', 'error');
-    }
-  };
-
-  // All client-side — offers/events/check-ins are already loaded for the
-  // map itself, and check-ins are already filtered server-side by
-  // can_see_checkin() (mutual follows + shared groups/communities), so
-  // searching this list can never surface a person the user isn't already
-  // allowed to see on the map.
+  // All client-side: the homes are already loaded for the map itself.
   const searchResults = useMemo<SearchResult[]>(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return [];
     const results: SearchResult[] = [];
-    for (const o of offers) {
-      if (o.latitude == null || o.longitude == null) continue;
-      const hay = `${o.title} ${o.brand?.name ?? ''} ${o.discount_label}`.toLowerCase();
-      if (hay.includes(q)) results.push({ key: `offer:${o.id}`, type: 'offer', title: o.title, subtitle: o.brand?.name ?? 'Offer' });
-    }
-    for (const e of events) {
-      if (e.latitude == null || e.longitude == null) continue;
-      const hay = `${e.title} ${e.location} ${e.tag}`.toLowerCase();
-      if (hay.includes(q)) results.push({ key: `event:${e.id}`, type: 'event', title: e.title, subtitle: e.location });
-    }
     for (const r of residences) {
       if (r.latitude == null || r.longitude == null) continue;
       const hay = `${r.name} ${r.area} ${r.provider_name} housing room`.toLowerCase();
       if (hay.includes(q)) results.push({ key: `residence:${r.id}`, type: 'residence', title: r.name, subtitle: r.area });
     }
-    for (const c of checkIns) {
-      const place = c.place;
-      if (!place || place.latitude == null || place.longitude == null) continue;
-      const hay = `${c.user.display_name} ${c.user.username}`.toLowerCase();
-      if (hay.includes(q)) {
-        const placeTitle = c.place_type === 'offer' ? (place as Offer).title : (place as HavenlyEvent).title;
-        results.push({ key: `checkin:${c.id}`, type: 'person', title: c.user.display_name, subtitle: `Nearby at ${placeTitle}` });
-      }
-    }
     return results.slice(0, 8);
-  }, [offers, events, residences, checkIns, searchQuery]);
-
-  type FilterType = 'offer' | 'event' | 'residence' | 'checkin';
-  const filterTypeFor = (t: SearchResult['type']): FilterType => (t === 'person' ? 'checkin' : t);
+  }, [residences, searchQuery]);
 
   const handleSelectResult = (result: SearchResult) => {
     haptics.tap();
     Keyboard.dismiss();
     setSearchQuery('');
-    // A hidden category's markers are removed from the map, so flying to
-    // one would land on nothing — make sure this result's type is visible
-    // first rather than leaving a confusing dead tap.
-    const filterType = filterTypeFor(result.type);
-    if (hiddenTypes[filterType]) {
-      setHiddenTypes((prev) => ({ ...prev, [filterType]: false }));
-      if (typeof webviewRef.current?.injectJavaScript === 'function') {
-        webviewRef.current.injectJavaScript(`window.setTypeVisible && window.setTypeVisible(${JSON.stringify(filterType)}, true); true;`);
-      }
-    }
     if (typeof webviewRef.current?.injectJavaScript === 'function') {
       webviewRef.current.injectJavaScript(`window.flyTo && window.flyTo(${JSON.stringify(result.key)}); true;`);
     }
@@ -753,23 +581,15 @@ export default function MapScreen() {
     try {
       const msg = JSON.parse(event.nativeEvent.data);
       if (msg.type === 'openResidence') navigation.navigate('ResidenceDetail', { residenceId: msg.id });
-      else if (msg.type === 'ping') handlePing(msg.id);
-      else if (msg.type === 'toggleInterest') handleToggleInterest(msg.placeType, msg.id);
     } catch {
       // Ignore malformed messages from the page.
     }
   };
 
-  // Deliberately NOT depending on `interests` here — after the map first
-  // loads, toggling "down to go" patches the open popup directly via
-  // window.setInterest() (see handleToggleInterest) instead of rebuilding
-  // this whole HTML string, which would remount the WebView and reset
-  // whatever the user had panned/zoomed to just to update one count.
   const html = useMemo(() => {
     if (!center || !MAPBOX_TOKEN) return null;
-    return buildMapHtml({ center, offers, events, residences, checkIns, interests, myId, mapboxToken: MAPBOX_TOKEN, colors });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [center, offers, events, residences, checkIns, myId, colors]);
+    return buildMapHtml({ center, residences, myId, mapboxToken: MAPBOX_TOKEN, colors });
+  }, [center, residences, myId, colors]);
 
   // The map is drawn inside a native web view, which a browser can't host.
   // Say so plainly on the website instead of showing a library error.
@@ -786,7 +606,7 @@ export default function MapScreen() {
           <Icon name="map-pin" size={22} color={colors.inkSoft} />
           <Text style={styles.webNoticeTitle}>The map lives in the phone app</Text>
           <Text style={styles.webNoticeText}>
-            Open Havenly on your phone to see offers, events, housing and who’s checked in nearby.
+            Open Havenly on your phone to see homes near you on the map.
           </Text>
         </View>
       </View>

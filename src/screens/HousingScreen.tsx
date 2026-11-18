@@ -145,6 +145,9 @@ export default function HousingScreen() {
       <View style={styles.topRow}>
         <Wordmark size={26} />
         <View style={styles.topActions}>
+          <AnimatedPressable style={styles.iconBtn} onPress={() => navigation.navigate('Map')} accessibilityRole="button" accessibilityLabel="See the homes on a map">
+            <Icon name="map-pin" size={18} color={colors.ink} />
+          </AnimatedPressable>
           {myId ? (
             <AnimatedPressable style={styles.iconBtn} onPress={() => navigation.navigate('MyEnquiries')} accessibilityRole="button" accessibilityLabel="My enquiries">
               <Icon name="clipboard" size={18} color={colors.ink} />

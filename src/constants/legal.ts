@@ -4,7 +4,7 @@
 // placeholders below once the company and business email exist.
 export const LEGAL_ENTITY = '[Havenly legal entity name]';
 export const LEGAL_CONTACT_EMAIL = '[privacy email]';
-export const LEGAL_LAST_UPDATED = '19 October 2026';
+export const LEGAL_LAST_UPDATED = '18 November 2026';
 export const LEGAL_IS_DRAFT = true;
 
 export interface LegalSection {
@@ -29,12 +29,10 @@ export const PRIVACY_POLICY: LegalDocument = {
       paragraphs: ['We only collect what the app needs to work:'],
       bullets: [
         'Account details: your email address and password. Passwords are stored encrypted by our authentication provider; we never see them.',
-        'Your profile: display name, username, bio, profile and cover photos, university and interests.',
-        'What you post and do: posts, photos, videos, comments, likes, saved posts, communities you join, people you follow, and your daily activity streak.',
-        'Messages: direct and group messages, including posts you share in them.',
-        'Location: only while you use the map or location-based sorting, and only if you allow it. We don\'t track your location in the background. A check-in is something you choose to make; it expires after 4 hours and is only visible to mutual follows, members of group chats you share, and members of communities you share.',
+        'Your profile: display name, username, bio, profile and cover photos, and university.',
+        'Messages: your one-to-one messages.',
+        'Location: only while you use the map, and only if you allow it. We don\'t track your location in the background.',
         'Housing: residences you save, and enquiries you send: move-in month, length of stay, room, budget, viewing availability, your message and the phone or WhatsApp number you give us. If you sign with a residence, we record the contract value so we can work out the fee the residence owes us.',
-        'Perks: offers you claim and their redemption codes.',
         'Safety: people you block and reports you make.',
         'Technical data: standard logs from our hosting provider (such as IP address, device type and request times), and crash reports when the app hits an error, used to keep the service running and secure.',
       ],
@@ -42,11 +40,11 @@ export const PRIVACY_POLICY: LegalDocument = {
     {
       heading: 'How we use it',
       bullets: [
-        'To run the app: show your profile, posts, messages, communities, perks, map and housing listings.',
-        'To personalise your feed using your interests and university.',
+        'To run the app: show your profile, messages, saved places, the map and housing listings.',
+        'To show you how far each place is from your university.',
         'To pass your housing enquiries to the residence you contacted and follow them up.',
         'To calculate and invoice the referral fees residences pay us.',
-        'To send you in-app notifications, for example when someone follows you or your enquiry moves forward.',
+        'To send you in-app notifications, for example when your enquiry moves forward.',
         'To keep Havenly safe: reviewing reports, enforcing our terms and preventing abuse.',
       ],
       after: ['We don\'t sell your personal information, and we don\'t use advertising or analytics trackers in the app.'],
@@ -54,9 +52,8 @@ export const PRIVACY_POLICY: LegalDocument = {
     {
       heading: 'Who we share it with',
       bullets: [
-        'Other Havenly users see what you choose to make visible: your profile, posts, comments and community activity. Messages are visible to the people in that conversation.',
+        'Other Havenly users you message can see your display name, username and profile photo. Messages are visible only to the people in that conversation.',
         'Residences you enquire with receive your name, university, phone or WhatsApp number and your enquiry details, so they can contact you. Once they have it, they handle it under their own privacy policy.',
-        'Brands offering perks see your redemption code when you use it, not your profile.',
         'Service providers who run parts of Havenly for us: Supabase (database, accounts and file storage), Mapbox (maps) and Sentry (crash reports, which record what went wrong and on which screen, linked to your account ID at most and never to your name, email or messages). They process data only to provide their service.',
         'Authorities, where UAE law requires us to.',
       ],
@@ -70,16 +67,16 @@ export const PRIVACY_POLICY: LegalDocument = {
     {
       heading: 'How long we keep it',
       paragraphs: [
-        'We keep your information while your account is open. Expired check-ins stop being shown after 4 hours.',
-        `If you delete your account (Settings → Delete account), we delete your account, profile, posts, comments, messages you sent, saved items, enquiries, and the photos and videos you uploaded. If you signed with a residence through Havenly, we keep a record of that deal (the residence, dates, contract value and fee) with your name, phone number and messages removed, because we need it for accounting. Information a residence already received from an enquiry is held by that residence.`,
+        'We keep your information while your account is open.',
+        `If you delete your account (Settings → Delete account), we delete your account, profile, messages you sent, saved places, enquiries, and the photos you uploaded, including anything you posted in earlier versions of Havenly. If you signed with a residence through Havenly, we keep a record of that deal (the residence, dates, contract value and fee) with your name, phone number and messages removed, because we need it for accounting. Information a residence already received from an enquiry is held by that residence.`,
       ],
     },
     {
       heading: 'Your choices and rights',
       bullets: [
-        'Edit your profile, university and interests at any time.',
+        'Edit your profile and university at any time.',
         'Turn off location access in your phone\'s settings; the map then shows Dubai without your position.',
-        'Block anyone, and report posts, people, messages or communities.',
+        'Block anyone, and report people or messages.',
         'Delete your account from Settings.',
         `Ask us for a copy of your information, to correct it, or to delete it, by emailing ${LEGAL_CONTACT_EMAIL}. We reply within 30 days.`,
       ],
