@@ -44,3 +44,5 @@ Round 2: VERDICT FINDINGS(1).
 
 Round 3: VERDICT FINDINGS(1).
 4. MAJOR, `SavedScreen.tsx:44-53`: a slow load for one account could finish after the account changed and show the old account's saved places. **Fixed:** results are applied only if the signed-in account is still the one the load started for, and the list is cleared when the account changes.
+
+Round 4: VERDICT PASS (no findings).
