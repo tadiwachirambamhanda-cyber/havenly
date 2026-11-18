@@ -33,3 +33,8 @@ None.
 1. typecheck, lint (no warnings), 93 tests (3 new for the ordering), expo-doctor 21/21 and the web export pass.
 2. Demo with two sample saved places seeded temporarily (restored afterwards; demo mode blocks real saving): Housing showed both hearts filled; Saved listed both, newest first, with price, bills, deal tag and commute; tapping a row opened the listing; tapping the heart with writes blocked put the row back and showed "Couldn't remove it from your saved list".
 3. Not tested: saving and removing against a real account on the live database (same `setResidenceSaved` call Housing already uses), and a phone.
+
+## Codex review
+Round 1: VERDICT FINDINGS(2).
+1. MAJOR, `SavedScreen.tsx:54-58`: after a failed reload the old rows (and the header count) stayed. **Fixed:** a failed load clears the rows, so the error screen shows "0 places" instead of a stale number.
+2. MINOR, `routes.test.ts`: nothing stopped the removed `CompareTab` from coming back. **Fixed:** it is now in the list of routes that must be absent.

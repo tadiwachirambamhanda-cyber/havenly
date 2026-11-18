@@ -21,7 +21,7 @@ describe('navigation targets', () => {
     for (const name of ['MainTabs', 'Housing', 'Saved', 'Compare', 'Inbox', 'Profile', 'ResidenceDetail', 'Notifications']) {
       expect(registered.has(name), name).toBe(true);
     }
-    for (const gone of ['Feed', 'Discover', 'PostDetail', 'CreatePost', 'Communities', 'EventDetail', 'FollowList', 'UserProfile', 'NewGroup', 'SharePost']) {
+    for (const gone of ['CompareTab', 'Feed', 'Discover', 'PostDetail', 'CreatePost', 'Communities', 'EventDetail', 'FollowList', 'UserProfile', 'NewGroup', 'SharePost']) {
       expect(registered.has(gone), gone).toBe(false);
     }
   });

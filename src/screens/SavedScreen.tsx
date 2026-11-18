@@ -53,6 +53,7 @@ export default function SavedScreen() {
       setRows(orderByIds((res.data as Residence[]) ?? [], ids));
       setFailed(false);
     } catch {
+      setRows([]);
       setFailed(true);
     }
     setLoaded(true);
