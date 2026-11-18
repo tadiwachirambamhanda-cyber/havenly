@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, ScrollView, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
 import { Text } from '@/components/Text';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -35,7 +35,7 @@ interface EnquiryRow {
 export default function ProfileScreen() {
   const navigation = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
-  const { session } = useAuth();
+  const { session, isGuest } = useAuth();
   const { colors } = useTheme();
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -49,20 +49,23 @@ export default function ProfileScreen() {
   const enquiries = mine ? mine.enquiries : null;
   const enquiriesFailed = mine?.enquiriesFailed ?? false;
   const [refreshing, setRefreshing] = useState(false);
-  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [logoutConfirm, setLogoutConfirm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  // Only the latest request may update the screen, so a slow older one cannot overwrite a newer result.
+  const latestLoad = useRef(0);
   const load = useCallback(async () => {
     const userId = session?.user.id;
     if (!userId) return;
+    const loadId = ++latestLoad.current;
     const [profileRes, enquiryRes] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', userId).single(),
       supabase.from('housing_enquiries')
         .select('id, kind, status, status_updated_at, residence:residences(id, name)')
         .eq('user_id', userId).order('created_at', { ascending: false }).limit(3),
     ]);
+    if (loadId !== latestLoad.current) return;
     setData({
       owner: userId,
       profile: (profileRes.data as Profile) ?? null,
@@ -71,7 +74,7 @@ export default function ProfileScreen() {
     });
   }, [session]);
 
-  useFocusEffect(useCallback(() => { (async () => { await load(); setHasLoadedOnce(true); })(); }, [load]));
+  useFocusEffect(useCallback(() => { load(); }, [load]));
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -83,6 +86,7 @@ export default function ProfileScreen() {
   const confirmDelete = async () => {
     const userId = session?.user.id;
     if (!userId) return;
+    if (isGuest) { showToast('Demo mode: make an account to manage one.', 'error'); return; }
     setDeleting(true);
     try {
       await deleteOwnAccount(userId);
@@ -93,7 +97,6 @@ export default function ProfileScreen() {
   };
 
   if (!profile) {
-    if (hasLoadedOnce) return null;
     return (
       <View style={[styles.container, { paddingTop: insets.top + 24 }]} accessibilityLabel="Loading your profile">
         <View style={styles.headRow}>

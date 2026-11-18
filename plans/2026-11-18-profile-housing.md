@@ -54,3 +54,8 @@ Round 1: VERDICT FINDINGS(4).
 2. MAJOR, `ProfileScreen.tsx:53-65`: profile and enquiries stayed in local state across an account change. **Fixed:** loaded data is tagged with its account and never shown for another one.
 3. MINOR, `HousingEnquiryScreen.tsx:69`: the discard guard only looked at message and budget. **Fixed:** it now covers move-in month, length, room, viewing time, kind and phone (a phone filled in from the last enquiry does not count as a change).
 4. MINOR, `legal.ts:71,80`: the policy still said account deletion is in Settings. **Fixed:** it says Profile.
+
+Round 2: VERDICT FINDINGS(3), all minor.
+5. `ProfileScreen.tsx:66-74`: an older profile load could overwrite a newer one. **Fixed:** only the latest request updates the screen, and a missing profile always shows the loading placeholder.
+6. `legal.ts:151`: the Terms still said deletion is in Settings. **Fixed:** the one location is updated to Profile; nothing else in the Terms was touched (the rest still needs its own update).
+7. `ProfileScreen.tsx:215-217`: Delete account looked active in demo mode. **Fixed:** in demo mode it shows "Demo mode: make an account to manage one."

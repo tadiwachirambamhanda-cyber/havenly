@@ -148,7 +148,7 @@ export const TERMS_OF_USE: LegalDocument = {
     },
     {
       heading: 'Ending your account',
-      paragraphs: ['You can delete your account at any time in Settings. We may close accounts that break these terms. Sections that by their nature should continue (such as content licences already used, disclaimers and the limits on liability) continue after your account ends.'],
+      paragraphs: ['You can delete your account at any time in Profile. We may close accounts that break these terms. Sections that by their nature should continue (such as content licences already used, disclaimers and the limits on liability) continue after your account ends.'],
     },
     {
       heading: 'Disclaimers and liability',
