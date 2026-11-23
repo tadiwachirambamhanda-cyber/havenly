@@ -296,6 +296,11 @@ export default function ResidenceDetailScreen() {
             {home ? (
               <View style={{ marginTop: 10, gap: 8 }}>
                 <OutlineButton
+                  label="Enquire with friends"
+                  icon="users"
+                  onPress={() => { if (requireAccount('enquire', residenceId)) navigation.navigate('StartGroup', { residenceId }); }}
+                />
+                <OutlineButton
                   label={housemateCount > 0 ? `${housemateCount} ${housemateCount === 1 ? 'student is' : 'students are'} looking for housemates here` : 'Find housemates for this home'}
                   icon="users"
                   onPress={() => { if (requireAccount('housemates', residenceId)) navigation.navigate(housemateCount > 0 ? 'HousemateBoard' : 'MyHousemateCard', { residenceId }); }}

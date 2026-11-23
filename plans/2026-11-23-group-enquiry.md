@@ -37,7 +37,7 @@ Create `supabase/migrations/<timestamp>_group_enquiry.sql`, `src/lib/groupEnquir
 4. Demo: the screens open with sample data and block writes with the demo message.
 
 ## What could break
-The enquiry insert and the status notification are shared with every normal enquiry: a mistake there would break ordinary enquiries too, so each is tested with and without a group. Invite codes are guessable in theory (6 letters from 31, about 887 million); joining is limited to open groups and each guess needs a signed-in account.
+The enquiry insert and the status notification are shared with every normal enquiry: a mistake there would break ordinary enquiries too, so each is tested with and without a group. Invite codes are guessable in theory (6 characters from 32, about 1.07 billion); joining is limited to open groups and each guess needs a signed-in account.
 
 ## Not doing
 Deep links (a code is typed or pasted for now), splitting the deposit or collecting any money, voting inside a group, one enquiry per member, matching strangers into a group (that is the Housemates board), editing a group after it is sent.
@@ -46,3 +46,15 @@ Deep links (a code is typed or pasted for now), splitting the deposit or collect
 1. May I apply the database migration (two new tables, one new column on enquiries, five functions, changed enquiry insert check and status notification)?
 2. Invite by a typed code (this plan) or also a tappable link? A link needs extra setup (deep links) and I recommend adding it later.
 3. One enquiry and one fee per group (this plan), or one enquiry per person?
+
+## Answers
+1. Migration applied (approved). 2. Typed code only. 3. One enquiry and one fee per group.
+
+## Changes from the plan
+- NotificationsScreen needed no change: the existing status notification is simply sent to every member by the database.
+- The demo cannot open the group page (it only supports flat embeds), so the group screens are verified against the real database instead; demo still blocks writes.
+
+## Verification
+- typecheck 0 errors, lint clean, 137 tests passing.
+- Database: 40 rolled-back checks, then 46/46 checks through the real public API with real accounts (create, join, leave, share, one enquiry, team view with phones, status reaches every member, ordinary solo enquiries unaffected).
+- UI: signed in with a real test account on localhost, started a group, the group page showed code, member list, "Waiting for friends" state. All test data deleted afterwards (7 profiles, 0 groups, 0 homes, 0 test users).

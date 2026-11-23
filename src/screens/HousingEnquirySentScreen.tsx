@@ -20,7 +20,7 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 // and what happens next, instead of a brief pop-up and a silent return.
 export default function HousingEnquirySentScreen() {
   const navigation = useNavigation<Nav>();
-  const { residenceName, kind, moveIn } = useRoute<Route>().params;
+  const { residenceName, kind, moveIn, groupSize } = useRoute<Route>().params;
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -30,7 +30,7 @@ export default function HousingEnquirySentScreen() {
     <View style={[styles.container, { paddingTop: insets.top + 56, paddingBottom: insets.bottom + 20 }]}>
       <View style={styles.body}>
         <Icon name="check-circle" size={44} color={colors.ink} weight="fill" />
-        <Text style={styles.title}>{isViewing ? 'Viewing request sent' : 'Question sent'}</Text>
+        <Text style={styles.title}>{groupSize ? 'Group enquiry sent' : isViewing ? 'Viewing request sent' : 'Question sent'}</Text>
         <Text style={styles.summary}>
           {residenceName}
           {isViewing ? ` · move-in ${formatMonth(moveIn)}` : ''}
@@ -38,9 +38,9 @@ export default function HousingEnquirySentScreen() {
 
         <Text style={styles.nextLabel}>What happens next</Text>
         <View style={styles.steps}>
-          <Text style={styles.step}>The Havenly team passes your details to {residenceName}.</Text>
+          <Text style={styles.step}>{groupSize ? `The Havenly team passes your group's details (${groupSize} people) to ${residenceName}.` : `The Havenly team passes your details to ${residenceName}.`}</Text>
           <Text style={styles.step}>
-            You’ll get a notification when they’re in touch{isViewing ? ' or your viewing is booked' : ''}.
+            {groupSize ? 'Everyone in the group' : 'You'}’ll get a notification when they’re in touch{isViewing ? ' or your viewing is booked' : ''}.
           </Text>
           <Text style={styles.step}>You can follow every enquiry any time under My enquiries.</Text>
         </View>

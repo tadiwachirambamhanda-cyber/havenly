@@ -1,3 +1,4 @@
+import { adminEnquiryGroup, type AdminGroupMember } from '@/lib/groupEnquiryApi';
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, Linking } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
@@ -31,6 +32,7 @@ export default function AdminEnquiryScreen() {
   const [enquiry, setEnquiry] = useState<HousingEnquiry | null>(null);
   const [terms, setTerms] = useState<ResidencePartnerTerms | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [group, setGroup] = useState<AdminGroupMember[]>([]);
   const [pendingStatus, setPendingStatus] = useState<EnquiryStatus | null>(null);
   const [contractValue, setContractValue] = useState('');
   const [saving, setSaving] = useState(false);
@@ -42,6 +44,11 @@ export default function AdminEnquiryScreen() {
       .eq('id', enquiryId).maybeSingle();
     const row = data as unknown as HousingEnquiry | null;
     setEnquiry(row);
+    if (row?.group_id) {
+      adminEnquiryGroup(row.id).then(setGroup).catch(() => setGroup([]));
+    } else {
+      setGroup([]);
+    }
     if (row) {
       const { data: termRow } = await supabase.from('residence_partner_terms').select('*').eq('residence_id', row.residence_id).maybeSingle();
       setTerms(termRow as ResidencePartnerTerms | null);
@@ -107,8 +114,13 @@ export default function AdminEnquiryScreen() {
 
   const leadSummary = enquiry ? [
     `New Havenly student enquiry for ${enquiry.residence?.name ?? 'your residence'}`,
-    `Student: ${enquiry.user?.display_name ?? 'Deleted account'}${enquiry.user?.university ? ` (${enquiry.user.university})` : ''}`,
-    enquiry.contact_phone ? `Phone: ${enquiry.contact_phone}` : null,
+    group.length > 1 ? `GROUP of ${group.length} students:` : null,
+    ...(group.length > 1
+      ? group.map((m) => `- ${m.display_name}${m.university ? ` (${m.university})` : ''}: ${m.contact_phone}${m.is_organiser ? ' (started the group)' : ''}`)
+      : [
+        `Student: ${enquiry.user?.display_name ?? 'Deleted account'}${enquiry.user?.university ? ` (${enquiry.user.university})` : ''}`,
+        enquiry.contact_phone ? `Phone: ${enquiry.contact_phone}` : null,
+      ]),
     `Type: ${enquiry.kind === 'viewing' ? 'Viewing request' : 'Question'}`,
     enquiry.room_type ? `Room: ${enquiry.room_type.name}` : null,
     `Move-in: ${formatMonth(enquiry.move_in_month)} for ${enquiry.duration_months} months`,
@@ -167,6 +179,22 @@ export default function AdminEnquiryScreen() {
         <Text style={styles.title}>Enquiry</Text>
         <Text style={styles.headerTime}>{timeAgo(enquiry.created_at)}</Text>
       </View>
+
+      {group.length > 1 ? (
+        <View style={styles.card}>
+          <Text style={styles.cardLabel}>Group of {group.length}</Text>
+          <Text style={styles.muted2}>One enquiry, one referral fee for the home. Everyone below follows its status.</Text>
+          {group.map((m) => (
+            <View key={m.user_id} style={styles.detailRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.detailValue}>{m.display_name}{m.is_organiser ? ' (started it)' : ''}</Text>
+                {m.university ? <Text style={styles.muted2}>{m.university}</Text> : null}
+              </View>
+              <Text style={styles.detailValue}>{m.contact_phone}</Text>
+            </View>
+          ))}
+        </View>
+      ) : null}
 
       <View style={styles.card}>
         <Text style={styles.cardLabel}>Student</Text>

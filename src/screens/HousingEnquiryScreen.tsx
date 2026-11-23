@@ -1,4 +1,5 @@
 import { usableMoveIn } from '@/lib/profilePrefs';
+import { groupErrorMessage } from '@/lib/groupEnquiry';
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
@@ -26,7 +27,7 @@ const PHONE_RE = /^\+?[\d\s()-]{8,20}$/;
 export default function HousingEnquiryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<Route>();
-  const { residenceId } = route.params;
+  const { residenceId, groupId } = route.params;
   const { session, profile } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -52,6 +53,7 @@ export default function HousingEnquiryScreen() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState(false);
+  const [groupSize, setGroupSize] = useState<number | null>(null);
 
   useEffect(() => {
     supabase.from('residences').select('*, room_types(*)').eq('id', residenceId).maybeSingle()
@@ -68,7 +70,12 @@ export default function HousingEnquiryScreen() {
           if (last) { setPhone((cur) => cur || last); setPrefilledPhone(last); }
         });
     }
-  }, [residenceId, myId]);
+    // For a group enquiry: how many people the team will see (members can read who is in their group).
+    if (groupId) {
+      supabase.from('enquiry_group_members').select('user_id', { count: 'exact', head: true }).eq('group_id', groupId)
+        .then(({ count }) => setGroupSize(count ?? null));
+    }
+  }, [residenceId, myId, groupId]);
 
   const allowLeave = useConfirmDiscard(!sent && (
     message.trim() !== '' || budget.trim() !== savedBudget || moveIn !== initialMoveIn || duration !== 12
@@ -104,11 +111,12 @@ export default function HousingEnquiryScreen() {
       contact_phone: cleanPhone,
       message: message.trim() || null,
       preferred_viewing: kind === 'viewing' ? viewingTime : null,
+      group_id: groupId ?? null,
     });
     setSending(false);
 
     if (insertError) {
-      setError('Couldn’t send your enquiry. Check your connection and try again.');
+      setError(groupId ? groupErrorMessage(insertError, 'Couldn’t send your group enquiry. Check your connection and try again.') : 'Couldn’t send your enquiry. Check your connection and try again.');
       return;
     }
     haptics.success();
@@ -116,7 +124,7 @@ export default function HousingEnquiryScreen() {
     allowLeave();
     // Replaces this form with a confirmation that says what happens next;
     // going back from there returns to the residence.
-    navigation.replace('HousingEnquirySent', { residenceName: residence?.name ?? 'the residence', kind, moveIn });
+    navigation.replace('HousingEnquirySent', { residenceName: residence?.name ?? 'the residence', kind, moveIn, groupSize: groupId ? groupSize ?? undefined : undefined });
   };
 
   const chip = (key: string, label: string, selected: boolean, onPress: () => void) => (
@@ -133,6 +141,13 @@ export default function HousingEnquiryScreen() {
           <Text style={styles.headerTitle} numberOfLines={1}>{residence?.name ?? 'Enquiry'}</Text>
           <View style={{ width: 50 }} />
         </View>
+        {groupId ? (
+          <View style={{ marginHorizontal: 16, marginBottom: 8 }}>
+            <Notice kind="note">
+              {groupSize ? `Sending for your group of ${groupSize}.` : 'Sending for your group.'} The team will see every member’s name, university and phone number, and everyone will follow this enquiry.
+            </Notice>
+          </View>
+        ) : null}
 
         <View style={styles.segment}>
           {(['viewing', 'question'] as EnquiryKind[]).map((k) => (
