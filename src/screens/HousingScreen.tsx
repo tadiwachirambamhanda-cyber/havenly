@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl, ScrollView } from 'react-native';
+import { View, StyleSheet, FlatList, RefreshControl, ScrollView, Pressable } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 import { Wordmark } from '@/components/Brand';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -196,6 +196,12 @@ export default function HousingScreen() {
         {myId ? chip('saved', 'Saved', savedOnly, () => setSavedOnly((v) => !v), 'heart') : null}
       </ScrollView>
 
+      <Pressable style={styles.guideRow} onPress={() => navigation.navigate('Guide')} accessibilityRole="link" accessibilityLabel="New to renting in Dubai? Read the guide">
+        <Icon name="book-open" size={16} color={colors.coral} />
+        <Text style={styles.guideRowText}>New to renting in Dubai? Read the guide</Text>
+        <Icon name="chevron-right" size={13} color={colors.inkSoft} />
+      </Pressable>
+
       {loaded && !loadFailed ? (
         <View style={styles.countRow}>
           <Text style={styles.count} accessibilityRole="header">
@@ -365,6 +371,8 @@ function createStyles(colors: ColorTokens) {
     chipSelected: { backgroundColor: colors.coralFill, borderColor: colors.coralFill },
     chipText: { fontFamily: 'HankenGrotesk_600SemiBold', fontSize: 14, color: colors.ink },
     chipTextSelected: { color: '#FFFFFF' },
+    guideRow: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44, marginHorizontal: 16, marginBottom: 4 },
+    guideRowText: { flex: 1, fontSize: 14, fontWeight: '600', color: colors.ink },
     countRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingHorizontal: 16, marginTop: 12, minHeight: 44 },
     count: { flex: 1, fontSize: 14, color: colors.inkSoft },
     sortBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44, justifyContent: 'center' },

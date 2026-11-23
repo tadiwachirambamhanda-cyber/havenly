@@ -28,3 +28,12 @@ Translating the guide, a calculator, a permit-number lookup against the Dubai La
 
 ## Questions
 1. What does the Havenly team really check before marking a listing Verified? My draft says: that the provider is real, the advert permit number is valid, and the price and details match what the provider told us. Please correct it to what you actually do.
+
+## Changes from the plan
+- Added `src/lib/trust.ts` (`formatCheckedDate`, dated in Dubai time, UTC+4) with tests.
+- The Verified explainer is an ActionSheet with "Read the renting guide" and "Got it". Its text, and the "not checked" line, live with the guide content in `src/constants/rentingGuide.ts`.
+
+## Verification
+1. typecheck, lint (no warnings), 123 tests (8 new: guide content integrity, checked-date formatting), expo-doctor and export (run below) pass.
+2. Browser: signed out, the Housing screen shows "New to renting in Dubai? Read the guide" and the guide opens with the dated disclaimer, six sections and the sources. In the demo: a verified listing shows the badge, "Checked on 13 November 2026" and "What does Verified mean?", which opens the explainer sheet; an unverified listing shows "Not checked by Havenly yet. Before you pay, ask for the permit number and a written contract. Read the renting guide"; every listing ends with "Before you pay: read the renting guide".
+3. Not checked: the guide's facts against a source other than the published pages I read (research was cut short by a search limit, so anything beyond them is phrased as "ask"); a phone.
