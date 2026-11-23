@@ -21,7 +21,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     points: [
       'Dubai property adverts carry a permit number (Trakheesi). Ask for it. Havenly shows it on a listing when we have it.',
       'Ask for the tenancy contract in writing before you pay a deposit, and read it.',
-      'Pay only to the account named in the contract, never in cash to a person, and keep every receipt.',
+      'Follow the payment instructions in the written contract, check them with the provider, and keep every receipt. Be wary of anyone who asks for cash or a transfer to a personal account.',
       'On Havenly, tap the Verified badge on a listing to see what the team checks, and when.',
     ],
   },
@@ -34,6 +34,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       'Security deposit. Landlords commonly ask for 5% of the annual rent for an unfurnished home and 10% for a furnished one. The amount is whatever your contract says.',
       'Ejari. A tenancy contract is registered with the Dubai Land Department through Ejari. The sources we read quote about AED 178 online and about AED 220 at a registration centre. Ask who registers it.',
       'DEWA (water and electricity). It is connected once the Ejari is registered. The sources quote a refundable deposit of about AED 2,000 for an apartment and AED 4,000 for a villa, plus an activation fee of roughly AED 130 to 155.',
+      'Housing fee. A Dubai housing fee is added to the tenant\'s monthly DEWA bill. The sources we read put it at about 5% of the annual rent. Ask what it will be.',
       'Agent fee. The sources we read give no standard rate. Ask whether there is one, how much it is and who pays it, before you sign.',
       'What is included. Some places include bills, internet or cleaning. Havenly shows "Bills included" or an estimate on each listing. Ask what the rent covers.',
     ],
@@ -51,7 +52,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     id: 'sharing',
     title: 'Sharing a home',
     points: [
-      'Dubai passed a shared-housing law in 2026. Sharing is allowed only in homes that may be shared, through owners or licensed operators.',
+      'Dubai passed a shared-housing law in 2026. Sharing has to happen in homes that are permitted for it, through owners or licensed operators, within space and occupancy limits. Check that the specific home and arrangement meet the current rules.',
       'Everyone who lives in the home should be named on the tenancy or have the landlord\'s written consent.',
       'Be careful with anyone offering a bed space or a room in a partitioned flat. Ask for the permit and the contract first.',
       'Havenly\'s housemate board is for friends and students taking a whole home together on one lease.',

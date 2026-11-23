@@ -244,7 +244,7 @@ export default function ResidenceDetailScreen() {
           </View>
           {residence.is_verified ? (
             <Text style={styles.trustLine}>
-              {formatCheckedDate(residence.verified_at) ? `Checked on ${formatCheckedDate(residence.verified_at)}. ` : ''}
+              {formatCheckedDate(residence.verified_at) ? `Verified on ${formatCheckedDate(residence.verified_at)}. ` : ''}
               <Text style={styles.trustLink} onPress={() => setVerifiedSheet(true)} accessibilityRole="button">What does Verified mean?</Text>
             </Text>
           ) : (
