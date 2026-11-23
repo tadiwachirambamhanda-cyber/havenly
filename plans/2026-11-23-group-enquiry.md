@@ -58,3 +58,7 @@ Deep links (a code is typed or pasted for now), splitting the deposit or collect
 - typecheck 0 errors, lint clean, 137 tests passing.
 - Database: 40 rolled-back checks, then 46/46 checks through the real public API with real accounts (create, join, leave, share, one enquiry, team view with phones, status reaches every member, ordinary solo enquiries unaffected).
 - UI: signed in with a real test account on localhost, started a group, the group page showed code, member list, "Waiting for friends" state. All test data deleted afterwards (7 profiles, 0 groups, 0 homes, 0 test users).
+
+## Codex review
+Round 1: VERDICT FINDINGS(1).
+1. MAJOR, group members can read the organiser's enquiry row, including their phone. **Dismissed as a database change, mitigated in the app**: members only get in with a code the organiser chose to share, and the enquiry is shared on purpose so everyone follows it. Hiding the phone would need a separate view and rewrites of three screens. Instead the organiser's send screen now says plainly that the group can see what they write, including their phone number.

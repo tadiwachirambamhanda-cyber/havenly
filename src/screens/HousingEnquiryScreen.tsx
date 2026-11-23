@@ -144,7 +144,7 @@ export default function HousingEnquiryScreen() {
         {groupId ? (
           <View style={{ marginHorizontal: 16, marginBottom: 8 }}>
             <Notice kind="note">
-              {groupSize ? `Sending for your group of ${groupSize}.` : 'Sending for your group.'} The team will see every member’s name, university and phone number, and everyone will follow this enquiry.
+              {groupSize ? `Sending for your group of ${groupSize}.` : 'Sending for your group.'} The team will see every member’s name, university and phone number, and everyone in the group will follow this enquiry and can see what you write here, including your phone number.
             </Notice>
           </View>
         ) : null}
