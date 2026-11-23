@@ -45,3 +45,5 @@ Round 1: VERDICT FINDINGS(5).
 3. MAJOR, `rentingGuide.ts:99`: the Verified explainer states checks the code cannot prove the team performs. **Kept open on purpose:** the wording is a draft and the owner must confirm it matches what the team really does before this merges (it is the question in this plan and in the PR). It is deliberately written as the full claim so the owner corrects it to the truth, not as a vague text that hides the question.
 4. MAJOR, `ResidenceDetailScreen.tsx:247`: "Checked on" used `verified_at`, which keeps the first verification date, so it could imply a more recent check. **Fixed:** the label is now "Verified on [date]".
 5. MINOR, `rentingGuide.ts:54`: "allowed only through owners or licensed operators" was too short for the permit and occupancy rules. **Fixed:** it now says permitted homes, within space and occupancy limits, and to check the specific home.
+
+Round 2: VERDICT FINDINGS(1): only finding 3 again, which stays open until the owner confirms or corrects the Verified wording.
