@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Text } from '@/components/Text';
 import { useNavigation, useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -10,6 +10,9 @@ import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { countForHome } from '@/lib/housematesApi';
+import { formatCheckedDate } from '@/lib/trust';
+import ActionSheet from '@/components/ActionSheet';
+import { NOT_VERIFIED_LINE, VERIFIED_EXPLAINER, VERIFIED_TITLE } from '@/constants/rentingGuide';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { haptics } from '@/lib/haptics';
@@ -57,6 +60,7 @@ export default function ResidenceDetailScreen() {
   const [openEnquiryStatus, setOpenEnquiryStatus] = useState<EnquiryStatus | null>(null);
   const [compareFull, setCompareFull] = useState(false);
   const [housemateCount, setHousemateCount] = useState(0);
+  const [verifiedSheet, setVerifiedSheet] = useState(false);
   // Once the photo has scrolled away, a solid strip keeps the floating buttons readable.
   const [pastHero, setPastHero] = useState(false);
 
@@ -230,10 +234,25 @@ export default function ResidenceDetailScreen() {
           ) : null}
 
           <View style={styles.tagRow}>
-            {residence.is_verified ? <VerifiedBadge /> : <NotVerifiedTag />}
+            {residence.is_verified ? (
+              <Pressable onPress={() => setVerifiedSheet(true)} accessibilityRole="button" accessibilityLabel="Verified by Havenly. What does this mean?" hitSlop={6}>
+                <VerifiedBadge />
+              </Pressable>
+            ) : <NotVerifiedTag />}
             {residence.bills_included === true ? <BillsTag /> : null}
             {deal ? <DealTag /> : null}
           </View>
+          {residence.is_verified ? (
+            <Text style={styles.trustLine}>
+              {formatCheckedDate(residence.verified_at) ? `Verified on ${formatCheckedDate(residence.verified_at)}. ` : ''}
+              <Text style={styles.trustLink} onPress={() => setVerifiedSheet(true)} accessibilityRole="button">What does Verified mean?</Text>
+            </Text>
+          ) : (
+            <Text style={styles.trustLine}>
+              {NOT_VERIFIED_LINE}{' '}
+              <Text style={styles.trustLink} onPress={() => navigation.navigate('Guide')} accessibilityRole="link">Read the renting guide</Text>
+            </Text>
+          )}
 
           <Text style={styles.name} accessibilityRole="header">{residence.name}</Text>
           <View style={styles.locRow}>
@@ -352,7 +371,11 @@ export default function ResidenceDetailScreen() {
           {residence.description ? <Text style={styles.description}>{residence.description}</Text> : null}
 
           <Text style={styles.provider}>Listed by {residence.provider_name}</Text>
-          {residence.permit_number ? <Text style={styles.small}>Advert permit no. {residence.permit_number}</Text> : null}
+          {residence.permit_number ? <Text style={styles.small}>Advert permit (Trakheesi) no. {residence.permit_number}</Text> : null}
+          <Pressable onPress={() => navigation.navigate('Guide')} accessibilityRole="link" style={styles.guideLink}>
+            <Icon name="book-open" size={16} color={colors.coral} />
+            <Text style={styles.guideLinkText}>Before you pay: read the renting guide</Text>
+          </Pressable>
         </View>
       </ScrollView>
 
@@ -362,6 +385,14 @@ export default function ResidenceDetailScreen() {
         </View>
       ) : null}
       {backButton}
+      <ActionSheet
+        visible={verifiedSheet}
+        onClose={() => setVerifiedSheet(false)}
+        title={VERIFIED_TITLE}
+        message={VERIFIED_EXPLAINER}
+        actions={[{ label: 'Read the renting guide', onPress: () => navigation.navigate('Guide') }]}
+        cancelLabel="Got it"
+      />
       <AnimatedPressable
         style={[styles.roundBtn, { top: insets.top + 12, right: 16 }]}
         scaleTo={0.92}
@@ -445,6 +476,10 @@ function createStyles(colors: ColorTokens) {
     muted: { fontSize: 14, lineHeight: 20, color: colors.inkBody, marginTop: 12 },
     h2: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink, marginTop: 28, marginBottom: 10 },
     card: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 4 },
+    trustLine: { fontSize: 13.5, lineHeight: 19, color: colors.inkSoft, marginTop: 10 },
+    trustLink: { color: colors.coral, fontWeight: '700', textDecorationLine: 'underline' },
+    guideLink: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44, marginTop: 14 },
+    guideLinkText: { fontSize: 15, fontWeight: '700', color: colors.coral },
     small: { fontSize: 13, color: colors.inkMuted, marginTop: 8 },
     roomRow: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: 12, padding: 14, marginBottom: 8 },
     roomName: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 15, color: colors.ink },

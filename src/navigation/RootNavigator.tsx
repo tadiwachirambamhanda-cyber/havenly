@@ -19,6 +19,7 @@ import NotificationsScreen from '@/screens/NotificationsScreen';
 import BlockedUsersScreen from '@/screens/BlockedUsersScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
 import ChangePasswordScreen from '@/screens/ChangePasswordScreen';
+import GuideScreen from '@/screens/GuideScreen';
 import HousemateBoardScreen from '@/screens/HousemateBoardScreen';
 import MyHousemateCardScreen from '@/screens/MyHousemateCardScreen';
 import HousemateReviewScreen from '@/screens/HousemateReviewScreen';
@@ -53,6 +54,7 @@ export type RootStackParamList = {
   BlockedUsers: undefined;
   Settings: undefined;
   ChangePassword: undefined;
+  Guide: undefined;
   HousemateBoard: { residenceId?: string } | undefined;
   MyHousemateCard: { residenceId?: string } | undefined;
   HousemateReview: undefined;
@@ -149,6 +151,7 @@ export default function RootNavigator() {
           // login or sign-up screen.
           <>
             <Stack.Screen name="PublicHousing" component={HousingScreen} />
+            <Stack.Screen name="Guide" component={GuideScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="Map" component={MapScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="ResidenceDetail" component={ResidenceDetailScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="SplitRent" component={SplitRentScreen} options={{ presentation: 'modal' }} />
@@ -167,6 +170,7 @@ export default function RootNavigator() {
             <Stack.Screen name="BlockedUsers" component={BlockedUsersScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+            <Stack.Screen name="Guide" component={GuideScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="HousemateBoard" component={HousemateBoardScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="MyHousemateCard" component={MyHousemateCardScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="HousemateReview" component={HousemateReviewScreen} options={{ presentation: 'card' }} />
