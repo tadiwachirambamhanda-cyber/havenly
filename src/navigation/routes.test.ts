@@ -22,7 +22,7 @@ describe('navigation targets', () => {
       expect(registered.has(name), name).toBe(true);
     }
     // Archived social screens, and Map, Compare and the old perk screens removed in v2.
-    for (const gone of ['CompareTab', 'Compare', 'Map', 'Offers', 'OfferDetail', 'ManageBrands', 'CreateOffer', 'Feed', 'Discover', 'Communities', 'FollowList', 'UserProfile', 'NewGroup', 'SharePost']) {
+    for (const gone of ['CompareTab', 'Compare', 'Map', 'SplitRent', 'Offers', 'OfferDetail', 'ManageBrands', 'CreateOffer', 'Feed', 'Discover', 'Communities', 'FollowList', 'UserProfile', 'NewGroup', 'SharePost']) {
       expect(registered.has(gone), gone).toBe(false);
     }
   });

@@ -35,7 +35,6 @@ import MyEnquiriesScreen from '@/screens/MyEnquiriesScreen';
 import ManageHousingScreen from '@/screens/ManageHousingScreen';
 import AdminEnquiryScreen from '@/screens/AdminEnquiryScreen';
 import EditResidenceScreen from '@/screens/EditResidenceScreen';
-import SplitRentScreen from '@/screens/SplitRentScreen';
 import SavedScreen from '@/screens/SavedScreen';
 import SignInToContinueScreen from '@/screens/SignInToContinueScreen';
 import LegalScreen from '@/screens/LegalScreen';
@@ -72,7 +71,6 @@ export type RootStackParamList = {
   EditProfile: undefined;
   PublicHousing: undefined;
   ResidenceDetail: { residenceId: string };
-  SplitRent: { residenceId: string };
   SignInToContinue: { reason: AccountReason; residenceId?: string };
   HousingEnquiry: { residenceId: string; kind: 'question' | 'viewing'; groupId?: string };
   HousingEnquirySent: { residenceName: string; kind: 'question' | 'viewing'; moveIn: string; groupSize?: number };
@@ -160,7 +158,7 @@ export default function RootNavigator() {
     <NavigationContainer theme={navTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!session ? (
-          // Signed out: the real Housing screen first, then a listing and the rent split, all
+          // Signed out: the real Housing screen first, then a listing (with its rent split), all
           // without an account. Saving and enquiring open SignInToContinue
           // (useRequireAccount). That sheet is the only place to make an account or log in:
           // the Housing screen's "Log in" opens it in log-in mode. There is no separate
@@ -169,7 +167,6 @@ export default function RootNavigator() {
             <Stack.Screen name="PublicHousing" component={HousingScreen} />
             <Stack.Screen name="Guide" component={GuideScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="ResidenceDetail" component={ResidenceDetailScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="SplitRent" component={SplitRentScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="SignInToContinue" component={SignInToContinueScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Legal" component={LegalScreen} options={{ presentation: 'card' }} />
           </>
@@ -196,7 +193,6 @@ export default function RootNavigator() {
             <Stack.Screen name="HousemateReview" component={HousemateReviewScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="ResidenceDetail" component={ResidenceDetailScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="SplitRent" component={SplitRentScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="HousingEnquiry" component={HousingEnquiryScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="HousingEnquirySent" component={HousingEnquirySentScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="MyEnquiries" component={MyEnquiriesScreen} options={{ presentation: 'card' }} />
