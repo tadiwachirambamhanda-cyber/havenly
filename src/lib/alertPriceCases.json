@@ -1,0 +1,11 @@
+[
+  { "name": "one monthly room", "rooms": [[3200, "month", true]], "studentRate": null, "from": 3200 },
+  { "name": "yearly price that needs rounding up", "rooms": [[35000, "year", true]], "studentRate": null, "from": 2917 },
+  { "name": "yearly price that lands on a half", "rooms": [[30006, "year", true]], "studentRate": null, "from": 2501 },
+  { "name": "semester price", "rooms": [[17000, "semester", true]], "studentRate": null, "from": 2833 },
+  { "name": "cheapest available room wins", "rooms": [[3500, "month", true], [2900, "month", false], [3100, "month", true]], "studentRate": null, "from": 3100 },
+  { "name": "lower student rate wins", "rooms": [[3200, "month", true]], "studentRate": 2800, "from": 2800 },
+  { "name": "higher student rate is ignored", "rooms": [[3200, "month", true]], "studentRate": 3400, "from": 3200 },
+  { "name": "no rooms", "rooms": [], "studentRate": null, "from": null },
+  { "name": "all full, even with a student rate", "rooms": [[3200, "month", false]], "studentRate": 2800, "from": null }
+]
