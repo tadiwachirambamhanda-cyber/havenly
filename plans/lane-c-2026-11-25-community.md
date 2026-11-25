@@ -44,6 +44,24 @@ Follows, a global feed, video, notifications for likes and comments, signed-out 
 - Housing has no route param for an area, so tapping an area tag opens the Housing tab without the area filled in. A `Housing: { area?: string }` param (read by Lane A's HousingScreen) would finish F20's "Housing search for that area".
 - Undo after a review decision has been sent would need a database function that reopens the reports.
 
+## Handover (2026-11-25, first Lane C session)
+
+**Done and committed** (typecheck, lint and tests green at each commit; not yet tried in a browser):
+- Step 1: `src/lib/community.ts` (+ 25 tests), `communityApi.ts`, `communityPhotos.ts` (private `community-photos` store, signed links, skipped in guest mode). Old "Sample" perks and Veldemers are filtered in `fetchPerks` / `fetchPerk` (`isHiddenSampleBrand`).
+- Step 2: `src/components/community/`: `ui.tsx`, `PostCard.tsx` (with `PostPhotos`, `TagChip`), `SafetyMenu.tsx` (Report with reasons, Block, Delete), `usePostActions.tsx`, `EventCard.tsx` (with `useGoing`, `DateBlock`, `GoingButton`), `PerkCard.tsx` (with `usePerkCodes`, `CodeBox`, `GetCodeButton`), `HousemateCardView.tsx`, `useHousemateActions.tsx`, `useMembership.tsx`, `FindCommunities.tsx`, `TagPicker.tsx`. HousemateBoard now uses the shared card ("Message <name>"); Profile's Housemates block is removed.
+- Step 3: `CommunityScreen` (my communities with the university card first, Find more, shortcuts, team row for admins, latest posts with an event and a perk, Messages button with the unread dot next to Post: owner's request of 2026-11-25).
+- Step 4: `CommunityDetailScreen` (berry header, Join/Joined with leave confirm, Posts/Housemates/Events/Perks, floating Write a post).
+- Step 5 (half): `CreatePostScreen` done. **`PostDetailScreen` is not built yet** (still the placeholder).
+
+**Left to do**
+1. Merge `origin/main` (three tabs; Inbox is now a stack route) and change `navigation.navigate('Inbox' as never)` in CommunityScreen back to `navigation.navigate('Inbox')`, removing the comment.
+2. `PostDetailScreen` (`{ postId }`, Lane A opens it): full post via `PostCard full`, all comments (`fetchComments([id])`), comment box (`addComment`, `commentProblem`), comment ⋯ menu through `useSafetyMenu` (type 'comment', Delete own via `deleteComment`), a not-found state when the post is hidden or deleted.
+3. `EventDetailScreen` (`DateBlock large`, `eventWhen`, location, description, `GoingButton` via `useGoing`, Report via `useSafetyMenu`), `PerksScreen` (list of `PerkCard`), `PerkDetailScreen` (`fetchPerk`, `CodeBox` / `GetCodeButton`, address, end date).
+4. Team screens: `ReviewQueueScreen` (deferred Hide/Keep with Undo as in Choices: 6 s timer, flush on leave; `fetchReviewQueue`, `decideReport`, `reportedTimes`, `reasonLabel`, "Hidden by reports" when `hidden_at`), `ManageEventsScreen` (`fetchAllEvents`, `saveEvent`, `deleteEvent`, `eventProblem`, `parseEventWhen`, `eventInputFromIso`, optional community), `ManagePerksScreen` (`fetchAllBrands`, `fetchAllPerks`, `createBrand`, `createPerk`, `setPerkActive`, `brandProblem`, `perkProblem`; mark the old sample ones "Hidden from students").
+5. Try every screen on the web at 390 and 1440, light and dark (port 8084), then the full checks (`npx expo-doctor`, `npx expo export --platform web` not run yet), Codex review, record findings here, push, PR.
+
+**Open points for the report**: an area tag opens the Housing tab without the area (no Housing `area` param yet); Undo after a review decision is sent needs a "reopen reports" database function; `useConfirmDiscard` is not used on New post because its `Alert.alert` does nothing on the web.
+
 ## Changes from the plan
 
 ## Verification
