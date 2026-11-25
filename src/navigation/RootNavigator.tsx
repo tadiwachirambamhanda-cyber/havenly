@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NavigationContainer, DefaultTheme, DarkTheme, type NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -124,6 +125,7 @@ function SplashLoading({ colors }: { colors: ColorTokens }) {
 export default function RootNavigator() {
   const { session, profile, loading, isGuest } = useAuth();
   const { colors, scheme } = useTheme();
+  const insets = useSafeAreaInsets();
   useStreakBump();
   // Plays exactly once per app process (not on every subsequent sign-in) —
   // showLaunch starts true and never flips back, so it covers the initial
@@ -155,6 +157,8 @@ export default function RootNavigator() {
   return (
     <View style={{ flex: 1 }}>
     {isGuest ? <GuestBanner /> : null}
+    {/* In the demo the banner already covers the status bar area, so the screens below must not leave room for it again. */}
+    <SafeAreaInsetsContext.Provider value={isGuest ? { ...insets, top: 0 } : insets}>
     <NavigationContainer theme={navTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!session ? (
@@ -213,6 +217,7 @@ export default function RootNavigator() {
         )}
       </Stack.Navigator>
     </NavigationContainer>
+    </SafeAreaInsetsContext.Provider>
     </View>
   );
 }
