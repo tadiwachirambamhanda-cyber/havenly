@@ -20,7 +20,6 @@ import AnimatedPressable from '@/components/AnimatedPressable';
 import BurstHeart from '@/components/BurstHeart';
 import Skeleton from '@/components/Skeleton';
 import { BillsTag, DealTag, StateBlock, VerifiedBadge } from '@/components/housing/parts';
-import { setCompareOwner, useCompareIds } from '@/components/housing/compareStore';
 import { takePendingReturn } from '@/components/housing/pendingReturn';
 import {
   EMPTY_FILTERS, PRICE_CAPS, SORT_LABEL, billsLine, commuteText, eachPersonLine, filterAndSort, filtersActive, housematesLine,
@@ -44,7 +43,6 @@ export default function HousingScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
   const myUniversity = profile?.university ?? null;
-  const compareIds = useCompareIds();
 
   const [residences, setResidences] = useState<Residence[]>([]);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
@@ -73,7 +71,6 @@ export default function HousingScreen() {
   }, [myId]);
 
   // The compare list belongs to whoever is signed in: start empty for a visitor.
-  React.useEffect(() => { setCompareOwner(myId ?? null); }, [myId]);
 
   useFocusEffect(useCallback(() => {
     load();
@@ -135,19 +132,11 @@ export default function HousingScreen() {
     </AnimatedPressable>
   );
 
-  const openCompare = () => {
-    if (!requireAccount('compare')) return;
-    navigation.navigate('Compare');
-  };
-
   const header = (
     <View>
       <View style={styles.topRow}>
         <Wordmark size={26} />
         <View style={styles.topActions}>
-          <AnimatedPressable style={styles.iconBtn} onPress={() => navigation.navigate('Map')} accessibilityRole="button" accessibilityLabel="See the homes on a map">
-            <Icon name="map-pin" size={18} color={colors.ink} />
-          </AnimatedPressable>
           <AnimatedPressable style={styles.iconBtn} onPress={() => { if (requireAccount('housemates')) navigation.navigate('HousemateBoard'); }} accessibilityRole="button" accessibilityLabel="Find housemates">
             <Icon name="users" size={18} color={colors.ink} />
           </AnimatedPressable>
@@ -336,12 +325,6 @@ export default function HousingScreen() {
         contentContainerStyle={{ paddingBottom: 150, flexGrow: 1 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
       />
-      {compareIds.length > 0 ? (
-        <AnimatedPressable style={styles.compareBar} onPress={openCompare} accessibilityRole="button" accessibilityLabel={`Compare ${compareIds.length} ${compareIds.length === 1 ? "place" : "places"}`}>
-          <Icon name="grid" size={18} color="#FFFFFF" />
-          <Text style={styles.compareText}>Compare {compareIds.length} {compareIds.length === 1 ? 'place' : 'places'}</Text>
-        </AnimatedPressable>
-      ) : null}
     </View>
   );
 }
@@ -399,10 +382,5 @@ function createStyles(colors: ColorTokens) {
     kindSub: { fontSize: 14, color: colors.inkBody },
     metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 },
     meta: { flex: 1, fontSize: 14, color: colors.inkBody },
-    compareBar: {
-      position: 'absolute', left: 16, right: 16, bottom: 84, height: 52, borderRadius: 12, backgroundColor: colors.coralFill,
-      flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    },
-    compareText: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 16, color: '#FFFFFF' },
   });
 }

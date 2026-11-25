@@ -20,7 +20,6 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 const TITLE: Record<AccountReason, string> = {
   enquire: 'Make a free account to send your enquiry',
   save: 'Make a free account to save places',
-  compare: 'Make a free account to compare places',
   join: 'Make a free account',
   login: 'Welcome back',
   housemates: 'Make a free account to find housemates',
@@ -29,7 +28,6 @@ const TITLE: Record<AccountReason, string> = {
 const WHY: Record<AccountReason, string> = {
   enquire: 'So the Havenly team and the provider can reach you about this place.',
   save: 'So your saved places are kept for you on any device.',
-  compare: 'So the places you compare are kept for you.',
   join: 'So you can save places and send enquiries.',
   login: 'Log in to see your saved places and your enquiries.',
   housemates: 'So other students can see your card and you can see theirs. Cards are checked by the team first.',

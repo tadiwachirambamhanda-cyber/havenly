@@ -91,16 +91,6 @@ export default function SettingsScreen() {
             <Text style={styles.rowText}>Check housemate cards</Text>
             <Text style={styles.chevron}>›</Text>
           </AnimatedPressable>
-          <View style={styles.divider} />
-          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('ManageBrands')}>
-            <Text style={styles.rowText}>Manage brands</Text>
-            <Text style={styles.chevron}>›</Text>
-          </AnimatedPressable>
-          <View style={styles.divider} />
-          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('CreateOffer')}>
-            <Text style={styles.rowText}>Create offer</Text>
-            <Text style={styles.chevron}>›</Text>
-          </AnimatedPressable>
         </>
       )}
 
