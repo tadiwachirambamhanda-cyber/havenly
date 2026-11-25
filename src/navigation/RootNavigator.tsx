@@ -39,7 +39,17 @@ import SplitRentScreen from '@/screens/SplitRentScreen';
 import SavedScreen from '@/screens/SavedScreen';
 import SignInToContinueScreen from '@/screens/SignInToContinueScreen';
 import LegalScreen from '@/screens/LegalScreen';
-import ComingSoonScreen from '@/screens/ComingSoonScreen';
+// v2 community screens (Lane C). Each file is a placeholder until Lane C builds it.
+import CommunityScreen from '@/screens/CommunityScreen';
+import CommunityDetailScreen from '@/screens/CommunityDetailScreen';
+import CreatePostScreen from '@/screens/CreatePostScreen';
+import PostDetailScreen from '@/screens/PostDetailScreen';
+import EventDetailScreen from '@/screens/EventDetailScreen';
+import PerksScreen from '@/screens/PerksScreen';
+import PerkDetailScreen from '@/screens/PerkDetailScreen';
+import ReviewQueueScreen from '@/screens/ReviewQueueScreen';
+import ManageEventsScreen from '@/screens/ManageEventsScreen';
+import ManagePerksScreen from '@/screens/ManagePerksScreen';
 
 // Why a signed-out visitor is being asked to make an account (shown in SignInToContinue).
 export type AccountReason = 'save' | 'enquire' | 'join' | 'login' | 'housemates';
@@ -71,7 +81,7 @@ export type RootStackParamList = {
   AdminEnquiry: { enquiryId: string };
   EditResidence: { residenceId?: string };
   Legal: { doc: 'privacy' | 'terms' };
-  // v2 community (Lane C). Placeholders until built: see ComingSoonScreen.
+  // v2 community (Lane C): placeholders until built.
   CommunityDetail: { communityId: string };
   CreatePost: { communityId?: string; residenceId?: string; area?: string } | undefined;
   PostDetail: { postId: string };
@@ -98,7 +108,7 @@ function MainTabs() {
   return (
     <Tab.Navigator initialRouteName="Housing" screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
       <Tab.Screen name="Housing" component={HousingScreen} />
-      <Tab.Screen name="Community" component={ComingSoonScreen} />
+      <Tab.Screen name="Community" component={CommunityScreen} />
       <Tab.Screen name="Saved" component={SavedScreen} />
       <Tab.Screen name="Inbox" component={InboxScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
@@ -193,15 +203,15 @@ export default function RootNavigator() {
             <Stack.Screen name="AdminEnquiry" component={AdminEnquiryScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="EditResidence" component={EditResidenceScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Legal" component={LegalScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="CommunityDetail" component={ComingSoonScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="CreatePost" component={ComingSoonScreen} options={{ presentation: 'modal' }} />
-            <Stack.Screen name="PostDetail" component={ComingSoonScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="EventDetail" component={ComingSoonScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="Perks" component={ComingSoonScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="PerkDetail" component={ComingSoonScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="ReviewQueue" component={ComingSoonScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="ManageEvents" component={ComingSoonScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="ManagePerks" component={ComingSoonScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="CommunityDetail" component={CommunityDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ presentation: 'modal' }} />
+            <Stack.Screen name="PostDetail" component={PostDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="EventDetail" component={EventDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="Perks" component={PerksScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="PerkDetail" component={PerkDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="ReviewQueue" component={ReviewQueueScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="ManageEvents" component={ManageEventsScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="ManagePerks" component={ManagePerksScreen} options={{ presentation: 'card' }} />
           </>
         )}
       </Stack.Navigator>

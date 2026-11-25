@@ -91,6 +91,21 @@ export default function SettingsScreen() {
             <Text style={styles.rowText}>Check housemate cards</Text>
             <Text style={styles.chevron}>›</Text>
           </AnimatedPressable>
+          <View style={styles.divider} />
+          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('ReviewQueue')}>
+            <Text style={styles.rowText}>Review reports</Text>
+            <Text style={styles.chevron}>›</Text>
+          </AnimatedPressable>
+          <View style={styles.divider} />
+          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('ManageEvents')}>
+            <Text style={styles.rowText}>Manage events</Text>
+            <Text style={styles.chevron}>›</Text>
+          </AnimatedPressable>
+          <View style={styles.divider} />
+          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('ManagePerks')}>
+            <Text style={styles.rowText}>Manage perks</Text>
+            <Text style={styles.chevron}>›</Text>
+          </AnimatedPressable>
         </>
       )}
 
