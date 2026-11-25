@@ -10,6 +10,7 @@ import InitialsAvatar from '@/components/InitialsAvatar';
 import Icon from '@/components/Icon';
 import ActionSheet from '@/components/ActionSheet';
 import AnimatedPressable from '@/components/AnimatedPressable';
+import AlertSettings from '@/components/AlertSettings';
 import Skeleton from '@/components/Skeleton';
 import { OutlineButton } from '@/components/housing/parts';
 import { supabase } from '@/lib/supabase';
@@ -63,7 +64,7 @@ export default function ProfileScreen() {
     const loadId = ++latestLoad.current;
     const [profileRes, privateRes, enquiryRes, groupRows] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', userId).single(),
-      supabase.from('profile_private').select('budget_aed, move_in_month, housemate_pref, gender').eq('user_id', userId).maybeSingle(),
+      supabase.from('profile_private').select('budget_aed, move_in_month, housemate_pref, gender, alert_new_places, alert_price_drops').eq('user_id', userId).maybeSingle(),
       supabase.from('housing_enquiries')
         .select('id, kind, status, status_updated_at, residence:residences(id, name)')
         .eq('user_id', userId).order('created_at', { ascending: false }).limit(3),
@@ -216,6 +217,17 @@ export default function ProfileScreen() {
           <Icon name="chevron-right" size={14} color={colors.inkSoft} />
         </View>
       </Pressable>
+
+      <Text style={[styles.section, styles.sectionPad]}>Alerts</Text>
+      <AlertSettings
+        key={mine?.owner}
+        userId={mine?.owner ?? ''}
+        isGuest={isGuest}
+        budgetAed={profile.budget_aed}
+        gender={profile.gender}
+        saved={profile}
+        onEditProfile={() => navigation.navigate('EditProfile')}
+      />
 
       <Text style={[styles.section, styles.sectionPad]}>Housemates</Text>
       <View style={styles.card}>

@@ -222,7 +222,7 @@ export default function EditProfileScreen() {
           );
         })}
       </View>
-      <Text style={styles.sectionHint}>Used only to match housemate preferences. It is shown on your housemate card, if you make one, and nowhere else.</Text>
+      <Text style={styles.sectionHint}>Used to match housemate preferences and, if you switch on new-place alerts, to include women-only or men-only places. It is shown on your housemate card, if you make one, and nowhere else.</Text>
 
       <Text style={styles.label}>I would live with</Text>
       <View style={styles.chipGrid}>

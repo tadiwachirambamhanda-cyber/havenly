@@ -1,4 +1,5 @@
 import { HOUSING_NOTIFICATION_TYPES } from '@/lib/notificationTypes';
+import { alertMessage } from '@/lib/alerts';
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { Text } from '@/components/Text';
@@ -34,7 +35,12 @@ const ICON_BY_TYPE: Record<Notification['type'], IconName> = {
   ping: 'hand-waving',
   enquiry_new: 'key',
   enquiry_status: 'key',
+  new_place: 'home',
+  price_drop: 'tag',
 };
+
+// From Havenly itself, not a person: shown with the Havenly mark.
+const isFromHavenly = (n: Notification) => n.type === 'enquiry_status' || n.type === 'new_place' || n.type === 'price_drop';
 
 const STATUS_MESSAGE: Partial<Record<EnquiryStatus, string>> = {
   contacted: 'is getting in touch with you',
@@ -43,6 +49,7 @@ const STATUS_MESSAGE: Partial<Record<EnquiryStatus, string>> = {
 };
 
 function messageFor(n: Row): string {
+  if (n.type === 'new_place' || n.type === 'price_drop') return alertMessage({ ...n, type: n.type });
   const name = n.actor?.display_name ?? 'Someone';
   if (n.type === 'follow') return `${name} started following you`;
   if (n.type === 'like') return `${name} liked your post`;
@@ -71,7 +78,7 @@ export default function NotificationsScreen() {
   const load = useCallback(async () => {
     if (!myId) return;
     const { data } = await supabase.from('notifications')
-      .select('*, actor:profiles!notifications_actor_id_fkey(*), post:posts(id, title, image_url), check_in:check_ins(id, place_type, place_id), enquiry:housing_enquiries(id, kind, residence:residences(id, name))')
+      .select('*, actor:profiles!notifications_actor_id_fkey(*), post:posts(id, title, image_url), check_in:check_ins(id, place_type, place_id), enquiry:housing_enquiries(id, kind, residence:residences(id, name)), residence:residences(id, name)')
       .eq('recipient_id', myId)
       // Housing only: follow, like, comment and ping notifications are archived (tag archive/social-v1).
       .in('type', [...HOUSING_NOTIFICATION_TYPES])
@@ -104,6 +111,9 @@ export default function NotificationsScreen() {
       navigation.navigate('AdminEnquiry', { enquiryId: n.enquiry_id });
     } else if (n.type === 'enquiry_status') {
       navigation.navigate('MyEnquiries');
+    } else if ((n.type === 'new_place' || n.type === 'price_drop') && n.residence_id) {
+      // A listing hidden since opens the page's own "no longer listed" message.
+      navigation.navigate('ResidenceDetail', { residenceId: n.residence_id });
     }
   };
 
@@ -131,7 +141,7 @@ export default function NotificationsScreen() {
             <View style={styles.iconChip}>
               <Icon name={ICON_BY_TYPE[item.type]} size={15} color={colors.coral} />
             </View>
-            {item.type === 'enquiry_status' ? (
+            {isFromHavenly(item) ? (
               <View style={[styles.avatar, styles.brandAvatar]}>
                 <Text style={styles.brandMark}>h</Text>
               </View>

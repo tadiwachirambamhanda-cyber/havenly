@@ -29,6 +29,7 @@ const RELATIONS: Record<string, { table: string; fk: string; many?: boolean }> =
   'check_ins.user': { table: 'profiles', fk: 'user_id' },
   'offers.brand': { table: 'brands', fk: 'brand_id' },
   'notifications.actor': { table: 'profiles', fk: 'actor_id' },
+  'notifications.residence': { table: 'residences', fk: 'residence_id' },
   'housing_enquiries.user': { table: 'profiles', fk: 'user_id' },
   'housing_enquiries.residence': { table: 'residences', fk: 'residence_id' },
 };
