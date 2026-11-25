@@ -18,8 +18,6 @@ import { haptics } from '@/lib/haptics';
 const TAB_CONFIG: Record<string, { icon: IconName; label: string }> = {
   Housing: { icon: 'home', label: 'Housing' },
   Community: { icon: 'users', label: 'Community' },
-  Saved: { icon: 'heart', label: 'Saved' },
-  Inbox: { icon: 'inbox', label: 'Inbox' },
   Profile: { icon: 'user', label: 'Profile' },
 };
 
@@ -86,7 +84,8 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
           <Icon name={config.icon} size={19} color={isFocused ? '#FFFFFF' : colors.tabInk} weight={isFocused ? 'fill' : 'bold'} />
           <Text style={[styles.tabLabel, { color: isFocused ? '#FFFFFF' : colors.tabInk }]} numberOfLines={1}>{config.label}</Text>
         </View>
-        {((route.name === 'Inbox' && hasUnread) || (route.name === 'Profile' && hasUnreadNotifs)) && <View style={styles.unreadDot} />}
+        {/* Messages now open from Community, so their dot shows there; notifications show on Profile. */}
+        {((route.name === 'Community' && hasUnread) || (route.name === 'Profile' && hasUnreadNotifs)) && <View style={styles.unreadDot} />}
       </AnimatedPressable>
     );
   };

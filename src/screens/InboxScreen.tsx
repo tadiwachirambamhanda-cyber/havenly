@@ -8,6 +8,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import InitialsAvatar from '@/components/InitialsAvatar';
 import Icon from '@/components/Icon';
+import BackButton from '@/components/BackButton';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -162,6 +163,7 @@ export default function InboxScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.titleRow}>
+        <BackButton style={styles.back}><Icon name="arrow-left" size={17} color={colors.ink} /></BackButton>
         <Text style={styles.title}>Messages</Text>
       </View>
       <View style={styles.searchBar}>
@@ -235,7 +237,8 @@ export default function InboxScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
-  titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingTop: 60 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: spacing.lg, paddingTop: 60 },
+  back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 26, color: colors.ink },
   newGroupBtn: {
     width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,
