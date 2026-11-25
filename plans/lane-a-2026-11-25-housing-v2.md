@@ -58,3 +58,28 @@ Fresh-reviewer, dimension plan, FINDINGS(5).
 3. Fixed in part: a post card is a button that opens `PostDetail` with `{ postId }` (the "Coming soon" placeholder until Lane C ships). Dismissed "pass both": "Ask about <area>" sends `{ area }` because the button asks about the area, and F20 wants area questions to show on every listing in that area.
 4. Fixed: the price pill reads "Under AED 3,000" when no price is set and "Under AED <cap>" when one is; More filters reads "More filters" or "More filters · N", N counting bills, deal, bedrooms (one) and Verified. Test: all four set = 4.
 5. Fixed: unit tests for the panel text with unknown bills, bills included, no deposit and an uneven deposit.
+
+## Changes from the plan
+
+- Owner addition (2026-11-25, 3 tabs): Housing's top bar has a 44 px "Saved places" heart (signed in) that opens `navigate('Saved' as never)`, next to My enquiries; Saved has a BackButton and no tab-bar bottom padding.
+- The area posts reload on focus (`useFocusEffect`) instead of `useEffect`, which lint rejects for setState; it also refreshes after asking a question.
+- The renting guide link moved to the Housing list footer; the card photo count pill went (the design has none).
+
+## Handover
+
+Branch `worktree-lane-a`, worktree `.claude/worktrees/agent-ad5ab431999bfdacb`. Not yet merged with origin/main.
+
+Done (all committed; typecheck, lint and `npm test` green at the last commit):
+- Step 1 shared parts (`parts.tsx`): v2 tags (Verified ink, Bills mint, Deal sun, QuietTag), pill buttons, `TextButton`, `CARD_RADIUS`/`FIELD_RADIUS`.
+- Step 2 `src/lib/areaPosts.ts` + 10 tests.
+- Step 3 `listingModel.ts`: pill labels, More filters count, `splitPanel` + tests (handoff numbers 3,150 to 3,233; 2 people 4,725 to 4,850).
+- Step 4 HousingScreen: four pills with option panels, v2 cards, mint banner to the Community tab, housemates button gone, Saved heart added.
+- Step 5 ResidenceDetailScreen: 320 px paging gallery, overlapping sheet, inline split panel with stepper, To move in, Getting to campus + Open in Maps, "Students talking about this area" (signed out / guest / loading / failed / posts), bottom bar with "Enquire with friends". "Split the rent" button removed; nothing opens `SplitRent` any more.
+- Step 6 Saved (back button), enquiry, sent, My enquiries, sign-in sheet, guide, start / join / group screens restyled to tokens and shapes.
+
+Left:
+1. Merge origin/main (three tabs merged there): then drop the `as never` on `navigate('Saved')` in HousingScreen and its comment, and check the empty state in SavedScreen (`navigate('MainTabs', { screen: 'Housing' })`) still fits the new navigator; re-run typecheck.
+2. Visual check at 390 and 1440, light and dark (dev server on 8082 was up and bundling; the browser pane refused localhost, so nothing was looked at yet). Check above all: pills row scrolls sideways inside itself only, the stepper fits at 390, the bottom bar does not cover content, dark mode on the mint panel and Verified pill.
+3. `npx expo-doctor`, `npx expo export --platform web`, write `## Verification`.
+4. /codex-review (write `.review/codex-brief.md`, check `.review/` is gitignored; `.gitignore` is the Chief Architect's), triage into `## Codex review`, then push and `gh pr create --base main`.
+5. Questions still open for the Chief Architect: remove the `SplitRent` route (then delete `SplitRentScreen.tsx`); the bell in the handoff header; the banner count.
