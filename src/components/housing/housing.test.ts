@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { Residence } from '../../types';
-import { EMPTY_FILTERS, billsLine, eachPersonLine, filterAndSort, moveInRows, monthlyAedOf, pickCommute, priceInfo } from './listingModel';
+import {
+  EMPTY_FILTERS, billsLine, eachPersonLine, filterAndSort, moreFiltersCount, morePillLabel, moveInRows, monthlyAedOf, pickCommute, priceInfo,
+  pricePillLabel, splitPanel, whoPillLabel,
+} from './listingModel';
 import { clearPendingReturn, setPendingReturn, takePendingReturn } from './pendingReturn';
 
 let n = 0;
@@ -106,5 +109,56 @@ describe('return to listing', () => {
     setPendingReturn('y', 0);
     expect(takePendingReturn(31 * 60 * 1000)).toBeNull();
     clearPendingReturn();
+  });
+});
+
+describe('Housing pills (F16)', () => {
+  it('price pill names the cap, or AED 3,000 when none is set', () => {
+    expect(pricePillLabel(null)).toBe('Under AED 3,000');
+    expect(pricePillLabel(2500)).toBe('Under AED 2,500');
+  });
+
+  it('who pill', () => {
+    expect(whoPillLabel(null)).toBe('Who it’s for');
+    expect(whoPillLabel('female_only')).toBe('Female only');
+  });
+
+  it('More filters counts bills, deal, bedrooms (once) and Verified', () => {
+    expect(morePillLabel(EMPTY_FILTERS)).toBe('More filters');
+    const all = { ...EMPTY_FILTERS, billsIncluded: true, studentDeal: true, bedrooms: 2 as const, verified: true };
+    expect(moreFiltersCount(all)).toBe(4);
+    expect(morePillLabel(all)).toBe('More filters · 4');
+    // Price, kind, who and search have their own controls and do not count.
+    expect(moreFiltersCount({ ...EMPTY_FILTERS, maxMonthly: 3000, kind: 'studio', gender: 'mixed', query: 'JLT' })).toBe(0);
+  });
+});
+
+describe('rent split panel (F16)', () => {
+  const home = (over: Partial<Residence> & { monthly?: number | null } = {}) => make({
+    listing_type: 'home', bedrooms: 3, monthly: 9000, bills_included: false, bills_min_aed: 450, bills_max_aed: 700, deposit_aed: 4500, ...over,
+  });
+
+  it('the handoff numbers: 3 people, then 2', () => {
+    expect(splitPanel(home(), 3)).toEqual({
+      people: 3, peopleLabel: '3 people', each: 'About AED 3,150 to 3,233 each a month',
+      note: 'Each pays rent plus their share of bills. Deposit AED 1,500 each.',
+    });
+    const two = splitPanel(home(), 2)!;
+    expect(two.each).toBe('About AED 4,725 to 4,850 each a month');
+    expect(two.note).toContain('Deposit AED 2,250 each.');
+    expect(splitPanel(home(), 1)!.peopleLabel).toBe('1 person');
+  });
+
+  it('bills included, unknown bills, no deposit, uneven deposit', () => {
+    expect(splitPanel(home({ bills_included: true }), 3)).toMatchObject({ each: 'AED 3,000 each a month', note: 'Bills are included in the rent. Deposit AED 1,500 each.' });
+    expect(splitPanel(home({ bills_included: null, bills_min_aed: null, bills_max_aed: null }), 3)!.note).toBe('Rent only: bills are not listed yet. Deposit AED 1,500 each.');
+    expect(splitPanel(home({ deposit_aed: null }), 3)!.note).toBe('Each pays rent plus their share of bills.');
+    expect(splitPanel(home({ deposit_aed: 5000 }), 3)!.note).toContain('Deposit about AED 1,667 each.');
+  });
+
+  it('nothing for a room, a home with no price, or a bad count', () => {
+    expect(splitPanel(make(), 2)).toBeNull();
+    expect(splitPanel(home({ monthly: null }), 3)).toBeNull();
+    expect(splitPanel(home(), 11)).toBeNull();
   });
 });

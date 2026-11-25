@@ -111,7 +111,7 @@ export default function SignInToContinueScreen() {
             <TextInput
               style={styles.field}
               placeholder="you@example.com"
-              placeholderTextColor="#6B655A"
+              placeholderTextColor={colors.inkSoft}
               autoCapitalize="none"
               autoCorrect={false}
               keyboardType="email-address"
@@ -137,7 +137,7 @@ export default function SignInToContinueScreen() {
               ref={passwordRef}
               style={[styles.field, error ? styles.fieldBad : null]}
               placeholder={mode === 'create' ? PASSWORD_HINT : 'Your password'}
-              placeholderTextColor="#6B655A"
+              placeholderTextColor={colors.inkSoft}
               secureTextEntry={!showPassword}
               textContentType={mode === 'create' ? 'newPassword' : 'password'}
               autoComplete={mode === 'create' ? 'new-password' : 'current-password'}
@@ -186,15 +186,15 @@ export default function SignInToContinueScreen() {
 
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#7A756B', justifyContent: 'flex-end' },
+    container: { flex: 1, backgroundColor: 'rgba(20,16,18,0.55)', justifyContent: 'flex-end' },
     sheet: { backgroundColor: colors.sand, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: '96%', width: '100%' },
-    heading: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 22, lineHeight: 27, color: colors.ink },
+    heading: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 22, lineHeight: 27, color: colors.ink },
     body: { fontSize: 15, lineHeight: 21, color: colors.inkBody },
     label: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 13, color: colors.ink, marginBottom: 6 },
     labelRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     showBtn: { minHeight: 44, minWidth: 44, alignItems: 'center', justifyContent: 'center', marginTop: -12 },
     showText: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 14, color: colors.coral },
-    field: { height: 52, borderRadius: 12, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white, paddingHorizontal: 14, fontSize: 16, color: colors.ink, outlineStyle: 'none' } as never,
+    field: { height: 52, borderRadius: 16, borderWidth: 1.5, borderColor: colors.fieldLine, backgroundColor: colors.white, paddingHorizontal: 14, fontSize: 16, color: colors.ink, outlineStyle: 'none' } as never,
     fieldBad: { borderColor: colors.errorText, borderWidth: 2 },
     rule: { fontSize: 13, color: colors.inkMuted, marginTop: 6 },
     linkBtn: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },

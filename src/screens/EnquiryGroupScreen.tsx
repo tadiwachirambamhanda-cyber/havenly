@@ -63,7 +63,7 @@ export default function EnquiryGroupScreen() {
   );
 
   if (state === 'loading') {
-    return <View style={styles.container} accessibilityLabel="Loading your group">{header}<Skeleton style={{ height: 160, marginHorizontal: 16, borderRadius: 14 }} /></View>;
+    return <View style={styles.container} accessibilityLabel="Loading your group">{header}<Skeleton style={{ height: 160, marginHorizontal: 16, borderRadius: 22 }} /></View>;
   }
   if (state !== 'ready' || !group) {
     return (
@@ -184,17 +184,17 @@ function createStyles(colors: ColorTokens) {
     container: { flex: 1, backgroundColor: colors.sand },
     top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: spacing.lg, paddingBottom: 12 },
     back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-    title: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 26, letterSpacing: -0.5, color: colors.ink, flex: 1 },
+    title: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 26, letterSpacing: -0.5, color: colors.ink, flex: 1 },
     pad: { paddingHorizontal: spacing.lg, gap: 14 },
-    card: { backgroundColor: colors.white, borderRadius: 14, borderWidth: 1, borderColor: colors.line, padding: 16, gap: 4 },
-    homeName: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 20, color: colors.ink },
+    card: { backgroundColor: colors.white, borderRadius: 22, borderWidth: 1, borderColor: colors.line, padding: 16, gap: 4 },
+    homeName: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 20, color: colors.ink },
     meta: { fontSize: 13.5, color: colors.inkSoft },
     each: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 16, color: colors.ink, marginTop: 8 },
     codeLabel: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft },
     code: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 40, letterSpacing: 8, color: colors.ink },
     codeButtons: { flexDirection: 'row', gap: 10, flexWrap: 'wrap', justifyContent: 'center' },
     hint: { fontSize: 13, color: colors.inkSoft, textAlign: 'center', lineHeight: 18 },
-    section: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 19, color: colors.ink, marginTop: 8 },
+    section: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 19, color: colors.ink, marginTop: 8 },
     memberRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
     divider: { borderTopWidth: 1, borderTopColor: colors.line },
     avatar: { width: 40, height: 40, borderRadius: 20 },
