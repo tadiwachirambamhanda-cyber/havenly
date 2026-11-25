@@ -1,82 +1,75 @@
-# PRD: Havenly, student accommodation in Dubai
+# PRD: Havenly v2, student housing and student community in Dubai
 
-For: Havenly (founder-run, pre-launch, Dubai). Written: 2026-11-18. Source: the founder's own idea ("Havenly becomes a student accommodation platform first, like Property Finder or Bayut, but for students in Dubai"), plus the housing v1 already built (2026-10-14) and `docs/havenly-launch-prd.html`.
+For: Havenly (founder-run, pre-launch, Dubai). Written: 2026-11-25 (replaces the housing-first PRD of 2026-11-18). Source: the founder's own decisions in conversation on 2026-11-25 ("a lane that will handle the social community side of the app as previously before but only the features we need … a vibrant look and redesign that will fit both functions of the app, so our app will tackle 2 birds with 1 stone"), and the housing v1 already built (F1 to F13).
 
 ## The client
 
-Havenly is the founder's own product. It is a small, pre-launch team with a working app (web and phone) and a social layer (feed, communities, events, perks, messages) that already exists. The Housing tab (browse residences, enquire, track deals) shipped as a first version.
+Havenly is the founder's own product: a small, pre-launch team with a working app (web live on Vercel, phone through Expo Go). Housing v1 is built: listings, search, enquiries and group enquiries, saved places, alerts, the housemates board, the renting guide and the team's tools. The social features (feed, communities, events, perks) were removed on 2026-11-18 and are kept at git tag `archive/social-v1`; their database tables still exist.
 
 ## The problem
 
-Students who move to Dubai for university search for a place to live across Property Finder, Bayut, Facebook groups, WhatsApp groups and agents. Those sites are built for adults renting a whole flat, not for a student who wants a room or a bed near campus, a fixed budget, a term start date, and a place that takes students. Students do not know which listings are real, what the full cost is, or how long the commute to their university will be.
+Students who move to Dubai for university hunt for a place across Property Finder, Bayut, Facebook and WhatsApp groups and agents, and the real answers ("is this area safe at night?", "how long is the bus to Academic City?", "anyone need a flatmate?") live in those groups, not on the listing sites. Havenly fixes the listing side. v2 brings the student conversation into the same app, so students come back between house hunts and the community answers their housing questions.
 
 ## Who uses it
 
-- **Student (searching):** an 18 to 28 year old at a Dubai university, often new to the city, who wants a safe, affordable place near campus and wants to ask or book a viewing without hassle.
-- **Havenly team (admin):** adds and edits the listings, answers enquiries, and tracks each student from enquiry to signed contract and the referral fee owed.
-- **Housing provider (not a user yet):** a residence operator or licensed agency. Students sign the contract with them offline; they pay Havenly a referral fee per signed student.
+- **Student (searching):** 18 to 28, at a Dubai university, often new to the city. Wants a safe, affordable place near campus, and other students to ask.
+- **Student (in the community):** any signed-in student. Joins university communities, posts, asks about areas, finds events, perks and housemates.
+- **Havenly team (admin):** adds listings, answers enquiries, tracks referral fees, adds events and perks, and reviews reported posts.
+- **Housing provider (not a user yet):** pays a referral fee per signed student; signs the contract offline.
 
 ## What it must do
 
-1. Housing is the first thing a person sees and the main reason to open the app. The social features stay, but sit behind it.
-2. Anyone can browse and open listings without making an account. An account is asked for only when they save a listing, send an enquiry or use the social features that write (post, comment, message). Decided 2026-11-18.
-3. A student can search and narrow listings by area, university, price, room type, number of bedrooms, who it is for (mixed, female only, male only) and amenities, and sort the results.
-4. Listings cover more than one kind of place: student residence, room in a shared apartment, private room, studio, and a whole 1, 2 or 3 bedroom home that students rent together.
-5. A listing page gives the full picture: photo gallery, price and what the student pays on top (deposit, fees), and for a whole home the rent split per person (for example AED 9,000 for 3 bedrooms is about AED 3,000 each), what is included, how far it is from each nearby university, and a "Verified by Havenly" mark only when the team has checked the listing.
-6. A student can send an enquiry or ask for a viewing, and follow its status. (Built already.)
-7. A student can save listings and compare up to three side by side.
-8. Every listing says whether bills are included, and if not, shows an estimated monthly range. Bills included is a filter and a badge, because Havenly wants to make paying for housing simple for students.
-9. For a whole home, a student can see how many people share and what each person pays a month: their share of rent, of bills (or the range) and of the deposit.
-10. Student deals: the team can attach a student offer to a listing (student rate, waived deposit or fees, free first month, group discount). Listings that offer a student deal or include bills get a "Student-friendly" badge and rank higher in search. This is Havenly's leverage when onboarding agents and residences.
-11. The Havenly team can add and edit every listing, including the new fields, and track the pipeline and referral fees. (Built already; extended.)
+1. Housing stays the first screen and the main reason to open the app. Tabs become Housing, Community, Saved, Inbox, Profile.
+2. One new, vibrant look that fits both housing and community, designed first and approved by the founder (Housing home and Community) before any screen is rebuilt.
+3. University communities: any signed-in student can join and read any community; every post shows the poster's university. Signed-out visitors can browse listings as today.
+4. Posts live inside communities only: photos and text, likes and comments. No global feed of people you follow.
+5. Area questions: a post can be tagged with an area or a listing; the listing page shows "Students talking about this area".
+6. The housemates board moves into Community, with its matching rules unchanged.
+7. Events and student perks come back inside Community.
+8. Anyone can report a post, comment or event; the team has a review queue to hide or keep it.
+9. Housing gets simpler: demo mode, the in-app Map and Compare are removed; the rent split shows on the listing page instead of its own sheet; search shows search, price, kind of place and who it is for up front, with the rest under "More filters".
+10. Everything else in housing stays: listings, Verified, enquiries and group enquiry, Saved, alerts, renting guide, messages and team tools.
 
 ## How the client will judge it
 
-- "I open the app and I land on student housing, not on a social feed."
-- "My friend opens the link, finds a room under AED 3,000 a month near their university in under a minute, without signing up."
-- "I can tell what the place really costs and how far it is from my campus before I ask."
-- "I can see which listings the team has checked."
-- "I add a new listing in a few minutes and it shows up for students."
+- "I open the app and land on housing, and Community is one tap away."
+- "The app looks alive, not like a property portal, and housing and community clearly belong to one app."
+- "I post 'anyone living in JLT, how is the commute?' in my university's community, and it shows on JLT listings."
+- "A friend from another university can read and answer in my community, and I can see where they study."
+- "Something nasty gets reported and the team can hide it the same day."
 
 ## Constraints
 
-- Platforms: web first (live at havenly-app-zeta.vercel.app, redeploys on every merge to main). The phone app runs through Expo, but Expo Go does not open this project (SDK 57), so testing on a phone needs a development build, which needs an Apple or Google developer account.
-- Money: AED. Prices are shown per month, semester or year as the provider sells them. 5% VAT applies where relevant.
-- Supabase free tier (pauses when idle), no production database yet.
-- Listings must be real. Never invent a place, price or review. Sample listings are clearly marked as samples and removed before real launch.
-- English only in v1.
-- Pre-launch to-dos the founder deferred still stand: domain and business email, legal entity and contact in `src/constants/legal.ts`, lawyer review of the privacy policy and terms, public policy URL for the app stores.
+- Platforms: web (Vercel, redeploys on every merge) and phone through Expo Go (SDK 58).
+- Supabase free tier (pauses when idle; the founder has two free projects at most).
+- English only. AED.
+- Listings must be real; nothing invented. Community content is real students' content: no seeded fake posts presented as real.
+- Anything students post must be reportable and removable before public launch (app store rule for user content).
+- Pre-launch to-dos still stand: domain and business email, legal entity, lawyer review of the privacy policy and terms (now also community rules), public policy URL.
 
 ## Not in this version
 
-The founder has not given an out-of-scope list, so this is a proposal for the founder to confirm. Claude must not build any of it in v1:
-
-- Agents and residences adding their own listings and paying to do so. This is the planned next stage (see "Later" in the feature list); in v1 only the Havenly team adds listings. The data should be built so a listing can later belong to an agent or residence account.
-- Taking rent, deposits or any payment in the app.
-- Generating, signing or storing tenancy contracts. Contracts stay offline with the provider.
-- Taking a cut of rent as a broker. The referral fee from the provider stays the model.
-- Map search with pins and a draw-on-map tool.
-- Reviews and ratings of places by students.
-- Villas. They are not listed.
-- Roommate matching, new-listing alerts, push notifications, virtual tours, Arabic.
-- New social features, or removing the existing ones.
+- A global feed, following people, follower lists, other people's post grids.
+- Video posts.
+- Check-ins, pings and activity streaks.
+- Sharing posts into chats.
+- Push notifications (needs a development build).
+- Demo mode, the in-app Map screen and Compare (removed in this version).
+- Everything already out of scope for housing: payments and contracts in the app, agents listing their own places, reviews and ratings of places, Arabic.
 
 ## Data
 
-- Existing tables: `residences`, `room_types`, `residence_partner_terms` (fee and contacts, admin only), `saved_residences`, `housing_enquiries`. Listing type, extra costs, verification, and permit number are new fields.
-- The first real listings come from the founder: the residences already contacted. The founder supplies the photos and prices. The rooms from the separate Havenly Housing WhatsApp and Instagram business (R01 to R03) are not included for now.
-- Students' personal data stays limited to what an enquiry needs: name, phone, move-in month, budget. Nothing real in test data.
+- Existing tables reused: `communities`, `community_members`, `posts`, `comments`, `post_likes`, `events`, `brands`, `offers`, `offer_claims`, reports and blocks. Their policies were written for the old app and must be re-checked before use (for example, campus communities were restricted to their own students; now anyone may join).
+- New: a post's area or listing tag; a team review state on reported content.
+- Personal data stays limited: a post shows display name, photo and university only. No real people in test data or seeds.
 
 ## Open questions
 
-1. **Decided 2026-11-18:** only the Havenly team adds listings in v1. Later, agents and residences add their own for a fee. Still open: how the fee works (per listing, monthly subscription, per featured listing), the amount, how they pay, and whether the referral fee per signed student stays alongside it.
-2. **Regulation (parked for later, before public launch; the founder will deal with the lawyer review then):** as far as we know, property adverts in Dubai need a permit number from the regulator (Trakheesi) and renting out shared or partitioned rooms is restricted. Does Havenly need a brokerage licence, or is "provider pays a referral fee, contract is offline" enough? Which listing types are legal to show?
-3. **Decided 2026-11-18:** these kinds of place go in v1: student residence, room in a shared apartment, private room, studio, and whole 1, 2 and 3 bedroom homes that students share and split. Villas are not listed. For a whole home, the enquiry and contract go with one student (the one who enquires); the enquiry form stays as it is, with no group of names. Decided 2026-11-18.
-4. **Who pays?** Decided: students use it free; agents and residences pay to list. Still open: do private landlords (not agents) list at all, and does a listing fee replace or sit on top of today's referral fee per signed student?
-5. **Which areas and universities first?** (Dubai International Academic City, Knowledge Village, Silicon Oasis, Marina and JLT, others.)
-6. **Decided 2026-11-18:** yes, signed-out visitors see the full real listings. Sign-in is asked for only when someone wants to save or enquire (and for writing in the social part).
-7. **Decided 2026-11-18:** the Havenly Housing WhatsApp and Google Form business (rooms R01 to R03) stays separate for now and does not become listings in the app.
-8. **Phone vs web for v1:** is web enough for the first friends and students, with the phone app waiting for the developer accounts?
-9. **Student discounts (decided 2026-11-18 that we need them):** who funds them? This PRD assumes the provider gives the deal (a student rate, waived fees, free first month, bills included, group discount) in exchange for ranking, a badge and a lower listing fee later, not Havenly out of its own fee. How does a student prove they are a student (v1 assumes the provider checks the student ID at signing)? Is giving back part of Havenly's fee as move-in credit allowed? (Lawyer.)
-10. **Guest mode already exists** (merged 2026-11-17): "Explore without signing up" opens a read-only demo that runs only on bundled sample content and is forbidden from touching the database (`docs/guest-mode-brief.md`). To show real listings to signed-out visitors (F6), we need a separate, read-only public housing view that reads only active listings, or we change the guest-mode rules. Which do you prefer? (This PRD assumes the separate public housing view, so the demo keeps its safety rules.)
-11. **Name of the social part:** keep "Feed, Discover, Inbox, Profile" as they are, or group them under one "Community" tab?
+1. **Events:** who creates them, students or only the team? (Students posting events means more moderation.)
+2. **Perks:** the old perks needed activity streaks, which are now out. Does a student just see the discount and show a code, and does each perk need a limit per student?
+3. **Moderation:** who on the team reviews reports, how fast, and what is not allowed (written community rules)? Should a post with several reports hide itself until reviewed?
+4. **Signed-out visitors:** may they read communities, or only listings? (This PRD assumes listings only; reading Community needs an account.)
+5. **Notifications:** should students be told when someone comments on or likes their post? (Not in v2 unless decided.)
+6. **Which communities exist at launch:** one per university already in the app, plus a few interest groups? Who creates new ones (team only, assumed)?
+7. **UAE rules for user posts:** what the community rules and terms must say (lawyer).
+8. **Brand:** does the vibrant redesign keep the current logo and name styling, or may the design revisit them?
