@@ -62,8 +62,34 @@ Follows, a global feed, video, notifications for likes and comments, signed-out 
 
 **Open points for the report**: an area tag opens the Housing tab without the area (no Housing `area` param yet); Undo after a review decision is sent needs a "reopen reports" database function; `useConfirmDiscard` is not used on New post because its `Alert.alert` does nothing on the web.
 
+**Update, same session (continued):** items 1 to 5 above are done: main merged, Messages opens `navigate('Inbox')`, all seven remaining screens built, checks run, Codex review below.
+
 ## Changes from the plan
+- Chief Architect decision (2026-11-25): tapping an area tag opens the Housing tab, without the area, for now.
+- Owner request (2026-11-25): a Messages button with an unread dot next to Post on the Community tab (the app now has three tabs).
+- The Events shortcut on the Community tab switches the list to upcoming events (there is no separate events route).
+- The demo (guest mode) still shows its own made-up sample perks; the old real-database sample perks and Veldemers stay hidden from students.
+- New post does not ask "Discard changes?" on leaving: the shared `useConfirmDiscard` uses `Alert.alert`, which does nothing on the web and would trap the screen.
+- Extra shared files in `src/components/community/`: `CommunityPicker.tsx`, `FindCommunities.tsx`, `TagPicker.tsx`, `useMembership.tsx`, `useHousemateActions.tsx`, `usePostActions.tsx`, `SafetyMenu.tsx`.
 
 ## Verification
+- `npm run typecheck`: pass. `npm run lint`: pass. `npm test`: 18 files, 177 tests pass (25 new in `community.test.ts`).
+- `npx expo-doctor`: 20/20 checks passed. `npx expo export --platform web`: exported.
+- Browser check on port 8084 in the demo (guest mode, sample data only, no real database): Community tab at 375 wide (dark) and 1440 wide (light), no sideways scroll (scrollWidth 1440 = window 1440); a community's Posts, Housemates (Nora's sample card with "Message Nora"), Events and Perks sections; the Events view and an event page. Fixed what it found: "Join" was unreadable on the berry header in dark mode; the Events view always showed "No events coming up"; the demo's sample perks were hidden.
+- Not checked in the browser: anything that writes (posting with photos, likes, comments, reports, Going, Get code, joining, team screens), because the demo blocks writes and this lane may not create accounts. The Chief Architect's real-accounts check covers these.
+- Console: only warnings from the Housing screen (nested buttons), not from Community.
 
 ## Codex review
+
+**Round 1: VERDICT: FINDINGS(3)**
+1. MAJOR, `communityPhotos.ts`: a signed link already given out keeps working until it expires (1 hour), even after the post is hidden. **Dismissed**: the brief sets `createSignedUrl(path, 3600)`; the store cannot take back a link once given, but new links stop at once and cached ones are dropped. A shorter time is for the Chief Architect to decide.
+2. MAJOR, `PerkCard.tsx`: perk codes were not tied to the account, so a screen that stays open across an account change could show the previous account's code for a moment. **Fixed**: codes and Going are now tagged with the account that loaded them.
+3. MAJOR, `PostCard.tsx`: an area tag opens Housing without the area. **Dismissed**: the Chief Architect decided this is fine for now (no Housing area parameter yet).
+
+**Round 2: VERDICT: FINDINGS(4)**
+1. MAJOR, `communityApi.ts`: "Get code" could claim an inactive or expired perk by its id. **Dismissed**: `claim_offer` checks `is_active`, `starts_at` and `ends_at` in the database (`20261125200000_community_v2.sql`).
+2. MAJOR, `communityApi.ts`: if loading my codes fails, "Get code" shows again. **Dismissed**: tapping it calls `claim_offer`, which returns the same code, so nothing wrong happens.
+3. MAJOR, `EventCard.tsx`: events could show without Going for a moment after an account change. **Dismissed**: signing out replaces the whole navigation stack, and the Community screens are keyed by account; Going is now tied to the account as well (round 1 fix).
+4. MINOR, `community.ts`: a time like `9:30` is accepted though the label says HH:MM. **Dismissed**: it is read correctly as 09:30; being lenient helps the team.
+
+Stopped after round 2: only dismissed findings remain.
