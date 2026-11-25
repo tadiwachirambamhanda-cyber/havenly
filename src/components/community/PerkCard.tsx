@@ -21,13 +21,15 @@ export function usePerkCodes() {
   const { session } = useAuth();
   const myId = session?.user.id;
   const { showToast } = useToast();
-  const [codes, setCodes] = useState<Record<string, string>>({});
+  // Tagged with the account they belong to, so another account's codes never show, even for a moment.
+  const [owned, setOwned] = useState<{ owner: string | undefined; codes: Record<string, string> }>({ owner: myId, codes: {} });
+  const codes = owned.owner === myId ? owned.codes : {};
   const [busy, setBusy] = useState<string | null>(null);
 
   useEffect(() => {
     if (!myId) return;
     let alive = true;
-    fetchMyCodes(myId).then((c) => { if (alive) setCodes(c); });
+    fetchMyCodes(myId).then((c) => { if (alive) setOwned({ owner: myId, codes: c }); });
     return () => { alive = false; };
   }, [myId]);
 
@@ -36,13 +38,13 @@ export function usePerkCodes() {
     haptics.tap();
     try {
       const code = await claimPerk(offerId);
-      setCodes((prev) => ({ ...prev, [offerId]: code }));
+      setOwned((prev) => ({ owner: myId, codes: { ...(prev.owner === myId ? prev.codes : {}), [offerId]: code } }));
     } catch (e) {
       showToast(friendlyError(e, 'Couldn’t get the code. Try again.'), 'error');
     } finally {
       setBusy(null);
     }
-  }, [showToast]);
+  }, [showToast, myId]);
 
   return { codes, busy, getCode };
 }

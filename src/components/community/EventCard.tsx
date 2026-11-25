@@ -22,19 +22,27 @@ export function useGoing(setEvents: (update: (prev: EventRow[]) => EventRow[]) =
   const { session } = useAuth();
   const myId = session?.user.id;
   const { showToast } = useToast();
-  const [going, setGoingIds] = useState<Set<string>>(new Set());
+  // Tagged with the account it belongs to, like the perk codes.
+  const [owned, setOwned] = useState<{ owner: string | undefined; ids: Set<string> }>({ owner: myId, ids: new Set() });
+  const going = useMemo(() => (owned.owner === myId ? owned.ids : new Set<string>()), [owned, myId]);
+  const setGoingIds = useCallback((u: Set<string> | ((prev: Set<string>) => Set<string>)) => {
+    setOwned((prev) => {
+      const base = prev.owner === myId ? prev.ids : new Set<string>();
+      return { owner: myId, ids: typeof u === 'function' ? u(base) : u };
+    });
+  }, [myId]);
   const busy = useRef(new Set<string>());
 
   const reload = useCallback(async () => {
     if (!myId) return;
     setGoingIds(await fetchMyGoing(myId));
-  }, [myId]);
+  }, [myId, setGoingIds]);
   useEffect(() => {
     if (!myId) return;
     let alive = true;
     fetchMyGoing(myId).then((ids) => { if (alive) setGoingIds(ids); });
     return () => { alive = false; };
-  }, [myId]);
+  }, [myId, setGoingIds]);
 
   const toggle = useCallback(async (event: EventRow) => {
     if (!myId || busy.current.has(event.id)) return;
@@ -54,7 +62,7 @@ export function useGoing(setEvents: (update: (prev: EventRow[]) => EventRow[]) =
     } finally {
       busy.current.delete(event.id);
     }
-  }, [myId, going, setEvents, showToast]);
+  }, [myId, going, setEvents, showToast, setGoingIds]);
 
   return { going, toggle, reload };
 }
