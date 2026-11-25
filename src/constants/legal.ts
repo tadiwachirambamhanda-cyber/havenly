@@ -4,7 +4,7 @@
 // placeholders below once the company and business email exist.
 export const LEGAL_ENTITY = '[Havenly legal entity name]';
 export const LEGAL_CONTACT_EMAIL = '[privacy email]';
-export const LEGAL_LAST_UPDATED = '18 November 2026';
+export const LEGAL_LAST_UPDATED = '25 November 2026';
 export const LEGAL_IS_DRAFT = true;
 
 export interface LegalSection {
@@ -33,7 +33,8 @@ export const PRIVACY_POLICY: LegalDocument = {
         'Messages: your messages, including one-to-one chats and any group conversations you are already part of.',
         'Location: only while you use the map or location-based sorting, and only if you allow it. We don\'t track your location in the background.',
         'Housing: residences you save, and enquiries you send: move-in month, length of stay, room, budget, viewing availability, your message and the phone or WhatsApp number you give us. If you sign with a residence, we record the contract value so we can work out the fee the residence owes us.',
-        'Housemate card (optional): if you make one, the area you want to live in, up to five lifestyle tags, a short note, how many housemates you need and which home, if any. It also shows your display name, university, gender (if you gave it), budget and move-in month from your profile. Your gender is optional and is used only to match housemate preferences.',
+        'Housemate card (optional): if you make one, the area you want to live in, up to five lifestyle tags, a short note, how many housemates you need and which home, if any. It also shows your display name, university, gender (if you gave it), budget and move-in month from your profile. Your gender is optional and is used only to match housemate preferences and, if you switch on new-place alerts, to decide whether women-only or men-only places are included.',
+        'Alert settings: whether you want alerts for price drops on saved places and for new places that fit you.',
         'Group enquiries: if you start or join a group enquiry, your group membership and the phone number you give for it. Other members of your group see your name and university; they do not see your phone number.',
         'Safety: people you block and reports you make.',
         'Technical data: standard logs from our hosting provider (such as IP address, device type and request times), and, when crash reporting is switched on, crash reports when the app hits an error, used to keep the service running and secure.',
@@ -49,6 +50,7 @@ export const PRIVACY_POLICY: LegalDocument = {
         'To show your housemate card to other students whose housemate preference matches yours, after our team has checked it, and to let them message you.',
         'To calculate and invoice the referral fees residences pay us.',
         'To send you in-app notifications, for example when your enquiry moves forward.',
+        'To send you alerts you can switch on or off in Profile: when a place you saved gets cheaper, and when a new place is listed that fits your budget, your university and (if you gave it) your gender. These are worked out automatically from your saved places and profile, inside Havenly; nothing is shared with the residence.',
         'To keep Havenly safe: reviewing reports, enforcing our terms and preventing abuse.',
       ],
       after: ['We don\'t sell your personal information, and we don\'t use advertising or analytics trackers in the app.'],

@@ -208,7 +208,15 @@ export function createFixtures(): FixtureTables {
     conversation_reads: empty(),
     conversation_hidden_for: empty(),
     messages: empty(),
-    notifications: empty(),
+    // Two sample alerts. Already read, so opening the bell does not try to mark them (a blocked write).
+    notifications: [
+      { id: 'sample-alert-1', recipient_id: GUEST_USER_ID, actor_id: null, type: 'price_drop', residence_id: 'residence-2',
+        old_price_aed: 2300, new_price_aed: 2100, post_id: null, comment_id: null, check_in_id: null, enquiry_id: null,
+        enquiry_status: null, is_read: true, created_at: daysAgo(1) },
+      { id: 'sample-alert-2', recipient_id: GUEST_USER_ID, actor_id: null, type: 'new_place', residence_id: 'residence-1',
+        old_price_aed: null, new_price_aed: 2000, post_id: null, comment_id: null, check_in_id: null, enquiry_id: null,
+        enquiry_status: null, is_read: true, created_at: daysAgo(2) },
+    ],
     check_ins: empty(),
     interests: empty(),
     offer_claims: empty(),
