@@ -16,8 +16,9 @@ import { haptics } from '@/lib/haptics';
 // Every tab shows its name under the icon: icons alone (a key for Housing,
 // a tray for Inbox) have to be guessed, words don't.
 const TAB_CONFIG: Record<string, { icon: IconName; label: string }> = {
+  Housing: { icon: 'home', label: 'Housing' },
+  Community: { icon: 'users', label: 'Community' },
   Saved: { icon: 'heart', label: 'Saved' },
-  Housing: { icon: 'key', label: 'Housing' },
   Inbox: { icon: 'inbox', label: 'Inbox' },
   Profile: { icon: 'user', label: 'Profile' },
 };
@@ -80,11 +81,10 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
           }
         }}
       >
-        {/* Inactive tabs are the pill's text colour (sand) at reduced opacity,
-            so they stay readable on both the dark and the dark-mode pill. */}
-        <View style={[styles.tabContent, { opacity: isFocused ? 1 : 0.65 }]}>
-          <Icon name={config.icon} size={19} color={isFocused ? colors.ink : colors.sand} weight={isFocused ? 'fill' : 'bold'} />
-          <Text style={[styles.tabLabel, { color: isFocused ? colors.ink : colors.sand }]} numberOfLines={1}>{config.label}</Text>
+        {/* v2: the active tab is berry with white; inactive tabs use tabInk on the tabBg pill. */}
+        <View style={styles.tabContent}>
+          <Icon name={config.icon} size={19} color={isFocused ? '#FFFFFF' : colors.tabInk} weight={isFocused ? 'fill' : 'bold'} />
+          <Text style={[styles.tabLabel, { color: isFocused ? '#FFFFFF' : colors.tabInk }]} numberOfLines={1}>{config.label}</Text>
         </View>
         {((route.name === 'Inbox' && hasUnread) || (route.name === 'Profile' && hasUnreadNotifs)) && <View style={styles.unreadDot} />}
       </AnimatedPressable>
@@ -109,7 +109,7 @@ function createStyles(colors: ColorTokens) {
     position: 'absolute', left: 16, right: 16, flexDirection: 'row', alignItems: 'center', gap: 10,
   },
   pill: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.ink,
+    flex: 1, flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: colors.tabBg,
     borderRadius: 100, padding: 6,
     // One soft shadow, only here: the bar floats over scrolling content and
     // needs to separate from it. Nothing else in the app casts one.
@@ -122,20 +122,16 @@ function createStyles(colors: ColorTokens) {
   // indicatorStyle, not a fixed offset, so it lines up exactly with icons
   // regardless of the pill's own padding/gap.
   indicator: {
-    // Sand, not coral: the + button is the one coral thing in the bar, so
-    // it's the one that stands out (Von Restorff). Sand/ink flip together
-    // with the pill in dark mode, so contrast holds both ways.
-    position: 'absolute', top: 6, bottom: 6, left: 0, borderRadius: 18, backgroundColor: colors.sand,
+    // v2 handoff: the active tab is a berry pill with white icon and label.
+    position: 'absolute', top: 6, bottom: 6, left: 0, borderRadius: 24, backgroundColor: colors.coralFill,
   },
-  pillItem: { flex: 1, height: 48, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  pillItem: { flex: 1, height: 52, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   tabContent: { alignItems: 'center', gap: 2 },
   tabLabel: { fontSize: 10, fontWeight: '700', letterSpacing: 0.1 },
-  // colors.sand, not literal white — this dot sits on the ink-colored pill,
-  // which flips to cream in dark mode, so the dot must flip the other way
-  // to stay visible against it.
+  // A berry dot ringed in the pill's own colour, so it reads on both the light and dark pill.
   unreadDot: {
-    position: 'absolute', top: 4, right: '26%', width: 7, height: 7, borderRadius: 3.5,
-    backgroundColor: colors.sand, borderWidth: 1.5, borderColor: colors.coral,
+    position: 'absolute', top: 6, right: '24%', width: 9, height: 9, borderRadius: 4.5,
+    backgroundColor: colors.coralFill, borderWidth: 2, borderColor: colors.tabBg,
   },
   fab: {
     width: 46, height: 46, borderRadius: 23, backgroundColor: colors.coralFill, flexShrink: 0,
