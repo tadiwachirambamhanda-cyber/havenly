@@ -10,6 +10,8 @@ export interface Profile {
   has_completed_onboarding: boolean; is_admin: boolean; created_at: string;
   // Private fields (table profile_private): only present on your own profile, never on other students'.
   budget_aed?: number | null; move_in_month?: string | null; housemate_pref?: 'any' | 'female_only' | 'male_only' | null;
+  // Alert switches, also private (profile_private). Missing means the defaults in src/lib/alerts.ts.
+  alert_new_places?: boolean | null; alert_price_drops?: boolean | null;
   gender?: 'female' | 'male' | null;
 }
 

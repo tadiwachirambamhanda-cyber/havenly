@@ -32,7 +32,9 @@ export interface AlertSwitches {
 // A student who never touched them: price alerts on (they saved the place), new-place alerts off.
 export const DEFAULT_ALERT_SWITCHES: AlertSwitches = { alert_new_places: false, alert_price_drops: true };
 
-export function switchesOf(row: Partial<AlertSwitches> | null | undefined): AlertSwitches {
+export type SavedSwitches = { [K in keyof AlertSwitches]?: boolean | null };
+
+export function switchesOf(row: SavedSwitches | null | undefined): AlertSwitches {
   return {
     alert_new_places: row?.alert_new_places ?? DEFAULT_ALERT_SWITCHES.alert_new_places,
     alert_price_drops: row?.alert_price_drops ?? DEFAULT_ALERT_SWITCHES.alert_price_drops,
