@@ -48,3 +48,6 @@ Fresh review, 6 findings, all accepted:
 ## Ideas for later
 - Move post photos to a private store so hidden posts' photos stop opening by link.
 - New app icon and splash images in berry (the icon is still oxblood).
+
+## Answers (owner, 2026-11-25)
+"yes, keep, build": 1 apply the migration after the rolled-back test; 2 keep the old sample posts, brands and perks hidden and untouched for now.
