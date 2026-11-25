@@ -231,18 +231,6 @@ export default function ProfileScreen() {
         onEditProfile={() => navigation.navigate('EditProfile')}
       />
 
-      <Text style={[styles.section, styles.sectionPad]}>Housemates</Text>
-      <View style={styles.card}>
-        <View style={styles.housemateBody}>
-          <Text style={styles.enquiryName}>Want to live with other students?</Text>
-          <Text style={styles.muted2}>Make a card so students who want to live together can find you. The team checks every card first.</Text>
-          <View style={styles.housemateBtns}>
-            <OutlineButton label="See the board" icon="users" onPress={() => navigation.navigate('HousemateBoard')} height={44} />
-            <OutlineButton label="My card" onPress={() => navigation.navigate('MyHousemateCard')} height={44} />
-          </View>
-        </View>
-      </View>
-
       <Text style={[styles.section, styles.sectionPad]}>Account</Text>
       <View style={styles.card}>
         {email ? (
