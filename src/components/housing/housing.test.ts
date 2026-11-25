@@ -1,7 +1,6 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { Residence } from '../../types';
 import { EMPTY_FILTERS, billsLine, eachPersonLine, filterAndSort, moveInRows, monthlyAedOf, pickCommute, priceInfo } from './listingModel';
-import { MAX_COMPARE, addToCompare, clearCompare, getCompareIds, removeFromCompare, setCompareOwner } from './compareStore';
 import { clearPendingReturn, setPendingReturn, takePendingReturn } from './pendingReturn';
 
 let n = 0;
@@ -98,30 +97,6 @@ describe('commute', () => {
   });
 });
 
-describe('compare list', () => {
-  beforeEach(() => clearCompare());
-  it('holds three and refuses a fourth', () => {
-    expect(addToCompare('1')).toBe('added');
-    expect(addToCompare('1')).toBe('already');
-    addToCompare('2'); addToCompare('3');
-    expect(addToCompare('4')).toBe('full');
-    expect(getCompareIds()).toHaveLength(MAX_COMPARE);
-    removeFromCompare('2');
-    expect(addToCompare('4')).toBe('added');
-  });
-});
-
-describe('compare list owner', () => {
-  it('starts empty for a different account', () => {
-    setCompareOwner('a');
-    addToCompare('1');
-    setCompareOwner('a');
-    expect(getCompareIds()).toEqual(['1']);
-    setCompareOwner('b');
-    expect(getCompareIds()).toEqual([]);
-    clearCompare();
-  });
-});
 
 describe('return to listing', () => {
   it('is read once and expires', () => {

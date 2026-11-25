@@ -16,8 +16,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { formatAed, setResidenceSaved } from '@/lib/housing';
 import { LISTING_TYPE_LABEL } from '@/lib/listing';
-import { BillsTag, DealTag, OutlineButton, StateBlock } from '@/components/housing/parts';
-import { useCompareIds } from '@/components/housing/compareStore';
+import { BillsTag, DealTag, StateBlock } from '@/components/housing/parts';
 import { billsLine, commuteText, isDeal, isWholeHome, orderByIds, pickCommute, priceInfo } from '@/components/housing/listingModel';
 import type { ColorTokens } from '@/theme/tokens';
 import type { Residence } from '@/types';
@@ -34,7 +33,6 @@ export default function SavedScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
   const myUniversity = profile?.university ?? null;
-  const compareCount = useCompareIds().length;
 
   // The loaded list is tagged with the account it was loaded for. A slow load that finishes after the
   // account changed is tagged with the old account and is never shown, so one person never sees another's
@@ -95,9 +93,6 @@ export default function SavedScreen() {
         <Text style={styles.title} accessibilityRole="header">Saved</Text>
         <Text style={styles.count}>{rows.length === 1 ? '1 place' : `${rows.length} places`}</Text>
       </View>
-      {compareCount > 0 ? (
-        <OutlineButton label={`Compare (${compareCount})`} onPress={() => navigation.navigate('Compare')} height={44} />
-      ) : null}
     </View>
   );
 

@@ -16,13 +16,31 @@ export interface Profile {
 }
 
 export interface Post {
-  id: string; author_id: string; author?: Profile; title: string; body: string | null;
+  // v2 posts have no title (old ones do); photos are paths in the post-images store (image_paths, up to 4).
+  id: string; author_id: string; author?: Profile; title: string | null; body: string | null;
   image_url: string | null; video_url: string | null; tag: string; is_editorial: boolean; like_count: number;
   comment_count: number; created_at: string; community_id: string | null; location: string | null; community?: { name: string } | null;
+  image_paths?: string[] | null;
+  // Area questions: an area name (src/constants/areas.ts) or a listing the post is about.
+  area?: string | null; residence_id?: string | null;
+  // Set when the post is hidden by 3 reports or by the team; only its author and the team still see it.
+  hidden_at?: string | null;
 }
 
 export interface Comment {
   id: string; post_id: string; author_id: string; author?: Profile; body: string; created_at: string;
+  hidden_at?: string | null;
+}
+
+// What students can report through report_item, and the reasons they choose from.
+export type ReportableType = 'post' | 'comment' | 'event';
+export type ReportReason = 'spam' | 'harassment' | 'hate' | 'inappropriate' | 'scam' | 'not_student_life' | 'other';
+
+// One row of the team's review queue (review_queue): never names the reporters.
+export interface ReviewItem {
+  target_type: ReportableType; target_id: string; reports: number; reasons: ReportReason[];
+  hidden_at: string | null; author_id: string | null; author_name: string | null; content: string | null;
+  community_name: string | null; first_reported: string;
 }
 
 export type CommunityCategory = 'interest' | 'campus';
@@ -49,6 +67,8 @@ export interface HavenlyEvent {
   id: string; title: string; description: string | null; location: string; tag: string;
   event_date: string; created_at: string;
   latitude: number | null; longitude: number | null;
+  // v2: added by the team, optionally for one community; students mark Going (event_going).
+  community_id?: string | null; hidden_at?: string | null; going_count?: number;
 }
 
 export type NotificationType = 'follow' | 'like' | 'comment' | 'ping' | 'enquiry_new' | 'enquiry_status' | 'new_place' | 'price_drop';

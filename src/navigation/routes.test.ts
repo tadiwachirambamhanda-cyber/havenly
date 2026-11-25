@@ -18,10 +18,11 @@ const registered = new Set([...root.matchAll(/(?:Stack|Tab)\.Screen\s+name="(\w+
 
 describe('navigation targets', () => {
   it('registers the screens we expect', () => {
-    for (const name of ['MainTabs', 'Housing', 'Saved', 'Compare', 'Inbox', 'Profile', 'ResidenceDetail', 'Notifications', 'Map', 'ChangePassword', 'HousemateBoard', 'MyHousemateCard', 'HousemateReview', 'Guide', 'StartGroup', 'EnquiryGroup', 'JoinGroup']) {
+    for (const name of ['MainTabs', 'Housing', 'Community', 'Saved', 'Inbox', 'Profile', 'ResidenceDetail', 'Notifications', 'ChangePassword', 'HousemateBoard', 'MyHousemateCard', 'HousemateReview', 'Guide', 'StartGroup', 'EnquiryGroup', 'JoinGroup', 'CommunityDetail', 'CreatePost', 'PostDetail', 'EventDetail', 'Perks', 'PerkDetail', 'ReviewQueue', 'ManageEvents', 'ManagePerks']) {
       expect(registered.has(name), name).toBe(true);
     }
-    for (const gone of ['CompareTab', 'Feed', 'Discover', 'PostDetail', 'CreatePost', 'Communities', 'EventDetail', 'FollowList', 'UserProfile', 'NewGroup', 'SharePost']) {
+    // Archived social screens, and Map, Compare and the old perk screens removed in v2.
+    for (const gone of ['CompareTab', 'Compare', 'Map', 'Offers', 'OfferDetail', 'ManageBrands', 'CreateOffer', 'Feed', 'Discover', 'Communities', 'FollowList', 'UserProfile', 'NewGroup', 'SharePost']) {
       expect(registered.has(gone), gone).toBe(false);
     }
   });

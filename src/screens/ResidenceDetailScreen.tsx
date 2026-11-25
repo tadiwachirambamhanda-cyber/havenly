@@ -27,7 +27,6 @@ import BackButton from '@/components/BackButton';
 import BurstHeart from '@/components/BurstHeart';
 import Skeleton from '@/components/Skeleton';
 import { BillsTag, DealTag, NotVerifiedTag, Notice, OutlineButton, PrimaryButton, StateBlock, VerifiedBadge } from '@/components/housing/parts';
-import { MAX_COMPARE, addToCompare, removeFromCompare, useCompareIds } from '@/components/housing/compareStore';
 import { billsLine, commuteText, housematesLine, isDeal, isWholeHome, moveInRows, priceInfo } from '@/components/housing/listingModel';
 import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
@@ -50,7 +49,6 @@ export default function ResidenceDetailScreen() {
   const requireAccount = useRequireAccount();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const myId = session?.user.id;
-  const compareIds = useCompareIds();
 
   const [residence, setResidence] = useState<Residence | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -58,7 +56,6 @@ export default function ResidenceDetailScreen() {
   const [saved, setSaved] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [openEnquiryStatus, setOpenEnquiryStatus] = useState<EnquiryStatus | null>(null);
-  const [compareFull, setCompareFull] = useState(false);
   const [housemateCount, setHousemateCount] = useState(0);
   const [verifiedSheet, setVerifiedSheet] = useState(false);
   // Once the photo has scrolled away, a solid strip keeps the floating buttons readable.
@@ -108,18 +105,6 @@ export default function ResidenceDetailScreen() {
       setSaved(!next);
       showToast('Couldn’t update your saved list. Try again.', 'error');
     }
-  };
-
-  const inCompare = compareIds.includes(residenceId);
-  const toggleCompare = () => {
-    if (!requireAccount('compare', residenceId)) return;
-    if (inCompare) {
-      removeFromCompare(residenceId);
-      setCompareFull(false);
-      return;
-    }
-    if (addToCompare(residenceId) === 'full') setCompareFull(true);
-    else setCompareFull(false);
   };
 
   const enquire = () => {
@@ -312,13 +297,6 @@ export default function ResidenceDetailScreen() {
             ) : null}
           </View>
 
-          <OutlineButton
-            label={inCompare ? 'Added to compare, tap to remove' : 'Add to compare'}
-            icon={inCompare ? 'check' : 'plus'}
-            onPress={toggleCompare}
-            style={{ marginTop: 12 }}
-          />
-          {compareFull ? <Notice style={{ marginTop: 8 }}>You can compare up to {MAX_COMPARE} places. Remove one to add this one.</Notice> : null}
 
           {rooms.length > 0 && (
             <>

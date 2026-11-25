@@ -1,95 +1,61 @@
-# Handoff: Havenly housing screens
+# Handoff: Havenly v2 look (housing and community)
 
-For the coding agent that builds these screens. Read `design/brief.md`, `docs/ux/screen-map.md` and `design/INSPIRATION.md` first. The design canvas (private link, owner only): https://claude.ai/artifact/KboQ7z1ZjZS6sE2rubYgHK
+For the coding agent building F14 to F24. Approved by the founder on 2026-11-25 (Housing and Community first, then the rest). Live canvas: https://claude.ai/artifact/3ae2kXBT5Kjp7SS6DbxWgF (private to the founder; the `.dc.html` files here are the same screens). The v1 housing handoff is kept in `v1-housing/` for layouts that did not change.
 
-## What is in this folder
+Note: the prototypes link between screens in Main → Community → listing → community → new post. In the files here, `Main.dc.html` is saved as `Housing.dc.html`; links inside them still say `Main.dc.html`. No screenshots are saved: open the canvas link, or a `.dc.html` file in the design canvas, to see them.
 
-| File | Screen (route in the screen map) | Features |
-|---|---|---|
-| `Housing.dc.html` | `Housing`, search and results | F4, F5, F11, F12 (card line), F13 (tag) |
-| `ResidenceDetail.dc.html` | `ResidenceDetail`, one listing | F3, F7, F8 |
-| `SplitRent.dc.html` | `SplitRent`, a sheet on a whole-home listing | F12 |
-| `Compare.dc.html` | `Compare`, up to 3 listings | F7 |
-| `SignInToContinue.dc.html` | `SignInToContinue`, a sheet | F6 |
-| `EditResidence.dc.html` | `EditResidence`, team only | F1, F2, F11, F13 |
-| `States.dc.html` | Empty, loading and error states for all six screens | all |
-| `screenshots/*.png` | One rendering of each at 2x (390 wide; States is 1290 wide) | |
+## Tokens
 
-The `.dc.html` files are plain HTML with inline styles inside an `<x-dc>` tag, so every size, colour and spacing in them is an exact value to read. `{{accent}}` is the one tweakable colour (the primary oxblood, default `#7A2433`). Ignore the `support.js` script line, it belongs to the design canvas. The screenshots were rendered from the same HTML in Chrome.
+The app keeps its token names (`src/theme/tokens.ts`); only the values change. New tokens are marked new.
 
-All names, prices, areas and photos in the mock-ups are fictional ("Sample listing, for design only"). Photos are plain grey blocks on purpose; real photos replace them.
+| Token | Light | Dark | Use |
+|---|---|---|---|
+| `sand` (ground) | `#FBF7F2` | `#141012` | Screen background |
+| `white` (surface) | `#FFFFFF` | `#1F191C` | Cards, sheets, fields |
+| `ink` | `#1C1418` | `#F6EEF0` | Text, Verified pill (light) |
+| `inkSoft` | `#6A5E62` | `#B9AAAF` | Secondary text |
+| `line` | `#EDE3DC` | `#33292D` | Card borders, dividers |
+| `fieldLine` | `#8E8085` | `#6E5F64` | Field and outline-button edges (3:1) |
+| `coral` (accent as text, icons) | `#C8234F` | `#FF6B8E` | Links, icons, the logo's full stop and mark |
+| `coralFill` (accent as fill) | `#C8234F` | `#D92B5A` | Primary buttons, selected chips, active tab, your-university card; white text on it |
+| `coralSoft` | `#FCE4EA` | `#3D1D27` | Soft berry chips, avatar backgrounds |
+| `mintBg` (new) | `#D6F5E8` | `#123A2D` | Community moments: liked, Bills included, Housemates, area tag selected, rent split panel |
+| `mintText` (new) | `#0B6B4C` | `#7DECC3` | Text and icons on mintBg |
+| `mintFill` (new) | `#0B6B4C` | `#5FE0B1` | "Going" when on; text on it `#FFFFFF` light, `#0B2A20` dark |
+| `dealBg` (sun) | `#FFE08A` | `#3D3010` | Student deal tag, perks |
+| `dealText` (sun) | `#6B4000` | `#FFD45C` | Text on dealBg; "Get code" button fill (with dealBg as its text) |
+| `tintBg` | `#F2E9E2` | `#2B2226` | Quiet tags (kind of place), review chips |
+| `photo` (new) | `#EFE3DB` | `#2B2226` | Empty photo boxes |
+| `verifiedBg` / `verifiedText` (new) | `#1C1418` / `#FFFFFF` | `#F6EEF0` / `#141012` | "Verified by Havenly" pill: never berry, mint or sun |
+| `tabBg` / `tabInk` (new) | `#1C1418` / `#CDBFC4` | `#F6EEF0` / `#3A3034` | Floating tab bar and its inactive items; active item is `coralFill` with white |
+| `errorBg` / `errorText` | `#FCE8E6` / `#8E1B12` | `#3A1F1B` / `#FFB4A8` | Errors, "Reported N times", Report in menus |
 
-## Tokens (exact values)
+Contrast checked: text on ground and surface 4.5:1 or better in both themes; white on `coralFill` 5.5:1 (light) and 4.7:1 (dark); mint and sun text on their backgrounds 5.7:1 and 6.9:1.
 
-Colour (palette name: oxblood and stone)
+Type: Schibsted Grotesk 800 for titles and prices (31 px screen titles, 24 to 27 px prices and listing names, 19 px section titles, letter-spacing -0.5 to -0.8 px); Hanken Grotesk for everything else (15 to 16 px body, 13 to 14 px secondary, 700 for labels and buttons). Uppercase 13 px 700 with 0.6 px spacing only for small section labels ("MY COMMUNITIES").
 
-| Token | Value | Used for |
-|---|---|---|
-| ground | `#F3F0EA` | screen background (warm stone) |
-| surface | `#FFFFFF` | cards, fields, tab bar, sheets |
-| surface-soft | `#ECE8DF`, `#E6E1D6` | close buttons, neutral tags, panels |
-| photo-placeholder | `#DDD7CB` | empty photo and skeletons |
-| ink | `#1F1B16` | text, Verified badge background, selected chips |
-| ink-body | `#3A342D` | body paragraphs |
-| ink-soft | `#5A544B` | secondary text, icons |
-| ink-muted | `#655F55` | small print only (12 px) |
-| placeholder | `#6B655A` | input placeholder |
-| line-card | `#E2DDD2` | card and tab-bar borders |
-| line-divider | `#E8E3D9` | rows inside a card |
-| line-field | `#8B8477` | field, chip and outline-button borders (3.7:1 on white, so the control edge is visible) |
-| primary | `#7A2433` (oxblood) | the one main button, active filter chip, active tab, selected thumbnail |
-| primary-tint | `#F1E9E4` (panel), `#E8E2D6` (tag) with text `#4A4036` | "Bills included" tag, each-person-pays panel |
-| deal | background `#F5E2C6`, text `#7A4300` | Student deal tag only |
-| error | text `#8E1B12` / `#A3231A`, background `#FCE8E6`, border `#E7B5B0`, always with a "!" icon and words | errors |
-| notice | background `#ECE8DF`, border `#8B8477`, text ink, with an "i" icon | neutral notices (for example "full or no longer listed") |
-| switch-off | `#BDB6A8` | switch track when off |
-| sheet-dim | `#7A756B` (stands in for ink at about 55% over the screen) | dimmed area above a sheet |
+Shape and spacing: 20 px screen gutters; cards radius 22, border 1 px `line`, padding 14 to 16; chips and buttons are pills (radius = half height); touch targets 44 px or more (chips 40, primary buttons 54); gaps 8 / 12 / 16 / 18. The floating tab bar: 70 px tall, radius 35, 14 px from the sides and 22 px from the bottom, five items. Shadows only on the floating "Write a post" button and open menus.
 
-Contrast (checked): white text on primary 9.9:1; primary on ground 8.7:1; ink on ground 15.1:1; ink-soft on ground 6.6:1; deal text on deal background 6.3:1; "Bills included" text 7.8:1; field border on white 3.7:1. Errors never rely on colour alone, because the primary is also a red family.
+## Screens
 
-Verified by Havenly is a solid ink (`#1F1B16`) badge with white text and a shield-check icon. It must never share a colour with the Student deal tag.
+**Housing** (`Housing.dc.html`). Logo (mark and wordmark in berry) and the bell with an unread dot. Title "Find your place near campus". Search field. Four pill filters: "Under AED 3,000", "Kind of place", "Who it's for", "More filters" (selected = berry fill). Count and sort. Result cards: photo (178 px) with Verified or Student deal pill top left and the save heart top right; price in 24 px with "per month"; "Bills included" mint chip; name; kind · area; commute line with icon. A mint banner between results: "Not sure about an area? 12 students talking about Al Barsha this week" opens that area in Community. Student deal: rate, then the normal price struck through.
 
-Type (two families, load from Google Fonts or `@expo-google-fonts`)
+**Community** (`Community.dc.html`). Title and an outline "Post" button. "MY COMMUNITIES": horizontal cards, your university first as a berry card ("Your university · 8 new"), joined ones white, then "Find more". Three shortcuts: Housemates (mint), Events (white), Perks (sun). "LATEST FROM YOUR COMMUNITIES": post cards (avatar initial, name, university · time, ⋯ menu, text, area tag chip with pin, like and comment pills: liked = mint); an event card with a berry date block and "I'm going" (on = mint fill with a tick); a perk card in sun with "Get code".
 
-| Role | Family and weight | Sizes used |
-|---|---|---|
-| Headings, prices | Schibsted Grotesk 700 (500/600 for small headings) | screen title 30/1.1 (letter-spacing -0.02em); listing title 27/1.12; sheet title 24 to 26; section heading 19 (600); card price 24; listing price 34; action-bar price 18; split amount 28 |
-| Body and UI | Hanken Grotesk 400/500/600/700 | body 15 to 16; secondary 14; small 12 to 13; buttons 15 to 16 (700); chips 14 |
-| Caps labels | Hanken Grotesk 700, 12, letter-spacing 0.06em, uppercase | section labels |
+**Listing page** (`ResidenceDetail.dc.html`). Photo gallery (320 px, back and save, "1 / 8"), then a sheet overlapping it by 24 px. Verified and kind pills, name, area. Cost card: price for the home, bills line, then the mint split panel (people stepper 1 to 10, "About AED X to Y each a month", deposit each), then "To move in" rows and total. "Getting to campus" rows and "Open in Maps". "Students talking about this area": up to 3 tagged posts and "Ask about <area>". Fixed bottom: "Enquire or book a viewing" (primary) and "Enquire with friends" (text button). The split replaces the old SplitRent sheet; the stepper defaults to the number of bedrooms.
 
-Numbers: use tabular numerals (`fontVariant: ['tabular-nums']`) only in Hanken lists and tables (the cost rows, the compare cells). Do not use them on Schibsted prices: it makes the comma look detached ("2 , 800").
+**A community** (`CommunityDetail.dc.html`). Berry header with back, Join / Joined, the community's initials, name and "[N] members · Your university". Four section pills: Posts, Housemates, Events, Perks (selected = ink fill). Posts with comments shown under them; the ⋯ menu holds "Report post" (error colour) and "Block <name>". Housemates shows only matching cards with "Message <name>" and "My housemate card". Perks shows the personal code in a dashed box. Floating "Write a post" button.
 
-Spacing, size and shape: screen side gutter 16; gap between cards 16; card padding 14 (cards) or 16 (cost boxes); photo height on a card 188, gallery 300; thumbnails 76 by 56; chip height 40 (pill); primary button 52 high, radius 12; secondary button 48; form fields 52 (public) and 48 (team form), radius 12 and 10; card radius 14; badge radius 8; sheet radius 22 on top corners; tab bar 68 high. Every tap target is at least 44 by 44. No shadows are used; borders do the separating.
+**New post** (`CreatePost.dc.html`). A sheet over the dimmed screen. Cancel, title, Post (disabled until there is text). "Posting in <community>" picker. Text box. Photos "N of 4" with an add tile. "Tag an area or a listing · optional" with the chosen tag in mint and a note that tagged posts show on that area's listings. Footer note that name, photo and university show, and anyone can report.
 
-## Components
+**Review queue, team** (`ReviewQueue.dc.html`). Title and "N to review". An explainer line. Each item: kind, "Reported N times" (error), "Hidden by reports" (ink) when auto-hidden at 3, where it was and who wrote it, the text, the reasons, then Hide (primary) and Keep; once decided, a mint line "Hidden for everyone" or "Kept and visible" with Undo. Empty state: "Nothing to review. New reports show up here."
 
-- **Result card:** photo (188) with save heart (44 round, white) top right, a photo count (`1 / [N]`) bottom right, and the Verified badge or Student deal tag bottom left. Under it: price, "per month", and the Bills included tag on the right; then the kind and area; then commute line, then housemates line. A student deal shows the new price, the old price struck through, and "per month". A whole home shows the home price and, on its own line in the warm brown `#4A4036`, the per-person range.
-- **Filter chips:** a horizontally scrolling row. First chip is "Verified by Havenly" (with the shield icon). Selected chips are filled primary with white text.
-- **Cost box (listing page):** price large, a line on what bills include, then "To move in" rows (first month, deposit, one-time fees) and a bold total.
-- **Compare grid:** three equal columns (114 each at 390 wide), each row has an uppercase label above three cells.
-- **Sheets (SplitRent, SignInToContinue):** white, 22 radius top, grabber, 44 round close button, content, one primary button at the bottom.
-- **Switch:** 52 by 32, knob 26; on is primary, off is `#B9C1B9`. Build it as a real switch control.
-- **Skeletons:** flat `#D6DCD5` blocks, no shimmer.
+## States to build (not all drawn)
 
-## Screens, parts and states
+Every screen: loading (skeletons in the card shapes), error (a `StateBlock` with "Try again"), empty (Housing: no matches with "Clear filters"; Community: no communities joined with "Find your university"; a community: "No posts yet. Ask the first question."; listing: no area posts yet, just "Ask about <area>"). Signed out: Community and posting open the sign-in sheet with why. Photos uploading on New post; post failed keeps the text.
 
-1. **Housing.** Parts: wordmark and Log in; title "Find a place near your campus"; search box (university or area); filter chips; result count and sort; result cards; tab bar (Housing, Discover, Feed, Inbox, Profile, Housing first). Primary action: open a listing. States in `States.dc.html`: empty (no match, with Clear filters), loading (two skeleton cards), error (Try again). A signed-out visitor sees all of it; saving a listing opens `SignInToContinue`.
-2. **ResidenceDetail.** Parts: gallery with back, share, save and `1 / [N]`; thumbnail strip; Verified and Bills included tags; title; location and Open in Maps; cost box; Add to compare; Getting to campus (minutes by bus or metro); The place (kind, who it is for, flatmates), amenity chips, description; provider and permit number; fixed action bar with the price and one button, "Enquire or book a viewing", and the line "You make a free account when you send this." States: loading, unavailable (banner, similar places), error, student deal and not-yet-verified variants.
-3. **SplitRent (sheet, whole homes only).** Parts: title; the "Each person pays" panel (main content); people stepper (default = bedrooms, a hint says so); rent and bills rows split by the number of people; bills as a range when not included; deposit and one-time fees split; a note that it is an equal split; the button "Enquire about this home". States: bills included (single amount), error (price missing).
-4. **Compare.** Parts: back and title; three column headers (photo, name, Choose or Chosen, Remove); rows: each person pays, bills, deposit, commute, kind, who it is for, Verified; bottom bar "Enquire about the chosen place" with the "up to 3" note. States: empty, limit reached (a 4th is refused), error. Signed-in only (saving needs an account).
-5. **SignInToContinue (sheet).** Title says why ("Make a free account to send your enquiry"); email; password with Show; the password rule line; Create account (primary), Log in instead, Not now; terms line. After success the user returns to where they were. States: wrong password, weak password, creating the account.
-6. **EditResidence (team).** The same form as today plus the F1 fields and the F11 and F13 fields: kind of place, bedrooms (whole home), listing details, deposit and one-time fees, bills (included switch, or estimate from and to), student deal (switch, type chips, student rate), Verified switch and permit number, photos, room types, who it is for, what is included, close to, private partner terms. Save in the header and at the bottom (the same action). States: validation, save failed, saving.
+## Choices
 
-## Rules from the brief to check on screenshots
-
-One primary action per screen; price visible first; real photos lead; no sign-in wall; Verified only when earned and never the same colour as Student deal; works at 390 and 1440 wide with no sideways scroll; every screen has its empty, loading and error states; no emoji, no numbered section labels, no icon-card grids, no hype copy.
-
-## What changed from the app today, and why
-
-The app today uses a warm sand ground, coral and teal, Fraunces headings and Plus Jakarta Sans, with a dark theme. The new look is a warm stone ground with warm charcoal text, one deep oxblood for the main action, dark ink for the Verified mark and amber for student deals, in Schibsted Grotesk and Hanken Grotesk. It was chosen on 2026-11-18 from five options (cool green, stone and forest, sand and midnight, oxblood and stone, petrol and stone) because it is warm and premium and does not look like other Dubai property portals or a green wellness brand. The old combination (cream, serif, warm accent) reads as an AI template and suits a social app, while this is a marketplace where price and trust must come first. The shared theme (`src/theme/tokens.ts`) and fonts belong to the Chief Architect's foundation step, not to a lane.
-
-## Not designed yet, so do not invent it
-
-- Dark theme: not drawn. If needed, derive it from these tokens and check contrast, do not guess colours.
-- Map view, "fair price for this area" gauge (needs real data), Arabic and right-to-left, a wide laptop layout beyond the existing 480 px column on web, the other social screens (Feed, Discover, Inbox, Profile) beyond their tab labels.
-- Real photos, real commute times and real provider names: those come from the Havenly team's data.
+- Berry `#C8234F` evolves the oxblood: same family, much brighter, still 5:1 with white. The logo takes it.
+- Mint is the "people" colour (likes, going, bills included, the split panel), so community and the friendly parts of housing feel related. Sun is only money-saving (deals, perks). Verified stays ink so trust never looks like a promotion.
+- Same cards, pills and tab bar in both halves; Community leans on mint and berry blocks, housing on photos and prices.

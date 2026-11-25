@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Havenly review queue</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#C8234F}a:hover{color:#A01740}
+</style>
+</helmet>
+<div style="width: 390px; height: 900px; position: relative; overflow: hidden; background: {{c.ground}}; color: {{c.ink}}; font-family: 'Hanken Grotesk', system-ui, sans-serif;">
+  <header style="display: flex; align-items: center; gap: 12px; padding: 54px 20px 6px;">
+    <a href="#" aria-label="Back" style="width: 44px; height: 44px; border-radius: 22px; border: 1px solid {{c.line}}; background: {{c.surface}}; display: flex; align-items: center; justify-content: center; color: {{c.ink}};">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>
+    </a>
+    <span style="display: flex; flex-direction: column;">
+      <h1 style="margin: 0; font-family: 'Schibsted Grotesk', sans-serif; font-weight: 800; font-size: 24px; letter-spacing: -0.5px;">Review queue</h1>
+      <span style="font-size: 13px; color: {{c.inkSoft}}; font-weight: 600;">{{countLabel}}</span>
+    </span>
+  </header>
+  <p style="margin: 8px 20px 14px; font-size: 13px; line-height: 1.45; color: {{c.inkSoft}};">Reported posts, comments and events. Anything reported by 3 different students is hidden until you decide. Reporters are never shown to the person reported.</p>
+
+  <div style="display: flex; flex-direction: column; gap: 12px; padding: 0 16px 40px;">
+    <sc-for list="{{items}}" as="it" hint-placeholder-count="3">
+      <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 22px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span style="height: 26px; padding: 0 10px; border-radius: 13px; background: {{c.tintBg}}; font-size: 12px; font-weight: 700; display: flex; align-items: center;">{{it.kind}}</span>
+          <span style="height: 26px; padding: 0 10px; border-radius: 13px; background: {{c.errorBg}}; color: {{c.errorText}}; font-size: 12px; font-weight: 700; display: flex; align-items: center;">{{it.reports}}</span>
+          <sc-if value="{{it.autoHidden}}" hint-placeholder-val="{{ false }}">
+            <span style="height: 26px; padding: 0 10px; border-radius: 13px; background: {{c.ink}}; color: {{c.ground}}; font-size: 12px; font-weight: 700; display: flex; align-items: center;">Hidden by reports</span>
+          </sc-if>
+        </div>
+        <span style="font-size: 13px; color: {{c.inkSoft}}; font-weight: 600;">{{it.where}}</span>
+        <p style="margin: 0; font-size: 15px; line-height: 1.45; padding: 10px 12px; border-radius: 14px; background: {{c.ground}};">{{it.text}}</p>
+        <span style="font-size: 13px; color: {{c.inkSoft}};">Reasons: {{it.reasons}}</span>
+        <sc-if value="{{it.open}}" hint-placeholder-val="{{ true }}">
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+            <button onClick="{{it.hide}}" style="height: 44px; border-radius: 22px; border: 0; background: {{c.berryFill}}; color: #FFFFFF; font: 800 14px 'Hanken Grotesk', sans-serif; cursor: pointer;">Hide</button>
+            <button onClick="{{it.keep}}" style="height: 44px; border-radius: 22px; border: 1.5px solid {{c.fieldLine}}; background: transparent; color: {{c.ink}}; font: 800 14px 'Hanken Grotesk', sans-serif; cursor: pointer;">Keep</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{it.done}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; justify-content: space-between; height: 44px; padding: 0 14px; border-radius: 22px; background: {{c.mintBg}}; color: {{c.mintText}}; font-weight: 700; font-size: 14px;">
+            {{it.doneLabel}}
+            <button onClick="{{it.undo}}" style="border: 0; background: transparent; color: {{c.mintText}}; font: 800 14px 'Hanken Grotesk', sans-serif; text-decoration: underline; cursor: pointer; padding: 10px 0;">Undo</button>
+          </div>
+        </sc-if>
+      </article>
+    </sc-for>
+    <sc-if value="{{allDone}}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 28px 16px; border-radius: 22px; border: 1.5px dashed {{c.fieldLine}}; text-align: center; display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-weight: 800; font-size: 17px;">Nothing to review</span>
+        <span style="font-size: 14px; color: {{c.inkSoft}};">New reports show up here.</span>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false,"section":"Theme"},"$preview":{"width":390,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { decided: {} }; }
+  theme(dark) {
+    return dark ? {
+      ground: '#141012', surface: '#1F191C', ink: '#F6EEF0', inkSoft: '#B9AAAF', line: '#33292D', fieldLine: '#6E5F64',
+      berryFill: '#D92B5A', tintBg: '#2B2226', mintBg: '#123A2D', mintText: '#7DECC3', errorBg: '#3A1F1B', errorText: '#FFB4A8'
+    } : {
+      ground: '#FBF7F2', surface: '#FFFFFF', ink: '#1C1418', inkSoft: '#6A5E62', line: '#EDE3DC', fieldLine: '#8E8085',
+      berryFill: '#C8234F', tintBg: '#F2E9E2', mintBg: '#D6F5E8', mintText: '#0B6B4C', errorBg: '#FCE8E6', errorText: '#8E1B12'
+    };
+  }
+  renderVals() {
+    const c = this.theme(this.props.dark ?? false);
+    const decided = this.state.decided;
+    const set = (id, v) => this.setState({ decided: { ...decided, [id]: v } });
+    const base = [
+      { id: 'a', kind: 'Comment', reports: 'Reported 3 times', autoHidden: true, where: 'On Sara’s post · Murdoch University Dubai · by Karim', text: 'Cheap visas and rooms, message me on WhatsApp now', reasons: 'spam (3)' },
+      { id: 'b', kind: 'Post', reports: 'Reported once', autoHidden: false, where: 'Canadian University Dubai · by Omar', text: 'Need one more housemate for a 3 bed in JLT from January, AED 3,100 each.', reasons: 'not about student life (1)' },
+    ];
+    const items = base.map((it) => {
+      const d = decided[it.id];
+      return {
+        ...it, open: !d, done: !!d,
+        doneLabel: d === 'hidden' ? 'Hidden for everyone' : 'Kept and visible',
+        hide: () => set(it.id, 'hidden'), keep: () => set(it.id, 'kept'), undo: () => set(it.id, undefined),
+      };
+    });
+    const left = items.filter((i) => i.open).length;
+    return { c, items, allDone: left === 0, countLabel: left === 1 ? '1 to review' : `${left} to review` };
+  }
+}
+</script>
+</body>
+</html>

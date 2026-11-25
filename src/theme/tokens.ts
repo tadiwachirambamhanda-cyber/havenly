@@ -1,42 +1,49 @@
 export const lightColors = {
   // Surfaces and text. The names are historical (sand is the screen ground, coral is the
-  // primary accent); the values follow design/handoff/README.md (oxblood and stone).
-  sand: '#F3F0EA', sandDeep: '#ECE8DF', ink: '#1F1B16', inkSoft: '#5A544B',
-  coral: '#7A2433', coralSoft: '#F1E9E4',
+  // primary accent); the values follow design/handoff/README.md (v2: berry, mint and sun).
+  sand: '#FBF7F2', sandDeep: '#F3EAE3', ink: '#1C1418', inkSoft: '#6A5E62',
+  coral: '#C8234F', coralSoft: '#FCE4EA',
   // coral is the accent as text, icons and outlines; coralFill is the accent as a solid fill
   // (buttons, selected chips, dots) that carries white text. Same in light; they differ in dark.
-  coralFill: '#7A2433',
-  white: '#FFFFFF', line: '#E2DDD2',
-  // Housing redesign tokens.
-  inkBody: '#3A342D', inkMuted: '#655F55',
+  coralFill: '#C8234F',
+  white: '#FFFFFF', line: '#EDE3DC',
+  inkBody: '#33282D', inkMuted: '#6A5E62',
   // Edge of a form field, chip or outline button: 3:1 or better against white.
-  fieldLine: '#8B8477',
-  // Student deal tag. Never share these with Verified (which is solid ink).
-  dealBg: '#F5E2C6', dealText: '#7A4300',
-  // Quiet tag (Bills included) and the each-person-pays panel.
-  tintBg: '#E8E2D6', tintText: '#4A4036',
+  fieldLine: '#8E8085',
+  // Sun: student deals and perks, and only those. Never share these with Verified.
+  dealBg: '#FFE08A', dealText: '#6B4000',
+  // Quiet tag (kind of place) and review chips.
+  tintBg: '#F2E9E2', tintText: '#4A3D42',
+  // Mint: community moments (liked, Going, joined) and the friendly parts of housing (bills
+  // included, the rent split). mintFill carries mintOn text.
+  mintBg: '#D6F5E8', mintText: '#0B6B4C', mintFill: '#0B6B4C', mintOn: '#FFFFFF',
+  // An empty photo box.
+  photo: '#EFE3DB',
+  // "Verified by Havenly": always ink, never berry, mint or sun, so trust never looks like a promotion.
+  verifiedBg: '#1C1418', verifiedText: '#FFFFFF',
+  // The floating tab bar and its inactive items; the active item is coralFill with white.
+  tabBg: '#1C1418', tabInk: '#CDBFC4',
   // Errors always carry an icon and words, never colour alone.
   errorBg: '#FCE8E6', errorLine: '#E7B5B0', errorText: '#8E1B12',
 };
 
-// Same keys as lightColors, values flipped — every screen keeps referencing
-// colors.ink for text and colors.sand/white for surfaces unchanged, only
-// what those resolve to changes. A few spots intentionally use colors.ink as
-// an "always-dark" accent pill background (send buttons, selected chips) —
-// those still read correctly here since the paired foreground color on top
-// of them flips too (colors.sand/white), preserving the same contrast.
-// Dark theme: oxblood is too dark to read as text or icons on the dark ground, so the accent
-// as text is a lighter rose (coral, 6.1:1) and the accent as a fill is a mid rose (coralFill,
-// 3.65:1 against the ground, and 5.1:1 under white text).
+// Same keys as lightColors, values flipped: screens keep referencing colors.ink for text and
+// colors.sand/white for surfaces, only what those resolve to changes. Dark: berry as text is a
+// lighter pink (coral, 6.9:1 on the ground) and as a fill a deeper berry (coralFill, 4.7:1 under
+// white text).
 export const darkColors: typeof lightColors = {
-  sand: '#151310', sandDeep: '#1D1A15', ink: '#F3ECDC', inkSoft: '#B7AC93',
-  coral: '#D4788A', coralSoft: '#3A2429',
-  coralFill: '#BA4660',
-  white: '#211D17', line: '#332D22',
-  inkBody: '#E6DFCC', inkMuted: '#9C9279',
-  fieldLine: '#7A715F',
-  dealBg: '#3A2D18', dealText: '#F3C46D',
-  tintBg: '#2A251C', tintText: '#D8CFB8',
+  sand: '#141012', sandDeep: '#1C1619', ink: '#F6EEF0', inkSoft: '#B9AAAF',
+  coral: '#FF6B8E', coralSoft: '#3D1D27',
+  coralFill: '#D92B5A',
+  white: '#1F191C', line: '#33292D',
+  inkBody: '#E9DDE1', inkMuted: '#A99BA0',
+  fieldLine: '#6E5F64',
+  dealBg: '#3D3010', dealText: '#FFD45C',
+  tintBg: '#2B2226', tintText: '#DCCDD2',
+  mintBg: '#123A2D', mintText: '#7DECC3', mintFill: '#5FE0B1', mintOn: '#0B2A20',
+  photo: '#2B2226',
+  verifiedBg: '#F6EEF0', verifiedText: '#141012',
+  tabBg: '#F6EEF0', tabInk: '#3A3034',
   errorBg: '#3A1F1B', errorLine: '#6E352E', errorText: '#FFB4A8',
 };
 
@@ -60,8 +67,8 @@ export const fonts = {
   body: 'HankenGrotesk_400Regular', bodySemiBold: 'HankenGrotesk_600SemiBold',
   bodyBold: 'HankenGrotesk_700Bold', mono: 'JetBrainsMono_500Medium',
 };
-// Tonal pair: light to deep within the one brand colour (oxblood), used for gradients. They
-// stay inside the brand palette: no teal, purple, blue or pink.
+// Tonal pair: light to deep within the one brand colour (berry), used for gradients. They
+// stay inside the brand palette.
 export const tones = {
-  coral: ['#A8465A', '#5E1824'],
+  coral: ['#E0476F', '#8E1538'],
 } as const satisfies Record<string, readonly [string, string]>;

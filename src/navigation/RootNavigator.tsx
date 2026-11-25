@@ -27,11 +27,6 @@ import HousemateBoardScreen from '@/screens/HousemateBoardScreen';
 import MyHousemateCardScreen from '@/screens/MyHousemateCardScreen';
 import HousemateReviewScreen from '@/screens/HousemateReviewScreen';
 import EditProfileScreen from '@/screens/EditProfileScreen';
-import OffersScreen from '@/screens/OffersScreen';
-import OfferDetailScreen from '@/screens/OfferDetailScreen';
-import ManageBrandsScreen from '@/screens/ManageBrandsScreen';
-import CreateOfferScreen from '@/screens/CreateOfferScreen';
-import MapScreen from '@/screens/MapScreen';
 import HousingScreen from '@/screens/HousingScreen';
 import ResidenceDetailScreen from '@/screens/ResidenceDetailScreen';
 import HousingEnquiryScreen from '@/screens/HousingEnquiryScreen';
@@ -41,13 +36,23 @@ import ManageHousingScreen from '@/screens/ManageHousingScreen';
 import AdminEnquiryScreen from '@/screens/AdminEnquiryScreen';
 import EditResidenceScreen from '@/screens/EditResidenceScreen';
 import SplitRentScreen from '@/screens/SplitRentScreen';
-import CompareScreen from '@/screens/CompareScreen';
 import SavedScreen from '@/screens/SavedScreen';
 import SignInToContinueScreen from '@/screens/SignInToContinueScreen';
 import LegalScreen from '@/screens/LegalScreen';
+// v2 community screens (Lane C). Each file is a placeholder until Lane C builds it.
+import CommunityScreen from '@/screens/CommunityScreen';
+import CommunityDetailScreen from '@/screens/CommunityDetailScreen';
+import CreatePostScreen from '@/screens/CreatePostScreen';
+import PostDetailScreen from '@/screens/PostDetailScreen';
+import EventDetailScreen from '@/screens/EventDetailScreen';
+import PerksScreen from '@/screens/PerksScreen';
+import PerkDetailScreen from '@/screens/PerkDetailScreen';
+import ReviewQueueScreen from '@/screens/ReviewQueueScreen';
+import ManageEventsScreen from '@/screens/ManageEventsScreen';
+import ManagePerksScreen from '@/screens/ManagePerksScreen';
 
 // Why a signed-out visitor is being asked to make an account (shown in SignInToContinue).
-export type AccountReason = 'save' | 'enquire' | 'compare' | 'join' | 'login' | 'housemates';
+export type AccountReason = 'save' | 'enquire' | 'join' | 'login' | 'housemates';
 
 export type RootStackParamList = {
   Onboarding: undefined;
@@ -65,15 +70,9 @@ export type RootStackParamList = {
   MyHousemateCard: { residenceId?: string } | undefined;
   HousemateReview: undefined;
   EditProfile: undefined;
-  Offers: undefined;
-  OfferDetail: { offerId: string };
-  ManageBrands: undefined;
-  CreateOffer: undefined;
-  Map: undefined;
   PublicHousing: undefined;
   ResidenceDetail: { residenceId: string };
   SplitRent: { residenceId: string };
-  Compare: undefined;
   SignInToContinue: { reason: AccountReason; residenceId?: string };
   HousingEnquiry: { residenceId: string; kind: 'question' | 'viewing'; groupId?: string };
   HousingEnquirySent: { residenceName: string; kind: 'question' | 'viewing'; moveIn: string; groupSize?: number };
@@ -82,10 +81,21 @@ export type RootStackParamList = {
   AdminEnquiry: { enquiryId: string };
   EditResidence: { residenceId?: string };
   Legal: { doc: 'privacy' | 'terms' };
+  // v2 community (Lane C): placeholders until built.
+  CommunityDetail: { communityId: string };
+  CreatePost: { communityId?: string; residenceId?: string; area?: string } | undefined;
+  PostDetail: { postId: string };
+  EventDetail: { eventId: string };
+  Perks: undefined;
+  PerkDetail: { perkId: string };
+  ReviewQueue: undefined;
+  ManageEvents: undefined;
+  ManagePerks: undefined;
 };
 
 export type MainTabParamList = {
   Housing: undefined;
+  Community: undefined;
   Saved: undefined;
   Inbox: undefined;
   Profile: undefined;
@@ -98,6 +108,7 @@ function MainTabs() {
   return (
     <Tab.Navigator initialRouteName="Housing" screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
       <Tab.Screen name="Housing" component={HousingScreen} />
+      <Tab.Screen name="Community" component={CommunityScreen} />
       <Tab.Screen name="Saved" component={SavedScreen} />
       <Tab.Screen name="Inbox" component={InboxScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
@@ -151,14 +162,13 @@ export default function RootNavigator() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!session ? (
           // Signed out: the real Housing screen first, then a listing and the rent split, all
-          // without an account. Saving, enquiring and comparing open SignInToContinue
+          // without an account. Saving and enquiring open SignInToContinue
           // (useRequireAccount). That sheet is the only place to make an account or log in:
           // the Housing screen's "Log in" opens it in log-in mode. There is no separate
           // login or sign-up screen.
           <>
             <Stack.Screen name="PublicHousing" component={HousingScreen} />
             <Stack.Screen name="Guide" component={GuideScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="Map" component={MapScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="ResidenceDetail" component={ResidenceDetailScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="SplitRent" component={SplitRentScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="SignInToContinue" component={SignInToContinueScreen} options={{ presentation: 'modal' }} />
@@ -184,14 +194,8 @@ export default function RootNavigator() {
             <Stack.Screen name="MyHousemateCard" component={MyHousemateCardScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="HousemateReview" component={HousemateReviewScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ presentation: 'modal' }} />
-            <Stack.Screen name="Offers" component={OffersScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="OfferDetail" component={OfferDetailScreen} options={{ presentation: 'card' }} />
-            <Stack.Screen name="ManageBrands" component={ManageBrandsScreen} options={{ presentation: 'modal' }} />
-            <Stack.Screen name="CreateOffer" component={CreateOfferScreen} options={{ presentation: 'modal' }} />
-            <Stack.Screen name="Map" component={MapScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="ResidenceDetail" component={ResidenceDetailScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="SplitRent" component={SplitRentScreen} options={{ presentation: 'modal' }} />
-            <Stack.Screen name="Compare" component={CompareScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="HousingEnquiry" component={HousingEnquiryScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="HousingEnquirySent" component={HousingEnquirySentScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="MyEnquiries" component={MyEnquiriesScreen} options={{ presentation: 'card' }} />
@@ -199,6 +203,15 @@ export default function RootNavigator() {
             <Stack.Screen name="AdminEnquiry" component={AdminEnquiryScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="EditResidence" component={EditResidenceScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="Legal" component={LegalScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="CommunityDetail" component={CommunityDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ presentation: 'modal' }} />
+            <Stack.Screen name="PostDetail" component={PostDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="EventDetail" component={EventDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="Perks" component={PerksScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="PerkDetail" component={PerkDetailScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="ReviewQueue" component={ReviewQueueScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="ManageEvents" component={ManageEventsScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="ManagePerks" component={ManagePerksScreen} options={{ presentation: 'card' }} />
           </>
         )}
       </Stack.Navigator>
