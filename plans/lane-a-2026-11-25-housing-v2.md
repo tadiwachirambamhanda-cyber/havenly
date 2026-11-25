@@ -48,3 +48,13 @@ The bell with an unread dot from the design (not in the brief's Done means), a p
 1. Remove the `SplitRent` route from `src/navigation/RootNavigator.tsx` (both stacks) and its test, then I delete `SplitRentScreen.tsx`.
 2. The handoff's Housing header shows a bell with an unread dot; the brief does not list it. Add it (to Notifications) or leave it?
 3. The mint banner in the handoff says "12 students talking about Al Barsha this week"; there is no count of that, so it reads "See what students say about <area>" without a number.
+
+## Plan check
+
+Fresh-reviewer, dimension plan, FINDINGS(5).
+
+1. Fixed: the area posts section has four states, each covered by a test of a pure state function in `areaPosts.ts`: signed out (one sign-in line), demo guest (no call, only "Ask about <area>", no sign-in line), call failed (a quiet "We could not load what students say" line with Try again; the rest of the page stays), and posts. A missing author shows "A student".
+2. Kept as Question 1: the route and file are the Chief Architect's. Until then the button is gone and nothing opens the sheet; the report says so rather than ticking that box silently.
+3. Fixed in part: a post card is a button that opens `PostDetail` with `{ postId }` (the "Coming soon" placeholder until Lane C ships). Dismissed "pass both": "Ask about <area>" sends `{ area }` because the button asks about the area, and F20 wants area questions to show on every listing in that area.
+4. Fixed: the price pill reads "Under AED 3,000" when no price is set and "Under AED <cap>" when one is; More filters reads "More filters" or "More filters · N", N counting bills, deal, bedrooms (one) and Verified. Test: all four set = 4.
+5. Fixed: unit tests for the panel text with unknown bills, bills included, no deposit and an uneven deposit.
