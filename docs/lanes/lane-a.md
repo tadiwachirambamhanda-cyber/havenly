@@ -1,37 +1,32 @@
-# Lane brief: Lane A
+# Lane brief: Lane A (v2)
 
-Written by the Chief Architect. Merged to main before the lane starts.
+Written by the Chief Architect on 2026-11-25 for Havenly v2. Replaces the v1 brief (in git history), whose work is merged.
 
 | Field | Value |
 |---|---|
 | Lane name | `Lane A` |
-| Goal | A student can find, understand, save, compare and enquire about a place, without an account until they save or enquire, and can split a whole home's rent with flatmates. |
-| Features | F3, F5, F6 (the screens), F7, F8 (restyle only), F11 (display and the filter), F12, F13 (display and ranking) |
-| Worktree and branch | `.claude/worktrees/lane-a`, branch `worktree-lane-a` |
-| Starting point | main after the foundation pull request is merged (the Chief Architect posts the commit when it merges) |
-| Allowed files and folders | `src/screens/HousingScreen.tsx`, `src/screens/ResidenceDetailScreen.tsx`, `src/screens/HousingEnquiryScreen.tsx`, `src/screens/HousingEnquirySentScreen.tsx`, `src/screens/MyEnquiriesScreen.tsx`, `src/screens/SplitRentScreen.tsx`, `src/screens/CompareScreen.tsx`, `src/screens/SignInToContinueScreen.tsx`, `src/components/housing/` (new), `plans/lane-a-*` |
-| Do not touch | Everything else, above all: `src/theme/`, `src/types/`, `src/config/`, `src/navigation/`, `src/lib/` (including `rentSplit.ts`, `ranking.ts`, `requireAccount.ts`, `housing.ts`, `listing.ts`), `src/guest/`, `supabase/`, `package.json`, `App.tsx`, `docs/`, `design/`, `CLAUDE.md`, and the admin screens (Lane B). |
-| Builds on | Design: `design/handoff/README.md`, the `.dc.html` prototypes and screenshots (Housing, ResidenceDetail, SplitRent, Compare, SignInToContinue, States). Code: tokens in `src/theme/tokens.ts` (`colors.fieldLine`, `dealBg`, `tintBg`, `errorBg`, and so on, plus the fonts), the fields on `Residence` in `src/types/index.ts`, `splitRent`, `moveInTotal` and `formatAedRange` in `src/lib/rentSplit.ts`, `sortForSearch`, `isStudentFriendly` and `effectiveMonthlyAed` in `src/lib/ranking.ts`, `useRequireAccount` in `src/lib/requireAccount.ts`, and `LISTING_TYPE_LABEL` in `src/lib/listing.ts` (read only). |
+| Goal | The housing side wears the approved v2 design: a simpler search, the rent split on the listing page, and "Students talking about this area" linking housing to Community. |
+| Features | F16, the housing half of F14 (every housing screen restyled), the listing-page half of F20 |
+| Worktree and branch | `.claude/worktrees/lane-a`, branch `worktree-lane-a` (a fresh one from main) |
+| Starting point | main after the v2 foundation pull request is merged (the Chief Architect posts the commit) |
+| Allowed files and folders | `src/screens/HousingScreen.tsx`, `ResidenceDetailScreen.tsx`, `SplitRentScreen.tsx` (to delete once the split is inline; remove its route by asking the Chief Architect), `HousingEnquiryScreen.tsx`, `HousingEnquirySentScreen.tsx`, `MyEnquiriesScreen.tsx`, `SavedScreen.tsx`, `SignInToContinueScreen.tsx`, `GuideScreen.tsx`, `StartGroupScreen.tsx`, `EnquiryGroupScreen.tsx`, `JoinGroupScreen.tsx`; `src/components/housing/` and its tests; new `src/lib/areaPosts.ts` and its test; `plans/lane-a-*` |
+| Do not touch | Everything else, above all: `src/theme/`, `src/types/`, `src/navigation/`, `src/constants/`, `src/lib/` (except `areaPosts.ts`; read `rentSplit.ts`, `ranking.ts`, `housing.ts`, `requireAccount.ts`, `listing.ts` only), `src/guest/`, `supabase/`, `package.json`, `App.tsx`, `docs/`, `design/`, `CLAUDE.md`, Lane C's community and housemate screens, `ProfileScreen.tsx`, the team's admin screens. |
+| Builds on | Design: `design/handoff/README.md`, `Housing.dc.html` and `ResidenceDetail.dc.html` (live canvas linked in the README); layouts that did not change are in `design/handoff/v1-housing/`. Tokens in `src/theme/tokens.ts` (new: `mintBg`, `mintText`, `photo`, `verifiedBg`, `verifiedText`). Data: `area_posts(p_residence, p_limit)` returns the posts tagged with that listing or its area for a signed-in student (none for signed-out visitors); `Post` in `src/types/index.ts`. Rent split: `splitRent`, `defaultPeople`, `formatAedRange` in `src/lib/rentSplit.ts`. |
 | Dev server port | 8082 (`npx expo start --web --port 8082`) |
-| Depends on / blocks | Depends on the foundation. Does not wait for Lane B: use the demo sample listings in guest mode, or listings the team adds. The database migration `20261118200000_housing_foundation_fields.sql` must be applied to the live project before testing the new fields against it (the Chief Architect does that). Blocks nothing. |
+| Depends on / blocks | Depends on the foundation. Tapping an area post opens `PostDetail` with `{ postId }` (Lane C builds that screen; until then it shows "Coming soon"). "Ask about <area>" opens `CreatePost` with `{ area }` or `{ residenceId }`. Blocks nothing. |
 
 ## Done means
 
-- [ ] **F3:** I open a verified listing and see the photo gallery and thumbnail strip, the price with the move-in costs and total, the commute to each nearby university, the Verified mark, and Open in Maps. An unverified listing has no Verified mark.
-- [ ] **F5:** I choose "Private room", under AED 3,000 a month and "Female only" and only matching listings stay; "2 bedroom home" shows only 2 bedroom homes; sorting by price puts the cheapest first; clearing the filters brings everything back. "Verified by Havenly" is the first filter chip.
-- [ ] **F11:** each card and the listing page say whether bills are included, or show the estimated monthly range; the "Bills included" filter keeps only those listings.
-- [ ] **F12:** on a AED 9,000, 3 bedroom home with bills AED 450 to 700, the split sheet opens on 3 people and shows about AED 3,150 to 3,233 each, with the rent, bills, deposit and fees rows; changing to 2 people updates every figure; a listing with no price shows the "We cannot split this one yet" state.
-- [ ] **F13:** a listing with a student deal shows the Student deal tag and the old price struck through, and "Student-friendly" listings sit above an identical listing with no deal in the default order.
-- [ ] **F7:** I save 3 listings and Compare shows them in three columns with the right rows; choosing one then Enquire works; trying to add a 4th is refused with the limit message.
-- [ ] **F6:** (ask the Chief Architect to set `PUBLIC_BROWSING` to true once your screens are safe for visitors) in a private window I see the Housing list, open a listing and the split sheet without signing in; tapping Save or Enquire opens "Make a free account to send your enquiry"; after creating an account I am back on the same listing.
-- [ ] With public browsing on, Save, Enquire and Compare each call `useRequireAccount()` before they do anything, and nothing a signed-out visitor can tap navigates to a screen that is missing from the signed-out navigator (`HousingEnquiry`, `Compare`, `MyEnquiries`) or writes to the database. Listings are read through the existing policy that shows active listings only.
-- [ ] **F8:** sending an enquiry and following its status work as before, in the new look.
-- [ ] Every screen has the empty, loading and error states from `design/handoff/States.dc.html`.
-- [ ] Each screen matches the screenshots in `design/handoff/screenshots/` at 390 wide and at a laptop width, with no sideways scroll.
+- [ ] **F14 (housing):** Housing, the listing page, Saved, the enquiry screens, group enquiry screens, sign-in sheet and renting guide match the handoff at 390 and 1440 wide in light and dark: berry primary buttons, mint "Bills included" and split panel, sun "Student deal", ink "Verified by Havenly", 22 px card radius, no sideways scroll.
+- [ ] **F16 filters:** Housing shows search plus four pills: "Under AED 3,000" (price), "Kind of place", "Who it's for", "More filters". More filters opens bills included, student deal, bedrooms and Verified. The results and "Clear filters" work as today.
+- [ ] **F16 split:** on a whole 3 bedroom home at AED 9,000 with bills AED 450 to 700, the listing page shows "Split between 3 people" with − and +, and "About AED 3,150 to 3,233 each a month" plus deposit each; changing to 2 updates every figure. The separate split sheet is gone, and nothing still opens it.
+- [ ] **F20 (listing):** signed in, a listing shows "Students talking about this area" with up to 3 tagged posts (name, university, text, answer count) and "Ask about <area>"; tapping a post opens it. With none, only "Ask about <area>". Signed out, the section shows one line inviting them to sign in to read what students say.
+- [ ] The mint banner between results ("Not sure about an area? … students talking about <area>") opens the Community tab. The Housing header's housemates button goes (housemates now live in Community); the listing page's whole-home housemate buttons stay.
+- [ ] Every screen keeps its empty, loading and error states, and sending an enquiry, group enquiry, saving and alerts work as before.
 
 ## Checks to run before reporting
 
-The project checks (`npm run typecheck`, `npm run lint`, `npm test`, `npx expo-doctor`, `npx expo export --platform web`) all pass, then /codex-review with every finding triaged, then /pr.
+`npm run typecheck`, `npm run lint`, `npm test`, `npx expo-doctor`, `npx expo export --platform web`, the app at 390 and 1440 wide in light and dark, then /codex-review with every finding triaged, then /pr.
 
 ## How to report
 
@@ -47,7 +42,7 @@ Look at: <one line on what to check first>
 
 ## When to stop and ask instead of guessing
 
-- You need to change a file on the "Do not touch" list (for example a new field, a new helper, a navigation change or a new sample listing in demo mode).
+- You need to change a file on the "Do not touch" list (a route, a type, a token, a database function).
 - The brief and the handoff disagree.
 - The same error happens 3 times.
 - You are about to build something not in "Done means".
