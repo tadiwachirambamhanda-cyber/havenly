@@ -168,3 +168,64 @@ export function orderByIds<T extends { id: string }>(list: readonly T[], ids: re
   const byId = new Map(list.map((r) => [r.id, r]));
   return ids.map((id) => byId.get(id)).filter((r): r is T => !!r);
 }
+
+// ----- The four pills on Housing (F16) -----
+
+export const DEFAULT_PRICE_CAP = 3000;
+
+const group = (n: number) => n.toLocaleString('en-US');
+
+// The price pill always names a cap: the one chosen, or AED 3,000 as the suggestion.
+export function pricePillLabel(maxMonthly: number | null): string {
+  return `Under AED ${group(maxMonthly ?? DEFAULT_PRICE_CAP)}`;
+}
+
+export const WHO_LABEL: Record<GenderPolicy, string> = { mixed: 'Mixed', female_only: 'Female only', male_only: 'Male only' };
+
+export function whoPillLabel(gender: GenderPolicy | null): string {
+  return gender ? WHO_LABEL[gender] : 'Who it’s for';
+}
+
+// The filters behind "More filters": bills included, student deal, bedrooms and Verified.
+export function moreFiltersCount(f: Filters): number {
+  return [f.billsIncluded, f.studentDeal, f.bedrooms != null, f.verified].filter(Boolean).length;
+}
+
+export function morePillLabel(f: Filters): string {
+  const n = moreFiltersCount(f);
+  return n ? `More filters · ${n}` : 'More filters';
+}
+
+// ----- The rent split panel on a whole-home listing page -----
+
+export interface SplitPanel {
+  people: number;
+  peopleLabel: string;
+  // "About AED 3,150 to 3,233 each a month"
+  each: string;
+  // "Each pays rent plus their share of bills. Deposit AED 1,500 each."
+  note: string;
+}
+
+export function splitPanel(r: Residence, people: number): SplitPanel | null {
+  if (!isWholeHome(r)) return null;
+  const rent = priceInfo(r).now;
+  if (rent == null) return null;
+  const s = splitRent({ rentAed: rent, depositAed: r.deposit_aed, feesAed: r.move_in_fee_aed, bills: billsInputOf(r), people });
+  if (!s) return null;
+  const range = formatAedRange(s.monthlyEachMin, s.monthlyEachMax);
+  const billsPart = s.bills.kind === 'included'
+    ? 'Bills are included in the rent.'
+    : s.bills.kind === 'range'
+      ? 'Each pays rent plus their share of bills.'
+      : 'Rent only: bills are not listed yet.';
+  const depositPart = s.depositEach != null && r.deposit_aed
+    ? ` Deposit ${s.depositEachApprox ? 'about ' : ''}AED ${group(s.depositEach)} each.`
+    : '';
+  return {
+    people,
+    peopleLabel: people === 1 ? '1 person' : `${people} people`,
+    each: `${s.isRange ? 'About ' : ''}${range} each a month`,
+    note: `${billsPart}${depositPart}`,
+  };
+}
