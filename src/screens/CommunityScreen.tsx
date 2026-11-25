@@ -199,7 +199,7 @@ function CommunityHome() {
     empty = <StateBlock icon="alert-circle" kind="error" title="We could not load Community" body="Check your connection and try again."
       primary={{ label: 'Try again', onPress: () => { setData(null); load(); } }} />;
   } else if (view === 'events') {
-    empty = <StateBlock icon="calendar" title="No events coming up" body="The team adds events for students. New ones show up here." />;
+    if (!events.length) empty = <StateBlock icon="calendar" title="No events coming up" body="The team adds events for students. New ones show up here." />;
   } else if (!joinedIds?.size) {
     empty = <StateBlock icon="users" title="Join your first community" body="Communities are where students ask about areas, find housemates and share tips."
       primary={{ label: order?.uni ? 'Open your university' : 'Find your university', onPress: () => (order?.uni ? openCommunity(order.uni) : setFindOpen(true)) }} />;

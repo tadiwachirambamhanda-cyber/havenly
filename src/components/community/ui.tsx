@@ -55,7 +55,7 @@ export function SectionLabel({ children, style }: { children: string; style?: St
   );
 }
 
-type Tone = 'plain' | 'mint' | 'mintFill' | 'ink' | 'berry' | 'sun';
+type Tone = 'plain' | 'mint' | 'mintFill' | 'ink' | 'berry' | 'sun' | 'onBerry';
 
 export function Pill({
   label, icon, tone = 'plain', onPress, accessibilityLabel, selected, disabled, style, height = 40,
@@ -71,6 +71,8 @@ export function Pill({
     ink: { bg: colors.ink, fg: colors.sand, border: colors.ink },
     berry: { bg: colors.coralFill, fg: '#FFFFFF', border: colors.coralFill },
     sun: { bg: colors.dealText, fg: colors.dealBg, border: colors.dealText },
+    // A white pill on a berry block (Join on a community header): same in both themes.
+    onBerry: { bg: '#FFFFFF', fg: '#A01740', border: '#FFFFFF' },
   };
   const l = look[tone];
   const body = (

@@ -139,8 +139,7 @@ function CommunityDetail({ communityId }: { communityId: string }) {
             <Pill
               label={joined ? 'Joined' : membership.joiningId === communityId ? 'Joining…' : 'Join'}
               icon={joined ? 'check' : 'plus'}
-              tone={joined ? 'mint' : 'plain'}
-              style={joined ? undefined : { backgroundColor: '#FFFFFF', borderColor: '#FFFFFF' }}
+              tone={joined ? 'mint' : 'onBerry'}
               disabled={membership.joiningId === communityId || !membership.joinedIds}
               onPress={() => (joined ? setConfirmLeave(true) : membership.join(community))}
               accessibilityLabel={joined ? `Joined ${community.name}. Tap to leave` : `Join ${community.name}`}

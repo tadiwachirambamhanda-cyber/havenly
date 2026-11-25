@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import type { Brand, Comment, Community, HavenlyEvent, Offer, Post, ReportableType, ReportReason, ReviewItem } from '@/types';
 import { isHiddenSampleBrand } from './community';
 import { removePhotos } from './communityPhotos';
+import { isGuestMode } from '@/guest/guestState';
 
 // Database calls for Community. Row security decides who sees what (hidden posts, blocked people,
 // memberships); these functions only shape the requests.
@@ -238,19 +239,23 @@ function isLive(o: PerkRow, now: number): boolean {
   return o.is_active && !!o.brand?.is_active && new Date(o.starts_at).getTime() <= now && (!o.ends_at || new Date(o.ends_at).getTime() > now);
 }
 
-// Active perks for students. The old sample perks and the Veldemers brand are left out here.
+// The old real-database sample perks and the Veldemers brand stay hidden from students. The demo (guest mode)
+// is all made-up sample content by design, so its sample perks still show there.
+const hiddenFromStudents = (brandName: string | null | undefined) => !isGuestMode() && isHiddenSampleBrand(brandName);
+
+// Active perks for students.
 export async function fetchPerks(): Promise<PerkRow[]> {
   const { data, error } = await supabase.from('offers').select('*, brand:brands(*)').eq('is_active', true).order('created_at', { ascending: false });
   if (error) throw error;
   const now = Date.now();
-  return ((data as PerkRow[]) ?? []).filter((o) => o.brand && isLive(o, now) && !isHiddenSampleBrand(o.brand.name));
+  return ((data as PerkRow[]) ?? []).filter((o) => o.brand && isLive(o, now) && !hiddenFromStudents(o.brand.name));
 }
 
 export async function fetchPerk(id: string): Promise<PerkRow | null> {
   const { data, error } = await supabase.from('offers').select('*, brand:brands(*)').eq('id', id).maybeSingle();
   if (error) throw error;
   const row = data as PerkRow | null;
-  if (!row || !row.brand || isHiddenSampleBrand(row.brand.name)) return null;
+  if (!row || !row.brand || hiddenFromStudents(row.brand.name)) return null;
   return row;
 }
 
