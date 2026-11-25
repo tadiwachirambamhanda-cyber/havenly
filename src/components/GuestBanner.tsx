@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '@/lib/ThemeContext';
 import { useAuth } from '@/lib/AuthContext';
 import { subscribeGuestBlocked } from '@/guest/guestState';
@@ -7,7 +9,10 @@ import { subscribeGuestBlocked } from '@/guest/guestState';
 // Shown on every screen while the read-only demo is on. "Create account" leaves
 // the demo and returns to the sign-in screen.
 export default function GuestBanner() {
-  const { colors } = useTheme();
+  const { colors, scheme } = useTheme();
+  // The banner sits under the phone's status bar (time, battery), not over it. Its colour is the
+  // opposite of the screen ground, so the status bar text flips to stay readable on it.
+  const insets = useSafeAreaInsets();
   const { exitGuest } = useAuth();
   const [flash, setFlash] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -25,7 +30,8 @@ export default function GuestBanner() {
     };
   }, []);
   return (
-    <View style={[styles.bar, { backgroundColor: flash ? colors.coralFill : colors.ink }]} accessibilityRole="alert">
+    <View style={[styles.bar, { paddingTop: insets.top + 8, backgroundColor: flash ? colors.coralFill : colors.ink }]} accessibilityRole="alert">
+      <StatusBar style={scheme === 'dark' ? 'dark' : 'light'} />
       <Text style={[styles.text, { color: flash ? '#FFFFFF' : colors.sand }]} numberOfLines={1}>
         {flash ? 'Create an account to do this.' : 'Demo mode · sample content only'}
       </Text>
