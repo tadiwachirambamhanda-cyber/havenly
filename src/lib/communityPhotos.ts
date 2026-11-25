@@ -75,16 +75,16 @@ export function forgetPhotoLinks(paths: string[] | null | undefined): void {
 export function usePhotoLinks(paths: string[] | null | undefined): Record<string, string> | undefined | 'failed' {
   const key = (paths ?? []).join('|');
   const [state, setState] = useState<{ key: string; urls: Record<string, string> | 'failed' } | null>(null);
+  // The demo has no private photos and its client refuses signed links.
+  const guest = isGuestMode();
   useEffect(() => {
-    if (!key) return;
-    // The demo has no private photos and its client refuses signed links.
-    if (isGuestMode()) { setState({ key, urls: {} }); return; }
+    if (!key || guest) return;
     let alive = true;
     signedUrls(key.split('|'))
       .then((urls) => { if (alive) setState({ key, urls }); })
       .catch(() => { if (alive) setState({ key, urls: 'failed' }); });
     return () => { alive = false; };
-  }, [key]);
-  if (!key) return {};
+  }, [key, guest]);
+  if (!key || guest) return {};
   return state && state.key === key ? state.urls : undefined;
 }
