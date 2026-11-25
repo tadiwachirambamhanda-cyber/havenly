@@ -71,3 +71,4 @@ Round 1: VERDICT FINDINGS(4), all MAJOR, all fixed in `supabase/migrations/20261
 2. Comments of a hidden post could still be read directly. **Fixed:** a comment is visible only while its post is.
 3. Two joins at the same moment could pass the 20 limit. **Fixed:** a trigger makes one student's joins wait for each other, then counts.
 4. Reports from fresh accounts could start counting once the accounts aged. **Fixed:** a report counts only if the account was a day old when it was made.
+Round 2: VERDICT FINDINGS(1), MAJOR: three reports arriving at the same moment could each count before seeing the others, so the item might not hide. **Fixed** in `20261125220000_report_item_lock.sql`: reports on one item wait for each other, then count (rolled-back test 10/10, applied live).

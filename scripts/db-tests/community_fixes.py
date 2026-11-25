@@ -1,8 +1,8 @@
-# Rolled-back test for the v2 community fixes (Codex review). Run from the repo root, on a database where
-# 20261125200000_community_v2 is applied and 20261125210000_community_v2_fixes is NOT yet:
+# Rolled-back test for the v2 community fixes (Codex review rounds 1 and 2). It loads the latest report_item
+# (20261125220000_report_item_lock.sql) on a database where 20261125210000_community_v2_fixes is applied.
 #   python3 -I scripts/db-tests/community_fixes.py > /tmp/f.sql && supabase db query --linked --file /tmp/f.sql
-# Expect: ROLLBACK_TEST_RESULT passed=N failed=[].
-mig = open('supabase/migrations/20261125210000_community_v2_fixes.sql').read()
+# Expect: ROLLBACK_TEST_RESULT passed=10 failed=[].
+mig = open('supabase/migrations/20261125220000_report_item_lock.sql').read()
 test = r'''
 create function pg_temp.as_user(u uuid) returns void language plpgsql as $f$
 begin
