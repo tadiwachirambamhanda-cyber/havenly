@@ -61,7 +61,7 @@ Fresh-reviewer, dimension plan, FINDINGS(5).
 
 ## Changes from the plan
 
-- Owner addition (2026-11-25, 3 tabs): Housing's top bar has a 44 px "Saved places" heart (signed in) that opens `navigate('Saved' as never)`, next to My enquiries; Saved has a BackButton and no tab-bar bottom padding.
+- Owner addition (2026-11-25, 3 tabs): Housing's top bar has a 44 px "Saved places" heart (signed in) that opens `navigate('Saved')`, next to My enquiries; Saved has a BackButton and no tab-bar bottom padding.
 - The area posts reload on focus (`useFocusEffect`) instead of `useEffect`, which lint rejects for setState; it also refreshes after asking a question.
 - The renting guide link moved to the Housing list footer; the card photo count pill went (the design has none).
 
@@ -83,3 +83,18 @@ Left:
 3. `npx expo-doctor`, `npx expo export --platform web`, write `## Verification`.
 4. /codex-review (write `.review/codex-brief.md`, check `.review/` is gitignored; `.gitignore` is the Chief Architect's), triage into `## Codex review`, then push and `gh pr create --base main`.
 5. Questions still open for the Chief Architect: remove the `SplitRent` route (then delete `SplitRentScreen.tsx`); the bell in the handoff header; the banner count.
+
+Update: the same session carried on; all five items are done below. Chief Architect decisions: `SplitRentScreen.tsx` stays unused until he removes its route after this PR; no bell in the Housing header; the banner without a number is fine.
+
+## Verification
+
+- `npm run typecheck`: pass. `npm run lint`: no problems. `npm test`: 168 passed. `npx expo-doctor`: 20/20 checks passed. `npx expo export --platform web`: exported.
+- Merged origin/main (three tabs); `navigate('Saved')` is now typed, the `as never` is gone.
+- In the browser at 390 wide, in the demo (sample content): Housing shows the four pills; the pill row scrolls inside itself and the page does not scroll sideways. More filters opens Bills included, Student deal, Verified and 1/2/3 bedrooms; picking 3 bedrooms turns the kind pill into "Whole home" and More filters into "More filters · 1", leaving 1 place, with "Clear filters" shown. The mint banner sits after the first card.
+- The Sample Home (whole 3 bedroom, AED 9,000, bills 450 to 700) shows "Split between 3 people", "About AED 3,150 to 3,233 each a month", "Deposit AED 1,500 each"; tapping − shows 2 people, "About AED 4,725 to 4,850 each a month", "Deposit AED 2,250 each". No "Split the rent" button.
+- As a demo guest, "Students talking about this area" shows only "Ask about Jumeirah Lake Towers" (no database call). The signed-out and signed-in post states are covered by unit tests; the live database has no listings yet to open while signed out.
+- Light and dark both checked on Housing and the listing page; 1440 wide shows the app in its 480 px column with no sideways scroll. The Saved heart opens Saved with its back button.
+
+## Codex review
+
+Round 1 (`origin/main...HEAD`): `VERDICT: PASS`, no findings.
