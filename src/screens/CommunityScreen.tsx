@@ -136,9 +136,7 @@ function CommunityHome() {
       <View style={[s.top, { paddingTop: insets.top + 12 }]}>
         <Text style={s.title} accessibilityRole="header">Community</Text>
         <AnimatedPressable
-          // Inbox becomes a stack route (same name) on the Chief Architect's three-tab branch; until it merges
-          // it is a tab route, which the root stack's types do not list, hence the cast.
-          onPress={() => navigation.navigate('Inbox' as never)}
+          onPress={() => navigation.navigate('Inbox')}
           style={s.roundBtn} accessibilityRole="button" accessibilityLabel="Messages"
           accessibilityHint={hasUnread ? 'You have unread messages' : undefined}
         >
