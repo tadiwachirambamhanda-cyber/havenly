@@ -71,7 +71,7 @@ export default function StartGroupScreen() {
               onChangeText={setPhone}
               keyboardType="phone-pad"
               placeholder="+971 50 123 4567"
-              placeholderTextColor="#6B655A"
+              placeholderTextColor={colors.inkSoft}
               maxLength={20}
               accessibilityLabel="Your phone or WhatsApp number"
               onSubmitEditing={start}
@@ -90,9 +90,9 @@ function createStyles(colors: ColorTokens) {
     container: { flex: 1, backgroundColor: colors.sand },
     top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: spacing.lg, paddingBottom: 12 },
     back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-    title: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 24, letterSpacing: -0.4, color: colors.ink, flex: 1 },
+    title: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 24, letterSpacing: -0.4, color: colors.ink, flex: 1 },
     body: { fontSize: 15, lineHeight: 22, color: colors.inkBody },
     label: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.7, color: colors.inkSoft, marginBottom: 8 },
-    field: { height: 52, borderRadius: 12, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white, paddingHorizontal: 14, fontSize: 16, color: colors.ink },
+    field: { height: 52, borderRadius: 16, borderWidth: 1.5, borderColor: colors.fieldLine, backgroundColor: colors.white, paddingHorizontal: 14, fontSize: 16, color: colors.ink },
   });
 }

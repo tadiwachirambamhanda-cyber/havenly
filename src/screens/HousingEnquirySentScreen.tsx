@@ -8,7 +8,7 @@ import Icon from '@/components/Icon';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { useTheme } from '@/lib/ThemeContext';
 import { formatMonth } from '@/lib/housing';
-import { radius, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -60,7 +60,7 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand, paddingHorizontal: spacing.lg },
     body: { flex: 1, alignItems: 'flex-start' },
-    title: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 28, letterSpacing: -0.4, color: colors.ink, marginTop: 18 },
+    title: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 28, letterSpacing: -0.4, color: colors.ink, marginTop: 18 },
     summary: { fontSize: 15, fontWeight: '600', color: colors.inkBody, marginTop: 6 },
     nextLabel: {
       fontFamily: 'HankenGrotesk_700Bold', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.72,
@@ -68,8 +68,8 @@ function createStyles(colors: ColorTokens) {
     },
     steps: { gap: 10, marginTop: 12 },
     step: { fontSize: 15, lineHeight: 22, color: colors.inkBody },
-    primary: { backgroundColor: colors.coralFill, minHeight: 52, justifyContent: 'center', borderRadius: radius.md, alignItems: 'center' },
-    primaryText: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
+    primary: { backgroundColor: colors.coralFill, minHeight: 54, justifyContent: 'center', borderRadius: 27, alignItems: 'center' },
+    primaryText: { color: '#FFFFFF', fontFamily: 'HankenGrotesk_800ExtraBold', fontSize: 16 },
     secondary: { minHeight: 48, justifyContent: 'center', alignItems: 'center', marginTop: 4 },
     secondaryText: { color: colors.ink, fontWeight: '700', fontSize: 15 },
   });

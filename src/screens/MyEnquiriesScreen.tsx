@@ -60,7 +60,7 @@ export default function MyEnquiriesScreen() {
   }, [load]);
 
   const statusTone = (status: EnquiryStatus) => {
-    if (status === 'signed') return { bg: '#1F1B16', fg: '#FFFFFF' };
+    if (status === 'signed') return { bg: colors.mintBg, fg: colors.mintText };
     if (status === 'lost') return { bg: colors.sandDeep, fg: colors.inkBody };
     if (status === 'new') return { bg: colors.tintBg, fg: colors.tintText };
     return { bg: colors.dealBg, fg: colors.dealText };
@@ -128,13 +128,13 @@ function createStyles(colors: ColorTokens) {
     container: { flex: 1, backgroundColor: colors.sand },
     header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 12, paddingHorizontal: spacing.lg },
     back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-    title: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 26, letterSpacing: -0.4, color: colors.ink },
+    title: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 26, letterSpacing: -0.4, color: colors.ink },
     card: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
-    thumb: { width: 60, height: 60, borderRadius: radius.sm },
+    thumb: { width: 60, height: 60, borderRadius: 14 },
     name: { fontSize: 15, fontWeight: '700', color: colors.ink },
     meta: { fontSize: 13, color: colors.inkBody, marginTop: 2 },
     footRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 7 },
-    statusPill: { paddingHorizontal: 10, minHeight: 26, justifyContent: 'center', borderRadius: 8 },
+    statusPill: { paddingHorizontal: 10, minHeight: 26, justifyContent: 'center', borderRadius: 13 },
     groupChip: { backgroundColor: colors.sandDeep, borderRadius: radius.pill, paddingHorizontal: 8, paddingVertical: 3 },
     groupChipText: { fontSize: 11.5, fontWeight: '700', color: colors.inkBody },
     statusText: { fontSize: 12, fontWeight: '700' },

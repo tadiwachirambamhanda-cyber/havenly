@@ -277,11 +277,11 @@ function createStyles(colors: ColorTokens) {
     chipTextSelected: { color: '#FFFFFF' },
     fieldInput: {
       marginHorizontal: spacing.lg, backgroundColor: colors.white, borderWidth: 1,
-      borderColor: colors.fieldLine, borderRadius: radius.md, paddingHorizontal: 14, height: 52, fontSize: 16, color: colors.ink,
+      borderColor: colors.fieldLine, borderRadius: 16, paddingHorizontal: 14, height: 52, fontSize: 16, color: colors.ink,
     },
     bodyInput: {
       marginHorizontal: spacing.lg, minHeight: 90, backgroundColor: colors.white, borderWidth: 1,
-      borderColor: colors.fieldLine, borderRadius: radius.md, padding: 14, fontSize: 16, color: colors.ink, textAlignVertical: 'top',
+      borderColor: colors.fieldLine, borderRadius: 16, padding: 14, fontSize: 16, color: colors.ink, textAlignVertical: 'top',
     },
     consent: { fontSize: 13, color: colors.inkMuted, lineHeight: 17, paddingHorizontal: spacing.lg, marginTop: spacing.lg },
     noticeGap: { marginHorizontal: spacing.lg, marginTop: 14 },

@@ -102,7 +102,7 @@ export default function JoinGroupScreen() {
               autoCapitalize="characters"
               autoCorrect={false}
               placeholder="ABC234"
-              placeholderTextColor="#6B655A"
+              placeholderTextColor={colors.inkSoft}
               maxLength={7}
               accessibilityLabel="Group code"
               onSubmitEditing={find}
@@ -129,7 +129,7 @@ export default function JoinGroupScreen() {
                   onChangeText={setPhone}
                   keyboardType="phone-pad"
                   placeholder="+971 50 123 4567"
-                  placeholderTextColor="#6B655A"
+                  placeholderTextColor={colors.inkSoft}
                   maxLength={20}
                   accessibilityLabel="Your phone or WhatsApp number"
                 />
@@ -151,12 +151,12 @@ function createStyles(colors: ColorTokens) {
     container: { flex: 1, backgroundColor: colors.sand },
     top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: spacing.lg, paddingBottom: 12 },
     back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-    title: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 24, letterSpacing: -0.4, color: colors.ink, flex: 1 },
+    title: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 24, letterSpacing: -0.4, color: colors.ink, flex: 1 },
     label: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.7, color: colors.inkSoft, marginBottom: 8 },
-    field: { height: 52, borderRadius: 12, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white, paddingHorizontal: 14, fontSize: 16, color: colors.ink },
+    field: { height: 52, borderRadius: 16, borderWidth: 1.5, borderColor: colors.fieldLine, backgroundColor: colors.white, paddingHorizontal: 14, fontSize: 16, color: colors.ink },
     codeField: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 26, letterSpacing: 6, textAlign: 'center' },
-    card: { backgroundColor: colors.white, borderRadius: 14, borderWidth: 1, borderColor: colors.line, padding: 16, gap: 4 },
-    homeName: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 20, color: colors.ink },
+    card: { backgroundColor: colors.white, borderRadius: 22, borderWidth: 1, borderColor: colors.line, padding: 16, gap: 4 },
+    homeName: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 20, color: colors.ink },
     meta: { fontSize: 13.5, lineHeight: 19, color: colors.inkSoft },
     each: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 16, color: colors.ink, marginTop: 8 },
   });
