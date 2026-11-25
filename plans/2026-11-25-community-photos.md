@@ -18,7 +18,7 @@ Rolled-back test: own-folder uploads only; a visible post's photo is visible to 
 Moving the old archived posts' photos (they stay in the public `post-images` store, untouched, as the owner chose to keep old content). The app code that uploads and shows photos (Lane C).
 
 ## Questions
-1. May I apply this migration to the live database? (It adds a new private photo store and its access rules; it changes nothing that exists.)
+1. Answered 2026-11-25: "yes apply the photo store".
 
 ## Verification
-Rolled-back test 11/11 passed on the live data. Not applied live yet: waiting for the owner's yes.
+Rolled-back test 11/11 passed on the live data. Applied live after the owner's yes: `community-photos` exists and is private; migration history recorded.
