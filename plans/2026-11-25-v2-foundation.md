@@ -72,3 +72,6 @@ Round 1: VERDICT FINDINGS(4), all MAJOR, all fixed in `supabase/migrations/20261
 3. Two joins at the same moment could pass the 20 limit. **Fixed:** a trigger makes one student's joins wait for each other, then counts.
 4. Reports from fresh accounts could start counting once the accounts aged. **Fixed:** a report counts only if the account was a day old when it was made.
 Round 2: VERDICT FINDINGS(1), MAJOR: three reports arriving at the same moment could each count before seeing the others, so the item might not hide. **Fixed** in `20261125220000_report_item_lock.sql`: reports on one item wait for each other, then count (rolled-back test 10/10, applied live).
+Round 3: VERDICT FINDINGS(2).
+1. MAJOR, a hidden post's photos still open by their direct link (public photo store). **Open, owner to decide:** this is the known limit accepted in the plan check; fixing it means a private photo store served only to allowed viewers, which changes how Lane C uploads and shows photos. Recommended: do it in Lane C's work before public launch.
+2. MAJOR, the 4 old posts outside any community were still readable directly. **Fixed** in `20261125230000_old_posts_hidden.sql` (rolled-back test 3/3: students cannot read them, authors and the team can; applied live). Stopped after 3 rounds, as the review loop allows.
