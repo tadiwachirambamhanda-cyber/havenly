@@ -11,6 +11,9 @@ describe('old data from the archived social features', () => {
     expect(chatBubbleText({ body: 'Hi' })).toBe('Hi');
   });
   it('only lists housing notifications', () => {
-    expect([...HOUSING_NOTIFICATION_TYPES]).toEqual(['enquiry_new', 'enquiry_status']);
+    expect([...HOUSING_NOTIFICATION_TYPES]).toEqual(['enquiry_new', 'enquiry_status', 'new_place', 'price_drop']);
+    for (const social of ['follow', 'like', 'comment', 'ping']) {
+      expect(HOUSING_NOTIFICATION_TYPES as readonly string[]).not.toContain(social);
+    }
   });
 });

@@ -49,15 +49,19 @@ export interface HavenlyEvent {
   latitude: number | null; longitude: number | null;
 }
 
-export type NotificationType = 'follow' | 'like' | 'comment' | 'ping' | 'enquiry_new' | 'enquiry_status';
+export type NotificationType = 'follow' | 'like' | 'comment' | 'ping' | 'enquiry_new' | 'enquiry_status' | 'new_place' | 'price_drop';
 
 export interface Notification {
-  id: string; recipient_id: string; actor_id: string; actor?: Profile; type: NotificationType;
+  // Empty for a listing alert (new_place, price_drop): those come from Havenly, not a person.
+  id: string; recipient_id: string; actor_id: string | null; actor?: Profile | null; type: NotificationType;
   post_id: string | null; post?: Pick<Post, 'id' | 'title' | 'image_url'> | null;
   comment_id: string | null;
   check_in_id: string | null; check_in?: Pick<CheckIn, 'id' | 'place_type' | 'place_id'> | null;
   enquiry_id: string | null; enquiry_status: EnquiryStatus | null;
   enquiry?: { id: string; kind: EnquiryKind; residence: { id: string; name: string } | null } | null;
+  // Listing alerts: the place, and the monthly "from" price before (price drops only) and now.
+  residence_id?: string | null; old_price_aed?: number | null; new_price_aed?: number | null;
+  residence?: { id: string; name: string } | null;
   is_read: boolean; created_at: string;
 }
 
