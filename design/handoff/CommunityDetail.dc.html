@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Havenly community page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#C8234F}a:hover{color:#A01740}
+</style>
+</helmet>
+<div style="width: 390px; height: 1180px; position: relative; overflow: hidden; background: {{c.ground}}; color: {{c.ink}}; font-family: 'Hanken Grotesk', system-ui, sans-serif;">
+
+  <div style="background: {{c.berryFill}}; color: #FFFFFF; padding: 52px 20px 22px; display: flex; flex-direction: column; gap: 14px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <a href="Community.dc.html" aria-label="Back" style="width: 44px; height: 44px; border-radius: 22px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; color: #FFFFFF;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>
+      </a>
+      <button onClick="{{toggleJoin}}" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 1.5px solid #FFFFFF; background: {{joinBg}}; color: {{joinInk}}; font: 800 14px 'Hanken Grotesk', sans-serif; cursor: pointer;">{{joinLabel}}</button>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="width: 56px; height: 56px; border-radius: 18px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-family: 'Schibsted Grotesk', sans-serif; font-weight: 800; font-size: 20px;">MU</span>
+      <span style="display: flex; flex-direction: column; gap: 3px;">
+        <h1 style="margin: 0; font-family: 'Schibsted Grotesk', sans-serif; font-weight: 800; font-size: 24px; line-height: 1.1; letter-spacing: -0.5px;">Murdoch University Dubai</h1>
+        <span style="font-size: 13px; font-weight: 600;">[N] members · Your university</span>
+      </span>
+    </div>
+  </div>
+
+  <div role="tablist" aria-label="Sections" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 14px 16px 6px;">
+    <sc-for list="{{sections}}" as="s" hint-placeholder-count="4">
+      <button role="tab" aria-selected="{{s.on}}" onClick="{{s.pick}}" style="{{s.style}}">{{s.label}}</button>
+    </sc-for>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 12px; padding: 10px 16px 120px;">
+    <sc-if value="{{isPosts}}" hint-placeholder-val="{{ true }}">
+      <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 22px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; position: relative;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="width: 40px; height: 40px; border-radius: 20px; background: {{c.berrySoft}}; color: {{c.berry}}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px;">S</span>
+          <span style="display: flex; flex-direction: column; flex: 1;">
+            <span style="font-weight: 700; font-size: 15px;">Sara</span>
+            <span style="font-size: 13px; color: {{c.inkSoft}};">Murdoch University Dubai · 2h</span>
+          </span>
+          <button onClick="{{toggleMenu}}" aria-label="More for this post" aria-expanded="{{menuOpen}}" style="width: 44px; height: 44px; border-radius: 22px; border: 0; background: transparent; color: {{c.inkSoft}}; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg>
+          </button>
+        </div>
+        <sc-if value="{{menuOpen}}" hint-placeholder-val="{{ false }}">
+          <div style="position: absolute; top: 56px; right: 14px; z-index: 2; width: 190px; background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 16px; box-shadow: 0 10px 30px rgba(28,20,24,0.16); padding: 6px;">
+            <button style="width: 100%; height: 44px; border: 0; background: transparent; border-radius: 10px; display: flex; align-items: center; gap: 10px; padding: 0 10px; font: 700 14px 'Hanken Grotesk', sans-serif; color: {{c.errorText}}; cursor: pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H5"></path></svg>Report post
+            </button>
+            <button style="width: 100%; height: 44px; border: 0; background: transparent; border-radius: 10px; display: flex; align-items: center; gap: 10px; padding: 0 10px; font: 700 14px 'Hanken Grotesk', sans-serif; color: {{c.ink}}; cursor: pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="m6.5 6.5 11 11"></path></svg>Block Sara
+            </button>
+          </div>
+        </sc-if>
+        <p style="margin: 0; font-size: 15px; line-height: 1.45;">Anyone living in JLT? How long is the bus to Knowledge Park in the morning?</p>
+        <a href="ResidenceDetail.dc.html" style="align-self: flex-start; height: 30px; padding: 0 11px; border-radius: 15px; border: 1px solid {{c.fieldLine}}; color: {{c.ink}}; text-decoration: none; display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="{{c.berry}}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"></path><circle cx="12" cy="10" r="2.2"></circle></svg>Jumeirah Lake Towers
+        </a>
+        <div style="display: flex; gap: 8px;">
+          <button style="height: 40px; padding: 0 14px; border-radius: 20px; border: 1px solid {{c.mintBg}}; background: {{c.mintBg}}; color: {{c.mintText}}; display: flex; align-items: center; gap: 6px; font: 700 14px 'Hanken Grotesk', sans-serif;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg>13
+          </button>
+          <button style="height: 40px; padding: 0 14px; border-radius: 20px; border: 1px solid {{c.line}}; background: transparent; color: {{c.ink}}; display: flex; align-items: center; gap: 6px; font: 700 14px 'Hanken Grotesk', sans-serif;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path></svg>4 comments
+          </button>
+        </div>
+        <div style="border-top: 1px solid {{c.line}}; padding-top: 10px; display: flex; gap: 10px;">
+          <span style="width: 30px; height: 30px; border-radius: 15px; background: {{c.mintBg}}; color: {{c.mintText}}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; flex-shrink: 0;">L</span>
+          <span style="font-size: 14px; line-height: 1.4;"><strong>Lina</strong> <span style="color: {{c.inkSoft}};">· Heriot-Watt University Dubai</span><br>Bus 84 takes about 25 min if you leave before 7:30.</span>
+        </div>
+      </article>
+
+      <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 22px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="width: 40px; height: 40px; border-radius: 20px; background: {{c.sunBg}}; color: {{c.sunText}}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px;">O</span>
+          <span style="display: flex; flex-direction: column; flex: 1;">
+            <span style="font-weight: 700; font-size: 15px;">Omar</span>
+            <span style="font-size: 13px; color: {{c.inkSoft}};">Canadian University Dubai · 1d</span>
+          </span>
+          <button aria-label="More for this post" style="width: 44px; height: 44px; border-radius: 22px; border: 0; background: transparent; color: {{c.inkSoft}}; display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg>
+          </button>
+        </div>
+        <p style="margin: 0; font-size: 15px; line-height: 1.45;">Need one more housemate for a 3 bed in JLT from January, AED 3,100 each. Quiet, no smoking.</p>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px;">
+          <div style="height: 120px; border-radius: 14px; background: {{c.photo}}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: {{c.inkSoft}};">PHOTO</div>
+          <div style="height: 120px; border-radius: 14px; background: {{c.photo}}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: {{c.inkSoft}};">PHOTO</div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button style="height: 40px; padding: 0 14px; border-radius: 20px; border: 1px solid {{c.line}}; background: transparent; color: {{c.ink}}; display: flex; align-items: center; gap: 6px; font: 700 14px 'Hanken Grotesk', sans-serif;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg>5
+          </button>
+          <button style="height: 40px; padding: 0 14px; border-radius: 20px; border: 1px solid {{c.line}}; background: transparent; color: {{c.ink}}; display: flex; align-items: center; gap: 6px; font: 700 14px 'Hanken Grotesk', sans-serif;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path></svg>2 comments
+          </button>
+        </div>
+      </article>
+    </sc-if>
+
+    <sc-if value="{{isHousemates}}" hint-placeholder-val="{{ false }}">
+      <p style="margin: 0; font-size: 14px; color: {{c.inkSoft}};">Students from this university looking to live together. You only see people whose preferences match yours.</p>
+      <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 22px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-weight: 700; font-size: 16px;">Nora · Murdoch University Dubai</span>
+        <span style="font-size: 14px;">Up to AED 2,800 a month · from January · Dubai Knowledge Park</span>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <span style="height: 28px; padding: 0 10px; border-radius: 14px; background: {{c.mintBg}}; color: {{c.mintText}}; font-size: 12px; font-weight: 700; display: flex; align-items: center;">Quiet</span>
+          <span style="height: 28px; padding: 0 10px; border-radius: 14px; background: {{c.mintBg}}; color: {{c.mintText}}; font-size: 12px; font-weight: 700; display: flex; align-items: center;">Non-smoker</span>
+        </div>
+        <a href="#" style="align-self: flex-start; height: 40px; padding: 0 16px; border-radius: 20px; background: {{c.berryFill}}; color: #FFFFFF; display: flex; align-items: center; font-weight: 800; font-size: 14px; text-decoration: none;">Message Nora</a>
+      </article>
+      <a href="#" style="height: 48px; border-radius: 24px; border: 1.5px solid {{c.fieldLine}}; color: {{c.ink}}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; text-decoration: none;">My housemate card</a>
+    </sc-if>
+
+    <sc-if value="{{isEvents}}" hint-placeholder-val="{{ false }}">
+      <article style="background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 22px; overflow: hidden; display: flex;">
+        <div style="width: 78px; flex-shrink: 0; background: {{c.berryFill}}; color: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 12px 0;">
+          <span style="font-size: 12px; font-weight: 700;">SAT</span>
+          <span style="font-family: 'Schibsted Grotesk', sans-serif; font-weight: 800; font-size: 28px; line-height: 1;">29</span>
+          <span style="font-size: 12px; font-weight: 600;">7 pm</span>
+        </div>
+        <div style="padding: 12px 14px; display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-weight: 700; font-size: 15px;">Move-in day meetup, Dubai Knowledge Park</span>
+          <span style="font-size: 13px; color: {{c.inkSoft}};">Havenly team · [N] going</span>
+        </div>
+      </article>
+    </sc-if>
+
+    <sc-if value="{{isPerks}}" hint-placeholder-val="{{ false }}">
+      <article style="border-radius: 22px; background: {{c.sunBg}}; color: {{c.sunText}}; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-weight: 800; font-size: 17px;">15% off at Sample Cafe, Knowledge Park</span>
+        <span style="font-size: 14px; font-weight: 600;">Show your code at the counter. One code per student.</span>
+        <div style="height: 54px; border-radius: 16px; border: 2px dashed {{c.sunText}}; display: flex; align-items: center; justify-content: center; font-family: 'Schibsted Grotesk', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 3px;">HVN-[CODE]</div>
+      </article>
+    </sc-if>
+  </div>
+
+  <a href="CreatePost.dc.html" style="position: absolute; right: 18px; bottom: 30px; height: 56px; padding: 0 22px; border-radius: 28px; background: {{c.berryFill}}; color: #FFFFFF; display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; text-decoration: none; box-shadow: 0 8px 22px rgba(200,35,79,0.32);">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Write a post
+  </a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false,"section":"Theme"},"$preview":{"width":390,"height":1180}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { section: 'posts', joined: true, menu: false }; }
+  theme(dark) {
+    return dark ? {
+      ground: '#141012', surface: '#1F191C', ink: '#F6EEF0', inkSoft: '#B9AAAF', line: '#33292D', fieldLine: '#6E5F64',
+      berry: '#FF6B8E', berryFill: '#D92B5A', berrySoft: '#3D1D27', photo: '#2B2226',
+      mintBg: '#123A2D', mintText: '#7DECC3', sunBg: '#3D3010', sunText: '#FFD45C', errorText: '#FFB4A8', chipBg: '#1F191C'
+    } : {
+      ground: '#FBF7F2', surface: '#FFFFFF', ink: '#1C1418', inkSoft: '#6A5E62', line: '#EDE3DC', fieldLine: '#8E8085',
+      berry: '#C8234F', berryFill: '#C8234F', berrySoft: '#FCE4EA', photo: '#EFE3DB',
+      mintBg: '#D6F5E8', mintText: '#0B6B4C', sunBg: '#FFE08A', sunText: '#6B4000', errorText: '#8E1B12', chipBg: '#FFFFFF'
+    };
+  }
+  renderVals() {
+    const c = this.theme(this.props.dark ?? false);
+    const cur = this.state.section;
+    const sections = [['posts', 'Posts'], ['housemates', 'Housemates'], ['events', 'Events'], ['perks', 'Perks']].map(([id, label]) => {
+      const on = cur === id;
+      return {
+        label, on: on ? 'true' : 'false',
+        pick: () => this.setState({ section: id, menu: false }),
+        style: `height: 40px; border-radius: 20px; cursor: pointer; font: 700 13px 'Hanken Grotesk', sans-serif; ${on ? `background: ${c.ink}; color: ${c.ground}; border: 0;` : `background: transparent; color: ${c.ink}; border: 1.5px solid ${c.fieldLine};`}`,
+      };
+    });
+    const joined = this.state.joined;
+    return {
+      c, sections,
+      isPosts: cur === 'posts', isHousemates: cur === 'housemates', isEvents: cur === 'events', isPerks: cur === 'perks',
+      joinLabel: joined ? 'Joined' : 'Join',
+      joinBg: joined ? 'transparent' : '#FFFFFF',
+      joinInk: joined ? '#FFFFFF' : c.berryFill,
+      toggleJoin: () => this.setState({ joined: !joined }),
+      menuOpen: this.state.menu,
+      toggleMenu: () => this.setState({ menu: !this.state.menu }),
+    };
+  }
+}
+</script>
+</body>
+</html>

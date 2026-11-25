@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Havenly listing page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#C8234F}a:hover{color:#A01740}
+</style>
+</helmet>
+<div style="width: 390px; height: 1560px; position: relative; overflow: hidden; background: {{c.ground}}; color: {{c.ink}}; font-family: 'Hanken Grotesk', system-ui, sans-serif;">
+
+  <div style="position: relative; height: 320px; background: {{c.photo}}; display: flex; align-items: center; justify-content: center; color: {{c.inkSoft}}; font-size: 12px; font-weight: 600; letter-spacing: 0.4px;">
+    LISTING PHOTO 1 OF 8
+    <a href="Main.dc.html" aria-label="Back" style="position: absolute; top: 52px; left: 16px; width: 44px; height: 44px; border-radius: 22px; background: {{c.surface}}; display: flex; align-items: center; justify-content: center; color: {{c.ink}};">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>
+    </a>
+    <button aria-label="Save this place" style="position: absolute; top: 52px; right: 16px; width: 44px; height: 44px; border-radius: 22px; border: 0; background: {{c.surface}}; display: flex; align-items: center; justify-content: center;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="{{c.berry}}" stroke="{{c.berry}}" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg>
+    </button>
+    <span style="position: absolute; bottom: 14px; right: 16px; height: 26px; padding: 0 10px; border-radius: 13px; background: rgba(28,20,24,0.72); color: #FFFFFF; font-size: 12px; font-weight: 700; display: flex; align-items: center; letter-spacing: 0;">1 / 8</span>
+  </div>
+
+  <div style="margin-top: -24px; position: relative; background: {{c.ground}}; border-radius: 26px 26px 0 0; padding: 22px 20px 0; display: flex; flex-direction: column; gap: 18px;">
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <span style="display: flex; align-items: center; gap: 5px; height: 28px; padding: 0 10px; border-radius: 14px; background: {{c.verifiedBg}}; color: {{c.verifiedText}}; font-size: 12px; font-weight: 700;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>Verified by Havenly
+        </span>
+        <span style="height: 28px; padding: 0 10px; border-radius: 14px; background: {{c.tintBg}}; color: {{c.ink}}; font-size: 12px; font-weight: 700; display: flex; align-items: center;">Whole 3 bedroom home</span>
+      </div>
+      <h1 style="margin: 0; font-family: 'Schibsted Grotesk', sans-serif; font-weight: 800; font-size: 27px; line-height: 1.12; letter-spacing: -0.6px;">Sample Home, Jumeirah Lake Towers</h1>
+      <span style="font-size: 14px; color: {{c.inkSoft}};">Jumeirah Lake Towers · Sample, not a real place</span>
+    </div>
+
+    <section style="background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;">
+        <span style="font-family: 'Schibsted Grotesk', sans-serif; font-weight: 800; font-size: 26px; letter-spacing: -0.5px;">AED 9,000</span>
+        <span style="font-size: 14px; color: {{c.inkSoft}}; font-weight: 500;">per month for the home</span>
+      </div>
+      <span style="font-size: 14px; color: {{c.ink}};">Bills not included, about AED 450 to 700 a month for the home</span>
+
+      <div style="background: {{c.mintBg}}; color: {{c.mintText}}; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <span style="font-weight: 700; font-size: 14px;">Split between</span>
+          <div style="display: flex; align-items: center; gap: 4px; background: {{c.surface}}; border-radius: 22px; padding: 2px;">
+            <button onClick="{{less}}" aria-label="One person fewer" style="width: 40px; height: 40px; border-radius: 20px; border: 0; background: transparent; color: {{c.ink}}; cursor: pointer; font: 800 20px 'Hanken Grotesk', sans-serif;">−</button>
+            <span style="min-width: 74px; text-align: center; font-weight: 800; font-size: 15px; color: {{c.ink}};">{{peopleLabel}}</span>
+            <button onClick="{{more}}" aria-label="One person more" style="width: 40px; height: 40px; border-radius: 20px; border: 0; background: transparent; color: {{c.ink}}; cursor: pointer; font: 800 20px 'Hanken Grotesk', sans-serif;">+</button>
+          </div>
+        </div>
+        <span style="font-family: 'Schibsted Grotesk', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.3px;">{{each}}</span>
+        <span style="font-size: 13px; font-weight: 600;">Each pays rent plus their share of bills. Deposit {{depositEach}} each.</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 14px;">
+        <span style="font-weight: 700; font-size: 15px;">To move in</span>
+        <div style="display: flex; justify-content: space-between;"><span style="color: {{c.inkSoft}};">First month</span><span style="font-weight: 600;">AED 9,000</span></div>
+        <div style="display: flex; justify-content: space-between;"><span style="color: {{c.inkSoft}};">Deposit</span><span style="font-weight: 600;">AED 4,500</span></div>
+        <div style="display: flex; justify-content: space-between; border-top: 1px solid {{c.line}}; padding-top: 8px;"><span style="font-weight: 700;">Total before you move in</span><span style="font-weight: 800;">AED 13,500</span></div>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-family: 'Schibsted Grotesk', sans-serif; font-weight: 800; font-size: 19px;">Getting to campus</h2>
+      <div style="display: flex; align-items: center; gap: 10px; font-size: 14px;">
+        <span style="width: 36px; height: 36px; border-radius: 12px; background: {{c.berrySoft}}; color: {{c.berry}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="14" rx="3"></rect><path d="M5 11h14M8 21l2-4M16 21l-2-4"></path></svg></span>
+        <span style="flex: 1;"><strong>22 min by bus</strong> to Murdoch University Dubai</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; font-size: 14px;">
+        <span style="width: 36px; height: 36px; border-radius: 12px; background: {{c.berrySoft}}; color: {{c.berry}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="14" rx="3"></rect><path d="M5 11h14M8 21l2-4M16 21l-2-4"></path></svg></span>
+        <span style="flex: 1;"><strong>35 min by metro</strong> to Canadian University Dubai</span>
+      </div>
+      <a href="#" style="align-self: flex-start; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 6px; text-decoration: none; padding: 10px 0;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"></path><circle cx="12" cy="10" r="2.2"></circle></svg>Open in Maps
+      </a>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: baseline; justify-content: space-between;">
+        <h2 style="margin: 0; font-family: 'Schibsted Grotesk', sans-serif; font-weight: 800; font-size: 19px;">Students talking about this area</h2>
+      </div>
+      <a href="CommunityDetail.dc.html" style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 20px; background: {{c.surface}}; border: 1px solid {{c.line}}; color: {{c.ink}}; text-decoration: none;">
+        <span style="font-size: 13px; color: {{c.inkSoft}}; font-weight: 600;">Sara · Murdoch University Dubai · 2h</span>
+        <span style="font-size: 15px; line-height: 1.4;">Anyone living in JLT? How long is the bus to Knowledge Park in the morning?</span>
+        <span style="font-size: 13px; font-weight: 700; color: {{c.mintText}};">4 answers</span>
+      </a>
+      <a href="CommunityDetail.dc.html" style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 20px; background: {{c.surface}}; border: 1px solid {{c.line}}; color: {{c.ink}}; text-decoration: none;">
+        <span style="font-size: 13px; color: {{c.inkSoft}}; font-weight: 600;">Omar · Canadian University Dubai · 1d</span>
+        <span style="font-size: 15px; line-height: 1.4;">Need one more housemate for a 3 bed in JLT from January, AED 3,100 each.</span>
+        <span style="font-size: 13px; font-weight: 700; color: {{c.mintText}};">2 answers</span>
+      </a>
+      <a href="CreatePost.dc.html" style="align-self: flex-start; font-weight: 700; font-size: 14px; text-decoration: none; padding: 10px 0;">Ask about Jumeirah Lake Towers</a>
+    </section>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 26px; background: {{c.surface}}; border-top: 1px solid {{c.line}}; display: flex; flex-direction: column; gap: 8px;">
+    <a href="#" style="height: 54px; border-radius: 27px; background: {{c.berryFill}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; text-decoration: none;">Enquire or book a viewing</a>
+    <a href="#" style="height: 44px; border-radius: 22px; color: {{c.ink}}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; text-decoration: none; gap: 6px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c.8-3.2 3-5 5.5-5s4.7 1.8 5.5 5"></path><circle cx="17" cy="9" r="2.6"></circle><path d="M16 14.2c2.3.1 4 1.7 4.6 4.8"></path></svg>Enquire with friends
+    </a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false,"section":"Theme"},"$preview":{"width":390,"height":1560}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { people: 3 }; }
+  theme(dark) {
+    return dark ? {
+      ground: '#141012', surface: '#1F191C', ink: '#F6EEF0', inkSoft: '#B9AAAF', line: '#33292D', fieldLine: '#6E5F64',
+      berry: '#FF6B8E', berryFill: '#D92B5A', berrySoft: '#3D1D27', photo: '#2B2226', tintBg: '#2B2226',
+      mintBg: '#123A2D', mintText: '#7DECC3', verifiedBg: '#F6EEF0', verifiedText: '#141012'
+    } : {
+      ground: '#FBF7F2', surface: '#FFFFFF', ink: '#1C1418', inkSoft: '#6A5E62', line: '#EDE3DC', fieldLine: '#8E8085',
+      berry: '#C8234F', berryFill: '#C8234F', berrySoft: '#FCE4EA', photo: '#EFE3DB', tintBg: '#F2E9E2',
+      mintBg: '#D6F5E8', mintText: '#0B6B4C', verifiedBg: '#1C1418', verifiedText: '#FFFFFF'
+    };
+  }
+  renderVals() {
+    const c = this.theme(this.props.dark ?? false);
+    const n = this.state.people;
+    const fmt = (x) => Math.round(x).toLocaleString('en-US');
+    const lo = (9000 + 450) / n, hi = (9000 + 700) / n;
+    return {
+      c,
+      peopleLabel: n === 1 ? '1 person' : `${n} people`,
+      each: `About AED ${fmt(lo)} to ${fmt(hi)} each a month`,
+      depositEach: `AED ${fmt(4500 / n)}`,
+      less: () => this.setState({ people: Math.max(1, n - 1) }),
+      more: () => this.setState({ people: Math.min(10, n + 1) }),
+    };
+  }
+}
+</script>
+</body>
+</html>

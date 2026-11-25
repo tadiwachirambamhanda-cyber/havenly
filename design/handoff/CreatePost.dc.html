@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Havenly new post</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#C8234F}a:hover{color:#A01740}
+textarea::placeholder{color:#8E8085}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: rgba(28,20,24,0.55); font-family: 'Hanken Grotesk', system-ui, sans-serif;">
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; top: 64px; background: {{c.ground}}; color: {{c.ink}}; border-radius: 28px 28px 0 0; padding: 10px 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px;">
+    <span style="align-self: center; width: 40px; height: 5px; border-radius: 3px; background: {{c.line}};"></span>
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <a href="CommunityDetail.dc.html" style="font-weight: 700; font-size: 15px; color: {{c.ink}}; text-decoration: none; padding: 10px 0;">Cancel</a>
+      <h1 style="margin: 0; font-family: 'Schibsted Grotesk', sans-serif; font-weight: 800; font-size: 19px;">New post</h1>
+      <button disabled="{{postDisabled}}" style="{{postStyle}}">Post</button>
+    </div>
+
+    <button style="height: 48px; border-radius: 16px; border: 1.5px solid {{c.fieldLine}}; background: {{c.surface}}; color: {{c.ink}}; display: flex; align-items: center; gap: 10px; padding: 0 14px; font: 600 14px 'Hanken Grotesk', sans-serif; cursor: pointer;">
+      <span style="width: 28px; height: 28px; border-radius: 9px; background: {{c.berryFill}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px;">MU</span>
+      <span style="flex: 1; text-align: left;">Posting in <strong>Murdoch University Dubai</strong></span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+    </button>
+
+    <label for="post-text" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">What do you want to ask or share?</label>
+    <textarea id="post-text" onInput="{{onText}}" placeholder="Ask about an area, a place or campus life…" style="min-height: 150px; resize: none; border-radius: 18px; border: 1.5px solid {{c.fieldLine}}; background: {{c.surface}}; color: {{c.ink}}; padding: 14px; font: 500 16px/1.45 'Hanken Grotesk', sans-serif; outline: none;"></textarea>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <span style="font-weight: 700; font-size: 14px;">Photos <span style="color: {{c.inkSoft}}; font-weight: 600;">· 2 of 4</span></span>
+      <div style="display: flex; gap: 8px;">
+        <div style="width: 76px; height: 76px; border-radius: 14px; background: {{c.photo}}; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: {{c.inkSoft}};">PHOTO</div>
+        <div style="width: 76px; height: 76px; border-radius: 14px; background: {{c.photo}}; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: {{c.inkSoft}};">PHOTO</div>
+        <button aria-label="Add a photo" style="width: 76px; height: 76px; border-radius: 14px; border: 1.5px dashed {{c.fieldLine}}; background: transparent; color: {{c.ink}}; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <span style="font-weight: 700; font-size: 14px;">Tag an area or a listing <span style="color: {{c.inkSoft}}; font-weight: 600;">· optional</span></span>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button onClick="{{toggleTag}}" style="{{tagStyle}}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"></path><circle cx="12" cy="10" r="2.2"></circle></svg>Jumeirah Lake Towers
+        </button>
+        <button style="height: 36px; padding: 0 12px; border-radius: 18px; border: 1.5px dashed {{c.fieldLine}}; background: transparent; color: {{c.ink}}; font: 700 13px 'Hanken Grotesk', sans-serif; cursor: pointer;">Choose an area or listing</button>
+      </div>
+      <span style="font-size: 13px; color: {{c.inkSoft}}; line-height: 1.4;">Tagged posts also show on that area’s listings, under “Students talking about this area”.</span>
+    </div>
+
+    <span style="margin-top: auto; font-size: 13px; color: {{c.inkSoft}}; line-height: 1.4;">Your name, photo and university show on your post. Anyone can report a post that breaks the community rules.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false,"section":"Theme"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { text: '', tagged: true }; }
+  theme(dark) {
+    return dark ? {
+      ground: '#141012', surface: '#1F191C', ink: '#F6EEF0', inkSoft: '#B9AAAF', line: '#33292D', fieldLine: '#6E5F64',
+      berryFill: '#D92B5A', photo: '#2B2226', mintBg: '#123A2D', mintText: '#7DECC3', disabledBg: '#33292D', disabledInk: '#8E8085'
+    } : {
+      ground: '#FBF7F2', surface: '#FFFFFF', ink: '#1C1418', inkSoft: '#6A5E62', line: '#EDE3DC', fieldLine: '#8E8085',
+      berryFill: '#C8234F', photo: '#EFE3DB', mintBg: '#D6F5E8', mintText: '#0B6B4C', disabledBg: '#EDE3DC', disabledInk: '#6A5E62'
+    };
+  }
+  renderVals() {
+    const c = this.theme(this.props.dark ?? false);
+    const ready = this.state.text.trim().length > 0;
+    const tagged = this.state.tagged;
+    return {
+      c,
+      postDisabled: !ready,
+      postStyle: `height: 40px; padding: 0 18px; border-radius: 20px; border: 0; font: 800 14px 'Hanken Grotesk', sans-serif; ${ready ? `background: ${c.berryFill}; color: #FFFFFF; cursor: pointer;` : `background: ${c.disabledBg}; color: ${c.disabledInk}; cursor: not-allowed;`}`,
+      onText: (e) => this.setState({ text: e.target.value }),
+      toggleTag: () => this.setState({ tagged: !tagged }),
+      tagStyle: `height: 36px; padding: 0 12px; border-radius: 18px; display: flex; align-items: center; gap: 5px; font: 700 13px 'Hanken Grotesk', sans-serif; cursor: pointer; ${tagged ? `background: ${c.mintBg}; color: ${c.mintText}; border: 1.5px solid ${c.mintBg};` : `background: transparent; color: ${c.ink}; border: 1.5px solid ${c.fieldLine};`}`,
+    };
+  }
+}
+</script>
+</body>
+</html>
