@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import Icon from '@/components/Icon';
 import AnimatedPressable from '@/components/AnimatedPressable';
+import BackButton from '@/components/BackButton';
 import BurstHeart from '@/components/BurstHeart';
 import PhotoPlaceholder from '@/components/PhotoPlaceholder';
 import Skeleton from '@/components/Skeleton';
@@ -16,7 +17,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { formatAed, setResidenceSaved } from '@/lib/housing';
 import { LISTING_TYPE_LABEL } from '@/lib/listing';
-import { BillsTag, DealTag, StateBlock } from '@/components/housing/parts';
+import { BillsTag, CARD_RADIUS, DealTag, StateBlock } from '@/components/housing/parts';
 import { billsLine, commuteText, isDeal, isWholeHome, orderByIds, pickCommute, priceInfo } from '@/components/housing/listingModel';
 import type { ColorTokens } from '@/theme/tokens';
 import type { Residence } from '@/types';
@@ -87,8 +88,12 @@ export default function SavedScreen() {
     }
   };
 
+  // Saved is a screen opened from Housing (no longer a tab), so it has its own way back.
   const header = (
     <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+      <BackButton style={styles.back}>
+        <Icon name="arrow-left" size={18} color={colors.ink} />
+      </BackButton>
       <View style={{ flex: 1 }}>
         <Text style={styles.title} accessibilityRole="header">Saved</Text>
         <Text style={styles.count}>{rows.length === 1 ? '1 place' : `${rows.length} places`}</Text>
@@ -100,7 +105,7 @@ export default function SavedScreen() {
     return (
       <View style={styles.container} accessibilityLabel="Loading saved places">
         {header}
-        {[0, 1, 2].map((i) => <Skeleton key={i} style={{ height: 96, marginHorizontal: 16, marginBottom: 12, borderRadius: 14 }} />)}
+        {[0, 1, 2].map((i) => <Skeleton key={i} style={{ height: 118, marginHorizontal: 20, marginBottom: 12, borderRadius: CARD_RADIUS }} />)}
       </View>
     );
   }
@@ -120,7 +125,7 @@ export default function SavedScreen() {
         data={rows}
         keyExtractor={(r) => r.id}
         ListHeaderComponent={header}
-        contentContainerStyle={{ paddingBottom: 130, flexGrow: 1 }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 24, flexGrow: 1 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
         ListEmptyComponent={
           <StateBlock icon="heart" title="Nothing saved yet" body="Tap the heart on a place to keep it here."
@@ -159,13 +164,13 @@ export default function SavedScreen() {
                 </View>
                 {commute ? (
                   <View style={styles.metaRow}>
-                    <Icon name="bus" size={14} color={colors.inkSoft} />
+                    <Icon name="bus" size={14} color={colors.coral} />
                     <Text style={styles.meta} numberOfLines={1}>{commuteText(commute)} to {commute.university}</Text>
                   </View>
                 ) : null}
               </View>
               <AnimatedPressable style={styles.heart} scaleTo={0.92} onPress={() => unsave(item)} accessibilityRole="button" accessibilityLabel={`Remove ${item.name} from saved`}>
-                <BurstHeart active size={20} color="#1F1B16" activeColor={colors.coral} />
+                <BurstHeart active size={20} color={colors.coral} activeColor={colors.coral} />
               </AnimatedPressable>
             </AnimatedPressable>
           );
@@ -178,15 +183,16 @@ export default function SavedScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand },
-    header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, gap: 12 },
-    title: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 30, letterSpacing: -0.6, color: colors.ink },
+    header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 14, gap: 12 },
+    back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+    title: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 31, lineHeight: 34, letterSpacing: -0.8, color: colors.ink },
     count: { fontSize: 14, color: colors.inkSoft, marginTop: 2 },
-    row: { flexDirection: 'row', gap: 12, backgroundColor: colors.white, borderRadius: 14, borderWidth: 1, borderColor: colors.line, padding: 10, marginHorizontal: 16, marginBottom: 12 },
-    thumb: { width: 96, height: 96, borderRadius: 10, overflow: 'hidden', backgroundColor: colors.sandDeep },
+    row: { flexDirection: 'row', gap: 12, backgroundColor: colors.white, borderRadius: CARD_RADIUS, borderWidth: 1, borderColor: colors.line, padding: 10, marginHorizontal: 20, marginBottom: 12 },
+    thumb: { width: 96, height: 96, borderRadius: 16, overflow: 'hidden', backgroundColor: colors.photo },
     body: { flex: 1, gap: 3, paddingRight: 36 },
     priceLine: { flexDirection: 'row', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' },
-    price: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 20, color: colors.ink },
-    priceMissing: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 16, color: colors.inkSoft },
+    price: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 20, letterSpacing: -0.4, color: colors.ink },
+    priceMissing: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 16, color: colors.inkSoft },
     was: { fontSize: 13, color: colors.inkSoft, textDecorationLine: 'line-through' },
     per: { fontSize: 12, color: colors.inkSoft },
     name: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 15, color: colors.ink },
