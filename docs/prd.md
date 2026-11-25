@@ -65,11 +65,11 @@ Students who move to Dubai for university hunt for a place across Property Finde
 
 ## Open questions
 
-1. **Events:** who creates them, students or only the team? (Students posting events means more moderation.)
-2. **Perks:** the old perks needed activity streaks, which are now out. Does a student just see the discount and show a code, and does each perk need a limit per student?
-3. **Moderation:** who on the team reviews reports, how fast, and what is not allowed (written community rules)? Should a post with several reports hide itself until reviewed?
+1. **Decided 2026-11-25:** only the team creates events; students browse and tap Going.
+2. **Decided 2026-11-25:** a student taps "Get code" and gets a personal code to show at the shop; one claim per perk per student. No streaks.
+3. **Moderation:** decided 2026-11-25 that a post or comment reported by 3 different students hides itself until the team reviews it. Still open: who on the team reviews, how fast, and the written community rules.
 4. **Signed-out visitors:** may they read communities, or only listings? (This PRD assumes listings only; reading Community needs an account.)
 5. **Notifications:** should students be told when someone comments on or likes their post? (Not in v2 unless decided.)
 6. **Which communities exist at launch:** one per university already in the app, plus a few interest groups? Who creates new ones (team only, assumed)?
 7. **UAE rules for user posts:** what the community rules and terms must say (lawyer).
-8. **Brand:** does the vibrant redesign keep the current logo and name styling, or may the design revisit them?
+8. **Decided 2026-11-25:** keep the logo (roof-h mark and wordmark); it takes the new main colour. Colour direction: evolve the oxblood into a brighter berry red, with mint for community (likes, Going) and sun yellow for deals and perks, on warm off-white (light) and near-black (dark). The founder approves the exact palette on the first two designs.
