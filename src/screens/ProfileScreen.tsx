@@ -1,3 +1,4 @@
+import { fetchMyGroups, type MyGroupRow } from '@/lib/groupEnquiryApi';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, ScrollView, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
 import { Text } from '@/components/Text';
@@ -43,11 +44,12 @@ export default function ProfileScreen() {
 
   // Loaded data is tagged with the account it belongs to; a slow load that finishes after the account changed
   // is never shown, so one person never sees another's profile or enquiries on a shared device.
-  const [data, setData] = useState<{ owner: string; profile: Profile | null; enquiries: EnquiryRow[]; enquiriesFailed: boolean } | null>(null);
+  const [data, setData] = useState<{ owner: string; profile: Profile | null; enquiries: EnquiryRow[]; enquiriesFailed: boolean; groups: MyGroupRow[] } | null>(null);
   const mine = data && data.owner === session?.user.id ? data : null;
   const profile = mine?.profile ?? null;
   const enquiries = mine ? mine.enquiries : null;
   const enquiriesFailed = mine?.enquiriesFailed ?? false;
+  const groups = mine?.groups ?? [];
   const [refreshing, setRefreshing] = useState(false);
   const [logoutConfirm, setLogoutConfirm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -59,12 +61,13 @@ export default function ProfileScreen() {
     const userId = session?.user.id;
     if (!userId) return;
     const loadId = ++latestLoad.current;
-    const [profileRes, privateRes, enquiryRes] = await Promise.all([
+    const [profileRes, privateRes, enquiryRes, groupRows] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', userId).single(),
       supabase.from('profile_private').select('budget_aed, move_in_month, housemate_pref, gender').eq('user_id', userId).maybeSingle(),
       supabase.from('housing_enquiries')
         .select('id, kind, status, status_updated_at, residence:residences(id, name)')
         .eq('user_id', userId).order('created_at', { ascending: false }).limit(3),
+      fetchMyGroups(userId).catch(() => [] as MyGroupRow[]),
     ]);
     if (loadId !== latestLoad.current) return;
     setData({
@@ -72,6 +75,7 @@ export default function ProfileScreen() {
       profile: profileRes.data ? ({ ...(profileRes.data as Profile), ...(privateRes.data ?? {}) } as Profile) : null,
       enquiries: enquiryRes.error ? [] : ((enquiryRes.data as unknown as EnquiryRow[]) ?? []),
       enquiriesFailed: !!enquiryRes.error,
+      groups: groupRows,
     });
   }, [session]);
 
@@ -178,6 +182,25 @@ export default function ProfileScreen() {
           ))}
         </View>
       )}
+
+      <Text style={[styles.section, styles.sectionPad]}>Enquire with friends</Text>
+      <View style={styles.card}>
+        {groups.map((g, i) => (
+          <Pressable key={g.id} style={[styles.enquiryRow, i > 0 && styles.rowDivider]} onPress={() => navigation.navigate('EnquiryGroup', { groupId: g.id })} accessibilityRole="button" accessibilityLabel={`Group for ${g.residence_name}`}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.enquiryName} numberOfLines={1}>{g.residence_name}</Text>
+              <Text style={styles.muted2}>{g.members === 1 ? '1 person' : `${g.members} people`} · {g.status === 'sent' ? 'Enquiry sent' : 'Open'}</Text>
+            </View>
+            <Icon name="chevron-right" size={14} color={colors.inkSoft} />
+          </Pressable>
+        ))}
+        <View style={[styles.housemateBody, groups.length > 0 && styles.rowDivider]}>
+          <Text style={styles.muted2}>Friends taking a whole home together can send one enquiry as a group. A friend sent you a code?</Text>
+          <View style={styles.housemateBtns}>
+            <OutlineButton label="Join with a code" icon="users" onPress={() => navigation.navigate('JoinGroup')} height={44} />
+          </View>
+        </View>
+      </View>
 
       <Text style={[styles.section, styles.sectionPad]}>What I’m looking for</Text>
       <Pressable style={styles.card} onPress={() => navigation.navigate('EditProfile')} accessibilityRole="button" accessibilityLabel="Edit what I’m looking for">

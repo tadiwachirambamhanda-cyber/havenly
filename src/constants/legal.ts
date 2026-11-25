@@ -34,6 +34,7 @@ export const PRIVACY_POLICY: LegalDocument = {
         'Location: only while you use the map or location-based sorting, and only if you allow it. We don\'t track your location in the background.',
         'Housing: residences you save, and enquiries you send: move-in month, length of stay, room, budget, viewing availability, your message and the phone or WhatsApp number you give us. If you sign with a residence, we record the contract value so we can work out the fee the residence owes us.',
         'Housemate card (optional): if you make one, the area you want to live in, up to five lifestyle tags, a short note, how many housemates you need and which home, if any. It also shows your display name, university, gender (if you gave it), budget and move-in month from your profile. Your gender is optional and is used only to match housemate preferences.',
+        'Group enquiries: if you start or join a group enquiry, your group membership and the phone number you give for it. Other members of your group see your name and university; they do not see your phone number.',
         'Safety: people you block and reports you make.',
         'Technical data: standard logs from our hosting provider (such as IP address, device type and request times), and, when crash reporting is switched on, crash reports when the app hits an error, used to keep the service running and secure.',
       ],
@@ -44,6 +45,7 @@ export const PRIVACY_POLICY: LegalDocument = {
         'To run the app: show your profile, messages, saved places, the map and housing listings.',
         'To show you how far each place is from your university.',
         'To pass your housing enquiries to the residence you contacted and follow them up.',
+        'To run a group enquiry: to show the people in a group to each other, and to send the team and the residence one enquiry that lists every member with their phone number.',
         'To show your housemate card to other students whose housemate preference matches yours, after our team has checked it, and to let them message you.',
         'To calculate and invoice the referral fees residences pay us.',
         'To send you in-app notifications, for example when your enquiry moves forward.',
@@ -71,7 +73,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       heading: 'How long we keep it',
       paragraphs: [
         'We keep your information while your account is open.',
-        `If you delete your account (Profile → Delete account), we delete your account, profile, housemate card, messages you sent, saved places, enquiries, and the photos you uploaded, including anything you posted in earlier versions of Havenly. If you signed with a residence through Havenly, we keep a record of that deal (the residence, dates, contract value and fee) with your name, phone number and messages removed, because we need it for accounting. Information a residence already received from an enquiry is held by that residence.`,
+        `If you delete your account (Profile → Delete account), we delete your account, profile, housemate card, your place in any group enquiry (a group you started is closed), messages you sent, saved places, enquiries, and the photos you uploaded, including anything you posted in earlier versions of Havenly. If you signed with a residence through Havenly, we keep a record of that deal (the residence, dates, contract value and fee) with your name, phone number and messages removed, because we need it for accounting. Information a residence already received from an enquiry is held by that residence.`,
       ],
     },
     {
@@ -146,6 +148,14 @@ export const TERMS_OF_USE: LegalDocument = {
         'Shared housing in Dubai is regulated. Before you share a home, check that the home may be shared and that every person who lives there is on the tenancy or has the landlord\'s written consent.',
         'Our team checks each card before it appears and may hide a card that breaks these terms. Be honest on your card. Do not post contact details, ask for money, or contact someone who has not replied. You can block and report anyone.',
         'Havenly introduces students to each other. We do not check who anyone is beyond what they tell us, we are not responsible for what students agree between themselves, and we are not a party to any arrangement between housemates.',
+      ],
+    },
+    {
+      heading: 'Group enquiries',
+      paragraphs: [
+        'Friends taking a whole home together can send one enquiry as a group. The person who starts the group shares its code, and anyone who has the code can join while the group is open. Only share the code with people you know.',
+        'The Havenly team and the residence see the name, university and phone number of every member. Other members see names only. We send one enquiry and, if you sign, one referral arrangement for the home, as with any enquiry.',
+        'What the people in a group agree between themselves (who pays what, who signs, who moves in) is for them to agree. Havenly is not a party to it. Each person is responsible for their own share and for reading the contract before they sign.',
       ],
     },
     {

@@ -214,6 +214,8 @@ export function createFixtures(): FixtureTables {
     offer_claims: empty(),
     blocked_users: empty(),
     housing_enquiries: empty(),
+    enquiry_groups: empty(),
+    enquiry_group_members: empty(),
     residence_partner_terms: empty(),
   };
 }
@@ -227,3 +229,10 @@ export const GUEST_HOUSEMATE_CARDS = [
     area: 'Jumeirah Lake Towers', lifestyle: ['night_owl', 'social', 'guests_ok'], note: 'Taking the 3 bedroom in JLT with a friend and need one more. Sample card.',
     residence_id: 'residence-4', residence_name: 'Sample Home, Jumeirah Lake Towers', spots_needed: 1, updated_at: daysAgo(2) },
 ];
+
+// The demo's group enquiry: typing this code in "Join with a code" shows a sample group (joining stays blocked).
+export const GUEST_GROUP_CODE = 'HAVEN2';
+export const GUEST_GROUP_PREVIEW = {
+  group_id: 'sample-group', residence_id: 'residence-4', residence_name: 'Sample Home, Jumeirah Lake Towers',
+  organiser_name: 'Karim', members: 2, status: 'open',
+};

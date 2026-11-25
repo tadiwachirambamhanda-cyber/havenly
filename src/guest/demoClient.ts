@@ -1,7 +1,7 @@
 // An in-memory stand-in for the Supabase client, used only in guest mode. It
 // answers reads from the sample fixtures and refuses every write. It never makes
 // a network request.
-import { createFixtures, GUEST_HOUSEMATE_CARDS, type FixtureTables } from './fixtures';
+import { createFixtures, GUEST_GROUP_CODE, GUEST_GROUP_PREVIEW, GUEST_HOUSEMATE_CARDS, type FixtureTables } from './fixtures';
 import { exitGuestMode, notifyGuestBlocked } from './guestState';
 
 export const GUEST_BLOCKED_MESSAGE = 'Create an account to do this.';
@@ -30,6 +30,7 @@ const RELATIONS: Record<string, { table: string; fk: string; many?: boolean }> =
   'offers.brand': { table: 'brands', fk: 'brand_id' },
   'notifications.actor': { table: 'profiles', fk: 'actor_id' },
   'housing_enquiries.user': { table: 'profiles', fk: 'user_id' },
+  'housing_enquiries.residence': { table: 'residences', fk: 'residence_id' },
 };
 
 function parseEmbeds(select: string): { alias: string }[] {
@@ -184,11 +185,14 @@ export function createDemoClient(data: FixtureTables = createFixtures()): any {
   const blocked = () => Promise.resolve(blockedResult());
   return {
     from: (table: string) => new Query(table, data),
-    rpc: (name: string) => {
+    rpc: (name: string, args?: { p_code?: string }) => {
       if (name === 'bump_streak') return Promise.resolve(blockedResult(true));
       // Reads for the housemate board are answered with sample cards; every write stays blocked.
       if (name === 'housemate_board') return Promise.resolve({ data: GUEST_HOUSEMATE_CARDS, error: null });
       if (name === 'housemates_for_home') return Promise.resolve({ data: 1, error: null });
+      if (name === 'enquiry_group_preview') {
+        return Promise.resolve({ data: (args?.p_code ?? '').toUpperCase() === GUEST_GROUP_CODE ? [GUEST_GROUP_PREVIEW] : [], error: null });
+      }
       return blocked();
     },
     channel: () => channelStub(),

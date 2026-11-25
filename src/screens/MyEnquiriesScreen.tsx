@@ -1,3 +1,4 @@
+import { myGroupIds } from '@/lib/groupEnquiryApi';
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { Text } from '@/components/Text';
@@ -36,9 +37,11 @@ export default function MyEnquiriesScreen() {
 
   const load = useCallback(async () => {
     if (!myId) return;
+    // Mine, plus the enquiries my groups sent (members can read those).
+    const groupIds = await myGroupIds(myId);
     const { data, error } = await supabase.from('housing_enquiries')
       .select('*, residence:residences(id, name, area, photo_urls, provider_name), room_type:room_types(id, name, price_aed, billing_period)')
-      .eq('user_id', myId)
+      .or(groupIds.length > 0 ? `user_id.eq.${myId},group_id.in.(${groupIds.join(',')})` : `user_id.eq.${myId}`)
       .order('created_at', { ascending: false });
     if (error) setFailed(true);
     else {
@@ -106,6 +109,7 @@ export default function MyEnquiriesScreen() {
                       <View style={[styles.statusPill, { backgroundColor: tone.bg }]}>
                         <Text style={[styles.statusText, { color: tone.fg }]}>{ENQUIRY_STATUS_LABEL[item.status]}</Text>
                       </View>
+                      {item.group_id ? <View style={styles.groupChip}><Text style={styles.groupChipText}>Group</Text></View> : null}
                       <Text style={styles.time}>{timeAgo(item.created_at)}</Text>
                     </View>
                   </View>
@@ -131,6 +135,8 @@ function createStyles(colors: ColorTokens) {
     meta: { fontSize: 13, color: colors.inkBody, marginTop: 2 },
     footRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 7 },
     statusPill: { paddingHorizontal: 10, minHeight: 26, justifyContent: 'center', borderRadius: 8 },
+    groupChip: { backgroundColor: colors.sandDeep, borderRadius: radius.pill, paddingHorizontal: 8, paddingVertical: 3 },
+    groupChipText: { fontSize: 11.5, fontWeight: '700', color: colors.inkBody },
     statusText: { fontSize: 12, fontWeight: '700' },
     time: { fontSize: 12, color: colors.inkMuted },
   });

@@ -132,4 +132,6 @@ export interface HousingEnquiry {
   contact_phone: string | null; message: string | null; preferred_viewing: string | null; status: EnquiryStatus;
   contract_value_aed: number | null; referral_fee_aed: number | null; fee_paid_at: string | null;
   status_updated_at: string; created_at: string;
+  // Set when this enquiry was sent by a group of friends.
+  group_id?: string | null;
 }
