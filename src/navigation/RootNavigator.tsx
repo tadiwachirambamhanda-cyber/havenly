@@ -81,6 +81,8 @@ export type RootStackParamList = {
   AdminEnquiry: { enquiryId: string };
   EditResidence: { residenceId?: string };
   Legal: { doc: 'privacy' | 'terms' };
+  Saved: undefined;
+  Inbox: undefined;
   // v2 community (Lane C): placeholders until built.
   CommunityDetail: { communityId: string };
   CreatePost: { communityId?: string; residenceId?: string; area?: string } | undefined;
@@ -93,11 +95,10 @@ export type RootStackParamList = {
   ManagePerks: undefined;
 };
 
+// Three tabs (owner decision 2026-11-25): Saved and Inbox are screens opened from Housing, Community and Profile.
 export type MainTabParamList = {
   Housing: undefined;
   Community: undefined;
-  Saved: undefined;
-  Inbox: undefined;
   Profile: undefined;
 };
 
@@ -109,8 +110,6 @@ function MainTabs() {
     <Tab.Navigator initialRouteName="Housing" screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
       <Tab.Screen name="Housing" component={HousingScreen} />
       <Tab.Screen name="Community" component={CommunityScreen} />
-      <Tab.Screen name="Saved" component={SavedScreen} />
-      <Tab.Screen name="Inbox" component={InboxScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
@@ -182,6 +181,8 @@ export default function RootNavigator() {
           <>
             <Stack.Screen name="MainTabs" component={MainTabs} />
             <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="Saved" component={SavedScreen} options={{ presentation: 'card' }} />
+            <Stack.Screen name="Inbox" component={InboxScreen} options={{ presentation: 'card' }} />
             <Stack.Screen name="Chat" component={ChatScreen} />
             <Stack.Screen name="BlockedUsers" component={BlockedUsersScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
