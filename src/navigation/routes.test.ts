@@ -18,7 +18,7 @@ const registered = new Set([...root.matchAll(/(?:Stack|Tab)\.Screen\s+name="(\w+
 
 describe('navigation targets', () => {
   it('registers the screens we expect', () => {
-    for (const name of ['MainTabs', 'Housing', 'Community', 'Saved', 'Inbox', 'Profile', 'ResidenceDetail', 'Notifications', 'ChangePassword', 'HousemateBoard', 'MyHousemateCard', 'HousemateReview', 'Guide', 'StartGroup', 'EnquiryGroup', 'JoinGroup', 'CommunityDetail', 'CreatePost', 'PostDetail', 'EventDetail', 'Perks', 'PerkDetail', 'ReviewQueue', 'ManageEvents', 'ManagePerks']) {
+    for (const name of ['MainTabs', 'Housing', 'Community', 'Profile', 'Saved', 'Inbox', 'ResidenceDetail', 'Notifications', 'ChangePassword', 'HousemateBoard', 'MyHousemateCard', 'HousemateReview', 'Guide', 'StartGroup', 'EnquiryGroup', 'JoinGroup', 'CommunityDetail', 'CreatePost', 'PostDetail', 'EventDetail', 'Perks', 'PerkDetail', 'ReviewQueue', 'ManageEvents', 'ManagePerks']) {
       expect(registered.has(name), name).toBe(true);
     }
     // Archived social screens, and Map, Compare and the old perk screens removed in v2.
@@ -39,5 +39,14 @@ describe('navigation targets', () => {
       }
     }
     expect(bad).toEqual([]);
+  });
+});
+
+describe('three tabs', () => {
+  it('has only Housing, Community and Profile as tabs; Saved and Inbox are screens', () => {
+    const tabs = [...root.matchAll(/Tab\.Screen\s+name="(\w+)"/g)].map((m) => m[1]);
+    expect(tabs).toEqual(['Housing', 'Community', 'Profile']);
+    expect(root).toMatch(/Stack\.Screen name="Saved"/);
+    expect(root).toMatch(/Stack\.Screen name="Inbox"/);
   });
 });
