@@ -51,3 +51,10 @@ Fresh review, 6 findings, all accepted:
 
 ## Answers (owner, 2026-11-25)
 "yes, keep, build": 1 apply the migration after the rolled-back test; 2 keep the old sample posts, brands and perks hidden and untouched for now.
+
+## Changes from the plan
+- Signed-out visitors have no tab bar (they see the public Housing screen only), so the Community tab cannot be reached signed out and needs no sign-in prompt there.
+- Post photos are stored as paths inside the photo store (`image_paths`), not full links, so the "author's own folder" rule can be checked exactly; the app builds the link.
+- Posts used to need a title and a tag. v2 posts have neither, so the title is now optional, the tag defaults to "community", and post text must be 1 to 2,000 characters (old posts untouched).
+- The deleted Map, Compare and old perk screens went into the colours commit instead of the removals commit (same branch, no effect on the result).
+- The rolled-back test is kept as `scripts/db-tests/community.py`.
