@@ -220,9 +220,8 @@ export default function HousingScreen() {
         <View style={styles.topActions}>
           {myId ? (
             <>
-              {/* Saved is a stack screen in the 3-tab app (Chief Architect's navigation branch); `as never`
-                  until that branch merges and adds 'Saved' to RootStackParamList. */}
-              <AnimatedPressable style={styles.iconBtn} onPress={() => navigation.navigate('Saved' as never)} accessibilityRole="button" accessibilityLabel="Saved places">
+              {/* Saved is a stack screen in the three-tab app, opened from here and from Profile. */}
+              <AnimatedPressable style={styles.iconBtn} onPress={() => navigation.navigate('Saved')} accessibilityRole="button" accessibilityLabel="Saved places">
                 <Icon name="heart" size={18} color={colors.ink} />
               </AnimatedPressable>
               <AnimatedPressable style={styles.iconBtn} onPress={() => navigation.navigate('MyEnquiries')} accessibilityRole="button" accessibilityLabel="My enquiries">
