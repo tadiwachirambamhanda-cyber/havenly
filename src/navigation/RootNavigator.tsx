@@ -7,7 +7,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { ColorTokens } from '@/theme/tokens';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
-import { useStreakBump } from '@/lib/useStreakBump';
 import TabBar from '@/navigation/TabBar';
 import LaunchAnimation from '@/components/LaunchAnimation';
 import GuestBanner from '@/components/GuestBanner';
@@ -52,7 +51,7 @@ import ManageEventsScreen from '@/screens/ManageEventsScreen';
 import ManagePerksScreen from '@/screens/ManagePerksScreen';
 
 // Why a signed-out visitor is being asked to make an account (shown in SignInToContinue).
-export type AccountReason = 'save' | 'enquire' | 'join' | 'login' | 'housemates';
+export type AccountReason = 'save' | 'enquire' | 'join' | 'login' | 'housemates' | 'community';
 
 export type RootStackParamList = {
   Onboarding: undefined;
@@ -96,7 +95,7 @@ export type RootStackParamList = {
 
 // Three tabs (owner decision 2026-11-25): Saved and Inbox are screens opened from Housing, Community and Profile.
 export type MainTabParamList = {
-  Housing: undefined;
+  Housing: { area?: string } | undefined;
   Community: undefined;
   Profile: undefined;
 };
@@ -126,7 +125,6 @@ export default function RootNavigator() {
   const { session, profile, loading, isGuest } = useAuth();
   const { colors, scheme } = useTheme();
   const insets = useSafeAreaInsets();
-  useStreakBump();
   // Plays exactly once per app process (not on every subsequent sign-in) —
   // showLaunch starts true and never flips back, so it covers the initial
   // `loading` window without needing to coordinate its own fixed-length

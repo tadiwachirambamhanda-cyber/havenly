@@ -2,10 +2,9 @@ import React, { useMemo } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
-import BackButton from '@/components/BackButton';
+import ScreenHeader, { rowCardStyles } from '@/components/ScreenHeader';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon, { type IconName } from '@/components/Icon';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
@@ -25,22 +24,23 @@ const MODE_OPTIONS: { key: ThemeMode; label: string; icon: IconName }[] = [
 
 export default function SettingsScreen() {
   const navigation = useNavigation<Nav>();
-  const insets = useSafeAreaInsets();
   const { profile } = useAuth();
   const { colors, mode, setMode } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
+  const row = (label: string, onPress: () => void, first: boolean) => (
+    <AnimatedPressable key={label} style={[styles.row, !first && styles.rowDivider]} onPress={onPress} accessibilityRole="button">
+      <Text style={styles.rowText}>{label}</Text>
+      <Icon name="chevron-right" size={14} color={colors.inkSoft} />
+    </AnimatedPressable>
+  );
+
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <BackButton style={styles.back}>
-          <Icon name="arrow-left" size={17} color={colors.ink} />
-        </BackButton>
-        <Text style={styles.title}>Settings</Text>
-      </View>
+      <ScreenHeader title="Settings" />
 
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
-      <Text style={styles.sectionLabel}>Appearance</Text>
+      <Text style={[styles.sectionLabel, { marginTop: 8 }]}>Appearance</Text>
       <View style={styles.segmentRow}>
         {MODE_OPTIONS.map((opt) => {
           const isSelected = mode === opt.key;
@@ -61,51 +61,26 @@ export default function SettingsScreen() {
       {/* Grouped under short headings rather than one flat list of up to
           ten rows, so each group is a quick scan (Miller's Law). */}
       <Text style={styles.sectionLabel}>Privacy & safety</Text>
-      <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('BlockedUsers')}>
-        <Text style={styles.rowText}>Blocked accounts</Text>
-        <Text style={styles.chevron}>›</Text>
-      </AnimatedPressable>
+      <View style={styles.card}>
+        {row('Blocked accounts', () => navigation.navigate('BlockedUsers'), true)}
+      </View>
 
       <Text style={styles.sectionLabel}>Legal</Text>
-      <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('Legal', { doc: 'privacy' })}>
-        <Text style={styles.rowText}>Privacy policy</Text>
-        <Text style={styles.chevron}>›</Text>
-      </AnimatedPressable>
-
-      <View style={styles.divider} />
-
-      <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('Legal', { doc: 'terms' })}>
-        <Text style={styles.rowText}>Terms of use</Text>
-        <Text style={styles.chevron}>›</Text>
-      </AnimatedPressable>
+      <View style={styles.card}>
+        {row('Privacy policy', () => navigation.navigate('Legal', { doc: 'privacy' }), true)}
+        {row('Terms of use', () => navigation.navigate('Legal', { doc: 'terms' }), false)}
+      </View>
 
       {profile?.is_admin && (
         <>
           <Text style={styles.sectionLabel}>Havenly team</Text>
-          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('ManageHousing')}>
-            <Text style={styles.rowText}>Manage housing</Text>
-            <Text style={styles.chevron}>›</Text>
-          </AnimatedPressable>
-          <View style={styles.divider} />
-          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('HousemateReview')}>
-            <Text style={styles.rowText}>Check housemate cards</Text>
-            <Text style={styles.chevron}>›</Text>
-          </AnimatedPressable>
-          <View style={styles.divider} />
-          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('ReviewQueue')}>
-            <Text style={styles.rowText}>Review reports</Text>
-            <Text style={styles.chevron}>›</Text>
-          </AnimatedPressable>
-          <View style={styles.divider} />
-          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('ManageEvents')}>
-            <Text style={styles.rowText}>Manage events</Text>
-            <Text style={styles.chevron}>›</Text>
-          </AnimatedPressable>
-          <View style={styles.divider} />
-          <AnimatedPressable style={styles.row} onPress={() => navigation.navigate('ManagePerks')}>
-            <Text style={styles.rowText}>Manage perks</Text>
-            <Text style={styles.chevron}>›</Text>
-          </AnimatedPressable>
+          <View style={styles.card}>
+            {row('Manage housing', () => navigation.navigate('ManageHousing'), true)}
+            {row('Check housemate cards', () => navigation.navigate('HousemateReview'), false)}
+            {row('Review reports', () => navigation.navigate('ReviewQueue'), false)}
+            {row('Manage events', () => navigation.navigate('ManageEvents'), false)}
+            {row('Manage perks', () => navigation.navigate('ManagePerks'), false)}
+          </View>
         </>
       )}
 
@@ -118,26 +93,17 @@ export default function SettingsScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand },
-    header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingBottom: 16, paddingHorizontal: spacing.lg },
-    back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-    title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
-    sectionLabel: {
-      fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: spacing.lg, marginBottom: 4,
-    },
+    ...rowCardStyles(colors),
     segmentRow: {
-      flexDirection: 'row', gap: 6, marginHorizontal: spacing.lg, marginTop: 6, backgroundColor: colors.sandDeep,
-      borderRadius: 100, padding: 4,
+      flexDirection: 'row', gap: 6, marginHorizontal: spacing.lg, backgroundColor: colors.white,
+      borderWidth: 1, borderColor: colors.line, borderRadius: 100, padding: 4,
     },
     segment: {
       flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-      paddingVertical: 9, borderRadius: 100,
+      minHeight: 40, borderRadius: 100,
     },
     segmentActive: { backgroundColor: colors.ink },
-    segmentText: { fontSize: 12.5, fontWeight: '700', color: colors.inkSoft },
+    segmentText: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 14, color: colors.inkSoft },
     segmentTextActive: { color: colors.sand },
-    row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingVertical: 16 },
-    rowText: { fontSize: 14, fontWeight: '600', color: colors.ink },
-    chevron: { fontSize: 18, color: colors.inkSoft },
-    divider: { height: 1, backgroundColor: colors.line, marginHorizontal: spacing.lg, marginTop: 16 },
   });
 }

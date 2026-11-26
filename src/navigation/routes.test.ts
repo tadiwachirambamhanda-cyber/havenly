@@ -42,6 +42,24 @@ describe('navigation targets', () => {
   });
 });
 
+describe('signed-out Housing', () => {
+  // HousingScreen is also the signed-out PublicHousing stack screen, where MainTabs does not exist:
+  // a jump to a tab there does nothing, so every one must sit behind requireAccount.
+  it('only opens a tab after asking for an account', () => {
+    const housing = readFileSync('src/screens/HousingScreen.tsx', 'utf8');
+    const jumps = housing.split('\n').filter((l) => /navigate\(\s*'MainTabs'/.test(l));
+    expect(jumps.length).toBeGreaterThan(0);
+    for (const line of jumps) expect(line, line.trim()).toMatch(/if \(requireAccount\('\w+'/);
+    expect(housing).toMatch(/requireAccount\('community'\)/);
+  });
+
+  it('has sign-in texts for the community reason', () => {
+    const signIn = readFileSync('src/screens/SignInToContinueScreen.tsx', 'utf8');
+    expect(signIn).toContain("community: 'Make a free account to join the conversation'");
+    expect(signIn).toContain("community: 'So you can read and post in university communities, and ask students about an area.'");
+  });
+});
+
 describe('three tabs', () => {
   it('has only Housing, Community and Profile as tabs; Saved and Inbox are screens', () => {
     const tabs = [...root.matchAll(/Tab\.Screen\s+name="(\w+)"/g)].map((m) => m[1]);

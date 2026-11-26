@@ -4,7 +4,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
-import BackButton from '@/components/BackButton';
+import ScreenHeader, { CARD_RADIUS_V2 } from '@/components/ScreenHeader';
 import Animated from 'react-native-reanimated';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -14,7 +14,6 @@ import Icon, { type IconName } from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
-import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
 import PersonRowSkeleton from '@/components/PersonRowSkeleton';
@@ -119,17 +118,12 @@ export default function NotificationsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <BackButton style={styles.back}>
-          <Icon name="arrow-left" size={17} color={colors.ink} />
-        </BackButton>
-        <Text style={styles.title}>Notifications</Text>
-      </View>
+      <ScreenHeader title="Notifications" />
 
       <FlatList
         data={rows}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, gap: 8, flexGrow: 1 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
         ListEmptyComponent={loaded ? <EmptyState icon="bell" text="No notifications yet." /> : <PersonRowSkeleton count={8} />}
         renderItem={({ item, index }) => (
@@ -168,19 +162,19 @@ export default function NotificationsScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 16, paddingHorizontal: spacing.lg },
-  back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-  title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: spacing.lg, paddingVertical: 12 },
-  rowUnread: { backgroundColor: colors.sandDeep },
+  row: {
+    flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, paddingHorizontal: 14, paddingVertical: 12,
+    backgroundColor: colors.white, borderRadius: CARD_RADIUS_V2, borderWidth: 1, borderColor: colors.line,
+  },
+  rowUnread: { backgroundColor: colors.coralSoft, borderColor: colors.coralSoft },
   iconChip: {
-    width: 28, height: 28, borderRadius: 14, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,
+    width: 32, height: 32, borderRadius: 16, backgroundColor: colors.sand, borderWidth: 1, borderColor: colors.line,
     alignItems: 'center', justifyContent: 'center',
   },
-  avatar: { width: 40, height: 40, borderRadius: 20 },
-  message: { fontSize: 13, color: colors.ink, lineHeight: 18 },
-  time: { fontSize: 11, color: colors.inkSoft, marginTop: 2 },
-  postThumb: { width: 40, height: 40, borderRadius: 8 },
+  avatar: { width: 44, height: 44, borderRadius: 22 },
+  message: { fontSize: 15, color: colors.ink, lineHeight: 21 },
+  time: { fontSize: 13, color: colors.inkSoft, marginTop: 2 },
+  postThumb: { width: 44, height: 44, borderRadius: 12 },
   brandAvatar: { backgroundColor: colors.coralFill, alignItems: 'center', justifyContent: 'center' },
   brandMark: { fontFamily: 'SchibstedGrotesk_700Bold_Italic', fontSize: 20, color: 'white', marginTop: -2 },
   });

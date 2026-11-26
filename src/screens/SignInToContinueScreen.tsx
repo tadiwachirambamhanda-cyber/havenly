@@ -23,6 +23,7 @@ const TITLE: Record<AccountReason, string> = {
   join: 'Make a free account',
   login: 'Welcome back',
   housemates: 'Make a free account to find housemates',
+  community: 'Make a free account to join the conversation',
 };
 
 const WHY: Record<AccountReason, string> = {
@@ -31,6 +32,7 @@ const WHY: Record<AccountReason, string> = {
   join: 'So you can save places and send enquiries.',
   login: 'Log in to see your saved places and your enquiries.',
   housemates: 'So other students can see your card and you can see theirs. Cards are checked by the team first.',
+  community: 'So you can read and post in university communities, and ask students about an area.',
 };
 
 export default function SignInToContinueScreen() {

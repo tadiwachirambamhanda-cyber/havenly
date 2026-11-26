@@ -160,8 +160,7 @@ export default function SavedScreen() {
                 <Text style={styles.kind} numberOfLines={1}>{kind}</Text>
                 <View style={styles.tags}>
                   {item.bills_included === true ? <BillsTag /> : <Text style={styles.bills} numberOfLines={2}>{billsLine(item)}</Text>}
-                  {item.is_sample ? <SampleTag /> : null}
-                  {isDeal(item) ? <DealTag /> : null}
+                  {item.is_sample ? <SampleTag /> : isDeal(item) ? <DealTag /> : null}
                 </View>
                 {commute ? (
                   <View style={styles.metaRow}>

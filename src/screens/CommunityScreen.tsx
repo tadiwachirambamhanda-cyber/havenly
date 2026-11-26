@@ -164,17 +164,6 @@ function CommunityHome() {
         {shortcut('Perks', 'gift', colors.dealBg, colors.dealText, () => navigation.navigate('Perks'), colors.dealBg)}
       </View>
 
-      {profile?.is_admin ? (
-        <View style={s.team}>
-          <Text style={s.teamLabel}>Team</Text>
-          <View style={s.teamRow}>
-            <Pill label="Review reports" icon="shield-check" onPress={() => navigation.navigate('ReviewQueue')} />
-            <Pill label="Manage events" icon="calendar" onPress={() => navigation.navigate('ManageEvents')} />
-            <Pill label="Manage perks" icon="gift" onPress={() => navigation.navigate('ManagePerks')} />
-          </View>
-        </View>
-      ) : null}
-
       <SectionLabel>{view === 'events' ? 'Upcoming events' : 'Latest from your communities'}</SectionLabel>
     </Content>
   );
@@ -260,8 +249,5 @@ function styles(colors: ColorTokens) {
     shortcuts: { flexDirection: 'row', gap: 10, paddingHorizontal: GUTTER, marginTop: 16 },
     shortcut: { flex: 1, minHeight: 72, borderRadius: 22, borderWidth: 1, padding: 12, gap: 6, justifyContent: 'center' },
     shortcutText: { fontFamily: BOLD, fontSize: 14 },
-    team: { marginHorizontal: GUTTER, marginTop: 14, padding: 12, borderRadius: 22, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, gap: 8 },
-    teamLabel: { fontFamily: BOLD, fontSize: 13, letterSpacing: 0.6, textTransform: 'uppercase', color: colors.inkSoft },
-    teamRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   });
 }

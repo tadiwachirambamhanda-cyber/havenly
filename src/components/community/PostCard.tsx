@@ -55,8 +55,8 @@ export function TagChip({ post }: { post: Pick<FeedPost, 'area' | 'residence_id'
   if (!label) return null;
   const open = () => {
     if (post.residence_id) navigation.navigate('ResidenceDetail', { residenceId: post.residence_id });
-    // Housing has no area parameter yet (asked of the Chief Architect), so this opens the Housing tab.
-    else navigation.navigate('MainTabs', { screen: 'Housing' });
+    // An area opens the Housing tab with that area in its search.
+    else if (post.area) navigation.navigate('MainTabs', { screen: 'Housing', params: { area: post.area } });
   };
   return (
     <Pill

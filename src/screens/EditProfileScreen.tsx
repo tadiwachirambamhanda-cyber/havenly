@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, type ScrollViewInstance, ActivityIndicato
 import { Text, TextInput } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ScreenHeader from '@/components/ScreenHeader';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import InitialsAvatar from '@/components/InitialsAvatar';
@@ -24,7 +24,6 @@ import { HOUSEMATE_PREF_OPTIONS, parseBudget, type HousematePref } from '@/lib/p
 
 export default function EditProfileScreen() {
   const navigation = useNavigation();
-  const insets = useSafeAreaInsets();
   const { session, profile, refreshProfile } = useAuth();
   const { colors } = useTheme();
   const { showToast } = useToast();
@@ -141,13 +140,14 @@ export default function EditProfileScreen() {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
-      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <AnimatedPressable onPress={() => navigation.goBack()} accessibilityLabel="Cancel"><Text style={styles.headerBtn}>Cancel</Text></AnimatedPressable>
-        <Text style={styles.headerTitle}>Edit profile</Text>
-        <AnimatedPressable onPress={save} disabled={saving} accessibilityLabel="Save profile">
-          {saving ? <ActivityIndicator color={colors.coral} /> : <Text style={[styles.headerBtn, styles.saveBtn]}>Save</Text>}
-        </AnimatedPressable>
-      </View>
+      <ScreenHeader
+        title="Edit profile"
+        right={(
+          <AnimatedPressable style={styles.saveTop} onPress={save} disabled={saving} accessibilityLabel="Save profile">
+            {saving ? <ActivityIndicator color={colors.coral} /> : <Text style={styles.saveBtn}>Save</Text>}
+          </AnimatedPressable>
+        )}
+      />
 
       {error ? <Notice style={{ marginHorizontal: spacing.lg, marginBottom: 8 }}>{error}</Notice> : null}
 
@@ -247,10 +247,8 @@ export default function EditProfileScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
-  headerTitle: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 17, color: colors.ink },
-  headerBtn: { fontSize: 14, fontWeight: '600', color: colors.inkSoft },
-  saveBtn: { color: colors.coral, fontWeight: '700' },
+  saveTop: { minHeight: 44, minWidth: 44, alignItems: 'center', justifyContent: 'center' },
+  saveBtn: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 16, color: colors.coral },
   avatarWrap: { alignSelf: 'flex-start', marginTop: 8, marginLeft: spacing.lg, marginBottom: 20 },
   avatar: { width: 76, height: 76, borderRadius: 38, borderWidth: 4, borderColor: colors.sand },
   avatarEditBadge: {
@@ -258,21 +256,21 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: 'rgba(0,0,0,0.55)', borderWidth: 2, borderColor: colors.sand, alignItems: 'center', justifyContent: 'center',
   },
   label: {
-    fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: spacing.md, marginBottom: 6,
+    fontFamily: 'HankenGrotesk_700Bold', fontSize: 13, textTransform: 'uppercase', letterSpacing: 0.6, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 16, marginBottom: 6,
   },
   input: {
-    marginHorizontal: spacing.lg, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,
-    borderRadius: radius.sm, padding: 14, fontSize: 14, color: colors.ink,
+    marginHorizontal: spacing.lg, minHeight: 54, justifyContent: 'center', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.fieldLine,
+    borderRadius: 16, paddingHorizontal: 14, paddingVertical: 14, fontSize: 16, color: colors.ink,
   },
-  bioInput: { minHeight: 80, textAlignVertical: 'top' },
-  universityValue: { fontSize: 14, color: colors.ink },
-  universityPlaceholder: { fontSize: 14, color: colors.inkSoft },
-  section: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 19, color: colors.ink, paddingHorizontal: spacing.lg, marginTop: 28 },
+  bioInput: { minHeight: 96, textAlignVertical: 'top' },
+  universityValue: { fontSize: 16, color: colors.ink },
+  universityPlaceholder: { fontSize: 16, color: colors.inkSoft },
+  section: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 19, letterSpacing: -0.4, color: colors.ink, paddingHorizontal: spacing.lg, marginTop: 28 },
   sectionHint: { fontSize: 13, color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 4 },
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: spacing.lg },
   chip: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white },
   chipOn: { backgroundColor: colors.coralFill, borderColor: colors.coralFill },
-  chipText: { fontSize: 14, fontWeight: '600', color: colors.ink },
+  chipText: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 14, color: colors.ink },
   chipTextOn: { color: '#FFFFFF' },
   });
 }
