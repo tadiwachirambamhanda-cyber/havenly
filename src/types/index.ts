@@ -133,6 +133,8 @@ export interface Residence {
   id: string; name: string; provider_name: string; description: string | null; area: string; address: string | null;
   latitude: number | null; longitude: number | null; photo_urls: string[]; amenities: string[];
   nearby_universities: string[]; gender_policy: GenderPolicy; is_active: boolean; created_at: string;
+  // A clearly labelled made-up listing shown while real ones arrive: browsable and savable, never enquirable.
+  is_sample?: boolean;
   listing_type: ListingType; bedrooms: number | null; deposit_aed: number | null; move_in_fee_aed: number | null;
   is_verified: boolean; verified_at: string | null; permit_number: string | null;
   bills_included: boolean | null; bills_min_aed: number | null; bills_max_aed: number | null;

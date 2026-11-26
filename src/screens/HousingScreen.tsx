@@ -18,7 +18,7 @@ import { LISTING_TYPE_LABEL } from '@/lib/listing';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import BurstHeart from '@/components/BurstHeart';
 import Skeleton from '@/components/Skeleton';
-import { BillsTag, CARD_RADIUS, DealTag, FIELD_RADIUS, StateBlock, TextButton, VerifiedBadge } from '@/components/housing/parts';
+import { BillsTag, CARD_RADIUS, DealTag, FIELD_RADIUS, SampleTag, StateBlock, TextButton, VerifiedBadge } from '@/components/housing/parts';
 import { takePendingReturn } from '@/components/housing/pendingReturn';
 import {
   EMPTY_FILTERS, PRICE_CAPS, SORT_LABEL, WHO_LABEL, billsLine, commuteText, eachPersonLine, filterAndSort, filtersActive, isDeal,
@@ -328,7 +328,7 @@ export default function HousingScreen() {
             ) : (
               <PhotoPlaceholder icon="home" style={StyleSheet.absoluteFill} />
             )}
-            <View style={styles.photoBadge}>{item.is_verified ? <VerifiedBadge /> : isDeal(item) ? <DealTag /> : null}</View>
+            <View style={styles.photoBadge}>{item.is_sample ? <SampleTag /> : item.is_verified ? <VerifiedBadge /> : isDeal(item) ? <DealTag /> : null}</View>
             <AnimatedPressable style={styles.saveBtn} scaleTo={0.92} onPress={() => toggleSaved(item)} accessibilityRole="button" accessibilityLabel={isSaved ? 'Remove from saved' : 'Save this place'}>
               <BurstHeart active={isSaved} size={20} color={colors.coral} activeColor={colors.coral} />
             </AnimatedPressable>
