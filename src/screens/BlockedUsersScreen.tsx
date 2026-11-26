@@ -2,16 +2,14 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Text } from '@/components/Text';
 import AnimatedPressable from '@/components/AnimatedPressable';
-import BackButton from '@/components/BackButton';
+import ScreenHeader, { CARD_RADIUS_V2 } from '@/components/ScreenHeader';
 import { useFocusEffect } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import InitialsAvatar from '@/components/InitialsAvatar';
-import Icon from '@/components/Icon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { haptics } from '@/lib/haptics';
-import { radius, spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
 import PersonRowSkeleton from '@/components/PersonRowSkeleton';
@@ -48,16 +46,11 @@ export default function BlockedUsersScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <BackButton style={styles.back}>
-          <Icon name="arrow-left" size={17} color={colors.ink} />
-        </BackButton>
-        <Text style={styles.title}>Blocked accounts</Text>
-      </View>
+      <ScreenHeader title="Blocked accounts" />
       <FlatList
         data={blocked}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ padding: spacing.lg }}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, gap: 8 }}
         renderItem={({ item }) => (
           <SwipeToAction actionLabel="Unblock" onAction={() => unblock(item.id)}>
             <View style={styles.row}>
@@ -85,15 +78,14 @@ export default function BlockedUsersScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 54, paddingBottom: 16, paddingHorizontal: spacing.lg },
-  back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-  title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  row: {
+    flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, paddingHorizontal: 14, paddingVertical: 10,
+    backgroundColor: colors.white, borderRadius: CARD_RADIUS_V2, borderWidth: 1, borderColor: colors.line,
+  },
   avatar: { width: 44, height: 44, borderRadius: 22 },
-  name: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
-  handle: { fontSize: 11.5, color: colors.inkSoft, marginTop: 2 },
-  unblockBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
-  unblockText: { fontSize: 12, fontWeight: '700', color: colors.ink },
-  placeholder: { color: colors.inkSoft, textAlign: 'center', marginTop: 40 },
+  name: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 15, color: colors.ink },
+  handle: { fontSize: 13, color: colors.inkSoft, marginTop: 2 },
+  unblockBtn: { minHeight: 44, paddingHorizontal: 16, borderRadius: 22, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white, justifyContent: 'center' },
+  unblockText: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 14, color: colors.ink },
   });
 }
