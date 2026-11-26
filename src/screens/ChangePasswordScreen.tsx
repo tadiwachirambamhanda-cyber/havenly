@@ -2,9 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 import { useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Icon from '@/components/Icon';
-import BackButton from '@/components/BackButton';
+import ScreenHeader from '@/components/ScreenHeader';
 import AnimatedPressable from '@/components/AnimatedPressable';
 import { Notice, PrimaryButton } from '@/components/housing/parts';
 import { supabase } from '@/lib/supabase';
@@ -18,7 +16,6 @@ import type { ColorTokens } from '@/theme/tokens';
 
 export default function ChangePasswordScreen() {
   const navigation = useNavigation();
-  const insets = useSafeAreaInsets();
   const { isGuest } = useAuth();
   const { colors } = useTheme();
   const { showToast } = useToast();
@@ -52,11 +49,8 @@ export default function ChangePasswordScreen() {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.container}>
-        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-          <BackButton style={styles.back}><Icon name="arrow-left" size={17} color={colors.ink} /></BackButton>
-          <Text style={styles.title} accessibilityRole="header">Change password</Text>
-        </View>
-        <ScrollView contentContainerStyle={{ padding: spacing.lg, gap: 14 }} keyboardShouldPersistTaps="handled">
+        <ScreenHeader title="Change password" />
+        <ScrollView contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingTop: 8, paddingBottom: 40, gap: 16 }} keyboardShouldPersistTaps="handled">
           {isGuest ? <Notice kind="note">Demo mode shows this screen only. Make an account to change a password.</Notice> : null}
 
           <View>
@@ -69,7 +63,7 @@ export default function ChangePasswordScreen() {
             <TextInput
               style={styles.field}
               placeholder={PASSWORD_HINT}
-              placeholderTextColor="#6B655A"
+              placeholderTextColor={colors.inkSoft}
               secureTextEntry={!show}
               autoCapitalize="none"
               autoCorrect={false}
@@ -87,7 +81,7 @@ export default function ChangePasswordScreen() {
             <TextInput
               style={styles.field}
               placeholder="Type it again"
-              placeholderTextColor="#6B655A"
+              placeholderTextColor={colors.inkSoft}
               secureTextEntry={!show}
               autoCapitalize="none"
               autoCorrect={false}
@@ -114,12 +108,9 @@ export default function ChangePasswordScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand },
-    header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingBottom: 12, paddingHorizontal: spacing.lg },
-    back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-    title: { fontFamily: 'SchibstedGrotesk_700Bold', fontSize: 24, letterSpacing: -0.4, color: colors.ink },
     labelRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 },
-    label: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.7, color: colors.inkSoft, marginBottom: 6 },
-    show: { fontSize: 14, fontWeight: '700', color: colors.coral, minHeight: 32 },
-    field: { height: 52, borderRadius: 12, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white, paddingHorizontal: 14, fontSize: 16, color: colors.ink },
+    label: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 13, textTransform: 'uppercase', letterSpacing: 0.6, color: colors.inkSoft, marginBottom: 6 },
+    show: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 14, color: colors.coral, minHeight: 32 },
+    field: { height: 54, borderRadius: 16, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white, paddingHorizontal: 14, fontSize: 16, color: colors.ink },
   });
 }

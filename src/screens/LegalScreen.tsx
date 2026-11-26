@@ -6,8 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from '@/components/Icon';
 import { useTheme } from '@/lib/ThemeContext';
 import { LEGAL_IS_DRAFT, LEGAL_LAST_UPDATED, PRIVACY_POLICY, TERMS_OF_USE } from '@/constants/legal';
-import BackButton from '@/components/BackButton';
-import { radius, spacing } from '@/theme/tokens';
+import ScreenHeader, { CARD_RADIUS_V2 } from '@/components/ScreenHeader';
+import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -22,12 +22,7 @@ export default function LegalScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <BackButton style={styles.back}>
-          <Icon name="arrow-left" size={17} color={colors.ink} />
-        </BackButton>
-        <Text style={styles.title}>{doc.title}</Text>
-      </View>
+      <ScreenHeader title={doc.title} />
       <ScrollView contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingBottom: insets.bottom + 48 }}>
         <Text style={styles.updated}>Last updated {LEGAL_LAST_UPDATED}</Text>
         {LEGAL_IS_DRAFT && (
@@ -58,21 +53,18 @@ export default function LegalScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.sand },
-    header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingBottom: 12, paddingHorizontal: spacing.lg },
-    back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-    title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 19, color: colors.ink },
-    updated: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, marginTop: 4 },
+    updated: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 13, textTransform: 'uppercase', letterSpacing: 0.6, color: colors.inkSoft, marginTop: 4 },
     draftNote: {
-      flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 12,
-      backgroundColor: colors.sandDeep, borderRadius: radius.sm,
+      flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 14,
+      backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: CARD_RADIUS_V2,
     },
-    draftText: { flex: 1, fontSize: 12.5, color: colors.inkSoft },
-    intro: { fontSize: 14.5, lineHeight: 22, color: colors.ink, marginTop: 16 },
+    draftText: { flex: 1, fontSize: 14, color: colors.inkSoft },
+    intro: { fontSize: 16, lineHeight: 24, color: colors.ink, marginTop: 16 },
     section: { marginTop: 24 },
-    heading: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 17, color: colors.ink, marginBottom: 8 },
-    paragraph: { fontSize: 14, lineHeight: 21, color: colors.inkSoft, marginBottom: 8 },
+    heading: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 19, letterSpacing: -0.4, color: colors.ink, marginBottom: 8 },
+    paragraph: { fontSize: 15, lineHeight: 22, color: colors.inkBody, marginBottom: 8 },
     bulletRow: { flexDirection: 'row', gap: 10, marginBottom: 8, paddingRight: 4 },
-    bulletDot: { width: 5, height: 5, borderRadius: 2.5, backgroundColor: colors.inkSoft, marginTop: 8 },
-    bulletText: { flex: 1, fontSize: 14, lineHeight: 21, color: colors.inkSoft },
+    bulletDot: { width: 5, height: 5, borderRadius: 2.5, backgroundColor: colors.inkSoft, marginTop: 9 },
+    bulletText: { flex: 1, fontSize: 15, lineHeight: 22, color: colors.inkBody },
   });
 }
