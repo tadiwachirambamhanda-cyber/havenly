@@ -7,7 +7,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { ColorTokens } from '@/theme/tokens';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
-import { useStreakBump } from '@/lib/useStreakBump';
 import TabBar from '@/navigation/TabBar';
 import LaunchAnimation from '@/components/LaunchAnimation';
 import GuestBanner from '@/components/GuestBanner';
@@ -126,7 +125,6 @@ export default function RootNavigator() {
   const { session, profile, loading, isGuest } = useAuth();
   const { colors, scheme } = useTheme();
   const insets = useSafeAreaInsets();
-  useStreakBump();
   // Plays exactly once per app process (not on every subsequent sign-in) —
   // showLaunch starts true and never flips back, so it covers the initial
   // `loading` window without needing to coordinate its own fixed-length
