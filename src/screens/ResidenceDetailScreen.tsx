@@ -31,7 +31,7 @@ import BackButton from '@/components/BackButton';
 import BurstHeart from '@/components/BurstHeart';
 import Skeleton from '@/components/Skeleton';
 import {
-  BillsTag, CARD_RADIUS, DealTag, NotVerifiedTag, Notice, SampleTag, OutlineButton, PrimaryButton, QuietTag, StateBlock, TextButton, VerifiedBadge,
+  CARD_RADIUS, DealTag, NotVerifiedTag, Notice, SampleTag, OutlineButton, PrimaryButton, StateBlock, TextButton, VerifiedBadge,
 } from '@/components/housing/parts';
 import { billsLine, commuteText, housematesLine, isDeal, isWholeHome, moveInRows, priceInfo, splitPanel } from '@/components/housing/listingModel';
 import type { ColorTokens } from '@/theme/tokens';
@@ -322,22 +322,17 @@ export default function ResidenceDetailScreen() {
                   <VerifiedBadge />
                 </Pressable>
               ) : <NotVerifiedTag />}
-              <QuietTag label={kindTitle} />
-              {residence.bills_included === true ? <BillsTag /> : null}
               {deal ? <DealTag /> : null}
             </View>
             <Text style={styles.name} accessibilityRole="header">{residence.name}</Text>
-            <Text style={styles.loc}>{residence.area}, Dubai</Text>
+            <Text style={styles.loc}>{kindTitle} · {residence.area}, Dubai</Text>
             {residence.is_verified ? (
               <Text style={styles.trustLine}>
                 {formatCheckedDate(residence.verified_at) ? `Verified on ${formatCheckedDate(residence.verified_at)}. ` : ''}
                 <Text style={styles.trustLink} onPress={() => setVerifiedSheet(true)} accessibilityRole="button">What does Verified mean?</Text>
               </Text>
             ) : (
-              <Text style={styles.trustLine}>
-                {NOT_VERIFIED_LINE}{' '}
-                <Text style={styles.trustLink} onPress={() => navigation.navigate('Guide')} accessibilityRole="link">Read the renting guide</Text>
-              </Text>
+              <Text style={styles.trustLine}>{NOT_VERIFIED_LINE}</Text>
             )}
           </View>
 
@@ -382,6 +377,7 @@ export default function ResidenceDetailScreen() {
               <Text style={styles.muted}>The price is not listed yet. Send an enquiry and the Havenly team will confirm it.</Text>
             )}
           </View>
+          <TextButton label="Before you pay: read the renting guide" icon="book-open" onPress={() => navigation.navigate('Guide')} />
 
           {home ? (
             <View style={{ gap: 8 }}>
@@ -462,7 +458,6 @@ export default function ResidenceDetailScreen() {
 
             <Text style={styles.provider}>Listed by {residence.provider_name}</Text>
             {residence.permit_number ? <Text style={styles.small}>Advert permit (Trakheesi) no. {residence.permit_number}</Text> : null}
-            <TextButton label="Before you pay: read the renting guide" icon="book-open" onPress={() => navigation.navigate('Guide')} />
           </View>
         </View>
       </ScrollView>
@@ -478,7 +473,7 @@ export default function ResidenceDetailScreen() {
         onClose={() => setVerifiedSheet(false)}
         title={VERIFIED_TITLE}
         message={VERIFIED_EXPLAINER}
-        actions={[{ label: 'Read the renting guide', onPress: () => navigation.navigate('Guide') }]}
+        actions={[]}
         cancelLabel="Got it"
       />
       <AnimatedPressable
