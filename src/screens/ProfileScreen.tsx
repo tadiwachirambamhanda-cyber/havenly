@@ -18,7 +18,6 @@ import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { useUnreadNotifications } from '@/lib/useUnreadNotifications';
-import { useUnreadMessages } from '@/lib/useUnreadMessages';
 import { deleteOwnAccount } from '@/lib/account';
 import { ENQUIRY_STATUS_LABEL } from '@/lib/housing';
 import { preferenceSummary } from '@/lib/profilePrefs';
@@ -43,7 +42,6 @@ export default function ProfileScreen() {
   const { showToast } = useToast();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const hasUnreadNotifs = useUnreadNotifications();
-  const hasUnreadMessages = useUnreadMessages();
 
   // Loaded data is tagged with the account it belongs to; a slow load that finishes after the account changed
   // is never shown, so one person never sees another's profile or enquiries on a shared device.
@@ -246,12 +244,6 @@ export default function ProfileScreen() {
         </Pressable>
         <Pressable style={[styles.accountRow, styles.rowDivider]} onPress={() => navigation.navigate('Saved')} accessibilityRole="button">
           <Text style={styles.accountAction}>Saved places</Text>
-          <View style={{ flex: 1 }} />
-          <Icon name="chevron-right" size={14} color={colors.inkSoft} />
-        </Pressable>
-        <Pressable style={[styles.accountRow, styles.rowDivider]} onPress={() => navigation.navigate('Inbox')} accessibilityRole="button">
-          <Text style={styles.accountAction}>Messages</Text>
-          {hasUnreadMessages ? <View style={styles.newDot} accessibilityLabel="New messages" /> : null}
           <View style={{ flex: 1 }} />
           <Icon name="chevron-right" size={14} color={colors.inkSoft} />
         </Pressable>
