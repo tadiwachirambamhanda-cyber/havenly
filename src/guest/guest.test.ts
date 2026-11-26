@@ -3,7 +3,7 @@ import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createDemoClient, GUEST_BLOCKED_CODE, GUEST_BLOCKED_MESSAGE } from './demoClient';
 import { createSwitchingClient } from './clientSwitch';
-import { createFixtures, SAMPLE_IMAGE_BASE, GUEST_USER_ID } from './fixtures';
+import { createFixtures, SAMPLE_IMAGE_BASE, SAMPLE_LISTING_IMAGE_BASE, GUEST_USER_ID } from './fixtures';
 import { splitRent } from '../lib/rentSplit';
 import { isStudentFriendly } from '../lib/ranking';
 import { enterGuestMode, exitGuestMode, isGuestMode, subscribeGuestBlocked, subscribeGuestMode } from './guestState';
@@ -55,8 +55,13 @@ describe('fixtures contain no real data', () => {
     for (const post of data.posts as any[]) {
       if (post.image_url) expect(post.image_url.startsWith(SAMPLE_IMAGE_BASE)).toBe(true);
     }
+    // Two image sources only: our own public sample store, and the free-licence Unsplash photos on the sample
+    // listings (the same photos the live sample listings show). Anything else is a mistake.
     const urls = allStrings(data).filter((s) => /^https?:\/\//.test(s));
-    expect(urls.every((u) => u.startsWith(SAMPLE_IMAGE_BASE))).toBe(true);
+    expect(urls.every((u) => u.startsWith(SAMPLE_IMAGE_BASE) || u.startsWith(SAMPLE_LISTING_IMAGE_BASE))).toBe(true);
+    for (const r of data.residences as any[]) {
+      for (const u of r.photo_urls) expect(u.startsWith(SAMPLE_LISTING_IMAGE_BASE)).toBe(true);
+    }
   });
 
   it('labels every post, comment, event, residence and offer as a sample', () => {
@@ -253,8 +258,9 @@ describe('housing sample listings show the new screens', () => {
     expect(split?.monthlyEachMax).toBe(3233);
   });
 
-  it('has a Verified listing, a student-rate listing with a lower price, and commute times', () => {
-    expect(residences.some((r) => r.is_verified === true)).toBe(true);
+  // The demo shows the same labelled samples as the live app: a made-up place is never shown as checked.
+  it('marks every listing as a sample and none as Verified; has a student-rate listing with a lower price, and commute times', () => {
+    expect(residences.every((r) => r.is_sample === true && r.is_verified === false)).toBe(true);
     const rated = residences.find((r) => r.student_rate_aed != null);
     expect(rated).toBeDefined();
     const room = rooms.find((r) => r.residence_id === rated.id);

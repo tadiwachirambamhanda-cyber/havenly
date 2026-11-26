@@ -8,6 +8,8 @@ export const GUEST_USER_ID = 'guest-demo-user';
 // Public sample photos used by the seeded sample posts. They are fetched by
 // address by the image component; no Supabase call is involved.
 export const SAMPLE_IMAGE_BASE = 'https://xygkeodsjpaobnpjtkiz.supabase.co/storage/v1/object/public/post-images/';
+// The sample listings' photos: free-licence Unsplash photos, linked, the same as the live samples.
+export const SAMPLE_LISTING_IMAGE_BASE = 'https://images.unsplash.com/';
 
 type Row = Record<string, unknown>;
 export type FixtureTables = Record<string, Row[]>;
@@ -116,60 +118,91 @@ const room = (id: string, residence_id: string, name: string, price: number, per
   id, residence_id, name, price_aed: price, billing_period: period, occupancy, is_available: true, sort_order: order, created_at: daysAgo(30),
 });
 
+// The same six labelled samples as the live app (scripts/sample-listings/seed.sql), so the demo and the
+// live app look alike. Photos are linked from Unsplash (free licence); the demo never reads the database.
 const residences: Row[] = [
   {
     id: 'residence-1', name: 'Sample Residence, Knowledge Park', provider_name: 'Sample Housing Partner', area: 'Dubai Knowledge Park',
-    description: 'A made-up student residence for the demo: furnished rooms, a study lounge and a short walk to campus. (Sample listing)',
-    address: 'Dubai Knowledge Park, Dubai', latitude: 25.1015, longitude: 55.1648, photo_urls: [],
-    amenities: ['Wi-Fi', 'Study lounge', 'Gym', 'Laundry'], nearby_universities: ['Murdoch University Dubai', 'Heriot-Watt University Dubai'],
-    gender_policy: 'mixed', is_active: true, created_at: daysAgo(20),
+    description: 'A student residence a short walk from the Knowledge Park campuses, with study rooms and a campus shuttle. Sample, not a real place: shown so you can see how Havenly works. Enquiries are off. Photos from Unsplash, for illustration only. (Sample listing)',
+    address: 'Dubai Knowledge Park, Dubai', latitude: 25.1015, longitude: 55.1648,
+    photo_urls: ['https://images.unsplash.com/photo-1524234599372-a5bd0194758d?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1652882860938-f90aa298e644?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1652882860902-7c6b0f88ef23?auto=format&fit=crop&w=1200&q=80'],
+    amenities: ['Furnished', 'Bills included', 'Wi-Fi', 'Campus shuttle', 'Study rooms', 'Laundry', '24/7 security', 'Gym'], nearby_universities: ['Murdoch University Dubai', 'Middlesex University Dubai', 'Curtin University Dubai'],
+    gender_policy: 'mixed', is_active: true, created_at: daysAgo(20), is_sample: true,
     listing_type: 'residence', bedrooms: null, deposit_aed: 3000, move_in_fee_aed: 500,
-    is_verified: true, verified_at: daysAgo(10), permit_number: null,
+    is_verified: false, verified_at: null, permit_number: null,
     bills_included: true, bills_min_aed: null, bills_max_aed: null, student_deal_types: [], student_rate_aed: null, housemates: null,
-    commutes: [{ university: 'Heriot-Watt University Dubai', minutes: 12, mode: 'shuttle' }, { university: 'Murdoch University Dubai', minutes: 15, mode: 'shuttle' }],
+    commutes: [{ university: 'Murdoch University Dubai', minutes: 8, mode: 'walk' }, { university: 'Middlesex University Dubai', minutes: 10, mode: 'walk' }, { university: 'Curtin University Dubai', minutes: 12, mode: 'shuttle' }],
   },
   {
-    id: 'residence-2', name: 'Sample Residence, Academic City', provider_name: 'Sample Housing Partner', area: 'Dubai Academic City',
-    description: 'A made-up student residence for the demo with shared kitchens and a rooftop. (Sample listing)',
-    address: 'Dubai Academic City, Dubai', latitude: 25.1214, longitude: 55.4146, photo_urls: [],
-    amenities: ['Wi-Fi', 'Shared kitchen', 'Rooftop', 'Bike storage'], nearby_universities: ['University of Wollongong in Dubai'],
-    gender_policy: 'female_only', is_active: true, created_at: daysAgo(18),
-    listing_type: 'residence', bedrooms: null, deposit_aed: null, move_in_fee_aed: null,
+    id: 'residence-2', name: 'Sample Shared Room, Academic City', provider_name: 'Sample Housing Partner', area: 'Dubai International Academic City',
+    description: 'A bed in a twin room in a shared apartment near the Academic City campuses, the most affordable way to start. Sample, not a real place: shown so you can see how Havenly works. Enquiries are off. Photos from Unsplash, for illustration only. (Sample listing)',
+    address: 'Dubai International Academic City, Dubai', latitude: 25.1214, longitude: 55.4146,
+    photo_urls: ['https://images.unsplash.com/photo-1702014861736-d62834317c5e?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1665153515938-97aac6893f2c?auto=format&fit=crop&w=1200&q=80'],
+    amenities: ['Furnished', 'Bills included', 'Wi-Fi', 'Shared kitchen', 'Campus shuttle'], nearby_universities: ['Heriot-Watt University Dubai', 'BITS Pilani Dubai', 'Amity University Dubai'],
+    gender_policy: 'male_only', is_active: true, created_at: daysAgo(18), is_sample: true,
+    listing_type: 'shared_room', bedrooms: null, deposit_aed: 750, move_in_fee_aed: null,
     is_verified: false, verified_at: null, permit_number: null,
-    bills_included: false, bills_min_aed: 300, bills_max_aed: 450, student_deal_types: ['deposit_waived'], student_rate_aed: null, housemates: 2,
-    commutes: [{ university: 'University of Wollongong in Dubai', minutes: 9, mode: 'shuttle' }],
+    bills_included: true, bills_min_aed: null, bills_max_aed: null, student_deal_types: ['deposit_waived'], student_rate_aed: null, housemates: 3,
+    commutes: [{ university: 'Heriot-Watt University Dubai', minutes: 7, mode: 'shuttle' }, { university: 'BITS Pilani Dubai', minutes: 10, mode: 'shuttle' }, { university: 'Amity University Dubai', minutes: 12, mode: 'shuttle' }],
   },
   {
-    id: 'residence-3', name: 'Sample Residence, Al Barsha', provider_name: 'Sample Housing Partner', area: 'Al Barsha',
-    description: 'A made-up student residence for the demo close to the metro. (Sample listing)',
-    address: 'Al Barsha, Dubai', latitude: 25.1124, longitude: 55.2007, photo_urls: [],
-    amenities: ['Wi-Fi', 'Metro nearby', 'Gym'], nearby_universities: ['American University in Dubai'],
-    gender_policy: 'mixed', is_active: true, created_at: daysAgo(15),
-    listing_type: 'residence', bedrooms: null, deposit_aed: null, move_in_fee_aed: null,
+    id: 'residence-3', name: 'Sample Rooms, Al Barsha', provider_name: 'Sample Housing Partner', area: 'Al Barsha',
+    description: 'A private room in a calm shared apartment near the metro, with a shared kitchen and living room. Sample, not a real place: shown so you can see how Havenly works. Enquiries are off. Photos from Unsplash, for illustration only. (Sample listing)',
+    address: 'Al Barsha, Dubai', latitude: 25.1124, longitude: 55.2007,
+    photo_urls: ['https://images.unsplash.com/photo-1585128792103-0b591f96512e?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1582068019386-a943ee9287ae?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1619989652700-9984844cb0ea?auto=format&fit=crop&w=1200&q=80'],
+    amenities: ['Furnished', 'Bills included', 'Wi-Fi', 'Shared kitchen', 'Laundry'], nearby_universities: ['American University in Dubai', 'University of Wollongong in Dubai'],
+    gender_policy: 'female_only', is_active: true, created_at: daysAgo(15), is_sample: true,
+    listing_type: 'private_room', bedrooms: null, deposit_aed: 1000, move_in_fee_aed: null,
     is_verified: false, verified_at: null, permit_number: null,
-    bills_included: null, bills_min_aed: null, bills_max_aed: null, student_deal_types: ['student_rate'], student_rate_aed: 3100, housemates: null,
-    commutes: [{ university: 'American University in Dubai', minutes: 14, mode: 'metro' }],
+    bills_included: true, bills_min_aed: null, bills_max_aed: null, student_deal_types: [], student_rate_aed: null, housemates: 2,
+    commutes: [{ university: 'American University in Dubai', minutes: 20, mode: 'metro' }, { university: 'University of Wollongong in Dubai', minutes: 25, mode: 'metro' }],
   },
   {
     id: 'residence-4', name: 'Sample Home, Jumeirah Lake Towers', provider_name: 'Sample Housing Partner', area: 'Jumeirah Lake Towers',
-    description: 'A made-up whole 3 bedroom home for the demo, for three students to share and split the rent. (Sample listing)',
-    address: 'Jumeirah Lake Towers, Dubai', latitude: 25.0657, longitude: 55.1413, photo_urls: [],
-    amenities: ['Furnished', 'Wi-Fi', 'Parking'], nearby_universities: ['American University in Dubai'],
-    gender_policy: 'mixed', is_active: true, created_at: daysAgo(12),
-    listing_type: 'home', bedrooms: 3, deposit_aed: 4500, move_in_fee_aed: 500,
+    description: 'A bright 3 bedroom home with a lake view, for friends who want to rent together and split the rent. Sample, not a real place: shown so you can see how Havenly works. Enquiries are off. Photos from Unsplash, for illustration only. (Sample listing)',
+    address: 'Jumeirah Lake Towers, Dubai', latitude: 25.0657, longitude: 55.1413,
+    photo_urls: ['https://images.unsplash.com/photo-1771287490603-fbf9b6211cc3?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1791882895717-554975aa5fb7?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1760611655728-f5f0279ed611?auto=format&fit=crop&w=1200&q=80'],
+    amenities: ['Furnished', 'Wi-Fi', 'Gym', 'Pool', 'Parking', '24/7 security'], nearby_universities: ['Murdoch University Dubai', 'American University in Dubai'],
+    gender_policy: 'mixed', is_active: true, created_at: daysAgo(12), is_sample: true,
+    listing_type: 'home', bedrooms: 3, deposit_aed: 4500, move_in_fee_aed: null,
     is_verified: false, verified_at: null, permit_number: null,
     bills_included: false, bills_min_aed: 450, bills_max_aed: 700, student_deal_types: [], student_rate_aed: null, housemates: null,
-    commutes: [{ university: 'American University in Dubai', minutes: 25, mode: 'metro' }],
+    commutes: [{ university: 'Murdoch University Dubai', minutes: 22, mode: 'bus' }, { university: 'American University in Dubai', minutes: 18, mode: 'metro' }],
+  },
+  {
+    id: 'residence-5', name: 'Sample Studios, Silicon Oasis', provider_name: 'Sample Housing Partner', area: 'Dubai Silicon Oasis',
+    description: 'A compact furnished studio with its own kitchenette, close to the Academic City road. Sample, not a real place: shown so you can see how Havenly works. Enquiries are off. Photos from Unsplash, for illustration only. (Sample listing)',
+    address: 'Dubai Silicon Oasis, Dubai', latitude: 25.1188, longitude: 55.379,
+    photo_urls: ['https://images.unsplash.com/photo-1702014857653-dcea938d51f0?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1702014862053-946a122b920d?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1702014859908-d48b9b844240?auto=format&fit=crop&w=1200&q=80'],
+    amenities: ['Furnished', 'Wi-Fi', 'Gym', 'Pool', 'Parking', '24/7 security'], nearby_universities: ['Rochester Institute of Technology Dubai', 'Manipal Academy of Higher Education Dubai'],
+    gender_policy: 'mixed', is_active: true, created_at: daysAgo(10), is_sample: true,
+    listing_type: 'studio', bedrooms: null, deposit_aed: 1800, move_in_fee_aed: 300,
+    is_verified: false, verified_at: null, permit_number: null,
+    bills_included: false, bills_min_aed: 350, bills_max_aed: 500, student_deal_types: ['student_rate'], student_rate_aed: 3300, housemates: 0,
+    commutes: [{ university: 'Rochester Institute of Technology Dubai', minutes: 10, mode: 'bus' }, { university: 'Manipal Academy of Higher Education Dubai', minutes: 15, mode: 'taxi' }],
+  },
+  {
+    id: 'residence-6', name: 'Sample 2 Bed, Dubai Marina', provider_name: 'Sample Housing Partner', area: 'Dubai Marina',
+    description: 'A 2 bedroom apartment near the tram and the beach, good for two friends sharing. Sample, not a real place: shown so you can see how Havenly works. Enquiries are off. Photos from Unsplash, for illustration only. (Sample listing)',
+    address: 'Dubai Marina, Dubai', latitude: 25.0805, longitude: 55.1403,
+    photo_urls: ['https://images.unsplash.com/photo-1629032619752-594d21dfabd2?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1649429710616-dad56ce9a076?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1756154787365-c1a0b4dc4ed5?auto=format&fit=crop&w=1200&q=80'],
+    amenities: ['Furnished', 'Wi-Fi', 'Gym', 'Pool', '24/7 security'], nearby_universities: ['American University in Dubai', 'University of Wollongong in Dubai'],
+    gender_policy: 'mixed', is_active: true, created_at: daysAgo(8), is_sample: true,
+    listing_type: 'home', bedrooms: 2, deposit_aed: 4000, move_in_fee_aed: null,
+    is_verified: false, verified_at: null, permit_number: null,
+    bills_included: false, bills_min_aed: 400, bills_max_aed: 600, student_deal_types: [], student_rate_aed: null, housemates: null,
+    commutes: [{ university: 'American University in Dubai', minutes: 15, mode: 'metro' }, { university: 'University of Wollongong in Dubai', minutes: 20, mode: 'metro' }],
   },
 ];
 
 const room_types: Row[] = [
   room('room-1a', 'residence-1', 'Private studio', 38000, 'year', 1, 1),
   room('room-1b', 'residence-1', 'Shared twin room', 24000, 'year', 2, 2),
-  room('room-2a', 'residence-2', 'Single room', 3200, 'month', 1, 1),
-  room('room-2b', 'residence-2', 'Shared room', 2100, 'month', 2, 2),
-  room('room-3a', 'residence-3', 'Private studio', 41000, 'year', 1, 1),
+  room('room-2a', 'residence-2', 'Bed in a twin room', 1500, 'month', 2, 1),
+  room('room-3a', 'residence-3', 'Private room', 2800, 'month', 1, 1),
   room('room-4a', 'residence-4', 'Whole 3 bedroom home', 9000, 'month', 1, 1),
+  room('room-5a', 'residence-5', 'Studio', 3600, 'month', 1, 1),
+  room('room-6a', 'residence-6', 'Whole 2 bedroom home', 8500, 'month', 1, 1),
 ];
 
 const brands: Row[] = [
@@ -211,7 +244,7 @@ export function createFixtures(): FixtureTables {
     // Two sample alerts. Already read, so opening the bell does not try to mark them (a blocked write).
     notifications: [
       { id: 'sample-alert-1', recipient_id: GUEST_USER_ID, actor_id: null, type: 'price_drop', residence_id: 'residence-2',
-        old_price_aed: 2300, new_price_aed: 2100, post_id: null, comment_id: null, check_in_id: null, enquiry_id: null,
+        old_price_aed: 1700, new_price_aed: 1500, post_id: null, comment_id: null, check_in_id: null, enquiry_id: null,
         enquiry_status: null, is_read: true, created_at: daysAgo(1) },
       { id: 'sample-alert-2', recipient_id: GUEST_USER_ID, actor_id: null, type: 'new_place', residence_id: 'residence-1',
         old_price_aed: null, new_price_aed: 2000, post_id: null, comment_id: null, check_in_id: null, enquiry_id: null,
