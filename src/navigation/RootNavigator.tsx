@@ -51,7 +51,7 @@ import ManageEventsScreen from '@/screens/ManageEventsScreen';
 import ManagePerksScreen from '@/screens/ManagePerksScreen';
 
 // Why a signed-out visitor is being asked to make an account (shown in SignInToContinue).
-export type AccountReason = 'save' | 'enquire' | 'join' | 'login' | 'housemates';
+export type AccountReason = 'save' | 'enquire' | 'join' | 'login' | 'housemates' | 'community';
 
 export type RootStackParamList = {
   Onboarding: undefined;

@@ -136,7 +136,8 @@ export default function HousingScreen() {
   const pickBedrooms = (b: 1 | 2 | 3) => (filters.bedrooms === b ? set({ bedrooms: null }) : set({ bedrooms: b, kind: 'home' }));
 
   // Opens the Community tab, where students talk about areas.
-  const openCommunity = () => navigation.navigate('MainTabs', { screen: 'Community' });
+  // Signed out there is no MainTabs (Housing is the PublicHousing stack screen), so ask for an account first.
+  const openCommunity = () => { if (requireAccount('community')) navigation.navigate('MainTabs', { screen: 'Community' }); };
 
   const pill = (key: Exclude<Panel, null>, label: string, selected: boolean, caret: boolean) => {
     const open = panel === key;
