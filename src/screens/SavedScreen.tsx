@@ -17,7 +17,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
 import { formatAed, setResidenceSaved } from '@/lib/housing';
 import { LISTING_TYPE_LABEL } from '@/lib/listing';
-import { BillsTag, CARD_RADIUS, DealTag, StateBlock } from '@/components/housing/parts';
+import { BillsTag, CARD_RADIUS, DealTag, SampleTag, StateBlock } from '@/components/housing/parts';
 import { billsLine, commuteText, isDeal, isWholeHome, orderByIds, pickCommute, priceInfo } from '@/components/housing/listingModel';
 import type { ColorTokens } from '@/theme/tokens';
 import type { Residence } from '@/types';
@@ -160,6 +160,7 @@ export default function SavedScreen() {
                 <Text style={styles.kind} numberOfLines={1}>{kind}</Text>
                 <View style={styles.tags}>
                   {item.bills_included === true ? <BillsTag /> : <Text style={styles.bills} numberOfLines={2}>{billsLine(item)}</Text>}
+                  {item.is_sample ? <SampleTag /> : null}
                   {isDeal(item) ? <DealTag /> : null}
                 </View>
                 {commute ? (

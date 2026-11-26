@@ -31,7 +31,7 @@ import BackButton from '@/components/BackButton';
 import BurstHeart from '@/components/BurstHeart';
 import Skeleton from '@/components/Skeleton';
 import {
-  BillsTag, CARD_RADIUS, DealTag, NotVerifiedTag, Notice, OutlineButton, PrimaryButton, QuietTag, StateBlock, TextButton, VerifiedBadge,
+  BillsTag, CARD_RADIUS, DealTag, NotVerifiedTag, Notice, SampleTag, OutlineButton, PrimaryButton, QuietTag, StateBlock, TextButton, VerifiedBadge,
 } from '@/components/housing/parts';
 import { billsLine, commuteText, housematesLine, isDeal, isWholeHome, moveInRows, priceInfo, splitPanel } from '@/components/housing/listingModel';
 import type { ColorTokens } from '@/theme/tokens';
@@ -316,7 +316,8 @@ export default function ResidenceDetailScreen() {
 
           <View style={{ gap: 8 }}>
             <View style={styles.tagRow}>
-              {residence.is_verified ? (
+              {residence.is_sample ? <SampleTag /> : null}
+              {residence.is_sample ? null : residence.is_verified ? (
                 <Pressable onPress={() => setVerifiedSheet(true)} accessibilityRole="button" accessibilityLabel="Verified by Havenly. What does this mean?" hitSlop={8}>
                   <VerifiedBadge />
                 </Pressable>
@@ -498,12 +499,16 @@ export default function ResidenceDetailScreen() {
             <Icon name="chevron-right" size={14} color={colors.inkSoft} />
           </AnimatedPressable>
         ) : null}
-        <PrimaryButton
-          label={unavailable ? 'Currently full' : 'Enquire or book a viewing'}
-          disabled={unavailable}
-          onPress={enquire}
-        />
-        {home && !unavailable ? (
+        {residence?.is_sample ? (
+          <Notice kind="note">This is a sample listing to show how Havenly works, so enquiries are off. Real places are on their way.</Notice>
+        ) : (
+          <PrimaryButton
+            label={unavailable ? 'Currently full' : 'Enquire or book a viewing'}
+            disabled={unavailable}
+            onPress={enquire}
+          />
+        )}
+        {home && !unavailable && !residence?.is_sample ? (
           <TextButton
             label="Enquire with friends"
             icon="users"
@@ -512,7 +517,7 @@ export default function ResidenceDetailScreen() {
             onPress={() => { if (requireAccount('enquire', residenceId)) navigation.navigate('StartGroup', { residenceId }); }}
           />
         ) : null}
-        {!myId ? <Text style={styles.ctaNote}>You make a free account when you send this.</Text> : null}
+        {!myId && !residence?.is_sample ? <Text style={styles.ctaNote}>You make a free account when you send this.</Text> : null}
       </View>
     </View>
   );

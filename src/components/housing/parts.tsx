@@ -53,6 +53,16 @@ export function BillsTag() {
   );
 }
 
+// A made-up place shown so the app is not empty: always labelled, in ink so it reads as a notice, not a promotion.
+export function SampleTag() {
+  const { colors } = useTheme();
+  return (
+    <View style={[tag.base, { backgroundColor: colors.ink }]} accessibilityLabel="Sample listing, not a real place">
+      <Text style={[tag.text, { color: colors.sand }]}>Sample</Text>
+    </View>
+  );
+}
+
 // A quiet tag, such as the kind of place.
 export function QuietTag({ label }: { label: string }) {
   const { colors } = useTheme();
