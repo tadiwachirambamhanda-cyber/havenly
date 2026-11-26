@@ -7,6 +7,7 @@ Havenly is a student accommodation platform for Dubai. See `docs/prd.md` for wha
 ## Rules
 - The old social features are archived at git tag `archive/social-v1` (`docs/archive/social.md`). On 2026-11-25 the owner asked for a community in v2 (`docs/prd.md`): university communities, posts, area questions, housemates, events, perks and reports. Follows, a global feed, video and check-ins stay archived.
 - Follow the global rules in `~/.claude/CLAUDE.md`. Work on a branch, small commits, a pull request for every change. Never merge without the owner saying "merge".
+- One session runs this project: the Claude Code session titled "Havenly · Chief Architect" (in the sidebar's "Havenly" group). Only it, and the background lanes it starts, open, review or merge pull requests here. If you are any other session and the owner asks for Havenly work, say in one line that the Havenly Chief Architect session handles it, and do it only if the owner confirms.
 - Secrets stay out of the repo. `app.json` holds only the Supabase anon key and a Mapbox public token, which are meant to ship in the app; data access is protected by row-level security.
 - Guest mode (`src/guest/`) must never reach the real database. It runs on bundled sample content only and blocks every write. Read `docs/guest-mode-brief.md` before touching it.
 - Checks: `npm run typecheck`, `npm run lint`, `npm test`.
