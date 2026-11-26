@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 // Intercepts leaving the screen — the header Cancel button (which just calls
@@ -24,6 +24,11 @@ export function useConfirmDiscard(isDirty: boolean, message = 'Your changes will
     return navigation.addListener('beforeRemove', (e) => {
       if (bypassRef.current || !isDirty) return;
       e.preventDefault();
+      // Alert.alert does nothing on the web, so the browser's own confirm box asks there instead.
+      if (Platform.OS === 'web') {
+        if (typeof window !== 'undefined' && window.confirm(`Discard changes?\n\n${message}`)) navigation.dispatch(e.data.action);
+        return;
+      }
       Alert.alert('Discard changes?', message, [
         { text: 'Keep editing', style: 'cancel' },
         { text: 'Discard', style: 'destructive', onPress: () => navigation.dispatch(e.data.action) },
