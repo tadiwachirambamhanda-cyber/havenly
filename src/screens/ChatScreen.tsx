@@ -244,9 +244,9 @@ export default function ChatScreen() {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.container}>
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
           <BackButton style={styles.back}>
-            <Icon name="arrow-left" size={16} color={colors.ink} />
+            <Icon name="arrow-left" size={18} color={colors.ink} />
           </BackButton>
           <AnimatedPressable
             style={styles.headerAuthorTap}
@@ -273,7 +273,7 @@ export default function ChatScreen() {
           </AnimatedPressable>
           <View style={{ flex: 1 }} />
           <AnimatedPressable hitSlop={8} style={styles.overflow} onPress={openOptions} accessibilityLabel="More options">
-            <Icon name="more-horizontal" size={18} color={colors.ink} />
+            <Icon name="more-horizontal" size={20} color={colors.ink} />
           </AnimatedPressable>
         </View>
 
@@ -334,7 +334,7 @@ export default function ChatScreen() {
                 onSubmitEditing={send}
               />
               <AnimatedPressable style={styles.sendBtn} onPress={send} accessibilityLabel="Send message">
-                <Icon name="send" size={15} color={colors.sand} />
+                <Icon name="send" size={18} color="#FFFFFF" />
               </AnimatedPressable>
             </View>
           </View>
@@ -425,44 +425,44 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
   header: {
-    flexDirection: 'row', alignItems: 'center', gap: 10, paddingTop: 54, paddingBottom: 12,
+    flexDirection: 'row', alignItems: 'center', gap: 12, paddingBottom: 12,
     paddingHorizontal: spacing.lg, borderBottomWidth: 1, borderColor: colors.line,
   },
-  back: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-  overflow: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  headerAuthorTap: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  headerAvatar: { width: 34, height: 34, borderRadius: 17 },
-  groupAvatar: { backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },
-  headerName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
-  headerSub: { fontSize: 10.5, color: colors.inkSoft, marginTop: 1 },
-  senderName: { fontSize: 10.5, fontWeight: '700', color: colors.inkSoft, marginBottom: 3, marginLeft: 4 },
-  bubble: { maxWidth: '75%', padding: 12, borderRadius: 14 },
+  back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+  overflow: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+  headerAuthorTap: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44, flexShrink: 1 },
+  headerAvatar: { width: 40, height: 40, borderRadius: 20 },
+  groupAvatar: { backgroundColor: colors.coralSoft, alignItems: 'center', justifyContent: 'center' },
+  headerName: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 19, letterSpacing: -0.4, color: colors.ink },
+  headerSub: { fontSize: 13, color: colors.inkSoft, marginTop: 1 },
+  senderName: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 12, color: colors.inkSoft, marginBottom: 3, marginLeft: 4 },
+  bubble: { maxWidth: '78%', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 20 },
   bubbleThem: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignSelf: 'flex-start' },
   bubbleMe: { backgroundColor: colors.coralFill, alignSelf: 'flex-end' },
-  bubbleTextThem: { color: colors.ink, fontSize: 13 },
-  bubbleTextMe: { color: 'white', fontSize: 13 },
-  bubbleTimeThem: { color: colors.inkSoft, fontSize: 9.5, marginTop: 3 },
-  bubbleTimeMe: { color: 'rgba(255,255,255,0.75)', fontSize: 9.5, marginTop: 3 },
+  bubbleTextThem: { color: colors.ink, fontSize: 15, lineHeight: 21 },
+  bubbleTextMe: { color: 'white', fontSize: 15, lineHeight: 21 },
+  bubbleTimeThem: { color: colors.inkSoft, fontSize: 11, marginTop: 3 },
+  bubbleTimeMe: { color: 'rgba(255,255,255,0.8)', fontSize: 11, marginTop: 3 },
   bubbleShared: { padding: 8 },
   sharedPostRow: { flexDirection: 'row', alignItems: 'center', gap: 10, minWidth: 190 },
   sharedPostThumb: { width: 46, height: 46, borderRadius: radius.sm },
   sharedPostTag: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 9, textTransform: 'uppercase', letterSpacing: 0.8, opacity: 0.7 },
   sharedPostTitle: { fontSize: 12.5, fontWeight: '700', marginTop: 2, lineHeight: 16 },
-  inputRow: { padding: spacing.md, borderTopWidth: 1, borderColor: colors.line },
-  inputInner: { flexDirection: 'row', gap: 9, alignItems: 'center' },
-  pendingHint: { fontSize: 11, color: colors.inkSoft, marginBottom: 8, textAlign: 'center' },
-  input: { flex: 1, backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line, borderRadius: radius.button, paddingHorizontal: 16, paddingVertical: 11, fontSize: 13, color: colors.ink },
-  sendBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' },
+  inputRow: { paddingHorizontal: spacing.lg, paddingVertical: spacing.md, borderTopWidth: 1, borderColor: colors.line },
+  inputInner: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+  pendingHint: { fontSize: 13, color: colors.inkSoft, marginBottom: 8, textAlign: 'center' },
+  input: { flex: 1, minHeight: 48, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.fieldLine, borderRadius: 24, paddingHorizontal: 16, paddingVertical: 12, fontSize: 16, color: colors.ink },
+  sendBtn: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.coralFill, alignItems: 'center', justifyContent: 'center' },
   requestBar: { padding: spacing.lg, borderTopWidth: 1, borderColor: colors.line, alignItems: 'center' },
-  requestText: { fontSize: 12.5, color: colors.inkSoft, marginBottom: 12, textAlign: 'center' },
+  requestText: { fontSize: 15, color: colors.inkSoft, marginBottom: 12, textAlign: 'center' },
   requestActions: { flexDirection: 'row', gap: 10 },
-  declineBtn: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white },
-  declineBtnText: { fontSize: 13, fontWeight: '700', color: colors.ink },
-  acceptBtn: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: radius.button, backgroundColor: colors.coralFill },
-  acceptBtnText: { fontSize: 13, fontWeight: '700', color: 'white' },
+  declineBtn: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 22, borderRadius: 24, borderWidth: 1, borderColor: colors.fieldLine, backgroundColor: colors.white },
+  declineBtnText: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 15, color: colors.ink },
+  acceptBtn: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 22, borderRadius: 24, backgroundColor: colors.coralFill },
+  acceptBtnText: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 15, color: 'white' },
   membersBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   membersCard: {
-    backgroundColor: colors.sand, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg,
+    backgroundColor: colors.sand, borderTopLeftRadius: 22, borderTopRightRadius: 22,
     padding: spacing.lg, maxHeight: '70%',
   },
   membersHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.line, alignSelf: 'center', marginBottom: 14 },
@@ -473,11 +473,11 @@ function createStyles(colors: ColorTokens) {
     backgroundColor: colors.ink, borderWidth: 2, borderColor: colors.sand, alignItems: 'center', justifyContent: 'center',
   },
   groupNameRow: { marginTop: 10 },
-  groupNameInput: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 17, color: colors.ink, textAlign: 'center', padding: 0 },
-  membersSubtitle: { fontSize: 12, color: colors.inkSoft, marginTop: 2, textAlign: 'center' },
-  memberRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 9 },
+  groupNameInput: { fontFamily: 'SchibstedGrotesk_800ExtraBold', fontSize: 19, color: colors.ink, textAlign: 'center', padding: 0 },
+  membersSubtitle: { fontSize: 13, color: colors.inkSoft, marginTop: 2, textAlign: 'center' },
+  memberRow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingVertical: 6 },
   memberAvatar: { width: 42, height: 42, borderRadius: 21 },
-  memberName: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
-  memberHandle: { fontSize: 11, color: colors.inkSoft, marginTop: 1 },
+  memberName: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 15, color: colors.ink },
+  memberHandle: { fontSize: 13, color: colors.inkSoft, marginTop: 1 },
   });
 }

@@ -8,12 +8,12 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image } from 'expo-image';
 import InitialsAvatar from '@/components/InitialsAvatar';
 import Icon from '@/components/Icon';
-import BackButton from '@/components/BackButton';
+import ScreenHeader, { CARD_RADIUS_V2 } from '@/components/ScreenHeader';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { useToast } from '@/lib/ToastContext';
-import { radius, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 import type { ColorTokens } from '@/theme/tokens';
 import EmptyState from '@/components/EmptyState';
 import PersonRowSkeleton from '@/components/PersonRowSkeleton';
@@ -162,12 +162,9 @@ export default function InboxScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.titleRow}>
-        <BackButton style={styles.back}><Icon name="arrow-left" size={17} color={colors.ink} /></BackButton>
-        <Text style={styles.title}>Messages</Text>
-      </View>
+      <ScreenHeader title="Messages" />
       <View style={styles.searchBar}>
-        <Icon name="search" size={14} color={colors.inkSoft} />
+        <Icon name="search" size={18} color={colors.inkSoft} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search messages…"
@@ -192,7 +189,7 @@ export default function InboxScreen() {
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
         renderSectionHeader={({ section }) => (
           sections.length > 1 ? <Text style={styles.sectionLabel}>{section.title}</Text> : null
@@ -237,31 +234,26 @@ export default function InboxScreen() {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.sand },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: spacing.lg, paddingTop: 60 },
-  back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-  title: { fontFamily: 'SchibstedGrotesk_600SemiBold', fontSize: 26, color: colors.ink },
-  newGroupBtn: {
-    width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  groupAvatar: { backgroundColor: colors.sandDeep, alignItems: 'center', justifyContent: 'center' },
+  groupAvatar: { backgroundColor: colors.coralSoft, alignItems: 'center', justifyContent: 'center' },
   searchBar: {
-    flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: spacing.lg, marginTop: 12, marginBottom: 6,
-    paddingHorizontal: 16, paddingVertical: 11, backgroundColor: colors.white, borderWidth: 1.5,
-    borderColor: colors.line, borderRadius: radius.button,
+    flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: spacing.lg, marginBottom: 6,
+    paddingHorizontal: 16, minHeight: 52, backgroundColor: colors.white, borderWidth: 1,
+    borderColor: colors.fieldLine, borderRadius: 26,
   },
-  searchInput: { flex: 1, fontSize: 13, color: colors.ink },
-  clearBtn: { paddingHorizontal: 4 },
+  searchInput: { flex: 1, fontSize: 16, color: colors.ink, paddingVertical: 12 },
+  clearBtn: { minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
   sectionLabel: {
-    fontFamily: 'HankenGrotesk_700Bold', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, color: colors.inkSoft, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 8,
+    fontFamily: 'HankenGrotesk_700Bold', fontSize: 13, textTransform: 'uppercase', letterSpacing: 0.6, color: colors.inkSoft, paddingTop: 18, paddingBottom: 10,
   },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: spacing.lg, paddingVertical: 10 },
-  avatar: { width: 50, height: 50, borderRadius: 25 },
-  unreadDot: { position: 'absolute', top: -2, right: -2, width: 12, height: 12, borderRadius: 6, backgroundColor: colors.coralFill, borderWidth: 2, borderColor: colors.sand },
-  name: { fontSize: 13.5, fontWeight: '700', color: colors.ink },
-  preview: { fontSize: 12, color: colors.inkSoft, marginTop: 2 },
-  previewUnread: { color: colors.ink, fontWeight: '600' },
-  time: { fontSize: 10.5, color: colors.inkSoft },
-  placeholder: { color: colors.inkSoft, paddingHorizontal: spacing.lg, marginTop: 20 },
+  row: {
+    flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 72, paddingHorizontal: 14, paddingVertical: 12, marginBottom: 8,
+    backgroundColor: colors.white, borderRadius: CARD_RADIUS_V2, borderWidth: 1, borderColor: colors.line,
+  },
+  avatar: { width: 48, height: 48, borderRadius: 24 },
+  unreadDot: { position: 'absolute', top: -2, right: -2, width: 12, height: 12, borderRadius: 6, backgroundColor: colors.coralFill, borderWidth: 2, borderColor: colors.white },
+  name: { fontFamily: 'HankenGrotesk_700Bold', fontSize: 15, color: colors.ink },
+  preview: { fontSize: 14, color: colors.inkSoft, marginTop: 2 },
+  previewUnread: { color: colors.ink, fontFamily: 'HankenGrotesk_600SemiBold' },
+  time: { fontSize: 12, color: colors.inkSoft },
   });
 }
