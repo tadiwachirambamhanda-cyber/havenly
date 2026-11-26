@@ -1,9 +1,10 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl, ScrollView, Pressable } from 'react-native';
 import { Text, TextInput } from '@/components/Text';
 import { RoofH, Wordmark } from '@/components/Brand';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useFocusEffect, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { Image } from 'expo-image';
 import PhotoPlaceholder from '@/components/PhotoPlaceholder';
 import Icon from '@/components/Icon';
@@ -26,7 +27,7 @@ import {
 } from '@/components/housing/listingModel';
 import type { ColorTokens } from '@/theme/tokens';
 import type { GenderPolicy, ListingType, Residence } from '@/types';
-import type { RootStackParamList } from '@/navigation/RootNavigator';
+import type { MainTabParamList, RootStackParamList } from '@/navigation/RootNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 type Panel = 'price' | 'kind' | 'who' | 'more' | null;
@@ -38,6 +39,9 @@ const SORTS: SortChoice[] = ['recommended', 'price_low', 'price_high', 'newest']
 
 export default function HousingScreen() {
   const navigation = useNavigation<Nav>();
+  // The same screen is the Housing tab and, signed out, the PublicHousing stack screen (which has no params).
+  const tabNavigation = useNavigation<BottomTabNavigationProp<MainTabParamList, 'Housing'>>();
+  const route = useRoute<RouteProp<MainTabParamList, 'Housing'>>();
   const { session, profile } = useAuth();
   const { colors } = useTheme();
   const { showToast } = useToast();
@@ -114,6 +118,18 @@ export default function HousingScreen() {
   const anyFilter = filtersActive(filters);
   const clearAll = () => { setFilters(EMPTY_FILTERS); setPanel(null); };
   const set = (patch: Partial<Filters>) => setFilters((f) => ({ ...f, ...patch }));
+
+  // An area tag tapped in Community opens this tab with { area }: it fills the search, then the param is
+  // cleared so tapping the same tag again later still works.
+  const areaParam = route.params?.area;
+  const [appliedArea, setAppliedArea] = useState<string | undefined>(undefined);
+  if (areaParam !== appliedArea) {
+    setAppliedArea(areaParam);
+    if (areaParam) setFilters((f) => ({ ...f, query: areaParam }));
+  }
+  useEffect(() => {
+    if (areaParam) tabNavigation.setParams({ area: undefined });
+  }, [areaParam, tabNavigation]);
   // Picking a kind other than a whole home drops the bedroom count, which only applies to homes.
   const pickKind = (kind: ListingType | null) => set(kind === 'home' ? { kind } : { kind, bedrooms: null });
   // A bedroom count means a whole home.
@@ -221,11 +237,9 @@ export default function HousingScreen() {
           {myId ? (
             <>
               {/* Saved is a stack screen in the three-tab app, opened from here and from Profile. */}
+              {/* My enquiries lives in Profile. */}
               <AnimatedPressable style={styles.iconBtn} onPress={() => navigation.navigate('Saved')} accessibilityRole="button" accessibilityLabel="Saved places">
                 <Icon name="heart" size={18} color={colors.ink} />
-              </AnimatedPressable>
-              <AnimatedPressable style={styles.iconBtn} onPress={() => navigation.navigate('MyEnquiries')} accessibilityRole="button" accessibilityLabel="My enquiries">
-                <Icon name="clipboard" size={18} color={colors.ink} />
               </AnimatedPressable>
             </>
           ) : (

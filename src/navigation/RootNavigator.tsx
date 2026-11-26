@@ -95,7 +95,7 @@ export type RootStackParamList = {
 
 // Three tabs (owner decision 2026-11-25): Saved and Inbox are screens opened from Housing, Community and Profile.
 export type MainTabParamList = {
-  Housing: undefined;
+  Housing: { area?: string } | undefined;
   Community: undefined;
   Profile: undefined;
 };
